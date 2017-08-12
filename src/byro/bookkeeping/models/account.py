@@ -1,0 +1,42 @@
+from django.db import models
+
+from byro.common.models.auditable import Auditable
+from byro.common.models.choices import Choices
+
+
+class AccountCategory(Choices):
+    # Regular Categories
+    MEMBER_DONATION = 'member_donation'
+    MEMBER_FEES = 'member_fees'
+
+    # Categories for double-entry bookkeeping
+    ASSET = 'asset'
+    LIABILITY = 'liability'
+    INCOME = 'income'
+    EXPENSE = 'expense'
+
+    valid_choices = [MEMBER_DONATION, MEMBER_FEES]
+
+
+class Account(Auditable, models.Model):
+    member = models.ForeignKey(
+        to='members.Member',
+        null=True,
+        on_delete=models.PROTECT,
+    )
+    account_category = models.CharField(
+        choices=AccountCategory.choices,
+        max_length=AccountCategory.max_length,
+    )
+    name = models.CharField(max_length=300, null=True)  # e.g. 'Laser donations'
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        if self.member:
+            return f'{self.account_category} account of {self.member}'
+        return f'{self.account_category} account #{self.id}'
+
+    def total(self, start=None, end=None):
+        return self.incoming_transactions.aggregate(incoming=models.Sum('amount')).get('incoming', 0) or 0 \
+            - self.outgoing_transactions.aggregate(outgoing=models.Sum('amount')).get('outgoing', 0) or 0
