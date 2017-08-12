@@ -1,5 +1,5 @@
 from django.contrib.postgres.fields import JSONField
-from django.db import models
+from django.db import models, transaction
 
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
@@ -35,3 +35,29 @@ class RealTransaction(Auditable, models.Model):
     data = JSONField(null=True)
 
     # TODO: author/user
+
+    @transaction.atomic
+    def derive_virtual_transactions(self):
+        """
+        Collects responses to the signal `derive_virtual_transactions`. Raises an
+        exception if multiple results were found, and re-raises received Exceptions.
+
+        Returns a list of one or more VirtualTransaction objects if no Exception
+        was raised.
+        """
+        from byro.bookkeeping.signals import derive_virtual_transactions
+        responses = derive_virtual_transactions.send_robust(sender=self)
+        if len(responses) > 1:
+            raise Exception('More than one plugin tried to derive virtual transactions.')
+        if len(responses) < 1:
+            raise Exception('No plugin tried to derive virtual transactions.')
+        receiver, response = responses[0]
+
+        if isinstance(response, Exception):
+            raise response
+
+        if not isinstance(response, list) or len(response) == 0:
+            raise Exception('Transaction could not be matched')
+
+        return response  # TODO: sanity check response for virtual transaction objects
+
