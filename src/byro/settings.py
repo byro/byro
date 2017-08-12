@@ -36,8 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'byro.bookkeeping',
-    'byro.members',
+
+    'byro.bookkeeping.apps.BookkeepingConfig',
+    'byro.members.apps.MemberConfig',
+    'byro.plugins.profile.ProfilePluginConfig'
 ]
 
 MIDDLEWARE = [
