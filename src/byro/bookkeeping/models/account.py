@@ -21,6 +21,7 @@ class AccountCategory(Choices):
 class Account(Auditable, models.Model):
     member = models.ForeignKey(
         to='members.Member',
+        related_name='accounts',
         null=True,
         on_delete=models.PROTECT,
     )
@@ -29,6 +30,11 @@ class Account(Auditable, models.Model):
         max_length=AccountCategory.max_length,
     )
     name = models.CharField(max_length=300, null=True)  # e.g. 'Laser donations'
+
+    class Meta:
+        unique_together = (
+            ('member', 'account_category', 'name'),
+        )
 
     def __str__(self):
         if self.name:

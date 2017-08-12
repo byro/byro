@@ -6,7 +6,7 @@ from byro.members.models import Member
 
 
 @pytest.mark.django_db
-def test_normal_fees(member, member_fees_account):
+def test_normal_fees(member):
     rt = RealTransaction.objects.create(
         channel=TransactionChannel.BANK,
         booking_datetime=now(),
@@ -19,11 +19,12 @@ def test_normal_fees(member, member_fees_account):
 
     # Matching magic happens here later
 
+    account = member.get_account(category=AccountCategory.MEMBER_FEES)
     VirtualTransaction.objects.create(
         real_transaction=rt,
-        destination_account=member_fees_account,
+        destination_account=account,
         amount=rt.amount,
         value_datetime=rt.value_datetime,
     )
 
-    assert member_fees_account.total() == rt.amount
+    assert account.total() == rt.amount
