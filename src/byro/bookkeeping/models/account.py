@@ -44,5 +44,6 @@ class Account(Auditable, models.Model):
         return f'{self.account_category} account #{self.id}'
 
     def total(self, start=None, end=None):
-        return self.incoming_transactions.aggregate(incoming=models.Sum('amount')).get('incoming', 0) or 0 \
-            - self.outgoing_transactions.aggregate(outgoing=models.Sum('amount')).get('outgoing', 0) or 0
+        incoming_sum = self.incoming_transactions.aggregate(incoming=models.Sum('amount'))['incoming']
+        outgoing_sum = self.outgoing_transactions.aggregate(outgoing=models.Sum('amount'))['outgoing']
+        return (incoming_sum or 0) - (outgoing_sum or 0)
