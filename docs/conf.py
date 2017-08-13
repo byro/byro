@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 #
 # byro documentation build configuration file, created by
 # sphinx-quickstart on Sun Aug 13 13:02:39 2017.
