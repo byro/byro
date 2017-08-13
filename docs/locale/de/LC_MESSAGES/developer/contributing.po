@@ -3,23 +3,24 @@
 # This file is distributed under the same license as the byro package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: byro \n"
+"Project-Id-Version: byro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-13 19:01+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2017-08-13 21:24+0200\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de\n"
+"X-Generator: Poedit 2.0.3\n"
 
 #: ../../developer/contributing.rst:2
 msgid "Contributing to byro"
-msgstr ""
+msgstr "Zu byro beitragen"
 
 #: ../../developer/contributing.rst:4
 msgid ""
@@ -27,19 +28,29 @@ msgid ""
 "welcome! We'll happily review your contributions and give feedback on "
 "your changes, and help you if you're not sure how to solve a problem."
 msgstr ""
+"Wir sind immer an Verbesserungen an byro interessiert, und freuen uns "
+"auf **deine** Hilfe! Wir sehen gerne Pull Requests durch, geben dir "
+"Rückmeldungen zu deinen Veränderungen und helfen dir, wenn du dir nicht "
+"sicher bist, wie du ein Problem angehen sollst."
 
 #: ../../developer/contributing.rst:8
 msgid ""
 "You'll need to have a GitHub_ account to contribute to byro, and should "
 "know how to pull, push, and commit using git."
 msgstr ""
+"Du wirst einen GitHub_-Account brauchen, um zu byro beizutragen, und "
+"solltest wissen, wie man mit git pullt, pusht und committet."
 
 #: ../../developer/contributing.rst:11
 msgid ""
-"If you have some improvement already in mind, please `open an issue`_ for"
-" it. Otherwise, look at our `open issues`_ and choose one you want to "
+"If you have some improvement already in mind, please `open an issue`_ "
+"for it. Otherwise, look at our `open issues`_ and choose one you want to "
 "resolve. Don't hesitate to comment on the issue if anything is unclear."
 msgstr ""
+"Wenn du schon verbesserungen vor hast, erstelle bitte `ein Ticket`_ "
+"dafür. Ansonsten guck dir unsere `offenen Tickets`_ an und wähle eines, "
+"das du bearbeiten willst. Kommentiere gern am Ticket, wenn dir etwas "
+"nicht klar ist."
 
 #: ../../developer/contributing.rst:15
 msgid ""
@@ -47,14 +58,22 @@ msgid ""
 "provide instructions). Once you have cloned your repository and opened "
 "it, create a new feature branch including the issue ID::"
 msgstr ""
+"Zuerst solltest du `byro forken`, und dann dein Repo lokal clonen "
+"(GitHub wird dir sagen, wie das geht). Wenn du das Repo geclont und "
+"geöffnet hast, erstell einen neuen Branch, der die ID des Tickets "
+"enthält::"
 
 #: ../../developer/contributing.rst:21
 msgid ""
-"If your issue requires code changes, complete the :doc:`development setup"
-" </developer/setup>`, then continue here. If you want to change the "
-"documentation, please read up on the :doc:`documentation setup "
-"</developer/documentation>`."
+"If your issue requires code changes, complete the :doc:`development "
+"setup </developer/setup>`, then continue here. If you want to change the "
+"documentation, please read up on the :doc:`documentation setup </"
+"developer/documentation>`."
 msgstr ""
+"Wenn dein Ticket Änderungen im Code benötigt, geh jetzt das :doc:"
+"`Entwicklungs-Setup </developer/setup>` durch, dann mach hier weiter. "
+"Wenn du die Dokumentation anpassen willst, dann folge bitte dem :doc:"
+"`Dokumentationssetup </developer/documentation>`."
 
 #: ../../developer/contributing.rst:25
 msgid ""
@@ -64,6 +83,12 @@ msgid ""
 "tests and checks locally as well, and only consider your pull request "
 "ready once those tests pass."
 msgstr ""
+"Wir haben ein paar Style-Prüfungen für Code und Dokumentation, wie in "
+"den jeweiligen Setup-Anleitungen beschrieben. Diese werden in unserer "
+"Continuous Integration für jeden Commit und jeden Pull Request "
+"ausgeführt, aber du solltest die Tests und Prüfungen auch lokal "
+"ausführen, und deinen Pull Request erst als fertig betrachten, wenn er "
+"die Tests fehlerfrei durchläuft."
 
 #: ../../developer/contributing.rst:30
 msgid ""
@@ -71,6 +96,10 @@ msgid ""
 "guide here_. Once you have committed your work, add yourself to the "
 "``CONTRIBUTORS`` file, and push your branch::"
 msgstr ""
+"Bitte schreib hilfreiche, wohlformatierte Commit-Nachrichten – du kannst "
+"hier_ eine Anleitung dafür finden. Sobald du fertig bist und committet "
+"hast, füg dich zu der ``CONTRIBUTORS``-Datei hinzu und push deinen "
+"Branch::"
 
 #: ../../developer/contributing.rst:35
 msgid ""
@@ -79,4 +108,7 @@ msgid ""
 "issues, documentation style issues, …). Please give us a few days to get "
 "back to you with a review or a direct merge."
 msgstr ""
-
+"und öffne einen Pull Request. Dadurch werden deine Änderungen in unserer "
+"Continuous Integration auf Probleme getestet (brechende Tests, Style-"
+"Probleme, Dokumentationsprobleme, …). Bitte gib uns ein paar Tage, um "
+"deinen Pull Request durchzugehen und dir Rückmeldung zu geben."
