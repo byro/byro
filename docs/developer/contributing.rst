@@ -1,7 +1,7 @@
 Contributing
 ------------
 
-We're always interested in improvements in byro, and **your** help is welcome! We'll happily review
+We're always interested in improvements in byro, and **your** help is welcome! We'll review
 your contributions and give feedback on your changes, and help you if you're not sure how to
 solve a problem.
 
@@ -23,8 +23,8 @@ then continue here. If you want to change the documentation, please read up on t
 :doc:`documentation setup </developer/documentation>`.
 
 We have a couple of style checkers both for code and for documentation, as documented in the
-setup docs. They are checked in our Continuous Integration for every commit and pull request,
-but you should run the tests and checks locally as well, and only consider your pull request
+setup docs. We check them in our Continuous Integration for every commit and pull request,
+but you should run the tests and checks locally as well, and consider your pull request
 ready once those tests pass.
 
 Please write helpful, well-formatted commit messages – you can find a guide here_. Once you
@@ -32,9 +32,9 @@ have committed your work, add yourself to the ``CONTRIBUTORS`` file, and push yo
 
   git push -u origin issue/123
 
-and open a pull request. This will cause your changes to be checked by our Continuous
-Integration for any issues (breaking tests, code style issues, documentation style issues, …).
-Please give us a few days to get back to you with a review or a direct merge.
+and open a pull request. This will cause our Continuous Integration to check your changes for
+any issues (breaking tests, code style issues, documentation style issues, …).
+Please give us five to seven days to get back to you with a review or a direct merge.
 
 
 .. _GitHub: https://github.com

@@ -18,7 +18,7 @@ Writing documentation
 
 Now go to the ``docs`` directory, find the file you want to adjust (or create), and make your
 changes. You can look at the files by running ``make html`` in the ``docs`` directory and then
-browsing the ``_build/html`` directory. Alternatively, run
+browsing the ``_build/html`` directory. For more convenience, you can run
 
 ::
 
