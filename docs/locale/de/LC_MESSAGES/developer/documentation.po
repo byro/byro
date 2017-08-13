@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017
+# This file is distributed under the same license as the byro package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: byro \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-08-13 19:25+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.4.0\n"
+
+#: ../../developer/documentation.rst:2
+msgid "Working on this documentation"
+msgstr ""
+
+#: ../../developer/documentation.rst:4
+msgid ""
+"You have found something to improve in our documentation? Great! We'll "
+"assume that you have already forked and cloned byro as detailed in the "
+":doc:`contributing documentation </developer/contributing>`. For the "
+"following steps, you'll need to have Python 3 installed on your system."
+msgstr ""
+
+#: ../../developer/documentation.rst:9
+msgid ""
+"Start out in a shell in the repository. We'll start by generating a "
+"virtualenv and installing the required Python packages::"
+msgstr ""
+
+#: ../../developer/documentation.rst:17
+msgid "Writing documentation"
+msgstr ""
+
+#: ../../developer/documentation.rst:19
+msgid ""
+"Now go to the ``docs`` directory, find the file you want to adjust (or "
+"create), and make your changes. You can look at the files by running "
+"``make html`` in the ``docs`` directory and then browsing the "
+"``_build/html`` directory. Alternatively, run"
+msgstr ""
+
+#: ../../developer/documentation.rst:27
+msgid ""
+"Which starts an HTTP server and rebuilds the documentation upon any "
+"changes."
+msgstr ""
+
+#: ../../developer/documentation.rst:31
+msgid "Translating documentation"
+msgstr ""
+
+#: ../../developer/documentation.rst:33
+msgid "Our documentation is multilingual. To update the translation files, run"
+msgstr ""
+
+#: ../../developer/documentation.rst:40
+msgid ""
+"and then edit the generated ``.po`` files with an appropriate editor such"
+" as poedit."
+msgstr ""
+
+#: ../../developer/documentation.rst:44
+msgid "Checking documentation"
+msgstr ""
+
+#: ../../developer/documentation.rst:46
+msgid ""
+"In the future we want to use spell checking and style checking on our "
+"documentation."
+msgstr ""
+

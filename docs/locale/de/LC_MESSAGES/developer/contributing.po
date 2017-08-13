@@ -1,0 +1,82 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017
+# This file is distributed under the same license as the byro package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: byro \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-08-13 19:01+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.4.0\n"
+
+#: ../../developer/contributing.rst:2
+msgid "Contributing to byro"
+msgstr ""
+
+#: ../../developer/contributing.rst:4
+msgid ""
+"We're always interested in improvements in byro, and **your** help is "
+"welcome! We'll happily review your contributions and give feedback on "
+"your changes, and help you if you're not sure how to solve a problem."
+msgstr ""
+
+#: ../../developer/contributing.rst:8
+msgid ""
+"You'll need to have a GitHub_ account to contribute to byro, and should "
+"know how to pull, push, and commit using git."
+msgstr ""
+
+#: ../../developer/contributing.rst:11
+msgid ""
+"If you have some improvement already in mind, please `open an issue`_ for"
+" it. Otherwise, look at our `open issues`_ and choose one you want to "
+"resolve. Don't hesitate to comment on the issue if anything is unclear."
+msgstr ""
+
+#: ../../developer/contributing.rst:15
+msgid ""
+"First off, `fork byro`, and then clone your repository (GitHub will "
+"provide instructions). Once you have cloned your repository and opened "
+"it, create a new feature branch including the issue ID::"
+msgstr ""
+
+#: ../../developer/contributing.rst:21
+msgid ""
+"If your issue requires code changes, complete the :doc:`development setup"
+" </developer/setup>`, then continue here. If you want to change the "
+"documentation, please read up on the :doc:`documentation setup "
+"</developer/documentation>`."
+msgstr ""
+
+#: ../../developer/contributing.rst:25
+msgid ""
+"We have a couple of style checkers both for code and for documentation, "
+"as documented in the setup docs. They are checked in our Continuous "
+"Integration for every commit and pull request, but you should run the "
+"tests and checks locally as well, and only consider your pull request "
+"ready once those tests pass."
+msgstr ""
+
+#: ../../developer/contributing.rst:30
+msgid ""
+"Please write helpful, well-formatted commit messages – you can find a "
+"guide here_. Once you have committed your work, add yourself to the "
+"``CONTRIBUTORS`` file, and push your branch::"
+msgstr ""
+
+#: ../../developer/contributing.rst:35
+msgid ""
+"and open a pull request. This will cause your changes to be checked by "
+"our Continuous Integration for any issues (breaking tests, code style "
+"issues, documentation style issues, …). Please give us a few days to get "
+"back to you with a review or a direct merge."
+msgstr ""
+

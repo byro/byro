@@ -1,0 +1,68 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017
+# This file is distributed under the same license as the byro package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: byro \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-08-13 19:25+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.4.0\n"
+
+#: ../../developer/index.rst:2
+msgid "Developer documentation"
+msgstr ""
+
+#: ../../developer/index.rst:4
+msgid ""
+"This part of the byro documentation is for you if you want to improve "
+"byro or develop a plugin."
+msgstr ""
+
+#: ../../developer/index.rst:6
+msgid ""
+"If you want to improve byro itself, please head to our :doc:`contributor "
+"documentation </developer/contributing>`."
+msgstr ""
+
+#: ../../developer/index.rst:9
+msgid ""
+"If you want to work on byro's code (no matter which part), you'll want to"
+" start with the :doc:`/developer/setup`. It contains the contributing "
+"guidelines, an explanation on how to build a pull request, which style "
+"guidelines to follow, and an internal API documentation."
+msgstr ""
+
+#: ../../developer/index.rst:14
+msgid ""
+"If you want to develop (or improve) a plugin, have a look at our "
+":doc:`plugin development guides </developer/plugins/guides>`: They show "
+"how to develop a byro plugin with some hopefully easy-to-follow example "
+"plugins."
+msgstr ""
+
+#: ../../developer/index.rst:18
+msgid ""
+"If any part of the documentation is unclear, please head over to the "
+":doc:`documentation setup </developer/documentation>` to learn how to "
+"improve it, and then follow the :doc:`contributor documentation "
+"</developer/contributing>` to create a pull request."
+msgstr ""
+
+#~ msgid ""
+#~ "If you want to develop (or "
+#~ "improve) a plugin, have a look at"
+#~ " our `plugin development guides`_: They "
+#~ "show how to develop a byro plugin"
+#~ " with some hopefully easy-to-follow"
+#~ " example plugins."
+#~ msgstr ""
+
