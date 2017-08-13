@@ -5,6 +5,10 @@ byro
    :target: https://travis-ci.org/byro/byro
    :alt: Travis build status
 
+.. image:: https://codecov.io/gh/openeventstack/pretalx/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/openeventstack/pretalx
+   :alt: Code coverage
+
 .. image:: https://readthedocs.org/projects/byro/badge/?version=latest
    :target: http://byro.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation

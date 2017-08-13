@@ -4,7 +4,7 @@ python:
   - "3.6"
 sudo: false
 install:
-  - pip install -U pip setuptools wheel
+  - pip install -U pip setuptools wheel codecov coverage
   - pip install -Ur src/requirements.txt -r src/requirements/development.txt -r src/requirements/documentation.txt
 script:
   - bash .travis.sh $JOB

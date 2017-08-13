@@ -1,9 +1,9 @@
 import decimal
 
-from django.utils.timezone import now
 import pytest
+from django.utils.timezone import now
 
-from byro.bookkeeping.models import Account, AccountCategory, RealTransaction, TransactionChannel
+from byro.bookkeeping.models import RealTransaction, TransactionChannel
 from byro.members.models import Member
 
 

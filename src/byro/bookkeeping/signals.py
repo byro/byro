@@ -1,6 +1,5 @@
 import django.dispatch
 
-
 derive_virtual_transactions = django.dispatch.Signal(providing_args=[])
 """
 This signal provides a RealTransaction as sender and expects a list of

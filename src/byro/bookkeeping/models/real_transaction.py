@@ -60,4 +60,3 @@ class RealTransaction(Auditable, models.Model):
             raise Exception('Transaction could not be matched')
 
         return response  # TODO: sanity check response for virtual transaction objects
-

@@ -1,8 +1,7 @@
 import pytest
 from django.dispatch import receiver
-from django.utils.timezone import now
 
-from byro.bookkeeping.models import Account, AccountCategory, RealTransaction, TransactionChannel, VirtualTransaction
+from byro.bookkeeping.models import AccountCategory, VirtualTransaction
 from byro.bookkeeping.signals import derive_virtual_transactions
 from byro.members.models import Member
 
