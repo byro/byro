@@ -10,7 +10,9 @@ Welcome to byro's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   :glob:
 
+   development/*
 
 
 Indices and tables
