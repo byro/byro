@@ -168,3 +168,7 @@ texinfo_documents = [
      author, 'byro', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+# -- Options for internationalization -------------------------------------
+locale_dirs = ['locale/']   # path is example but recommended.
+gettext_compact = False     # optional.
