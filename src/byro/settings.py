@@ -86,6 +86,10 @@ DATABASES = {
     }
 }
 
+if os.getenv('TRAVIS'):
+    DATABASES['default']['USER'] = 'postgres'
+    DATABASES['default']['PASSWORD'] = ''
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators

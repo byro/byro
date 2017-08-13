@@ -1,0 +1,21 @@
+language: python
+sudo: true
+python:
+  - "3.6"
+sudo: false
+install:
+  - pip install -U pip setuptools wheel
+  - pip install -Ur src/requirements.txt -r src/requirements/development.txt -r src/requirements/documentation.txt
+script:
+  - bash .travis.sh $JOB
+cache:
+  directories:
+    - $HOME/.cache/pip
+services:
+  - postgresql
+env:
+  - JOB=tests
+  - JOB=style
+  - JOB=docs
+addons:
+  postgresql: "9.6"
