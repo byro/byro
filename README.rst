@@ -5,8 +5,8 @@ byro
    :target: https://travis-ci.org/byro/byro
    :alt: Travis build status
 
-.. image:: https://codecov.io/gh/openeventstack/pretalx/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/openeventstack/pretalx
+.. image:: https://codecov.io/gh/byro/byro/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/byro/byro
    :alt: Code coverage
 
 .. image:: https://readthedocs.org/projects/byro/badge/?version=latest
