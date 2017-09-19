@@ -9,7 +9,7 @@ from byro.members.models import Member
 
 @pytest.fixture
 def member():
-    return Member.create_member(
+    return Member.objects.create(
         email='joe@hacker.space'
     )
 
