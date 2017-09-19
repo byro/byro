@@ -19,12 +19,6 @@ class AccountCategory(Choices):
 
 
 class Account(Auditable, models.Model):
-    member = models.ForeignKey(
-        to='members.Member',
-        related_name='accounts',
-        null=True,
-        on_delete=models.PROTECT,
-    )
     account_category = models.CharField(
         choices=AccountCategory.choices,
         max_length=AccountCategory.max_length,
