@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from contextlib import suppress
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +42,10 @@ INSTALLED_APPS = [
     'byro.members.apps.MemberConfig',
     'byro.plugins.profile.ProfilePluginConfig'
 ]
+
+with suppress(ImportError):
+    import django_extensions  # noqa
+    INSTALLED_APPS.append('django_extensions')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
