@@ -33,14 +33,12 @@ class Account(Auditable, models.Model):
 
     class Meta:
         unique_together = (
-            ('member', 'account_category', 'name'),
+            ('account_category', 'name'),
         )
 
     def __str__(self):
         if self.name:
             return self.name
-        if self.member:
-            return f'{self.account_category} account of {self.member}'
         return f'{self.account_category} account #{self.id}'
 
     def total(self, start=None, end=None):

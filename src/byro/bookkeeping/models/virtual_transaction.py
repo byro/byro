@@ -22,6 +22,12 @@ class VirtualTransaction(Auditable, models.Model):
         on_delete=models.PROTECT,
         null=True
     )
+    member = models.ForeignKey(
+        to='members.Member',
+        related_name='transactions',
+        on_delete=models.PROTECT,
+        null=True
+    )
 
     amount = models.DecimalField(
         max_digits=8, decimal_places=2,  # TODO: enforce min_value = 0
