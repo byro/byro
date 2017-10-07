@@ -19,6 +19,37 @@ for small and medium sized clubs/NGOs/associations of all kinds, with a focus on
 Development Setup
 -----------------
 
+using Docker
+^^^^^^^^^^^^
+
+- add ``local_settings.py`` with this contents:
+
+.. code:: python
+
+  DATABASES = {
+      'default': {
+          'ENGINE': 'django.db.backends.postgresql_psycopg2',
+          'NAME': 'byro',
+          'USER': 'postgres',
+          'PASSWORD': '',
+          'HOST': 'db',
+      }
+  }
+
+- create database
+
+.. code:: shell
+
+  docker-compose run --rm web reset_db
+
+
+- run Django:
+
+.. code:: shell
+
+  docker-compose up -d
+
+
 
 Features
 --------
