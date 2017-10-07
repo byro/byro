@@ -1,0 +1,16 @@
+web:
+  build: .
+  command: "runserver 0.0.0.0:8020"
+  environment:
+      PYTHONUNBUFFERED: 0
+      DJANGO_SETTINGS_MODULE: byro.settings
+  entrypoint:
+   - './manage.py'
+  links:
+   - db
+  volumes:
+   - .:/opt/code
+  ports:
+   - "127.0.0.1:8020:8020"
+db:
+  image: postgres:10
