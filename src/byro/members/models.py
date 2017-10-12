@@ -1,7 +1,7 @@
 from django.db import models
+from django.db.models.fields.related import OneToOneRel
 
 from byro.common.models.auditable import Auditable
-
 
 class Member(Auditable, models.Model):
 
@@ -24,4 +24,14 @@ class Member(Auditable, models.Model):
 
     @property
     def profiles(self) -> list:
-        pass
+        profiles = []
+
+        for o in self._meta.related_objects:
+            if not isinstance(o, OneToOneRel):
+                continue
+            if not o.name.startswith('profile_'):
+                continue
+
+            profiles.append(getattr(self, o.name))
+
+        return profiles
