@@ -1,11 +1,9 @@
-import random
 import urllib
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.http import is_safe_url
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
