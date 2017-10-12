@@ -1,6 +1,5 @@
-from django.db import models
-
 from annoying.fields import AutoOneToOneField
+from django.db import models
 
 from byro.common.models.auditable import Auditable
 
