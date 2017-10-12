@@ -1,4 +1,5 @@
 django==1.11.*
 django-extensions==1.9.1
+django-solo=1.1.*
 jinja2==2.9.6
 psycopg2==2.7.*

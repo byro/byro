@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'byro.common.apps.CommonConfig',
     'byro.bookkeeping.apps.BookkeepingConfig',
     'byro.members.apps.MemberConfig',
     'byro.plugins.profile.ProfilePluginConfig'
