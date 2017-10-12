@@ -1,10 +1,17 @@
+from annoying.fields import AutoOneToOneField
 from django.db import models
 from localflavor.generic.models import IBANField, BICField
 
 from byro.common.models.auditable import Auditable
 
 
-class MemberIban(Auditable, models.Model):
+class MemberSepa(Auditable, models.Model):
+
+    member = AutoOneToOneField(
+        to='members.Member',
+        related_name='profile_sepa',
+        on_delete=models.PROTECT,
+    )
 
     iban = IBANField(null=True, blank=True, verbose_name="IBAN")
     bic = BICField(null=True, blank=True, verbose_name="BIC")

@@ -9,9 +9,10 @@ from byro.members.models import Member
 
 @pytest.fixture
 def member():
-    return Member.objects.create(
-        email='joe@hacker.space'
-    )
+    member = Member.objects.create(email='joe@hacker.space')
+    yield member
+    [profile.delete() for profile in member.profiles]
+    member.delete()
 
 
 @pytest.fixture
