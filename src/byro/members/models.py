@@ -7,3 +7,7 @@ class Member(Auditable, models.Model):
 
     # TODO: flesh out
     email = models.EmailField()
+
+    @property
+    def profiles(self) -> list:
+        pass
