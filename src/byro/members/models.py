@@ -3,6 +3,7 @@ from django.db.models.fields.related import OneToOneRel
 
 from byro.common.models.auditable import Auditable
 
+
 class Member(Auditable, models.Model):
 
     number = models.CharField(
