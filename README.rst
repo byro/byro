@@ -50,6 +50,12 @@ using Docker
   docker-compose up -d
 
 
+- run tests
+
+.. code:: shell
+
+   docker-compose exec web py.test -sx
+
 
 Features
 --------
