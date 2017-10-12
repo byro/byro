@@ -111,3 +111,7 @@ ENV/
 /site
 
 # End of https://www.gitignore.io/api/python,django
+
+# byro specific
+local/
+static.dist/
