@@ -1,6 +1,6 @@
 from annoying.fields import AutoOneToOneField
 from django.db import models
-from localflavor.generic.models import IBANField, BICField
+from localflavor.generic.models import BICField, IBANField
 
 from byro.common.models.auditable import Auditable
 
