@@ -8,6 +8,7 @@ from django.utils.translation import override
 from i18nfield.strings import LazyI18nString
 
 from byro.celery_app import app
+from byro.common.models import Configuration
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class SendMailException(Exception):
     pass
 
 
-def mail(email:str, subject: str, template: Union[str, LazyI18nString],
+def mail(email: str, subject: str, template: Union[str, LazyI18nString],
          context: Dict[str, Any]=None, locale: str=None,
          headers: dict=None):
     headers = headers or {}
@@ -69,4 +70,3 @@ def mail_send_task(to: str, subject: str, body: str, sender: str,
     except Exception:
         logger.exception('Error sending email')
         raise SendMailException('Failed to send an email to {}.'.format(to))
-

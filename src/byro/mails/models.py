@@ -1,5 +1,8 @@
+from copy import deepcopy
+
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import now
+from django.utils.translation import override, ugettext_lazy as _
 from i18nfield.fields import I18nCharField, I18nTextField
 
 from byro.common.models.auditable import Auditable
