@@ -1,0 +1,10 @@
+<h1>Please authenticate yourself.</h1>
+
+<form action="" method="post" autocomplete="off">
+    {% csrf_token %}
+    <input type="text" placeholder="Nick" required autofocus id="username" autocomplete="off"
+           name="username">
+    <input type="password" placeholder="Password" required id="password" autocomplete="off"
+           name="password">
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+</form>
