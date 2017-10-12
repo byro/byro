@@ -42,7 +42,6 @@ using Docker
 
   docker-compose run --rm web reset_db
 
-
 - run Django on port 8020:
 
 .. code:: shell
@@ -55,6 +54,12 @@ using Docker
 .. code:: shell
 
    docker-compose exec web py.test -sx
+
+- execute arbitrary django commands like so:
+
+... code:: shell
+
+  docker-compose run --rm web makemigrate
 
 
 Features
