@@ -43,7 +43,7 @@ using Docker
   docker-compose run --rm web reset_db
 
 
-- run Django:
+- run Django on port 8020:
 
 .. code:: shell
 
