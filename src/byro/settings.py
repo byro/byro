@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'byro.common.apps.CommonConfig',
     'byro.bookkeeping.apps.BookkeepingConfig',
+    'byro.mails.apps.MailsConfig',
     'byro.members.apps.MemberConfig',
     'byro.plugins.profile.ProfilePluginConfig'
 ]

@@ -37,3 +37,9 @@ class Configuration(SingletonModel):
         null=True, blank=True,
         verbose_name=_('registration form configuration'),
     )
+
+    mail_from = models.EmailField(
+        null=True, blank=True,
+        max_length=100,
+        verbose_name=_('e-mail sender address'),
+    )
