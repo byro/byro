@@ -5,3 +5,4 @@ django-i18nfield==1.2.*
 django-solo==1.1.*
 jinja2==2.9.6
 psycopg2==2.7.*
+django-annoying==0.10.*

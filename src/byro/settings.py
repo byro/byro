@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'byro.bookkeeping.apps.BookkeepingConfig',
     'byro.mails.apps.MailsConfig',
     'byro.members.apps.MemberConfig',
-    'byro.plugins.profile.ProfilePluginConfig'
+    'byro.plugins.profile.ProfilePluginConfig',
+
+    'annoying',
 ]
 
 with suppress(ImportError):
