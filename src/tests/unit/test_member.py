@@ -7,5 +7,5 @@ def test_profiles(member):
 
     profiles = member.profiles
 
-    assert len(profiles) == 1
-    assert isinstance(profiles[0], MemberProfile)
+    assert len(profiles) > 1
+    assert any([isinstance(profile, MemberProfile) for profile in profiles])
