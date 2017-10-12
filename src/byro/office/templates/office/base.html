@@ -1,0 +1,92 @@
+{% load bootstrap4 %}
+{% load compress %}
+{% load i18n %}
+{% load staticfiles %}
+{% load solo_tags %}
+{% get_solo 'common.Configuration' as config %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %} :: byro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{% static "office/img/favicon.png" %}">
+    {% compress css %}
+        <link rel="stylesheet" type="text/x-scss" href="{% static "office/scss/main.scss" %}"/>
+    {% endcompress %}
+    {% block stylesheets %}
+    {% endblock %}
+    {% block scripts %}
+    {% endblock %}
+    {% compress js %}
+        <script type="text/javascript" src="{% static "vendored/jquery-3.1.1.js" %}"></script>
+        <script type="text/javascript" src="{% static "vendored/tether/tether.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "vendored/bootstrap/js/bootstrap.js" %}"></script>
+    {% endcompress %}
+</head>
+
+<body>
+    <nav class="navbar navbar-toggleable-md navbar-inverse navbar-static-top bg-primary">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbartoggle">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="/">
+            <img src="{% static "office/img/icon.svg" %}"> byro
+        </a>
+        <div class="collapse navbar-collapse" id="navbartoggle">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="">
+                        <span class="fa fa-user"></span>
+                        {{ request.user.nick }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="">
+                        <span class="fa fa-sign-out"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="page-wrapper">
+        <nav class="nav flex-column sidebar">
+            <a class="nav-link {% if url_name == "office.dashboard" %}active{% endif %}" href="/">
+                <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
+            </a>
+        </nav>
+        <div id="page-content container-fluid">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <h3 class="byro-headline text-primary">
+                {% block headline %}
+                {% endblock %}
+            </h3>
+
+            {% block content %}
+            {% endblock %}
+
+            <footer>
+                {% with "href='http://byro.org'" as a_attr %}
+                    {% blocktrans trimmed %}
+                        powered by <a {{ a_attr }}>byro</a>
+                    {% endblocktrans %}
+                {% endwith %}
+                {% if development_warning %}
+                    <span class="text-warning">&middot; {% trans "running in development mode" %}</span>
+                    {% if byro_version %}
+                        <span>&middot; <a href="https://github.com/byro/byro/tree/{{ byro_version }}/">{{ byro_version }}</a></span>
+                    {% endif %}
+                {% endif %}
+            </footer>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
