@@ -15,7 +15,18 @@ from contextlib import suppress
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_ROOT = os.path.join(BASE_DIR, 'static.dist')
 
+for directory in (BASE_DIR, STATIC_ROOT):
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'byro', 'static')]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -38,10 +49,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'compressor',
+    'bootstrap4',
+    'solo.apps.SoloAppConfig',
+
     'byro.common.apps.CommonConfig',
     'byro.bookkeeping.apps.BookkeepingConfig',
     'byro.mails.apps.MailsConfig',
     'byro.members.apps.MemberConfig',
+    'byro.office.apps.OfficeConfig',
     'byro.plugins.profile.ProfilePluginConfig',
     'byro.plugins.sepa.SepaPluginConfig',
 
@@ -73,6 +89,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -139,6 +156,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+COMPRESS_ENABLED = COMPRESS_OFFLINE = not DEBUG
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', 'django_libsass.SassCompiler'),
+)
+
+COMPRESS_CSS_FILTERS = (
+    # CssAbsoluteFilter is incredibly slow, especially when dealing with our _flags.scss
+    # However, we don't need it if we consequently use the static() function in Sass
+    # 'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSCompressorFilter',
+)
 try:
     from .local_settings import *
 except ImportError:

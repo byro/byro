@@ -1,9 +1,11 @@
 celery==4.1.*
 django==1.11.*
+django-annoying==0.10.*
+django_compressor==2.2.*
 django-extensions==1.9.1
 django-i18nfield==1.2.*
+django-libsass==0.7
 django-localflavor==1.5.2
 django-solo==1.1.*
 jinja2==2.9.6
 psycopg2==2.7.*
-django-annoying==0.10.*
