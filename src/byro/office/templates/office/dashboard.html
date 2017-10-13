@@ -1,5 +1,28 @@
 {% extends "office/base.html" %}
+{% load i18n %}
 
 {% block content %}
-Dashing dashboard to follow.
+
+<div class="dashboard-list">
+    <div class="dashboard-block">
+        <h1>
+            {% blocktrans with count=member_count trimmed %}
+            {{ count }} members
+            {% endblocktrans %}
+        </h1>
+        <span class="dashboard-description">
+            {% trans "(all time)" %}
+        </span>
+    </div>
+    <div class="dashboard-block">
+        <h1>
+            {% blocktrans with count=active_count trimmed %}
+            {{ count }} active members
+            {% endblocktrans %}
+        </h1>
+        <span class="dashboard-description">
+            {% trans "(currently)" %}
+        </span>
+    </div>
+</div>
 {% endblock %}
