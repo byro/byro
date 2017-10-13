@@ -1,10 +1,12 @@
 from django.conf.urls import url
 
 from .views import (
-    ConfigurationView, DashboardView, MemberDetailView, MemberListView,
+    ConfigurationView, DashboardView, MemberDetailView,
+    MemberListView, RegistrationConfigView,
 )
 
 office_urls = [
+    url('^settings/registration$', RegistrationConfigView.as_view(), name='settings.registration'),
     url('^settings$', ConfigurationView.as_view(), name='settings'),
     url('^$', DashboardView.as_view(), name='dashboard'),
     url(r'^members/list', MemberListView.as_view(), name='members.list'),

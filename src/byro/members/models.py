@@ -29,13 +29,13 @@ class Member(Auditable, models.Model):
     def profiles(self) -> list:
         profiles = []
 
-        for o in self._meta.related_objects:
-            if not isinstance(o, OneToOneRel):
+        for related in self._meta.related_objects:
+            if not isinstance(related, OneToOneRel):
                 continue
-            if not o.name.startswith('profile_'):
+            if not related.name.startswith('profile_'):
                 continue
 
-            profiles.append(getattr(self, o.name))
+            profiles.append(getattr(self, related.name))
 
         return profiles
 

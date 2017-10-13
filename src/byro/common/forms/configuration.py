@@ -9,5 +9,5 @@ class ConfigurationForm(forms.ModelForm):
         model = Configuration
         fields = (
             'name', 'address', 'url', 'language', 'currency',
-            'registration_form', 'mail_from',
+            'mail_from',
         )

@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.views.generic import FormView
 
-from byro.common.forms import ConfigurationForm
+from byro.common.forms import ConfigurationForm, RegistrationConfigForm
 from byro.common.models import Configuration
 
 
@@ -20,3 +20,15 @@ class ConfigurationView(FormView):
 
     def get_success_url(self):
         return reverse('office:settings')
+
+
+class RegistrationConfigView(FormView):
+    form_class = RegistrationConfigForm
+    template_name = 'office/settings/form.html'
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('office:settings.registration')
