@@ -38,7 +38,7 @@ def test_match_single_fee(member, real_transaction):
         real_transaction.derive_virtual_transactions()
 
     account = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-    assert account.total() == real_transaction.amount
+    assert account.balance() == real_transaction.amount
 
 
 @pytest.mark.django_db
@@ -54,7 +54,7 @@ def test_match_no_fee(member, real_transaction):
     assert 'Transaction could not be matched' in str(excinfo)
 
     account = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-    assert account.total() == 0
+    assert account.balance() == 0
 
 
 @pytest.mark.django_db
@@ -85,4 +85,4 @@ def test_match_multiple_fees(member, real_transaction):
 
     fees = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
     donations = Account.objects.get(account_category=AccountCategory.MEMBER_DONATION)
-    assert fees.total() + donations.total() == real_transaction.amount
+    assert fees.balance() + donations.balance() == real_transaction.amount
