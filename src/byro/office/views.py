@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from byro.members.models import Member
 
