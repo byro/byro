@@ -17,7 +17,10 @@ ADD requirements/development.txt /opt/code/requirements/development.txt
 WORKDIR /opt/code
 RUN pip install -Ur requirements.txt
 RUN pip install -Ur requirements/development.txt
+ADD install_local_plugins.sh /opt/code/install_local_plugins.sh
 ADD . /opt/code
+
+RUN ./install_local_plugins.sh
 
 WORKDIR /opt/code
 
