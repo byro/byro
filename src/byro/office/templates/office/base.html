@@ -50,7 +50,7 @@
             <a class="nav-link {% if url_name == "dashboard" %}active{% endif %}" href="/">
                 <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
             </a>
-            <a class="nav-link {% if url_name == "settings" %}active{% endif %}" href="/">
+            <a class="nav-link {% if url_name == "settings" %}active{% endif %}" href="{% url 'office:settings' %}">
                 <span class="fa fa-wrench"></span> {% trans "Settings" %}
             </a>
             <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">
