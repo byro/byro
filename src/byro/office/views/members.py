@@ -18,7 +18,7 @@ class MemberDetailView(DetailView):
 
 
 class MemberCreateView(FormView):
-    template_name = 'office/settings/form.html'
+    template_name = 'office/member_add.html'
     form_class = CreateMemberForm
 
     def get_object(self):

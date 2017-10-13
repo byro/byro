@@ -3,6 +3,11 @@
 {% load i18n %}
 
 {% block content %}
+<p>
+<a href="{% url "office:members.add" %}" class="btn btn-primary">
+    <span class="fa fa-plus"></span> {% trans "Add new member" %}
+</a>
+</p>
 <table class="table table-condensed">
     <thead>
         <tr>
