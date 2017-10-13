@@ -52,6 +52,9 @@
             <a class="nav-link {% if url_name == "office.dashboard" %}active{% endif %}" href="/">
                 <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
             </a>
+            <a class="nav-link {% if url_name == "office.memberlist" %}active{% endif %}" href="{% url 'office:members.list' %}">
+                <span class="fa fa-address-book"></span> {% trans "Members" %}
+            </a>
             {% endif %}
         </nav>
         <div id="page-content" class="flex-column">
