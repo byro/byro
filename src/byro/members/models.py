@@ -10,18 +10,22 @@ class Member(Auditable, models.Model):
 
     number = models.CharField(
         max_length=100,
+        verbose_name=_('Membership number/ID'),
         null=True, blank=True,
     )
     name = models.CharField(
         max_length=100,
+        verbose_name=_('Name'),
         null=True, blank=True,
     )
     address = models.TextField(
         max_length=300,
+        verbose_name=_('Address'),
         null=True, blank=True,
     )
     email = models.EmailField(
         max_length=200,
+        verbose_name=_('E-Mail'),
         null=True, blank=True,
     )
 

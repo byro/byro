@@ -1,15 +1,16 @@
 from django import forms
 from django.db.models.fields.related import OneToOneRel
+from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models import Configuration
 from byro.members.models import Member
 
 
 class RegistrationConfigForm(forms.Form):
-    number = forms.IntegerField(required=False, label='number')
-    name = forms.IntegerField(required=False, label='name')
-    address = forms.IntegerField(required=False, label='address')
-    email = forms.IntegerField(required=False, label='email')
+    number = forms.IntegerField(required=False, label=_('Membership number/ID'))
+    name = forms.IntegerField(required=False, label=_('Name'))
+    address = forms.IntegerField(required=False, label=_('Address'))
+    email = forms.IntegerField(required=False, label=_('E-Mail'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -19,7 +20,7 @@ class RegistrationConfigForm(forms.Form):
         ]
         for profile in profile_classes:
             for field in profile._meta.fields:
-                if field.name != 'id':
+                if field.name not in ('id', 'member'):
                     self.fields[f'{profile.__name__}__{field.name}'] = forms.IntegerField(required=False, label=f'{field.verbose_name or field.name} ({profile.__name__})')
         config = Configuration.get_solo().registration_form or []
         for entry in config:
