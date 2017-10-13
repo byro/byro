@@ -11,9 +11,7 @@ class CreateMemberForm(forms.Form):
 
         super().__init__(*args, **kwargs)
 
-        config = Configuration.get_solo().registration_form
-        if not config:
-            raise Exception('Please configure your member creation form!')
+        config = Configuration.get_solo().registration_form or []
         config = sorted(
             [field for field in config if field['position'] is not None],
             key=lambda field: field['position']
