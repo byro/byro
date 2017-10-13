@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 from contextlib import suppress
 
+from pkg_resources import iter_entry_points
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'static.dist')
@@ -170,6 +172,14 @@ COMPRESS_CSS_FILTERS = (
     # 'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.CSSCompressorFilter',
 )
+
+# Plugin magic
+
+PLUGINS = []
+for entry_point in iter_entry_points(group='byro.plugin', name=None):
+    PLUGINS.append(entry_point.module_name)
+    INSTALLED_APPS.append(entry_point.module_name)
+
 try:
     from .local_settings import *
 except ImportError:
