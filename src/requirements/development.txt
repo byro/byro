@@ -4,3 +4,4 @@ pytest
 pytest-cov
 pytest-django
 pytest-sugar
+ipython
