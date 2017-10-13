@@ -16,7 +16,7 @@ class Member(Auditable, models.Model):
         max_length=100,
         null=True, blank=True,
     )
-    address = models.CharField(
+    address = models.TextField(
         max_length=300,
         null=True, blank=True,
     )

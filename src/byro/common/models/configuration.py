@@ -11,7 +11,7 @@ class Configuration(SingletonModel):
         max_length=100,
         verbose_name=_('name'),
     )
-    address = models.CharField(
+    address = models.TextField(
         null=True, blank=True,
         max_length=500,
         verbose_name=_('address'),
