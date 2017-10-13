@@ -11,6 +11,11 @@ from byro.members.models import Member
 def member():
     member = Member.objects.create(email='joe@hacker.space')
     yield member
+
+    # dirty hack until we find the real issue of the problem
+    import time
+    time.sleep(0.1)
+
     [profile.delete() for profile in member.profiles]
     member.transactions.all().delete()
     member.delete()
