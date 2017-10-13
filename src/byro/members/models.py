@@ -1,6 +1,9 @@
+from decimal import Decimal
+
 from django.db import models
 from django.db.models.fields.related import OneToOneRel
 from django.utils.decorators import classproperty
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models.auditable import Auditable
@@ -42,6 +45,14 @@ class Member(Auditable, models.Model):
             profiles.append(getattr(self, related.name))
 
         return profiles
+
+    @property
+    def balance(self) -> Decimal:
+        from byro.bookkeeping.models import VirtualTransaction
+        qs = VirtualTransaction.objects.filter(member=self, value_datetime__lte=now())
+        liability = qs.filter(source_account__account_category='member_fees').aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
+        asset = qs.filter(destination_account__account_category='member_fees').aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
+        return asset - liability
 
 
 class FeeIntervals:
