@@ -39,6 +39,9 @@ body {
         .fa {
             padding-right: 4px;
         }
+        &.active {
+            background-color: darken($primary-lightest, 5%);
+        }
     }
 }
 #page-content {

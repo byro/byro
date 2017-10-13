@@ -2,8 +2,6 @@
 {% load compress %}
 {% load i18n %}
 {% load staticfiles %}
-{% load solo_tags %}
-{% get_solo 'common.Configuration' as config %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -51,6 +49,9 @@
             {% if not request.user.is_anonymous %}
             <a class="nav-link {% if url_name == "dashboard" %}active{% endif %}" href="/">
                 <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
+            </a>
+            <a class="nav-link {% if url_name == "settings" %}active{% endif %}" href="/">
+                <span class="fa fa-wrench"></span> {% trans "Settings" %}
             </a>
             <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">
                 <span class="fa fa-address-book"></span> {% trans "Members" %}

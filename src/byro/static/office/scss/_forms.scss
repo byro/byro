@@ -7,3 +7,13 @@
         margin-top: 4px;
     }
 }
+
+form .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+form button {
+    margin-left: calc(25% + 8px);
+}

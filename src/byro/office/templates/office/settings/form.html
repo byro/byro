@@ -1,0 +1,13 @@
+{% extends "office/base.html" %}
+{% load bootstrap4 %}
+
+{% block headline %}Settings{% endblock %}
+
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form layout='horizontal' %}
+    <button class="btn btn-primary" type="submit">Save</button>
+</form>
+{% endblock %}
