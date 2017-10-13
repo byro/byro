@@ -8,19 +8,19 @@ from byro.members.models import Member
 
 
 class MemberListView(ListView):
-    template_name = 'office/member_list.html'
+    template_name = 'office/member/list.html'
     context_object_name = 'members'
     model = Member
 
 
 class MemberDetailView(DetailView):
-    template_name = 'office/member_detail.html'
+    template_name = 'office/member/detail.html'
     context_object_name = 'member'
     model = Member
 
 
 class MemberCreateView(FormView):
-    template_name = 'office/member_add.html'
+    template_name = 'office/member/add.html'
     form_class = CreateMemberForm
 
     def get_object(self):
