@@ -14,7 +14,7 @@ def member():
 
     # dirty hack until we find the real issue of the problem
     import time
-    time.sleep(0.1)
+    time.sleep(1)
 
     [profile.delete() for profile in member.profiles]
     member.transactions.all().delete()
