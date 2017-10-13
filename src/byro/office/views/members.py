@@ -1,7 +1,8 @@
+from django.urls import reverse
 from django.views.generic import DetailView, FormView, ListView
 
-from byro.members.models import Member
 from byro.members.forms import CreateMemberForm
+from byro.members.models import Member
 
 
 class MemberListView(ListView):
@@ -25,7 +26,8 @@ class MemberCreateView(FormView):
 
     def form_valid(self, form):
         form.save()
+        self.form = form
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:member.detail', kwargs=self.kwargs)
+        return reverse('office:members.detail', kwargs={'pk': self.form.instance.pk})

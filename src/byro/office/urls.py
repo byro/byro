@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
 from .views import (
-    ConfigurationView, DashboardView, MemberCreateView, MemberDetailView,
-    MemberListView, RegistrationConfigView,
+    ConfigurationView, DashboardView, MemberCreateView,
+    MemberDetailView, MemberListView, RegistrationConfigView,
 )
 
 office_urls = [
