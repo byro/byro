@@ -1,5 +1,4 @@
 import pytest
-from django.dispatch import receiver
 
 from byro.bookkeeping.models import Account, AccountCategory, VirtualTransaction
 from byro.bookkeeping.signals import derive_virtual_transactions
