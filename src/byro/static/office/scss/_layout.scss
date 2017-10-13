@@ -1,0 +1,46 @@
+body {
+    display: flex;
+    flex-direction: column;
+}
+#page-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}
+.navbar {
+    a {
+        color: $gray-800;
+    }
+}
+.sidebar {
+    background-color: $primary-lightest;
+    font-size: 14px;
+    width: 250px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    min-height: 100vh;
+
+    .nav-link {
+        color: $gray-800;
+        text-decoration: none;
+        border-bottom: 1px solid $gray-400;
+
+        &:hover {
+            background-color: darken($primary-lightest, 10%);
+        }
+    }
+}
+#page-content {
+    background: $white;
+    flex-grow: 1;
+    display: flex;
+    padding: 20px;
+
+    .container-fluid {
+    }
+}
+footer {
+    margin-top: 20px;
+    font-size: 11px;
+    text-align: center;
+}

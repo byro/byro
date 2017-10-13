@@ -9,7 +9,7 @@
 <head>
     <title>{% block title %}{% endblock %} :: byro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{% static "office/img/favicon.png" %}">
+    <!-- <link rel="icon" href="{% static "office/img/favicon.png" %}"> -->
     {% compress css %}
         <link rel="stylesheet" type="text/x-scss" href="{% static "office/scss/main.scss" %}"/>
     {% endcompress %}
@@ -25,12 +25,10 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-toggleable-md navbar-inverse navbar-static-top bg-primary">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbartoggle">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <nav class="navbar navbar-static-top bg-primary">
         <a class="navbar-brand" href="/">
-            <img src="{% static "office/img/icon.svg" %}"> byro
+            <!-- <img src="{% static "office/img/icon.svg" %}"> -->
+            byro
         </a>
         <div class="collapse navbar-collapse" id="navbartoggle">
             <ul class="navbar-nav">
@@ -54,23 +52,24 @@
                 <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
             </a>
         </nav>
-        <div id="page-content container-fluid">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        <div id="page-content" class="flex-column">
+            <div class="container-fluid">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-            <h3 class="byro-headline text-primary">
-                {% block headline %}
+                <h3 class="byro-headline text-primary">
+                    {% block headline %}
+                    {% endblock %}
+                </h3>
+
+                {% block content %}
                 {% endblock %}
-            </h3>
-
-            {% block content %}
-            {% endblock %}
-
+            </div>
             <footer>
                 {% with "href='http://byro.org'" as a_attr %}
                     {% blocktrans trimmed %}
