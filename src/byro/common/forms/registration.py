@@ -1,5 +1,4 @@
 from django import forms
-from django.db.models.fields.related import OneToOneRel
 from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models import Configuration
@@ -14,11 +13,7 @@ class RegistrationConfigForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        profile_classes = [
-            related.related_model for related in Member._meta.related_objects
-            if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
-        ]
-        for profile in profile_classes:
+        for profile in Member.profile_classes:
             for field in profile._meta.fields:
                 if field.name not in ('id', 'member'):
                     self.fields[f'{profile.__name__}__{field.name}'] = forms.IntegerField(required=False, label=f'{field.verbose_name or field.name} ({profile.__name__})')

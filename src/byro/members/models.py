@@ -32,19 +32,20 @@ class Member(Auditable, models.Model):
         null=True, blank=True,
     )
 
+    @classproperty
+    def profile_classes(cls) -> list:
+        return [
+            related.related_model for related in cls._meta.related_objects
+            if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
+        ]
+
     @property
     def profiles(self) -> list:
-        profiles = []
-
-        for related in self._meta.related_objects:
-            if not isinstance(related, OneToOneRel):
-                continue
-            if not related.name.startswith('profile_'):
-                continue
-
-            profiles.append(getattr(self, related.name))
-
-        return profiles
+        return [
+            getattr(self, related.name)
+            for related in self._meta.related_objects
+            if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
+        ]
 
     @property
     def balance(self) -> Decimal:
