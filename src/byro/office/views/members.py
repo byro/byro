@@ -1,5 +1,8 @@
+from django import forms
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView
 
@@ -34,6 +37,16 @@ class MemberDashboardView(DetailView):
     template_name = 'office/member/dashboard.html'
     context_object_name = 'member'
     model = Member
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        obj = self.get_object()
+        delta = now().date() - obj.memberships.first().start
+        context['member_since'] = {
+            'days': int(delta.total_seconds() / (60 * 60 * 24)),
+            'years': round(delta.days / 365, 1),
+        }
+        return context
 
 
 class MemberDataView(DetailView):

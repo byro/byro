@@ -1,6 +1,33 @@
 {% extends "office/member/base.html" %}
+{% load i18n %}
 
 {% block member_content %}
-ID: {{ member.pk }}<br>
-Name: {{ member.name }}
+<div class="dashboard-list">
+    <div class="dashboard-block">
+        <h1>
+            {{ member.balance }}
+        </h1>
+        <span class="dashboard-description">
+            {% trans "current balance" %}
+        </span>
+    </div>
+    <div class="dashboard-block">
+        <h1>
+            {% blocktrans with count=member_since.days trimmed %}
+            {{ count }} days
+            {% endblocktrans %}
+        </h1>
+        <span class="dashboard-description">
+            {% if member_since.days > 0 %}
+                {% blocktrans with count=member_since.years trimmed %}
+                or {{ count }} years of membership
+                {% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed %}
+                until this person becomes a member.
+                {% endblocktrans %}
+            {% endif %}
+        </span>
+    </div>
+</div>
 {% endblock %}
