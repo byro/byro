@@ -28,6 +28,9 @@ body {
         &:hover {
             background-color: darken($primary-lightest, 10%);
         }
+        .fa {
+            padding-right: 4px;
+        }
     }
 }
 #page-content {
