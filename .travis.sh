@@ -7,7 +7,8 @@ if [ "$1" == "tests" ]; then
     psql -c 'create database byro;' -U postgres
     cd src
     python manage.py check
-    pytest --cov=byro tests && codecov
+    pytest --cov=byro tests
+    codecov
 fi
 
 if [ "$1" == "style" ]; then
