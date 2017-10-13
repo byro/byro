@@ -1,10 +1,18 @@
-<h1>Please authenticate yourself.</h1>
+{% extends "office/base.html" %}
 
-<form action="" method="post" autocomplete="off">
-    {% csrf_token %}
-    <input type="text" placeholder="Nick" required autofocus id="username" autocomplete="off"
-           name="username">
-    <input type="password" placeholder="Password" required id="password" autocomplete="off"
-           name="password">
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-</form>
+{% block headline %}
+Welcome to byro!
+{% endblock %}
+
+{% block content %}
+<div class="login-form">
+    <form action="" method="post" autocomplete="off" class="col-md-4">
+        {% csrf_token %}
+        <input type="text" placeholder="Nick" required autofocus id="username" autocomplete="off"
+               class="form-control" name="username">
+        <input type="password" placeholder="Password" required id="password" autocomplete="off"
+               class="form-control" name="password">
+        <button class="btn btn-lg btn-primary form-control" type="submit">Sign in</button>
+    </form>
+</div>
+{% endblock %}

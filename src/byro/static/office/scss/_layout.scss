@@ -11,6 +11,14 @@ body {
     a {
         color: $gray-800;
     }
+    ul.navbar-nav {
+        display: flex;
+        flex-direction: row;
+
+        li {
+            padding: 0 8px;
+        }
+    }
 }
 .sidebar {
     background-color: $primary-lightest;
