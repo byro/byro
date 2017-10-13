@@ -1,10 +1,7 @@
-{% extends "office/base.html" %}
+{% extends "office/settings/base.html" %}
 {% load bootstrap4 %}
 
-{% block headline %}Settings{% endblock %}
-
-
-{% block content %}
+{% block settings_content %}
 <form method="post">
     {% csrf_token %}
     {% bootstrap_form form layout='horizontal' %}
