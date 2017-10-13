@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 
-from byro.members.models import Member, Membership
 from byro.bookkeeping.models import RealTransaction
+from byro.members.models import Member, Membership
 
 
 class DashboardView(TemplateView):
