@@ -34,8 +34,6 @@ class RealTransaction(Auditable, models.Model):
 
     data = JSONField(null=True)
 
-    # TODO: author/user
-
     @transaction.atomic
     def derive_virtual_transactions(self):
         """
