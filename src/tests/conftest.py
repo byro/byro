@@ -12,6 +12,7 @@ def member():
     member = Member.objects.create(email='joe@hacker.space')
     yield member
     [profile.delete() for profile in member.profiles]
+    member.transactions.all().delete()
     member.delete()
 
 
