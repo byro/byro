@@ -1,4 +1,6 @@
+from django.contrib import messages
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView
 
 from byro.common.forms import ConfigurationForm, RegistrationConfigForm
@@ -16,6 +18,7 @@ class ConfigurationView(FormView):
 
     def form_valid(self, form):
         form.save()
+        messages.success(self.request, _('The config was saved successfully.'))
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -28,6 +31,7 @@ class RegistrationConfigView(FormView):
 
     def form_valid(self, form):
         form.save()
+        messages.success(self.request, _('The config was saved successfully.'))
         return super().form_valid(form)
 
     def get_success_url(self):

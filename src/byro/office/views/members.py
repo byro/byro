@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView
 
 from byro.members.forms import CreateMemberForm
@@ -27,6 +28,7 @@ class MemberCreateView(FormView):
 
     def form_valid(self, form):
         form.save()
+        messages.success(self.request, _('The member was added, please edit additional details if applicable.'))
         self.form = form
         return super().form_valid(form)
 
