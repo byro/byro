@@ -1,6 +1,22 @@
 {% extends "office/member/base.html" %}
+{% load bootstrap4 %}
 
 {% block member_content %}
-ID: {{ member.pk }}<br>
-Name: {{ member.name }}
+
+<form method='post'>
+    {% csrf_token %}
+    {% for form in forms %}
+        <div class="card member-form-card">
+            <div class="card-header">{{ form.instance }}</div>
+            <div class="card-body">
+                {% bootstrap_form form layout='horizontal' %}
+            </div>
+        </div>
+    {% endfor %}
+    <div class="card member-form-card">
+        <div class="card-body">
+            <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+    </div>
+</form>
 {% endblock %}

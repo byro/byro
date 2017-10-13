@@ -41,6 +41,36 @@ class MemberDataView(DetailView):
     context_object_name = 'member'
     model = Member
 
+    def _instantiate(self, form_class, member, profile_class=None):
+        params = {
+            'instance': getattr(member, profile_class._meta.get_field('member').related_query_name()) if profile_class else member,
+            'prefix': profile_class.__name__ if profile_class else 'member_',
+            'data': self.request.POST if self.request.method == 'POST' else None,
+        }
+        return form_class(**params)
+
+    def get_forms(self):
+        obj = self.get_object()
+        return [self._instantiate(forms.modelform_factory(Member, fields=['name', 'number', 'address', 'email']), obj)] + [
+            self._instantiate(forms.modelform_factory(
+                profile_class,
+                fields=[f.name for f in profile_class._meta.fields if f.name not in ['id', 'member']],
+            ), obj, profile_class)
+            for profile_class in obj.profile_classes
+        ]
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['forms'] = self.get_forms()
+        return context
+
+    def post(self, *args, **kwargs):
+        for form in self.get_forms():
+            if form.is_valid():
+                form.save()
+        messages.success(self.request, _('Your changes have been saved.'))
+        return redirect(reverse('office:members.data', kwargs=self.kwargs))
+
 
 class MemberFinanceView(DetailView):
     template_name = 'office/member/finance.html'
