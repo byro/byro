@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 
 from byro.members.models import Member, Membership
+from byro.bookkeeping.models import RealTransaction
 
 
 class DashboardView(TemplateView):
@@ -10,4 +11,5 @@ class DashboardView(TemplateView):
         context = super().get_context_data(*args, **kwargs)
         context['member_count'] = Member.objects.all().count()
         context['active_count'] = Membership.objects.filter(end__isnull=True).count()
+        context['unmapped_transactions_count'] = RealTransaction.objects.filter(virtual_transactions__isnull=True).count()
         return context

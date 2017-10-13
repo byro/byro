@@ -24,5 +24,12 @@
             {% trans "(currently)" %}
         </span>
     </div>
+    <div class="dashboard-block">
+        <h1>
+            {% blocktrans with count=unmapped_transactions_count trimmed %}
+            {{ count }} unmapped transactions
+            {% endblocktrans %}
+        </h1>
+    </div>
 </div>
 {% endblock %}
