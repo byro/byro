@@ -13,12 +13,6 @@ class MemberListView(ListView):
     model = Member
 
 
-class MemberDetailView(DetailView):
-    template_name = 'office/member/detail.html'
-    context_object_name = 'member'
-    model = Member
-
-
 class MemberCreateView(FormView):
     template_name = 'office/member/add.html'
     form_class = CreateMemberForm
@@ -34,3 +28,21 @@ class MemberCreateView(FormView):
 
     def get_success_url(self):
         return reverse('office:members.detail', kwargs={'pk': self.form.instance.pk})
+
+
+class MemberDashboardView(DetailView):
+    template_name = 'office/member/dashboard.html'
+    context_object_name = 'member'
+    model = Member
+
+
+class MemberDataView(DetailView):
+    template_name = 'office/member/data.html'
+    context_object_name = 'member'
+    model = Member
+
+
+class MemberFinanceView(DetailView):
+    template_name = 'office/member/finance.html'
+    context_object_name = 'member'
+    model = Member

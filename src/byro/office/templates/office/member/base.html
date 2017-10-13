@@ -1,0 +1,38 @@
+{% extends "office/base.html" %}
+{% load i18n %}
+
+{% block headline %}{{ member.name }} ({{ member.number }}){% endblock %}
+
+{% block content %}
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <a
+      class="nav-link {% if "members.dashboard" in url_name %}active{% endif %}"
+      href="{% url "office:members.dashboard" pk=member.pk %}"
+    >
+        {% trans "Dashboard" %}
+    </a>
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link {% if "members.data" in url_name %}active{% endif %}"
+      href="{% url "office:members.data" pk=member.pk %}"
+    >
+        {% trans "Data" %}
+    </a>
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link {% if "members.finance" in url_name %}active{% endif %}"
+      href="{% url "office:members.finance" pk=member.pk %}"
+    >
+        {% trans "Finance" %}
+    </a>
+  </li>
+</ul>
+
+{% block member_content %}
+{% endblock %}
+
+{% endblock %}
+

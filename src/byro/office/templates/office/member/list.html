@@ -18,7 +18,7 @@
     <tbody>
         {% for member in members %}
             <tr>
-                <td><a href="{% url "office:members.detail" pk=member.pk %}">{{ member.number }}</a></td>
+                <td><a href="{% url "office:members.dashboard" pk=member.pk %}">{{ member.number }}</a></td>
                 <td>{{ member.name }}</td>
             </tr>
         {% endfor %}
