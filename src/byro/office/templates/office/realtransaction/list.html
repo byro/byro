@@ -26,12 +26,10 @@
                 <td>
                 <fieldset id="answer-options">
                     <div class="formset" data-formset data-formset-prefix="{{ vt_formset.prefix }}">
-                        {{ rtrans.vt_formset|length }}
                         {{ rtrans.vt_formset.management_form }}
                         {% bootstrap_formset_errors rtrans.vt_formset %}
                         <div data-formset-body>
                             {% for form in rtrans.vt_formset %}
-                                <h1>ohaio</h1>
                                 <div data-formset-form>
                                     <div class="sr-only">
                                         {{ form.id }}
