@@ -10,6 +10,9 @@ class RegistrationConfigForm(forms.Form):
     member__name = forms.IntegerField(required=False, label=_('Name'))
     member__address = forms.IntegerField(required=False, label=_('Address'))
     member__email = forms.IntegerField(required=False, label=_('E-Mail'))
+    membership__start = forms.IntegerField(required=False, label=_('Join date'))
+    membership__amount = forms.IntegerField(required=False, label=_('Membership fee'))
+    membership__interval = forms.IntegerField(required=False, label=_('Payment interval'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -110,11 +110,11 @@ class Membership(Auditable, models.Model):
     )
     amount = models.DecimalField(
         max_digits=8, decimal_places=2,
-        verbose_name=_('amount'),
+        verbose_name=_('membership fee'),
         help_text=_('The amount to be paid in the chosen interval'),
     )
     interval = models.IntegerField(
         choices=FeeIntervals.choices,
-        verbose_name=_('interval'),
+        verbose_name=_('payment interval'),
         help_text=_('How often does the member pay their fees?'),
     )

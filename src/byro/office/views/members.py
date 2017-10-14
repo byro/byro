@@ -9,7 +9,7 @@ from django.views.generic import DetailView, FormView, ListView
 
 from byro.bookkeeping.models import VirtualTransaction
 from byro.members.forms import CreateMemberForm
-from byro.members.models import Member
+from byro.members.models import Member, Membership
 
 
 class MemberListView(ListView):
@@ -32,7 +32,7 @@ class MemberCreateView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:members.detail', kwargs={'pk': self.form.instance.pk})
+        return reverse('office:members.data', kwargs={'pk': self.form.instance.pk})
 
 
 class MemberDashboardView(DetailView):
@@ -56,21 +56,24 @@ class MemberDataView(DetailView):
     context_object_name = 'member'
     model = Member
 
-    def _instantiate(self, form_class, member, profile_class=None):
+    def _instantiate(self, form_class, member, profile_class=None, instance=None):
         params = {
-            'instance': getattr(member, profile_class._meta.get_field('member').related_query_name()) if profile_class else member,
-            'prefix': profile_class.__name__ if profile_class else 'member_',
+            'instance': getattr(member, profile_class._meta.get_field('member').related_query_name()) if profile_class else instance,
+            'prefix': profile_class.__name__ if profile_class else instance.__class__.__name__ + '_' if instance else 'member_',
             'data': self.request.POST if self.request.method == 'POST' else None,
         }
         return form_class(**params)
 
     def get_forms(self):
         obj = self.get_object()
-        return [self._instantiate(forms.modelform_factory(Member, fields=['name', 'number', 'address', 'email']), obj)] + [
+        return [
+            self._instantiate(forms.modelform_factory(Member, fields=['name', 'number', 'address', 'email']), member=obj, instance=obj),
+            self._instantiate(forms.modelform_factory(Membership, fields=['start', 'interval', 'amount']), member=obj, instance=obj.memberships.first())
+        ] + [
             self._instantiate(forms.modelform_factory(
                 profile_class,
                 fields=[f.name for f in profile_class._meta.fields if f.name not in ['id', 'member']],
-            ), obj, profile_class)
+            ), member=obj, profile_class=profile_class)
             for profile_class in obj.profile_classes
         ]
 
