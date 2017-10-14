@@ -48,7 +48,31 @@ class Account(Auditable, models.Model):
             return self.name
         return f'{self.account_category} account #{self.id}'
 
-    def balance(self, start=None, end=None):
-        incoming_sum = self.incoming_transactions.aggregate(incoming=models.Sum('amount'))['incoming']
-        outgoing_sum = self.outgoing_transactions.aggregate(outgoing=models.Sum('amount'))['outgoing']
-        return (incoming_sum or 0) - (outgoing_sum or 0)
+
+    @property
+    def transactions(self):
+        from byro.bookkeeping.models import VirtualTransaction
+        return VirtualTransaction.objects.filter(
+            Q(source_account=self) | Q(destination_account=self)
+        )
+
+    def total_in(self, start=None, end=now()):
+        qs = self.incoming_transactions
+        if start:
+            qs = qs.filter(value_datetime__gte=start)
+        if end:
+            qs = qs.filter(value_datetime__lte=end)
+        return qs.aggregate(incoming=models.Sum('amount'))['incoming'] or 0
+
+    def total_out(self, start=None, end=now()):
+        qs = self.outgoing_transactions
+        if start:
+            qs = qs.filter(value_datetime__gte=start)
+        if end:
+            qs = qs.filter(value_datetime__lte=end)
+        return qs.aggregate(outgoing=models.Sum('amount'))['outgoing'] or 0
+
+    def balance(self, start=None, end=now()):
+        incoming_sum = self.total_in(start=start, end=end)
+        outgoing_sum = self.total_out(start=start, end=end)
+        return incoming_sum - outgoing_sum
