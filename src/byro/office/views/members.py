@@ -120,14 +120,14 @@ class MemberListTypeaheadView(View):
             return JsonResponse({'count': 0, 'results': []})
 
         queryset = Member.objects.filter(
-            Q(name__icontains=search) | Q(profile_profile__nickname__icontains=search)
+            Q(name__icontains=search) | Q(profile_profile__nick__icontains=search)
         )
         return JsonResponse({
             'count': len(queryset),
             'results': [
                 {
                     'id': member.pk,
-                    'nick': member.profile_profile.nickname,
+                    'nick': member.profile_profile.nick,
                     'name': member.name,
                 }
                 for member in queryset

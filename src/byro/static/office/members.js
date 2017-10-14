@@ -9,7 +9,7 @@ var members = new Bloodhound({
       var results = object.results
       var suggestions = []
       for (i = 0; i < results.length; i++) {
-        suggestions.push({value: results[i].pk, name: results[i].name})
+        suggestions.push({value: results[i].id, name: results[i].name})
       }
       return suggestions
     }
@@ -18,7 +18,7 @@ var members = new Bloodhound({
 
 $('.member-typeahead').typeahead(null, {
   name: 'id',
-  display: 'value',
+  display: 'name',
   source: members,
   templates: {
     suggestion: function(data) {
