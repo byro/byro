@@ -1,5 +1,5 @@
 from django.forms.models import BaseModelFormSet, inlineformset_factory
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import ListView
