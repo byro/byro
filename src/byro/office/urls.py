@@ -3,7 +3,8 @@ from django.conf.urls import include, url
 from .views import (
     ConfigurationView, DashboardView, MemberCreateView, MemberDashboardView,
     MemberDataView, MemberFinanceView, MemberListView, RegistrationConfigView,
-    RealTransactionListView,
+    RealTransactionListView, AccountListView, AccountDetailView, AccountCreateView,
+    AccountDeleteView
 )
 
 office_urls = [
@@ -17,5 +18,9 @@ office_urls = [
         url('finance$', MemberFinanceView.as_view(), name='members.finance'),
         url('$', MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
-    url('^realtransaction/list', RealTransactionListView.as_view(), name='realtransactions.list')
+    url('^realtransaction/list', RealTransactionListView.as_view(), name='realtransactions.list'),
+    url('^accounts/$', AccountListView.as_view(), name='accounts.list'),
+    url('^accounts/add$', AccountCreateView.as_view(), name='accounts.add'),
+    url('^accounts/(?P<pk>\d+)/$', AccountDetailView.as_view(), name='accounts.detail'),
+    url('^accounts/(?P<pk>\d+)/delete$', AccountDeleteView.as_view(), name='accounts.delete'),
 ]
