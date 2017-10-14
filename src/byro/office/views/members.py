@@ -17,6 +17,10 @@ class MemberListView(ListView):
     template_name = 'office/member/list.html'
     context_object_name = 'members'
     model = Member
+    paginate_by = 50
+
+    def get_queryset(self):
+        return Member.objects.filter(memberships__end__isnull=True).order_by('id')
 
 
 class MemberCreateView(FormView):
@@ -95,6 +99,7 @@ class MemberFinanceView(ListView):
     template_name = 'office/member/finance.html'
     context_object_name = 'transactions'
     model = VirtualTransaction
+    paginate_by = 50
 
     def get_member(self):
         return Member.objects.get(pk=self.kwargs['pk'])
@@ -104,7 +109,7 @@ class MemberFinanceView(ListView):
             Q(destination_account__account_category='member_fees') |
             Q(destination_account__account_category='member_donation'),
             value_datetime__lte=now(),
-        )
+        ).order_by('-value_datetime')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

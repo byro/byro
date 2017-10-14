@@ -15,7 +15,7 @@ class RealTransactionListView(ListView):
     model = RealTransaction
 
     def get_queryset(self):
-        return super().get_queryset().filter(virtual_transactions__isnull=False)
+        return super().get_queryset().filter(virtual_transactions__isnull=False).order_by('-value_datetime')
 
     def post(self, request, *args, **kwargs):
         try:

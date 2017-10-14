@@ -16,10 +16,11 @@
             <tr class="transaction {% if not transaction.real_transaction %}unmatched{% endif %}">
                 <td>{{ transaction.value_datetime.date }}</td>
                 <td>{{ transaction.amount }}</td>
-                <td>{{ transaction.destination_account.account_category }}</td>
+                <td>{{ transaction.destination_account.get_account_category_display }}</td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
 
+{% include "office/pagination.html" %}
 {% endblock %}
