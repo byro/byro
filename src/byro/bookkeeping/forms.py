@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput
 
 from .models import VirtualTransaction
 
@@ -13,3 +13,6 @@ class VirtualTransactionForm(ModelForm):
             'member',
             'amount',
         ]
+        widgets = {
+            'member': TextInput(attrs={'class': 'data-member-typeahead'}),
+        }
