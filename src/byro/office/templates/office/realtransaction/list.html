@@ -28,7 +28,7 @@
                         <input type="hidden" name="realtransaction_id" value="{{ rtrans.id }}">
                         {% csrf_token %}
                         <fieldset id="answer-options">
-                            <div class="formset" data-formset data-formset-prefix="{{ vt_formset.prefix }}">
+                            <div class="formset" data-formset data-formset-prefix="{{ rtrans.vt_formset.prefix }}">
                                 {{ rtrans.vt_formset.management_form }}
                                 {% bootstrap_formset_errors rtrans.vt_formset %}
                                 <div data-formset-body>
