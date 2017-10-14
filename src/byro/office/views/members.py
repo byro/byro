@@ -1,11 +1,12 @@
 from django import forms
 from django.contrib import messages
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView, View
 
 from byro.bookkeeping.models import VirtualTransaction
 from byro.members.forms import CreateMemberForm
@@ -109,3 +110,26 @@ class MemberFinanceView(ListView):
         context = super().get_context_data(*args, **kwargs)
         context['member'] = self.get_member()
         return context
+
+
+class MemberListTypeaheadView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        search = request.GET.get('search')
+        if not search or len(search) < 2:
+            return JsonResponse({'count': 0, 'results': []})
+
+        queryset = Member.objects.filter(
+            Q(name__icontains=search) | Q(profile_profile__nickname__icontains=search)
+        )
+        return JsonResponse({
+            'count': len(queryset),
+            'results': [
+                {
+                    'id': member.pk,
+                    'nick': member.profile_profile.nickname,
+                    'name': member.name,
+                }
+                for member in queryset
+            ],
+        })

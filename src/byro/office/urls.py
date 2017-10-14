@@ -6,6 +6,7 @@ office_urls = [
     url('^settings/registration$', settings.RegistrationConfigView.as_view(), name='settings.registration'),
     url('^settings$', settings.ConfigurationView.as_view(), name='settings.base'),
     url('^$', dashboard.DashboardView.as_view(), name='dashboard'),
+    url(r'^members/typeahead', members.MemberListTypeaheadView.as_view(), name='members.typeahead'),
     url(r'^members/list', members.MemberListView.as_view(), name='members.list'),
     url(r'^members/add', members.MemberCreateView.as_view(), name='members.add'),
     url(r'^members/view/(?P<pk>\d+)/', include([
