@@ -54,6 +54,18 @@ class Member(Auditable, models.Model):
         asset = qs.filter(destination_account__account_category='member_fees').aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
         return asset - liability
 
+    @property
+    def donations(self):
+        return self.transactions.filter(value_datetime__lte=now()).filter(
+            destination_account__account_category='member_donation'
+        )
+
+    @property
+    def fee_payments(self):
+        return self.transactions.filter(value_datetime__lte=now()).filter(
+            destination_account__account_category='member_fees'
+        )
+
 
 class FeeIntervals:
     MONTHLY = 1
