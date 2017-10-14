@@ -6,10 +6,10 @@ from byro.members.models import Member
 
 
 class RegistrationConfigForm(forms.Form):
-    number = forms.IntegerField(required=False, label=_('Membership number/ID'))
-    name = forms.IntegerField(required=False, label=_('Name'))
-    address = forms.IntegerField(required=False, label=_('Address'))
-    email = forms.IntegerField(required=False, label=_('E-Mail'))
+    member__number = forms.IntegerField(required=False, label=_('Membership number/ID'))
+    member__name = forms.IntegerField(required=False, label=_('Name'))
+    member__address = forms.IntegerField(required=False, label=_('Address'))
+    member__email = forms.IntegerField(required=False, label=_('E-Mail'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
