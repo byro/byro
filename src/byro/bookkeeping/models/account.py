@@ -1,4 +1,8 @@
 from django.db import models
+from django.db.models import Q
+from django.utils.decorators import classproperty
+from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
@@ -15,7 +19,16 @@ class AccountCategory(Choices):
     INCOME = 'income'
     EXPENSE = 'expense'
 
-    valid_choices = [MEMBER_DONATION, MEMBER_FEES]
+    @classproperty
+    def choices(cls):
+        return (
+            (cls.MEMBER_DONATION, _('Donation account')),
+            (cls.MEMBER_FEES, _('Membership fee account')),
+            (cls.ASSET, _('Asset account')),
+            (cls.LIABILITY, _('Liability account')),
+            (cls.INCOME, _('Income account')),
+            (cls.EXPENSE, _('Expense account')),
+        )
 
 
 class Account(Auditable, models.Model):
