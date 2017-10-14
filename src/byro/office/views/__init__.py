@@ -1,12 +1,12 @@
-from .accounts import AccountCreateView, AccountListView, AccountDeleteView, AccountDetailView
+from .accounts import (
+    AccountCreateView, AccountDeleteView, AccountDetailView, AccountListView,
+)
 from .dashboard import DashboardView
 from .members import (
     MemberCreateView, MemberDashboardView,
     MemberDataView, MemberFinanceView, MemberListView,
 )
-from .realtransactions import (
-    RealTransactionListView,
-)
+from .realtransactions import RealTransactionListView
 from .settings import ConfigurationView, RegistrationConfigView
 
 __all__ = [
