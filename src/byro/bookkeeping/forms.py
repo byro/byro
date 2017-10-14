@@ -4,7 +4,6 @@ from .models import VirtualTransaction
 
 
 class VirtualTransactionForm(forms.ModelForm):
-    member = forms.CharField(widget=forms.TextInput(attrs={'class': 'member-typeahead'}))
     member_name = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -22,3 +21,6 @@ class VirtualTransactionForm(forms.ModelForm):
             'member',
             'amount',
         ]
+        widgets = {
+            'member': forms.TextInput(attrs={'class': 'member-typeahead'}),
+        }
