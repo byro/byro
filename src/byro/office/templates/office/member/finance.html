@@ -7,16 +7,18 @@
     <thead>
         <tr>
             <th>{% trans "Date" %}</th>
-            <th>{% trans "Amount" %}</th>
+            <th>{% trans "Purpose" %}</th>
             <th>{% trans "Category" %}</th>
+            <th class="text-md-right">{% trans "Amount" %}</th>
         </tr>
     </thead>
     <tbody>
         {% for transaction in transactions %}
             <tr class="transaction {% if not transaction.real_transaction %}unmatched{% endif %}">
                 <td>{{ transaction.value_datetime.date }}</td>
-                <td>{{ transaction.amount }}</td>
+                <td>{{ transaction.real_transaction.purpose }}</td>
                 <td>{{ transaction.destination_account.get_account_category_display }}</td>
+                <td class="text-md-right">{{ transaction.amount }}</td>
             </tr>
         {% endfor %}
     </tbody>

@@ -20,7 +20,7 @@ class MemberListView(ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        return Member.objects.filter(memberships__end__isnull=True).order_by('id')
+        return Member.objects.filter(memberships__end__isnull=True).order_by('-id')
 
 
 class MemberCreateView(FormView):
