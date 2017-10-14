@@ -1,4 +1,6 @@
 from django.forms.models import BaseModelFormSet, inlineformset_factory
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import ListView
 
@@ -14,6 +16,22 @@ class RealTransactionListView(ListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(virtual_transactions__isnull=False)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            realtransaction_id = request.POST['realtransaction_id']
+        except LookupError:
+            return HttpResponseBadRequest()
+
+        formset = self.get_formset(realtransaction_id)
+
+        if formset.is_valid():
+            formset.save()
+        else:
+            # TODO: messages
+            raise Exception('invalid data')
+
+        return HttpResponseRedirect(reverse('office:realtransactions.list'))
 
     @cached_property
     def formset_class(self):

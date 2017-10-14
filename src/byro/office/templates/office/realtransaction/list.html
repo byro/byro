@@ -25,6 +25,7 @@
                 <td>{{ rtrans.originator }}</a></td>
                 <td>
                     <form method="POST" action="">
+                        <input type="hidden" name="realtransaction_id" value="{{ rtrans.id }}">
                         {% csrf_token %}
                         <fieldset id="answer-options">
                             <div class="formset" data-formset data-formset-prefix="{{ vt_formset.prefix }}">
