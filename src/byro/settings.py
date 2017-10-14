@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
     'compressor',
     'bootstrap4',
+    'djangoformsetjs',
     'solo.apps.SoloAppConfig',
 
     'byro.common.apps.CommonConfig',
