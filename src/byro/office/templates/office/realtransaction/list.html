@@ -24,59 +24,63 @@
                 <td>{{ rtrans.purpose }}</a></td>
                 <td>{{ rtrans.originator }}</a></td>
                 <td>
-                <fieldset id="answer-options">
-                    <div class="formset" data-formset data-formset-prefix="{{ vt_formset.prefix }}">
-                        {{ rtrans.vt_formset.management_form }}
-                        {% bootstrap_formset_errors rtrans.vt_formset %}
-                        <div data-formset-body>
-                            {% for form in rtrans.vt_formset %}
-                                <div data-formset-form>
-                                    <div class="sr-only">
-                                        {{ form.id }}
-                                        {% bootstrap_field form.DELETE form_group_class="" layout="inline" %}
-                                    </div>
-                                    <div class="question-option-row offset-3">
-                                        <div class="question-option-input{% if action == 'view' %} disabled{% endif %}">
-                                            {% bootstrap_form_errors form %}
-                                            {% bootstrap_form form layout='inline' form_group_class="" %}
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <fieldset id="answer-options">
+                            <div class="formset" data-formset data-formset-prefix="{{ vt_formset.prefix }}">
+                                {{ rtrans.vt_formset.management_form }}
+                                {% bootstrap_formset_errors rtrans.vt_formset %}
+                                <div data-formset-body>
+                                    {% for form in rtrans.vt_formset %}
+                                        <div data-formset-form>
+                                            <div class="sr-only">
+                                                {{ form.id }}
+                                                {% bootstrap_field form.DELETE form_group_class="" layout="inline" %}
+                                            </div>
+                                            <div class="question-option-row offset-3">
+                                                <div class="question-option-input{% if action == 'view' %} disabled{% endif %}">
+                                                    {% bootstrap_form_errors form %}
+                                                    {% bootstrap_form form layout='inline' form_group_class="" %}
+                                                </div>
+                                                {% if action != 'view' %}
+                                                <div class="question-option-delete">
+                                                    <button type="button" class="btn btn-danger" data-formset-delete-button>
+                                                        <i class="fa fa-trash"></i></button>
+                                                </div>
+                                                {% endif %}
+                                            </div>
                                         </div>
-                                        {% if action != 'view' %}
-                                        <div class="question-option-delete">
-                                            <button type="button" class="btn btn-danger" data-formset-delete-button>
-                                                <i class="fa fa-trash"></i></button>
-                                        </div>
-                                        {% endif %}
-                                    </div>
+                                    {% endfor %}
                                 </div>
-                            {% endfor %}
-                        </div>
-                        <script type="form-template" data-formset-empty-form>
-                            {% escapescript %}
-                                <div data-formset-form>
-                                    <div class="sr-only">
-                                        {{ rtrans.vt_formset.empty_form.id }}
-                                        {% bootstrap_field rtrans.vt_formset.empty_form.DELETE form_group_class="" layout="inline" %}
-                                    </div>
-                                    <div class="question-option-row offset-3">
-                                        <div class="question-option-input">
-                                            {% bootstrap_form rtrans.vt_formset.empty_form %}
+                                <script type="form-template" data-formset-empty-form>
+                                    {% escapescript %}
+                                        <div data-formset-form>
+                                            <div class="sr-only">
+                                                {{ rtrans.vt_formset.empty_form.id }}
+                                                {% bootstrap_field rtrans.vt_formset.empty_form.DELETE form_group_class="" layout="inline" %}
+                                            </div>
+                                            <div class="question-option-row offset-3">
+                                                <div class="question-option-input">
+                                                    {% bootstrap_form rtrans.vt_formset.empty_form %}
+                                                </div>
+                                                <div class="question-option-delete">
+                                                    <button type="button" class="btn btn-danger" data-formset-delete-button>
+                                                        <i class="fa fa-trash"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="question-option-delete">
-                                            <button type="button" class="btn btn-danger" data-formset-delete-button>
-                                                <i class="fa fa-trash"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endescapescript %}
-                        </script>
-                        {% if action != 'view' %}
-                        <p class="offset-3">
-                            <button type="button" class="btn btn-secondary" data-formset-add>
-                                <i class="fa fa-plus"></i> {% trans "Add a new VT" %}</button>
-                        </p>
-                        {% endif %}
-                    </div>
-                </fieldset>
+                                    {% endescapescript %}
+                                </script>
+                                {% if action != 'view' %}
+                                <p class="offset-3">
+                                        <button type="button" class="btn btn-secondary" data-formset-add>
+                                            <i class="fa fa-plus"></i> {% trans "Add a new VT" %}</button>
+                                </p>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-primary" data-formset-add>{% trans "Save" %}</button>
+                        </fieldset>
+                    </form>
                 </td>
             </tr>
         {% endfor %}
