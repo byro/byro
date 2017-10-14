@@ -1,11 +1,13 @@
 from django import forms
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView
 
+from byro.bookkeeping.models import VirtualTransaction
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member
 
@@ -85,7 +87,22 @@ class MemberDataView(DetailView):
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
 
 
-class MemberFinanceView(DetailView):
+class MemberFinanceView(ListView):
     template_name = 'office/member/finance.html'
-    context_object_name = 'member'
-    model = Member
+    context_object_name = 'transactions'
+    model = VirtualTransaction
+
+    def get_member(self):
+        return Member.objects.get(pk=self.kwargs['pk'])
+
+    def get_queryset(self):
+        return self.get_member().transactions.filter(
+            Q(destination_account__account_category='member_fees') |
+            Q(destination_account__account_category='member_donation'),
+            value_datetime__lte=now(),
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['member'] = self.get_member()
+        return context

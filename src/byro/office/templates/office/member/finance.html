@@ -1,6 +1,25 @@
 {% extends "office/member/base.html" %}
+{% load i18n %}
 
 {% block member_content %}
-ID: {{ member.pk }}<br>
-Name: {{ member.name }}
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>{% trans "Date" %}</th>
+            <th>{% trans "Amount" %}</th>
+            <th>{% trans "Category" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transaction in transactions %}
+            <tr class="transaction {% if not transaction.real_transaction %}unmatched{% endif %}">
+                <td>{{ transaction.value_datetime.date }}</td>
+                <td>{{ transaction.amount }}</td>
+                <td>{{ transaction.destination_account.account_category }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}
