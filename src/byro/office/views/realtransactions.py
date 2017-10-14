@@ -23,7 +23,6 @@ class RealTransactionListView(ListView):
         )
         return formset_class
 
-    def get_formset(self, transaction):
     def get_formset(self, real_transaction_id):
         return self.formset_class(
             self.request.POST if self.request.method == 'POST' else None,
