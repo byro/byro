@@ -24,13 +24,15 @@ class RealTransactionListView(ListView):
         return formset_class
 
     def get_formset(self, transaction):
+    def get_formset(self, real_transaction_id):
         return self.formset_class(
             self.request.POST if self.request.method == 'POST' else None,
-            queryset=VirtualTransaction.objects.filter(real_transaction=transaction)
+            queryset=VirtualTransaction.objects.filter(real_transaction_id=real_transaction_id),
+            prefix=f'virtual_transactions_{real_transaction_id}',
         )
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
         for transaction in ctx['transactions']:
-            transaction.vt_formset = self.get_formset(transaction)
+            transaction.vt_formset = self.get_formset(transaction.pk)
         return ctx
