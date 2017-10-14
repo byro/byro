@@ -66,6 +66,9 @@ class Member(Auditable, models.Model):
             destination_account__account_category='member_fees'
         )
 
+    def __str__(self):
+        return f'Member {self.number} ({self.name})'
+
 
 class FeeIntervals:
     MONTHLY = 1

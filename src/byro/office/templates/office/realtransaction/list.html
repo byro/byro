@@ -1,0 +1,36 @@
+{% extends "office/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>{% trans "Value Date" %}</th>
+            <th>{% trans "Amount" %}</th>
+            <th>{% trans "Purpose" %}</th>
+            <th>{% trans "Originator" %}</th>
+            <th>{% trans "Virtual Transactions" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rtrans in transactions %}
+            <tr>
+                <td>{{ rtrans.value_datetime }}</a></td>
+                <td>{{ rtrans.amount }}</a></td>
+                <td>{{ rtrans.purpose }}</a></td>
+                <td>{{ rtrans.originator }}</a></td>
+                <td>
+                    {% for vtrans in rtrans.virtual_transactions.all %}
+                        {{ vtrans.amount }}<br>
+                        {{ vtrans.member }}<br>
+                        ({{ vtrans.source_account }} => {{ vtrans.destination_account }})<br>
+                        {% if not forloop.last %}<hr>{% endif %}
+                    {% empty %}
+                        None found.
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

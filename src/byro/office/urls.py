@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from .views import (
     ConfigurationView, DashboardView, MemberCreateView, MemberDashboardView,
     MemberDataView, MemberFinanceView, MemberListView, RegistrationConfigView,
+    RealTransactionListView,
 )
 
 office_urls = [
@@ -16,4 +17,5 @@ office_urls = [
         url('finance$', MemberFinanceView.as_view(), name='members.finance'),
         url('$', MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
+    url('^realtransaction/list', RealTransactionListView.as_view(), name='realtransactions.list')
 ]
