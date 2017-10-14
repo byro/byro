@@ -38,7 +38,7 @@ def test_match_single_fee(member, real_transaction):
         real_transaction.derive_virtual_transactions()
 
     account = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-    assert account.balance() == real_transaction.amount
+    assert account.balance(end=None) == real_transaction.amount
 
 
 @pytest.mark.django_db
