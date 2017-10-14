@@ -1,0 +1,11 @@
+{% extends "office/base.html" %}
+{% load i18n %}
+
+{% block headline %}{% if account.name %}{{ account.name }}{% else %}{% trans "Default " %} {{ account.get_account_category_display }}{% endif %}{% endblock %}
+
+{% block content %}
+{% block account_content %}
+{% endblock %}
+
+{% endblock %}
+

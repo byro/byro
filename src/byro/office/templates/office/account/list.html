@@ -1,0 +1,42 @@
+{% extends "office/base.html" %}
+
+{% load i18n %}
+
+{% block headline %}{% trans "Accounts" %}{% endblock %}
+
+{% block content %}
+<p>
+<a href="{% url "office:accounts.add" %}" class="btn btn-primary">
+    <span class="fa fa-plus"></span> {% trans "Add new account" %}
+</a>
+</p>
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "Type" %}</th>
+            <th class="text-md-right">{% trans "Incoming" %}</th>
+            <th class="text-md-right">{% trans "Outgoing" %}</th>
+            <th class="text-md-right">{% trans "Balance" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for account in accounts %}
+            <tr>
+                <td><a href="{% url "office:accounts.detail" pk=account.pk %}">
+                    {% if account.name %}
+                        {{ account.name }}
+                    {% else %}
+                        {% trans "Default" %}
+                        {{ account.get_account_category_display }}
+                    {% endif %}
+                </a></td>
+                <td>{{ account.get_account_category_display }}</td>
+                <td class="text-md-right">{{ account.total_in }}</td>
+                <td class="text-md-right">{{ account.total_out }}</td>
+                <td class="text-md-right">{{ account.balance }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

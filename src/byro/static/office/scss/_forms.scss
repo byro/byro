@@ -27,3 +27,11 @@ form button {
     font-size: 14px;
     padding-top: 4px;
 }
+.inline-form {
+    display: flex;
+    flex-direction: row;
+
+    div, button {
+        margin: 4px;
+    }
+}

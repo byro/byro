@@ -1,0 +1,44 @@
+{% extends "office/account/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block account_content %}
+
+<form method='post' class="inline-form">
+    {% csrf_token %}
+    {% bootstrap_form form layout='inline' %}
+    <button class="btn btn-primary" type="submit">Save</button>
+</form>
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>{% trans "Date" %}</th>
+            <th>{% trans "Member" %}</th>
+            <th>{% trans "Purpose" %}</th>
+            <th class="text-md-right">{% trans "Incoming" %}</th>
+            <th class="text-md-right">{% trans "Outgoing" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.value_datetime.date }}</td>
+                <td>{{ transaction.member.name }}</td>
+                <td>{{ transaction.real_transaction.purpose }}</td>
+                <td class="text-md-right">
+                    {% if transaction.destination_account == account %}
+                        {{ transaction.amount }}
+                    {% endif %}
+                </td>
+                <td class="text-md-right">
+                    {% if transaction.source_account == account %}
+                        {{ transaction.amount }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

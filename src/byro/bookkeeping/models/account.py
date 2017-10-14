@@ -48,7 +48,6 @@ class Account(Auditable, models.Model):
             return self.name
         return f'{self.account_category} account #{self.id}'
 
-
     @property
     def transactions(self):
         from byro.bookkeeping.models import VirtualTransaction

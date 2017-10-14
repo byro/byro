@@ -56,6 +56,9 @@
             <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">
                 <span class="fa fa-address-book"></span> {% trans "Members" %}
             </a>
+            <a class="nav-link {% if url_name == "accounts.list" %}active{% endif %}" href="{% url 'office:accounts.list' %}">
+                <span class="fa fa-credit-card"></span> {% trans "Accounts" %}
+            </a>
             <a class="nav-link {% if url_name == "realtransactions.list" %}active{% endif %}" href="{% url 'office:realtransactions.list' %}">
                 <span class="fa fa-money"></span> {% trans "Real Transactions" %}
             </a>
