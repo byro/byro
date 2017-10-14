@@ -14,5 +14,5 @@ class VirtualTransactionForm(ModelForm):
             'amount',
         ]
         widgets = {
-            'member': TextInput(attrs={'class': 'data-member-typeahead'}),
+            'member': TextInput(attrs={'class': 'member-typeahead'}),
         }
