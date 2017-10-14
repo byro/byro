@@ -27,4 +27,7 @@ class Choices:
 
     @classproperty
     def max_length(cls):
-        return max([len(val) for val in cls.valid_choices])
+        if hasattr(cls, 'valid_choices'):
+            return max([len(val) for val in cls.valid_choices])
+        else:
+            return max([len(val) for val, _ in cls.choices])
