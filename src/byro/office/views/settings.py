@@ -22,7 +22,7 @@ class ConfigurationView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:settings')
+        return reverse('office:settings.base')
 
 
 class RegistrationConfigView(FormView):
