@@ -1,6 +1,7 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf.global_settings import LANGUAGES
 from solo.models import SingletonModel
 
 
@@ -23,6 +24,7 @@ class Configuration(SingletonModel):
     )
 
     language = models.CharField(
+        choices=LANGUAGES,
         null=True, blank=True,
         max_length=5,
         verbose_name=_('language'),
