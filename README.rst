@@ -22,7 +22,7 @@ Development Setup
 using Docker
 ^^^^^^^^^^^^
 
-- add ``local_settings.py`` with this contents:
+- add ``local_settings.py`` in the ``src/byro/`` folder with this contents:
 
 .. code:: python
 
@@ -48,6 +48,17 @@ using Docker
 
   docker-compose up -d
 
+- run the database-migrations
+
+.. code:: shell
+
+  docker-compose run --rm web migrate
+
+- create the superuser
+
+.. code:: shell
+
+  docker-compose run --rm web createsuperuser
 
 - run tests
 
@@ -57,7 +68,7 @@ using Docker
 
 - execute arbitrary django commands like so:
 
-... code:: shell
+.. code:: shell
 
   docker-compose run --rm web makemigrate
 
