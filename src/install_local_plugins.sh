@@ -5,7 +5,7 @@ if [ "$1" = '--help' ]; then
   exit 0
 fi
 
-for plugin in local/*(N); do
+for plugin in local/*(N); do  # this is a nullglob
   echo "installing $plugin"
 
   cd $plugin
