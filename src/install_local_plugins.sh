@@ -5,10 +5,10 @@ if [ "$1" = '--help' ]; then
   exit 0
 fi
 
-$(set nullglob; for plugin in local/*; do
-  echo installing $plugin
+for plugin in local/*(N); do
+  echo "installing $plugin"
 
   cd $plugin
   python setup.py develop
   cd -
-done)
+done
