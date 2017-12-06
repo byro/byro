@@ -4,6 +4,7 @@ MAINTAINER byro team
 EXPOSE 8020
 
 ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get install -y zsh
 
 # user
 RUN useradd uid1000 -d /home/uid1000
@@ -20,7 +21,7 @@ RUN pip install -Ur requirements/development.txt
 ADD install_local_plugins.sh /opt/code/install_local_plugins.sh
 ADD . /opt/code
 
-RUN ./install_local_plugins.sh
+RUN /bin/zsh install_local_plugins.sh
 
 WORKDIR /opt/code
 
