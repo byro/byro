@@ -16,11 +16,8 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-import byro.common.urls
-import byro.office.urls
-
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'', include(byro.common.urls.common_urls, namespace='common')),
-    url(r'', include(byro.office.urls.office_urls, namespace='office')),
+    url(r'', include('byro.common.urls', namespace='common')),
+    url(r'', include('byro.office.urls', namespace='office')),
 ]

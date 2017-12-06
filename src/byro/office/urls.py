@@ -2,7 +2,8 @@ from django.conf.urls import include, url
 
 from .views import accounts, dashboard, members, realtransactions, settings
 
-office_urls = [
+app_name = 'office'
+urlpatterns = [
     url('^settings/registration$', settings.RegistrationConfigView.as_view(), name='settings.registration'),
     url('^settings$', settings.ConfigurationView.as_view(), name='settings.base'),
     url('^$', dashboard.DashboardView.as_view(), name='dashboard'),
