@@ -72,6 +72,22 @@ using Docker
 
   docker-compose run --rm web makemigrate
 
+Not using Docker
+^^^^^^^^^^^^^^^^
+
+.. code:: shell
+
+    [postgres@localhost ~]$ createdb byro
+    [postgres@localhost ~]$ createuser byro -P
+    Enter password for new role:
+    Enter it again:
+    [postgres@ronja ~]$ psql
+    psql (10.1)
+    Type "help" for help.
+
+    postgres=# GRANT ALL PRIVILEGES ON DATABASE byro TO byro;
+    GRANT
+
 
 Features
 --------
