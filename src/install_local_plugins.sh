@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/zsh
 
-if [ "$1" == '--help' ]; then
+if [ "$1" = '--help' ]; then
   echo "Install all plugins from the 'local' directory."
   exit 0
 fi
 
-$(shopt -s nullglob; for plugin in local/*; do
+$(set nullglob; for plugin in local/*; do
   echo installing $plugin
 
   cd $plugin
