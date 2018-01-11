@@ -5,6 +5,10 @@ from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 
 
+class RealTransactionSource(Auditable, models.Model):
+    source_file = models.FileField(upload_to='transaction_uploads/')
+
+
 class TransactionChannel(Choices):
     BANK = 'bank'
     CASH = 'cash'
@@ -29,10 +33,14 @@ class RealTransaction(Auditable, models.Model):
         on_delete=models.PROTECT,
         null=True,
     )
-
     importer = models.CharField(null=True, max_length=200)
-
     data = JSONField(null=True)
+    source = models.ForeignKey(
+        to=RealTransactionSource,
+        on_delete=models.SET_NULL,
+        related_name='transactions',
+        null=True,
+    )
 
     @transaction.atomic
     def derive_virtual_transactions(self):
