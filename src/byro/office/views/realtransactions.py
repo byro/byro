@@ -1,5 +1,3 @@
-import copy
-
 from django.forms.models import BaseModelFormSet, inlineformset_factory
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls import reverse
@@ -38,16 +36,10 @@ class RealTransactionMatchView(TemplateView):
         return qs
 
     def post(self, request, *args, **kwargs):
-        try:
-            realtransaction_ids = request.GET['ids'].split(',')
-        except LookupError:
-            return HttpResponseBadRequest()
-
         formset = self.get_formset()
-
         if formset.is_valid():
             for transaction in self.get_queryset():
-                for form in local_formset:
+                for form in formset:
                     VirtualTransaction.objects.create(
                         real_transaction=transaction,
                         source_account=form.instance.source_account,
