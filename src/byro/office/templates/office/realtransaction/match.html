@@ -14,6 +14,7 @@
             <th class="table-column-small">{% trans "Amount" %}</th>
             <th class="table-column-medium">{% trans "Purpose" %}</th>
             <th class="table-column-small">{% trans "Originator" %}</th>
+            <th class="table-column-medium">{% trans "Matches" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -23,6 +24,15 @@
                 <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
                 <td>{{ rtrans.purpose }}</td>
                 <td>{{ rtrans.originator }}</td>
+                <td>
+                    <ul>
+                    {% for transaction in rtrans.virtual_transactions.all %}
+                    <li> {% blocktrans with amount=transaction.amount source=transaction.source_account dest=transaction.destination_account member=transaction.member trimmed %}
+                        {{ amount }} € from {{ source }} to {{ dest }} ({{ member }})
+                    {% endblocktrans %}</li>
+                    {% endfor %}
+                    </ul>
+                </td>
         </tr>
         {% endfor %}
     </tbody>

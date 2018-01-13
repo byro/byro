@@ -13,12 +13,15 @@
             <option value="matched"{% if "matched" == request.GET.filter %}selected{% endif %}>{% trans "Only matched transactions" %}</option>
             <option value="unmatched" {% if "unmatched" == request.GET.filter %}selected{% endif %}>{% trans "Only unmatched transactions" %}</option>
         </select>
+        <input name="q" class="form-control" type="text" placeholder="{% trans "Search" %}"/>
         <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
     </form>
 </div>
+<form action="match">
 <table class="table table-condensed table-bordered">
     <thead>
         <tr>
+            <th><button type="submit" class="btn btn-xs btn-primary">{% trans "match" %}</button></th>
             <th class="table-column-small">{% trans "Value Date" %}</th>
             <th class="table-column-small">{% trans "Amount" %}</th>
             <th class="table-column-medium">{% trans "Purpose" %}</th>
@@ -29,6 +32,7 @@
     <tbody>
         {% for rtrans in transactions %}
         <tr class="{% if not rtrans.virtual_transactions.exists %}table-warning{% else %}table-light{% endif %}">
+            <td><input type="checkbox" name="ids" value="{{ rtrans.id }}"></td>
                 <td>{{ rtrans.value_datetime.date.isoformat }}</td>
                 <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
                 <td>{{ rtrans.purpose }}</td>
@@ -42,11 +46,12 @@
                     {% empty %}
                         <a href="match?ids={{ rtrans.id }}" class="btn btn-xs btn-primary">{% trans "Match transaction" %}</a>
                     {% endfor %}
+                    </ul>
                 </td>
             </tr>
         {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+</table></form>
 {% include "office/pagination.html" %}
 <script>
 jQuery(function($) {

@@ -1,5 +1,6 @@
 from django.forms.models import BaseModelFormSet, inlineformset_factory
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import ListView, TemplateView
@@ -23,6 +24,9 @@ class RealTransactionListView(ListView):
         year = self.request.GET.get('year')
         if year is not None and year.isdigit():
             qs = qs.filter(value_datetime__year=year)
+        search = self.request.GET.get('q')
+        if search:
+            qs = qs.filter(Q(purpose__icontains=search) | Q(originator__icontains=search))
         return qs
 
 
@@ -31,7 +35,7 @@ class RealTransactionMatchView(TemplateView):
 
     def get_queryset(self):
         qs = RealTransaction.objects.all().order_by('-value_datetime')
-        ids = self.request.GET['ids'].split(',')
+        ids = self.request.GET.getlist('ids')
         qs = qs.filter(id__in=ids)
         return qs
 
@@ -40,13 +44,15 @@ class RealTransactionMatchView(TemplateView):
         if formset.is_valid():
             for transaction in self.get_queryset():
                 for form in formset:
-                    VirtualTransaction.objects.create(
-                        real_transaction=transaction,
-                        source_account=form.instance.source_account,
-                        destination_account=form.instance.destination_account,
-                        member=form.instance.member,
-                        amount=form.instance.amount or transaction.amount,
-                    )
+                    if form.instance and (form.instance.source_account or form.instance.destination_account):
+                        VirtualTransaction.objects.create(
+                            real_transaction=transaction,
+                            value_datetime=transaction.value_datetime,
+                            source_account=form.instance.source_account,
+                            destination_account=form.instance.destination_account,
+                            member=form.instance.member,
+                            amount=form.instance.amount or transaction.amount,
+                        )
         else:
             # TODO: messages
             raise Exception('invalid data: ' + str(formset.errors))
