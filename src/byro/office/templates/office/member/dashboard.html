@@ -3,9 +3,14 @@
 
 {% block member_content %}
 <div class="dashboard-list">
+    <div class="dashboard-block {% if not active %}block-danger{% endif %}">
+      <h1>
+        {% if not is_active %}<strong>not</strong>{% endif %} active
+      </h1>
+    </div>
     <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
         <h1>
-            {{ member.balance }}
+            {{ member.balance }} €
         </h1>
         <span class="dashboard-description">
             {% trans "current balance" %}
@@ -31,6 +36,14 @@
             {% blocktrans with start=member_since.first.isoformat %}
                 Joined on {{ start }}.
             {% endblocktrans %}
+        </span>
+    </div>
+    <div class="dashboard-block">
+      <h1>
+        {{ current_membership.amount }} €
+      </h1>
+      <span class="dashboard-description">
+        membership fee <strong>{{ current_membership.interval }}</strong>
         </span>
     </div>
 </div>
