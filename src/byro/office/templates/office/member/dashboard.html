@@ -3,7 +3,7 @@
 
 {% block member_content %}
 <div class="dashboard-list">
-    <div class="dashboard-block {% if not active %}block-danger{% endif %}">
+    <div class="dashboard-block {% if not is_active %}block-danger{% endif %}">
       <h1>
         {% if not is_active %}<strong>not</strong>{% endif %} active
       </h1>
