@@ -22,6 +22,11 @@ class Configuration(SingletonModel):
         max_length=200,
         verbose_name=_('url'),
     )
+    liability_interval = models.IntegerField(
+        default=36,
+        verbose_name=_('Liability interval'),
+        help_text=_('For which interval should remaining fees be calculated?'),
+    )
 
     language = models.CharField(
         choices=LANGUAGES,
