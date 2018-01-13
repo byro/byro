@@ -27,6 +27,10 @@
                 until this person becomes a member.
                 {% endblocktrans %}
             {% endif %}
+            <br>
+            {% blocktrans with start=member_since.first.isoformat %}
+                Joined on {{ start }}.
+            {% endblocktrans %}
         </span>
     </div>
 </div>

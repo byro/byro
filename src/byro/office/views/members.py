@@ -67,10 +67,12 @@ class MemberDashboardView(DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         obj = self.get_object()
-        delta = now().date() - obj.memberships.first().start
+        first = obj.memberships.first().start
+        delta = now().date() - first
         context['member_since'] = {
             'days': int(delta.total_seconds() / (60 * 60 * 24)),
             'years': round(delta.days / 365, 1),
+            'first': first,
         }
         return context
 
