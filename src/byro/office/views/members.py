@@ -32,6 +32,8 @@ class MemberListView(ListView):
                 pass
             else:
                 qs = qs.filter(memberships__end__isnull=True)
+        else:
+            qs = qs.filter(memberships__end__isnull=True)
         return qs
 
     def post(self, request, *args, **kwargs):
