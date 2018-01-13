@@ -3,7 +3,7 @@
 
 {% block member_content %}
 <div class="dashboard-list">
-    <div class="dashboard-block">
+    <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
         <h1>
             {{ member.balance }}
         </h1>
