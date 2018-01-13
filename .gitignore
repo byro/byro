@@ -118,3 +118,4 @@ ENV/
 # byro specific
 local/
 static.dist/
+transaction_uploads/
