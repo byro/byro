@@ -22,6 +22,11 @@ class MemberListView(ListView):
     def get_queryset(self):
         return Member.objects.filter(memberships__end__isnull=True).order_by('-id')
 
+    def post(self, request, *args, **kwargs):
+        for member in Member.objects.all():
+            member.update_liabilites()
+        return redirect(request.path)
+
 
 class MemberCreateView(FormView):
     template_name = 'office/member/add.html'

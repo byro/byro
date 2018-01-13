@@ -7,6 +7,10 @@
 <a href="{% url "office:members.add" %}" class="btn btn-primary">
     <span class="fa fa-plus"></span> {% trans "Add new member" %}
 </a>
+<form method="post" class="form form-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">{% trans "Rebuild" %}</button>
+</form>
 </p>
 <table class="table table-condensed">
     <thead>
