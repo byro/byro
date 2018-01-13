@@ -22,7 +22,7 @@
         {% for upload in uploads %}
             <tr>
                 <td class="text-md-left">{{ upload.source_file }}</td>
-                <td class="text-md-right">{{ upload.state }}</td>
+                <td class="text-md-left">{{ upload.state }}</td>
                 <td><form method="post" action="{{ upload.id }}"><button type="submit" class="btn btn-xs btn-danger">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button></form></td>
             </tr>
         {% endfor %}

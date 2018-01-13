@@ -27,16 +27,26 @@ class RealTransactionSource(Auditable, models.Model):
         Returns a list of one or more VirtualTransaction objects if no Exception
         was raised.
         """
+        self.state = SourceState.PROCESSING
+        self.save()
         from byro.bookkeeping.signals import process_csv_upload
         responses = process_csv_upload.send_robust(sender=self)
         if len(responses) > 1:
+            self.state = SourceState.FAILED
+            self.save()
             raise Exception('More than one plugin tried to process the CSV upload.')
         if len(responses) < 1:
+            self.state = SourceState.FAILED
+            self.save()
             raise Exception('No plugin tried to process the CSV upload.')
         receiver, response = responses[0]
 
         if isinstance(response, Exception):
+            self.state = SourceState.FAILED
+            self.save()
             raise response
+        self.state = SourceState.PROCESSED
+        self.save()
         return response
 
 
