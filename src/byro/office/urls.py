@@ -21,6 +21,8 @@ urlpatterns = [
     url('^realtransaction/list', realtransactions.RealTransactionListView.as_view(), name='realtransactions.list'),
 
     url('^upload/list', upload.UploadListView.as_view(), name='uploads.list'),
+    url('^upload/process/(?P<pk>\d+)', upload.UploadProcessView.as_view(), name='uploads.process'),
+    url('^upload/match/(?P<pk>\d+)', upload.UploadMatchView.as_view(), name='uploads.match'),
     url('^upload/add', upload.CsvUploadView.as_view(), name='uploads.add'),
 
     url('^accounts/$', accounts.AccountListView.as_view(), name='accounts.list'),

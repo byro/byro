@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, ListView
+from django.views.generic import DetailView, FormView, ListView
 
 from byro.bookkeeping.models import RealTransactionSource
 
@@ -36,3 +37,32 @@ class CsvUploadView(FormView):
 
     def get_success_url(self):
         return self.request.path
+
+
+class UploadProcessView(DetailView):
+    model = RealTransactionSource
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        try:
+            obj.process()
+            messages.success(self.request, _('The upload was processed successfully.'))
+        except Exception as e:
+            messages.error(self.request, _('The upload could not be processed: ') + str(e))
+        return redirect('office:uploads.list')
+
+
+class UploadMatchView(DetailView):
+    model = RealTransactionSource
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        errors = success = 0
+        for real_transaction in obj.transactions.all():
+            try:
+                real_transaction.derive_virtual_transactions()
+                success += 1
+            except Exception as e:
+                errors += 1
+        messages.info(request, f'{success} successful matches, {errors} errors.')
+        return redirect('office:uploads.list')

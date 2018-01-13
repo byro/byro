@@ -23,7 +23,16 @@
             <tr>
                 <td class="text-md-left">{{ upload.source_file }}</td>
                 <td class="text-md-left">{{ upload.state }}</td>
-                <td><form method="post" action="{{ upload.id }}"><button type="submit" class="btn btn-xs btn-danger">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button></form></td>
+                <td>
+                    <form method="post" action="process/{{ upload.id }}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-xs btn-warning">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button>
+                    </form>
+                    <form method="post" action="match/{{ upload.id }}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-xs btn-danger">{% trans "match" %}</button>
+                    </form>
+                </td>
             </tr>
         {% endfor %}
     </tbody>
