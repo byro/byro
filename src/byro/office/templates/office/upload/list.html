@@ -1,0 +1,32 @@
+{% extends "office/base.html" %}
+
+{% load i18n %}
+
+{% block headline %}{% trans "Transaction Imports" %}{% endblock %}
+
+{% block content %}
+<p>
+<a href="{% url "office:uploads.add" %}" class="btn btn-primary">
+    <span class="fa fa-plus"></span> {% trans "Add new import" %}
+</a>
+</p>
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "State" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for upload in uploads %}
+            <tr>
+                <td class="text-md-left">{{ upload.source_file }}</td>
+                <td class="text-md-right">{{ upload.state }}</td>
+                <td><form method="post" action="{{ upload.id }}"><button type="submit" class="btn btn-xs btn-danger">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button></form></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "office/pagination.html" %}
+{% endblock %}

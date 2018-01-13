@@ -19,7 +19,9 @@ urlpatterns = [
     ])),
 
     url('^realtransaction/list', realtransactions.RealTransactionListView.as_view(), name='realtransactions.list'),
-    url('^realtransaction/upload', upload.CsvUploadView.as_view(), name='realtransactions.add'),
+
+    url('^upload/list', upload.UploadListView.as_view(), name='uploads.list'),
+    url('^upload/add', upload.CsvUploadView.as_view(), name='uploads.add'),
 
     url('^accounts/$', accounts.AccountListView.as_view(), name='accounts.list'),
     url('^accounts/add$', accounts.AccountCreateView.as_view(), name='accounts.add'),

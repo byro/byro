@@ -62,6 +62,9 @@
             <a class="nav-link {% if url_name == "realtransactions.list" %}active{% endif %}" href="{% url 'office:realtransactions.list' %}">
                 <span class="fa fa-money"></span> {% trans "Real Transactions" %}
             </a>
+            <a class="nav-link {% if url_name == "uploads.list" %}active{% endif %}" href="{% url 'office:uploads.list' %}">
+                <span class="fa fa-upload"></span> {% trans "Transaction Upload" %}
+            </a>
             {% endif %}
         </nav>
         <div id="page-content" class="flex-column">
