@@ -67,7 +67,7 @@ class RealTransaction(Auditable, models.Model):
     amount = models.DecimalField(
         max_digits=8, decimal_places=2,
     )
-    purpose = models.CharField(max_length=200)
+    purpose = models.CharField(max_length=1000)
     originator = models.CharField(max_length=200)
     reverses = models.ForeignKey(
         to='RealTransaction',
