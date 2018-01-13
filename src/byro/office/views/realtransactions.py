@@ -15,7 +15,12 @@ class RealTransactionListView(ListView):
     model = RealTransaction
 
     def get_queryset(self):
-        return super().get_queryset().filter(virtual_transactions__isnull=False).order_by('-value_datetime')
+        qs = super().get_queryset().order_by('-value_datetime')
+        if self.request.GET.get('filter') == 'matched':
+            qs = qs.filter(virtual_transactions__isnull=False)
+        elif self.request.GET.get('filter') == 'unmatched':
+            qs = qs.filter(virtual_transactions__isnull=True)
+        return qs
 
     def post(self, request, *args, **kwargs):
         try:
