@@ -20,7 +20,19 @@ class MemberListView(ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        return Member.objects.filter(memberships__end__isnull=True).order_by('-id')
+        search = self.request.GET.get('q')
+        _filter = self.request.GET.get('filter')
+        qs = Member.objects.all()
+        if search:
+            qs = qs.filter(Q(name__icontains=search) | Q(number=search))
+        if _filter:
+            if _filter == 'inactive':
+                qs = qs.filter(memberships__end__isnull=False)
+            elif _filter == 'all':
+                pass
+            else:
+                qs = qs.filter(memberships__end__isnull=True)
+        return qs
 
     def post(self, request, *args, **kwargs):
         for member in Member.objects.all():

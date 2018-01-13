@@ -11,6 +11,17 @@
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">{% trans "Rebuild" %}</button>
 </form>
+<div class="form-group">
+    <form method="get" class="form form-inline">
+        <select name="filter" class="form-control">
+            <option value="">{% trans "Active members" %}</option>
+            <option value="inactive"{% if "inactive" == request.GET.filter %}selected{% endif %}>{% trans "Only inactive members" %}</option>
+            <option value="all" {% if "all" == request.GET.filter %}selected{% endif %}>{% trans "All members" %}</option>
+        </select>
+        <input name="q" class="form-control" type="text" placeholder="{% trans "Search" %}"/>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+    </form>
+</div>
 </p>
 <table class="table table-condensed">
     <thead>
