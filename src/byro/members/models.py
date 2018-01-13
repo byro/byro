@@ -87,6 +87,7 @@ class Member(Auditable, models.Model):
                 vt = VirtualTransaction.objects.filter(
                     source_account=account,
                     value_datetime=date,
+                    member=self,
                 ).first()
 
                 if vt:
@@ -98,6 +99,7 @@ class Member(Auditable, models.Model):
                         source_account=account,
                         value_datetime=date,
                         amount=membership.amount,
+                        member=self,
                     )
                 date += relativedelta(months=membership.interval)
 
