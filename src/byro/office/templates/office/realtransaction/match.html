@@ -1,0 +1,96 @@
+{% extends "office/base.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+{% load formset_tags %}
+
+{% block content %}
+<h3>{% trans "Match transactions" %}</h3>
+<script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th class="table-column-small">{% trans "Value Date" %}</th>
+            <th class="table-column-small">{% trans "Amount" %}</th>
+            <th class="table-column-medium">{% trans "Purpose" %}</th>
+            <th class="table-column-small">{% trans "Originator" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rtrans in transactions %}
+        <tr>
+                <td>{{ rtrans.value_datetime.date.isoformat }}</td>
+                <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
+                <td>{{ rtrans.purpose }}</td>
+                <td>{{ rtrans.originator }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<form method="POST" action="" class="form form-group">
+    <input type="hidden" name="realtransaction_id" value="{{ rtrans.id }}">
+    {% csrf_token %}
+    <fieldset id="answer-options">
+        <div class="formset" data-formset data-formset-prefix="{{ formset.prefix }}">
+            {{ formset.management_form }}
+            {% bootstrap_formset_errors formset %}
+            <div data-formset-body>
+                {% for form in formset %}
+                    <div data-formset-form>
+                        <div class="sr-only">
+                            {{ form.id }}
+                        </div>
+                        <div class="question-option-row offset-3">
+                            <div class="question-option-input{% if action == 'view' %} disabled{% endif %}">
+                                {% bootstrap_form_errors form %}
+                                {% bootstrap_form form layout='inline' form_group_class="" %}
+                            </div>
+                            {% if action != 'view' %}
+                            <div class="question-option-delete">
+                                <button type="button" class="btn btn-danger" data-formset-delete-button>
+                                    <i class="fa fa-trash"></i></button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <script type="form-template" data-formset-empty-form>
+                {% escapescript %}
+                    <div data-formset-form>
+                        <div class="sr-only">
+                            {{ formset.empty_form.id }}
+                        </div>
+                        <div class="question-option-row offset-3">
+                            <div class="question-option-input">
+                                {% bootstrap_form formset.empty_form %}
+                            </div>
+                        </div>
+                    </div>
+                {% endescapescript %}
+            </script>
+            {% if action != 'view' %}
+            <p class="offset-9">
+                <button type="button" class="btn btn-secondary" data-formset-add>
+                    <i class="fa fa-plus"></i> {% trans "Add a new VT" %}
+                </button>
+                <button type="submit" class="btn btn-primary" data-formset-add>
+                    {% trans "Save" %}
+                </button>
+            </p>
+            {% endif %}
+        </div>
+    </fieldset>
+</form>
+{% include "office/pagination.html" %}
+<script>
+jQuery(function($) {
+    $(".formset").formset({
+        animateForms: true
+    });
+});
+</script>
+<span id="vars" remoteUrl="/members/typeahead/?search=%QUERY"></span>
+<script type="text/javascript" src="{% static "vendored/typeahead.bundle.min.js" %}"></script>
+<script type="text/javascript" src="{% static "office/members.js" %}"></script>
+{% endblock %}

@@ -28,68 +28,20 @@
     </thead>
     <tbody>
         {% for rtrans in transactions %}
-        <tr class="{% if not rtrans.vt_formset|length %}table-warning{% else %}table-light{% endif %}">
+        <tr class="{% if not rtrans.virtual_transactions.exists %}table-warning{% else %}table-light{% endif %}">
                 <td>{{ rtrans.value_datetime.date.isoformat }}</td>
                 <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
                 <td>{{ rtrans.purpose }}</td>
                 <td>{{ rtrans.originator }}</td>
                 <td>
-                    <form method="POST" action="">
-                        <input type="hidden" name="realtransaction_id" value="{{ rtrans.id }}">
-                        {% csrf_token %}
-                        <fieldset id="answer-options">
-                            <div class="formset" data-formset data-formset-prefix="{{ rtrans.vt_formset.prefix }}">
-                                {{ rtrans.vt_formset.management_form }}
-                                {% bootstrap_formset_errors rtrans.vt_formset %}
-                                <div data-formset-body>
-                                    {% for form in rtrans.vt_formset %}
-                                        <div data-formset-form>
-                                            <div class="sr-only">
-                                                {{ form.id }}
-                                            </div>
-                                            <div class="question-option-row offset-3">
-                                                <div class="question-option-input{% if action == 'view' %} disabled{% endif %}">
-                                                    {% bootstrap_form_errors form %}
-                                                    {% bootstrap_form form layout='inline' form_group_class="" %}
-                                                </div>
-                                                {% if action != 'view' %}
-                                                <div class="question-option-delete">
-                                                    <button type="button" class="btn btn-danger" data-formset-delete-button>
-                                                        <i class="fa fa-trash"></i></button>
-                                                </div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <script type="form-template" data-formset-empty-form>
-                                    {% escapescript %}
-                                        <div data-formset-form>
-                                            <div class="sr-only">
-                                                {{ rtrans.vt_formset.empty_form.id }}
-                                            </div>
-                                            <div class="question-option-row offset-3">
-                                                <div class="question-option-input">
-                                                    {% bootstrap_form rtrans.vt_formset.empty_form %}
-                                                </div>
-                                                <div class="question-option-delete">
-                                                    <button type="button" class="btn btn-danger" data-formset-delete-button>
-                                                        <i class="fa fa-trash"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endescapescript %}
-                                </script>
-                                {% if action != 'view' %}
-                                <p class="offset-3">
-                                        <button type="button" class="btn btn-secondary" data-formset-add>
-                                            <i class="fa fa-plus"></i> {% trans "Add a new VT" %}</button>
-                                </p>
-                                {% endif %}
-                            </div>
-                            <button type="submit" class="btn btn-primary" data-formset-add>{% trans "Save" %}</button>
-                        </fieldset>
-                    </form>
+                    <ul>
+                    {% for transaction in rtrans.virtual_transactions.all %}
+                    <li> {% blocktrans with amount=transaction.amount source=transaction.source_account dest=transaction.destination_account member=transaction.member trimmed %}
+                        {{ amount }} € from {{ source }} to {{ dest }} ({{ member }})
+                    {% endblocktrans %}</li>
+                    {% empty %}
+                        <a href="match?ids={{ rtrans.id }}" class="btn btn-xs btn-primary">{% trans "Match transaction" %}</a>
+                    {% endfor %}
                 </td>
             </tr>
         {% endfor %}

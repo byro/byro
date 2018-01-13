@@ -19,6 +19,7 @@ urlpatterns = [
     ])),
 
     url('^realtransaction/list', realtransactions.RealTransactionListView.as_view(), name='realtransactions.list'),
+    url('^realtransaction/match', realtransactions.RealTransactionMatchView.as_view(), name='realtransactions.match'),
 
     url('^upload/list', upload.UploadListView.as_view(), name='uploads.list'),
     url('^upload/process/(?P<pk>\d+)', upload.UploadProcessView.as_view(), name='uploads.process'),

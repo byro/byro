@@ -1,8 +1,10 @@
+import copy
+
 from django.forms.models import BaseModelFormSet, inlineformset_factory
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 
 from byro.bookkeeping.forms import VirtualTransactionForm
 from byro.bookkeeping.models import RealTransaction, VirtualTransaction
@@ -25,19 +27,37 @@ class RealTransactionListView(ListView):
             qs = qs.filter(value_datetime__year=year)
         return qs
 
+
+class RealTransactionMatchView(TemplateView):
+    template_name = 'office/realtransaction/match.html'
+
+    def get_queryset(self):
+        qs = RealTransaction.objects.all().order_by('-value_datetime')
+        ids = self.request.GET['ids'].split(',')
+        qs = qs.filter(id__in=ids)
+        return qs
+
     def post(self, request, *args, **kwargs):
         try:
-            realtransaction_id = request.POST['realtransaction_id']
+            realtransaction_ids = request.GET['ids'].split(',')
         except LookupError:
             return HttpResponseBadRequest()
 
-        formset = self.get_formset(realtransaction_id)
+        formset = self.get_formset()
 
         if formset.is_valid():
-            formset.save()
+            for transaction in self.get_queryset():
+                for form in local_formset:
+                    VirtualTransaction.objects.create(
+                        real_transaction=transaction,
+                        source_account=form.instance.source_account,
+                        destination_account=form.instance.destination_account,
+                        member=form.instance.member,
+                        amount=form.instance.amount or transaction.amount,
+                    )
         else:
             # TODO: messages
-            raise Exception('invalid data')
+            raise Exception('invalid data: ' + str(formset.errors))
 
         return HttpResponseRedirect(reverse('office:realtransactions.list'))
 
@@ -49,15 +69,14 @@ class RealTransactionListView(ListView):
         )
         return formset_class
 
-    def get_formset(self, real_transaction_id):
+    def get_formset(self):
         return self.formset_class(
             self.request.POST if self.request.method == 'POST' else None,
-            queryset=VirtualTransaction.objects.filter(real_transaction_id=real_transaction_id),
-            prefix=f'virtual_transactions_{real_transaction_id}',
+            queryset=VirtualTransaction.objects.none(),
         )
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
-        for transaction in ctx['transactions']:
-            transaction.vt_formset = self.get_formset(transaction.pk)
+        ctx['transactions'] = self.get_queryset()
+        ctx['formset'] = self.get_formset()
         return ctx

@@ -44,3 +44,28 @@ form button {
 .table-column-large {
     width: 35%;
 }
+.offset-9 {
+    margin-left: 75%;
+    button.btn {
+        margin-left: 0 !important;
+    }
+}
+.question-option-input {
+    .form-group {
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+        flex-basis: content;
+
+        label {
+            padding-top: 21px;
+            font-weight: bold;
+            width: 250px;
+        }
+
+        .form-control {
+            width: 250px;
+            margin: 8px;
+        }
+    }
+}
