@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models.fields.related import OneToOneRel
 from django.utils.decorators import classproperty
@@ -7,6 +8,7 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models.auditable import Auditable
+from byro.common.models.configuration import Configuration
 
 
 class Member(Auditable, models.Model):
@@ -49,7 +51,9 @@ class Member(Auditable, models.Model):
 
     @property
     def balance(self) -> Decimal:
-        qs = self.transactions.filter(value_datetime__lte=now())
+        config = Configuration.get_solo()
+        cutoff = now() - relativedelta(months=config.liability_interval)
+        qs = self.transactions.filter(value_datetime__lte=now(), value_datetime__gte=cutoff)
         liability = qs.filter(source_account__account_category='member_fees').aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
         asset = qs.filter(destination_account__account_category='member_fees').aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
         return asset - liability
@@ -65,6 +69,29 @@ class Member(Auditable, models.Model):
         return self.transactions.filter(value_datetime__lte=now()).filter(
             destination_account__account_category='member_fees'
         )
+
+    def update_liabilites(self):
+        from byro.bookkeeping.models import Account, VirtualTransaction
+
+        config = Configuration.get_solo()
+        booking_date = now()
+        cutoff = booking_date - relativedelta(months=config.liability_interval)
+        account = Account.objects.filter(account_category='member_fees').first()
+
+        for membership in self.memberships.all():
+            date = membership.start
+            if date < cutoff:
+                date = cutoff
+            while date <= membership.end:
+                vt, _ = VirtualTransaction.objects.get_or_create(
+                    source_account=account,
+                    value_datetime=date,
+                    defaults={'booking_date': booking_date}
+                )
+                if vt.amount != membership.fee:
+                    vt.amount = membership.fee
+                    vt.save()
+                date += relativedelta(months=membership.interval)
 
     def __str__(self):
         return f'Member {self.number} ({self.name})'

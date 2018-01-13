@@ -1,4 +1,5 @@
 celery==4.1.*
+dateutil
 django==1.11.*
 django-annoying==0.10.*
 django-bootstrap4==0.0.*
