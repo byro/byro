@@ -8,6 +8,27 @@ from byro.common.models.choices import Choices
 class RealTransactionSource(Auditable, models.Model):
     source_file = models.FileField(upload_to='transaction_uploads/')
 
+    @transaction.atomic
+    def process(self):
+        """
+        Collects responses to the signal `derive_virtual_transactions`. Raises an
+        exception if multiple results were found, and re-raises received Exceptions.
+
+        Returns a list of one or more VirtualTransaction objects if no Exception
+        was raised.
+        """
+        from byro.bookkeeping.signals import process_csv_upload
+        responses = process_csv_upload.send_robust(sender=self)
+        if len(responses) > 1:
+            raise Exception('More than one plugin tried to process the CSV upload.')
+        if len(responses) < 1:
+            raise Exception('No plugin tried to process the CSV upload.')
+        receiver, response = responses[0]
+
+        if isinstance(response, Exception):
+            raise response
+        return response
+
 
 class TransactionChannel(Choices):
     BANK = 'bank'
