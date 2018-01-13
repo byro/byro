@@ -75,22 +75,30 @@ class Member(Auditable, models.Model):
 
         config = Configuration.get_solo()
         booking_date = now()
-        cutoff = booking_date - relativedelta(months=config.liability_interval)
+        cutoff = (booking_date - relativedelta(months=config.liability_interval)).date()
         account = Account.objects.filter(account_category='member_fees').first()
 
         for membership in self.memberships.all():
             date = membership.start
             if date < cutoff:
                 date = cutoff
-            while date <= membership.end:
-                vt, _ = VirtualTransaction.objects.get_or_create(
+            end = membership.end or booking_date.date()
+            while date <= end:
+                vt = VirtualTransaction.objects.filter(
                     source_account=account,
                     value_datetime=date,
-                    defaults={'booking_date': booking_date}
-                )
-                if vt.amount != membership.fee:
-                    vt.amount = membership.fee
-                    vt.save()
+                ).first()
+
+                if vt:
+                    if vt.amount != membership.amount:
+                        vt.amount = membership.amount
+                        vt.save()
+                else:
+                    VirtualTransaction.objects.create(
+                        source_account=account,
+                        value_datetime=date,
+                        amount=membership.amount,
+                    )
                 date += relativedelta(months=membership.interval)
 
     def __str__(self):
