@@ -22,7 +22,7 @@ class MemberListView(ListView):
     def get_queryset(self):
         search = self.request.GET.get('q')
         _filter = self.request.GET.get('filter')
-        qs = Member.objects.all()
+        qs = Member.objects.all().order_by('-id')
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(number=search))
         if _filter:
