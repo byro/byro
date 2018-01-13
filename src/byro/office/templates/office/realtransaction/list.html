@@ -7,14 +7,14 @@
 {% block content %}
 <script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
 <div class="form-group">
-<form method="get" class="form form-inline">
-    <select name="filter" class="form-control">
-        <option value="">{% trans "All transactions" %}</option>
-        <option value="matched"{% if "matched" == request.GET.filter %}selected{% endif %}>{% trans "Only matched transactions" %}</option>
-        <option value="unmatched" {% if "unmatched" == request.GET.filter %}selected{% endif %}>{% trans "Only unmatched transactions" %}</option>
-    </select>
-    <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
-</form>
+    <form method="get" class="form form-inline">
+        <select name="filter" class="form-control">
+            <option value="">{% trans "All transactions" %}</option>
+            <option value="matched"{% if "matched" == request.GET.filter %}selected{% endif %}>{% trans "Only matched transactions" %}</option>
+            <option value="unmatched" {% if "unmatched" == request.GET.filter %}selected{% endif %}>{% trans "Only unmatched transactions" %}</option>
+        </select>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+    </form>
 </div>
 <table class="table table-condensed">
     <thead>
@@ -28,11 +28,11 @@
     </thead>
     <tbody>
         {% for rtrans in transactions %}
-            <tr>
-                <td>{{ rtrans.value_datetime.date.isoformat }}</a></td>
-                <td>{{ rtrans.amount }}</a></td>
-                <td>{{ rtrans.purpose }}</a></td>
-                <td>{{ rtrans.originator }}</a></td>
+        <tr class="{% if not rtrans.vt_formset|length %}table-warning{% else %}table-light{% endif %}">
+                <td>{{ rtrans.value_datetime.date.isoformat }}</td>
+                <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
+                <td>{{ rtrans.purpose }}</td>
+                <td>{{ rtrans.originator }}</td>
                 <td>
                     <form method="POST" action="">
                         <input type="hidden" name="realtransaction_id" value="{{ rtrans.id }}">
