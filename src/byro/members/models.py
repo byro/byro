@@ -17,6 +17,7 @@ class Member(Auditable, models.Model):
         max_length=100,
         verbose_name=_('Membership number/ID'),
         null=True, blank=True,
+        db_index=True,
     )
     name = models.CharField(
         max_length=100,
