@@ -18,7 +18,7 @@
                 <td>{{ transaction.value_datetime.date }}</td>
                 <td>{{ transaction.real_transaction.purpose }}</td>
                 <td>{{ transaction.destination_account.get_account_category_display }}</td>
-                <td class="text-md-right">{{ transaction.amount }}</td>
+                <td class="text-md-right{% if transaction.amount < 0 %} text-danger{% endif %}">{{ transaction.amount }}</td>
             </tr>
         {% endfor %}
     </tbody>
