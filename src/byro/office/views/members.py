@@ -22,7 +22,7 @@ class MemberListView(ListView):
     def get_queryset(self):
         search = self.request.GET.get('q')
         _filter = self.request.GET.get('filter')
-        qs = Member.objects.all().order_by('-id')
+        qs = Member.objects.all()
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(number=search))
         if _filter:
@@ -34,7 +34,7 @@ class MemberListView(ListView):
                 qs = qs.filter(memberships__end__isnull=True)
         else:
             qs = qs.filter(memberships__end__isnull=True)
-        return qs
+        return qs.order_by('-id').distinct()
 
     def post(self, request, *args, **kwargs):
         for member in Member.objects.all():
