@@ -78,7 +78,7 @@ class MemberDashboardView(DetailView):
             'amount': obj.memberships.last().amount,
             'interval': obj.memberships.last().get_interval_display()
         }
-        context['is_active'] =  True
+        context['is_active'] = True
         if obj.memberships.last().end:
             context['is_active'] = not (obj.memberships.last().end < now().date())
         return context
