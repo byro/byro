@@ -20,6 +20,9 @@ class RealTransactionListView(ListView):
             qs = qs.filter(virtual_transactions__isnull=False)
         elif self.request.GET.get('filter') == 'unmatched':
             qs = qs.filter(virtual_transactions__isnull=True)
+        year = self.request.GET.get('year')
+        if year is not None and year.isdigit():
+            qs = qs.filter(value_datetime__year=year)
         return qs
 
     def post(self, request, *args, **kwargs):
