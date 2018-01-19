@@ -35,6 +35,8 @@ class Member(Auditable, models.Model):
         null=True, blank=True,
     )
 
+    form_title = _('Member')
+
     @classproperty
     def profile_classes(cls) -> list:
         return [
@@ -159,3 +161,5 @@ class Membership(Auditable, models.Model):
         verbose_name=_('payment interval'),
         help_text=_('How often does the member pay their fees?'),
     )
+
+    form_title = _('Membership')

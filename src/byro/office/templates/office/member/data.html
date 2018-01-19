@@ -7,7 +7,7 @@
     {% csrf_token %}
     {% for form in forms %}
         <div class="card member-form-card">
-            <div class="card-header">{{ form.instance }}</div>
+            <div class="card-header">{{ form.instance.form_title }}</div>
             <div class="card-body">
                 {% bootstrap_form form layout='horizontal' %}
             </div>

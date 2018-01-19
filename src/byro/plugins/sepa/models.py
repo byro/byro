@@ -1,5 +1,6 @@
 from annoying.fields import AutoOneToOneField
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from localflavor.generic.models import BICField, IBANField
 
 from byro.common.models.auditable import Auditable
@@ -59,3 +60,5 @@ class MemberSepa(Auditable, models.Model):
         null=True, blank=True,
         max_length=255,
         verbose_name="IBAN Mandate Reason",)
+
+    form_title = _('SEPA information')

@@ -26,3 +26,5 @@ class MemberProfile(Auditable, models.Model):
         max_length=32,
         blank=True, null=True
     )
+
+    form_title = _('General information')
