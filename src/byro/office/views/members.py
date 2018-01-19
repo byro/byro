@@ -89,10 +89,10 @@ class MemberDataView(DetailView):
     context_object_name = 'member'
     model = Member
 
-    def _instantiate(self, form_class, member, profile_class=None, instance=None):
+    def _instantiate(self, form_class, member, profile_class=None, instance=None, prefix=None):
         params = {
             'instance': getattr(member, profile_class._meta.get_field('member').related_query_name()) if profile_class else instance,
-            'prefix': profile_class.__name__ if profile_class else instance.__class__.__name__ + '_' if instance else 'member_',
+            'prefix': prefix or (profile_class.__name__ if profile_class else instance.__class__.__name__ + '_' if instance else 'member_'),
             'data': self.request.POST if self.request.method == 'POST' else None,
         }
         return form_class(**params)
@@ -101,7 +101,9 @@ class MemberDataView(DetailView):
         obj = self.get_object()
         return [
             self._instantiate(forms.modelform_factory(Member, fields=['name', 'number', 'address', 'email']), member=obj, instance=obj),
-            self._instantiate(forms.modelform_factory(Membership, fields=['start', 'interval', 'amount']), member=obj, instance=obj.memberships.first())
+        ] + [
+            self._instantiate(forms.modelform_factory(Membership, fields=['start', 'interval', 'amount']), member=obj, instance=m, prefix=m.id)
+            for m in obj.memberships.all()
         ] + [
             self._instantiate(forms.modelform_factory(
                 profile_class,
