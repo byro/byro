@@ -89,9 +89,9 @@ class MemberDataView(DetailView):
     context_object_name = 'member'
     model = Member
 
-    def _instantiate(self, form_class, member, profile_class=None, instance=None, prefix=None):
+    def _instantiate(self, form_class, member, profile_class=None, instance=None, prefix=None, empty=False):
         params = {
-            'instance': getattr(member, profile_class._meta.get_field('member').related_query_name()) if profile_class else instance,
+            'instance': (getattr(member, profile_class._meta.get_field('member').related_query_name()) if profile_class else instance) if not empty else None,
             'prefix': prefix or (profile_class.__name__ if profile_class else instance.__class__.__name__ + '_' if instance else 'member_'),
             'data': self.request.POST if self.request.method == 'POST' else None,
         }
@@ -104,7 +104,7 @@ class MemberDataView(DetailView):
         ] + [
             self._instantiate(forms.modelform_factory(Membership, fields=['start', 'end', 'interval', 'amount']), member=obj, instance=m, prefix=m.id)
             for m in obj.memberships.all()
-        ] + [
+        ] + [self._instantiate(forms.modelform_factory(Membership, fields=['start', 'end', 'interval', 'amount']), member=obj, profile_class=Membership, empty=True)] + [
             self._instantiate(forms.modelform_factory(
                 profile_class,
                 fields=[f.name for f in profile_class._meta.fields if f.name not in ['id', 'member']],
@@ -119,7 +119,9 @@ class MemberDataView(DetailView):
 
     def post(self, *args, **kwargs):
         for form in self.get_forms():
-            if form.is_valid():
+            if form.is_valid() and form.has_changed():
+                if not getattr(form.instance, 'member', False):
+                    form.instance.member = self.get_object()
                 form.save()
         messages.success(self.request, _('Your changes have been saved.'))
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
