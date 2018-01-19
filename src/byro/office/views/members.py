@@ -102,7 +102,7 @@ class MemberDataView(DetailView):
         return [
             self._instantiate(forms.modelform_factory(Member, fields=['name', 'number', 'address', 'email']), member=obj, instance=obj),
         ] + [
-            self._instantiate(forms.modelform_factory(Membership, fields=['start', 'interval', 'amount']), member=obj, instance=m, prefix=m.id)
+            self._instantiate(forms.modelform_factory(Membership, fields=['start', 'end', 'interval', 'amount']), member=obj, instance=m, prefix=m.id)
             for m in obj.memberships.all()
         ] + [
             self._instantiate(forms.modelform_factory(
