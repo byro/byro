@@ -60,9 +60,18 @@ def mail(email: str, subject: str, template: Union[str, LazyI18nString],
 
 
 @app.task
-def mail_send_task(to: str, subject: str, body: str, sender: str,
-                   cc: list=None, bcc: list=None, headers: dict=None):
-    email = EmailMultiAlternatives(subject, body, sender, to=to, cc=cc, bcc=bcc, headers=headers)
+def mail_send_task(
+        to: str, subject: str, body: str, sender: str, cc: list=None,
+        bcc: list=None, headers: dict=None, attachments: list=None,
+):
+    email = EmailMultiAlternatives(
+        subject, body, sender,
+        to=to, cc=cc, bcc=bcc, headers=headers,
+    )
+    if attachments:
+        from byro.documents.models import Document
+        for attachment in attachments:
+            email.attach_file(Document.objects.get(pk=attachment).document.file)
     backend = get_connection(fail_silently=False)
 
     try:

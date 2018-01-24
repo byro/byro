@@ -77,6 +77,10 @@ class EMail(Auditable, models.Model):
     )
     text = models.TextField(verbose_name=_('Text'))
     sent = models.DateTimeField(null=True, blank=True, verbose_name=_('Sent at'))
+    attachments = models.ManyToManyField(
+        to='documents.Document',
+        related_name='mails',
+    )
 
     def send(self):
         if self.sent:
@@ -91,6 +95,7 @@ class EMail(Auditable, models.Model):
                 'sender': self.reply_to,
                 'cc': (self.cc or '').split(','),
                 'bcc': (self.bcc or '').split(','),
+                'attachments': self.attachments.all().values_list('pk', flat=True),
             }
         )
 
