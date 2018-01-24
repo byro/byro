@@ -50,3 +50,5 @@ class Configuration(SingletonModel):
         max_length=100,
         verbose_name=_('e-mail sender address'),
     )
+
+    form_title = _('General settings')

@@ -4,7 +4,14 @@
 {% block settings_content %}
 <form method="post">
     {% csrf_token %}
-    {% bootstrap_form form layout='horizontal' %}
+    {% for f in form %}
+        <div class="card member-form-card">
+            <div class="card-header">{{ f.instance.form_title }}</div>
+            <div class="card-body">
+                {% bootstrap_form f layout='horizontal' %}
+            </div>
+        </div>
+    {% endfor %}
     <button class="btn btn-primary" type="submit">Save</button>
 </form>
 {% endblock %}
