@@ -46,7 +46,7 @@ class ConfigurationView(FormView):
 
 class RegistrationConfigView(FormView):
     form_class = RegistrationConfigForm
-    template_name = 'office/settings/form.html'
+    template_name = 'office/settings/registration_form.html'
 
     def form_valid(self, form):
         form.save()
