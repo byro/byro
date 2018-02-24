@@ -5,10 +5,14 @@ from django.http import Http404
 from django.urls import resolve
 
 from byro.common.models import Configuration
+from byro.mails.models import EMail
 
 
 def byro_information(request):
-    ctx = {'config': Configuration.get_solo()}
+    ctx = {
+        'config': Configuration.get_solo(),
+        'pending_mails': EMail.objects.filter(sent__isnull=True).count(),
+    }
 
     try:
         ctx['url_name'] = resolve(request.path_info).url_name
