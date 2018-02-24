@@ -1,0 +1,33 @@
+{% extends "office/mails/base.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+{% load formset_tags %}
+
+{% block mail_content %}
+<table class="table table-condensed table-bordered">
+    <thead>
+        <tr>
+            <th class="table-column-large">{% trans "Subject" %}</th>
+            <th class="table-column-small">{% trans "To" %}</th>
+            <th class="table-column-small">{% trans "Sent" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mail in mails %}
+            <tr class="table-light">
+                <td>
+                    <a href="{% url "office:mails.mail.view" pk=mail.pk %}">
+                        {{ mail.subject }}
+                    </a>
+                </td>
+                <td>{{ mail.to }}</td>
+                <td>
+                    {{ mail.sent|date:"Y-m-d H:i" }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+</table>
+{% include "office/pagination.html" %}
+{% endblock %}
