@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 
 from .views import (
-    accounts, dashboard, members, realtransactions, settings, upload,
+    accounts, dashboard, mails, members, realtransactions, settings, upload,
 )
 
 app_name = 'office'
@@ -30,4 +30,18 @@ urlpatterns = [
     url('^accounts/add$', accounts.AccountCreateView.as_view(), name='accounts.add'),
     url('^accounts/(?P<pk>\d+)/$', accounts.AccountDetailView.as_view(), name='accounts.detail'),
     url('^accounts/(?P<pk>\d+)/delete$', accounts.AccountDeleteView.as_view(), name='accounts.delete'),
+
+    url('^mails/(?P<pk>[0-9]+)$', mails.MailDetail.as_view(), name='mails.mail.view'),
+    url('^mails/(?P<pk>[0-9]+)/copy$', mails.MailCopy.as_view(), name='mails.mail.copy'),
+    url('^mails/(?P<pk>[0-9]+)/delete$', mails.OutboxPurge.as_view(), name='mails.mail.delete'),
+    url('^mails/(?P<pk>[0-9]+)/send$', mails.OutboxSend.as_view(), name='mails.mail.send'),
+    url('^mails/sent$', mails.SentMail.as_view(), name='mails.sent'),
+    url('^mails/outbox$', mails.OutboxList.as_view(), name='mails.outbox.list'),
+    url('^mails/outbox/send$', mails.OutboxSend.as_view(), name='mails.outbox.send'),
+    url('^mails/outbox/purge$', mails.OutboxPurge.as_view(), name='mails.outbox.purge'),
+
+    url('^mails/templates$', mails.TemplateList.as_view(), name='mails.templates.list'),
+    url('^mails/templates/new$', mails.TemplateDetail.as_view(), name='mails.templates.create'),
+    url('^mails/templates/(?P<pk>[0-9]+)$', mails.TemplateDetail.as_view(), name='mails.templates.view'),
+    url('^templates/(?P<pk>[0-9]+)/delete$', mails.TemplateDelete.as_view(), name='mails.templates.delete'),
 ]

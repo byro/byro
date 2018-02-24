@@ -1,0 +1,29 @@
+{% extends "office/base.html" %}
+{% load i18n %}
+
+{% block headline %}{% trans "Mails" %}{% endblock %}
+{% block content %}
+<ul class="nav nav-pills">
+    <li class="nav-item">
+        <a
+          class="nav-link {% if "mails.outbox" in url_name %}active{% endif %}"
+          href="{% url "office:mails.outbox.list" %}"
+        >{% trans "Outbox" %}</a>
+    </li>
+    <li class="nav-item">
+        <a
+          class="nav-link {% if "mails.sent" in url_name %}active{% endif %}"
+          href="{% url "office:mails.sent" %}"
+        >{% trans "Sent Mails" %}</a>
+    </li>
+    <li class="nav-item">
+        <a
+          class="nav-link {% if "mails.templates" in url_name %}active{% endif %}"
+          href="{% url "office:mails.templates.list" %}"
+        >{% trans "Templates" %}</a>
+    </li>
+</ul>
+
+    {% block mail_content %}
+    {% endblock %}
+{% endblock %}

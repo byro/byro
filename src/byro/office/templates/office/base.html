@@ -65,6 +65,13 @@
             <a class="nav-link {% if url_name == "uploads.list" %}active{% endif %}" href="{% url 'office:uploads.list' %}">
                 <span class="fa fa-upload"></span> {% trans "Transaction Upload" %}
             </a>
+            <a class="nav-link {% if url_name == "mails.outbox.list" %}active{% endif %}" href="{% url 'office:mails.outbox.list' %}">
+                <span class="fa fa-envelope-o"></span>
+                {% trans "Mails" %}
+                {% if pending_mails %}
+                <span class="pending-mails">{{ pending_mails }}</span>
+                {% endif %}
+            </a>
             {% endif %}
         </nav>
         <div id="page-content" class="flex-column">
