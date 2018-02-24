@@ -1,0 +1,33 @@
+{% extends "office/mails/base.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+{% load formset_tags %}
+
+{% block mail_content %}
+<form method='post'>
+    {% csrf_token %}
+    <div class="card member-form-card">
+        <div class="card-header">
+            {{ template.subject }}
+        </div>
+        <div class="card-body">
+            {% bootstrap_form form layout='horizontal' %}
+            <div class="card-body">
+                {% if not form.instance.sent %}
+                    <button class="btn btn-info" type="submit">Save</button>
+                    <a href="{% url "office:mails.mail.send" pk=form.instance.pk %}" class="btn btn-xs btn-primary">
+                        {% trans "Send" %}
+                    </a>
+                    <a href="{% url "office:mails.mail.delete" pk=form.instance.pk %}" class="btn btn-xs btn-danger">
+                        {% trans "Discard" %}
+                    </a>
+                {% else %}
+                    <a href="{% url "office:mails.mail.copy" pk=form.instance.pk %}" class="btn btn-xs btn-danger">
+                        {% trans "Copy to new mail" %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+</form>
+{% endblock %}

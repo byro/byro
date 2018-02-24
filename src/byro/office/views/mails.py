@@ -95,8 +95,12 @@ class TemplateList(ListView):
     context_object_name = 'templates'
 
 
-class TemplateDetail(DetailView):  # TODO
+class TemplateDetail(UpdateView):
     queryset = MailTemplate.objects.all()
+    template_name = 'office/mails/template_detail.html'
+    context_object_name = 'template'
+    form_class = forms.modelform_factory(EMail, fields=['subject', 'text', 'reply_to', 'bcc'])
+    success_url = '/mails/templates'
 
 
 class TemplateDelete(View):  # TODO
