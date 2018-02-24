@@ -1,0 +1,33 @@
+{% extends "office/mails/base.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+{% load formset_tags %}
+
+{% block mail_content %}
+<div class="alert alert-info">
+    {% blocktrans trimmed %}
+    There are a couple of default templates provided by byro, mostly
+    revolving around members coming and going.
+    {% endblocktrans %}
+</div>
+<table class="table table-condensed table-bordered">
+    <thead>
+        <tr>
+            <th class="table-column-large">{% trans "Subject" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for template in templates %}
+            <tr class="table-light">
+                <td>
+                    <a href="{% url "office:mails.templates.view" pk=template.pk %}">
+                        {{ template.subject }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+</table>
+{% include "office/pagination.html" %}
+{% endblock %}

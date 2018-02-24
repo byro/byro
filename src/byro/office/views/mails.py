@@ -39,14 +39,16 @@ class OutboxSend(View):  # TODO
         return qs
 
 
-class SentMail(ListView):  # TODO
+class SentMail(ListView):
     queryset = EMail.objects.filter(sent__isnull=False)
     template_name = 'office/mails/sent.html'
     context_object_name = 'mails'
 
 
-class TemplateList(ListView):  # TODO
+class TemplateList(ListView):
     queryset = MailTemplate.objects.all()
+    template_name = 'office/mails/templates.html'
+    context_object_name = 'templates'
 
 
 class TemplateDetail(DetailView):  # TODO
