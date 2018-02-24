@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -9,8 +10,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, View
 
 from byro.bookkeeping.models import VirtualTransaction
+from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
+from byro.members.signals import (
+    new_member, new_member_mail_information, new_member_office_mail_information,
+)
 
 
 class MemberListView(ListView):
@@ -49,10 +54,29 @@ class MemberCreateView(FormView):
     def get_object(self):
         return Member.objects.get(pk=self.kwargs['pk'])
 
+    @transaction.atomic
     def form_valid(self, form):
+        self.form = form
         form.save()
         messages.success(self.request, _('The member was added, please edit additional details if applicable.'))
-        self.form = form
+
+        new_member.send_robust(sender=form.instance)
+        config = Configuration.get_solo()
+
+        if config.welcome_member_template:
+            context = {
+                'name': config.name,
+                'contact': config.mail_from,
+                'number': form.instance.number,
+            }
+            responses = [r for r in new_member_mail_information.send_robust(sender=form.instance) if r]
+            context['additional_information'] = '\n'.join(responses).strip()
+            config.welcome_member_template.to_mail(email=form.instance.email, context=context)
+        if config.welcome_office_template:
+            context = {'member_name': form.instance.name}
+            responses = [r for r in new_member_office_mail_information.send_robust(sender=form.instance) if r]
+            context['additional_information'] = '\n'.join(responses).strip()
+            config.welcome_office_template.to_mail(email=form.instance.email, context=context)
         return super().form_valid(form)
 
     def get_success_url(self):
