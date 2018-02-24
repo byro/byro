@@ -18,6 +18,12 @@ class MailTemplate(Auditable, models.Model):
     text = I18nTextField(
         verbose_name=_('Text'),
     )
+    reply_to = models.EmailField(
+        max_length=200,
+        blank=True, null=True,
+        verbose_name=_('Reply-To'),
+        help_text=_('Change the Reply-To address if you do not want to use the default orga address'),
+    )
     bcc = models.CharField(
         max_length=1000,
         blank=True, null=True,
