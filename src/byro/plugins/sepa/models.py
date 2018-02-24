@@ -62,3 +62,7 @@ class MemberSepa(Auditable, models.Model):
         verbose_name="IBAN Mandate Reason",)
 
     form_title = _('SEPA information')
+
+    @property
+    def is_usable(self):
+        return bool(self.iban and self.bic and self.mandate_reference)
