@@ -32,7 +32,7 @@ def new_member_office_mail_info_sepa(sender, signal, **kwargs):
         'interval': membership.get_interval_display(),
         'start': membership.start.isoformat(),
     }
-    return _('''The new member has given us a SEPA mandate for {amount} per {interval}, starting {start}:
+    return _('''The new member has given us a SEPA mandate for {amount} ({interval}), starting on {start}:
 
 Name: {name}
 IBAN: {iban}
