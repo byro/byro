@@ -35,10 +35,10 @@
                 </td>
                 <td>{{ mail.to }}</td>
                 <td>
-                    <a href="{% url "office.mails.mail.send" pk=mail.pk %}" class="btn btn-xs btn-primary">
+                    <a href="{% url "office:mails.mail.send" pk=mail.pk %}" class="btn btn-xs btn-primary">
                         {% trans "Send" %}
                     </a>
-                    <a href="{% url "office.mails.mail.delete" pk=mail.pk %}" class="btn btn-xs btn-danger">
+                    <a href="{% url "office:mails.mail.delete" pk=mail.pk %}" class="btn btn-xs btn-danger">
                         {% trans "Discard" %}
                     </a>
                 </td>
