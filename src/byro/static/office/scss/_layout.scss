@@ -44,6 +44,14 @@ body {
         }
     }
 }
+.pending-mails {
+    background-color: #FF6E40;
+    padding: 4px;
+    border-radius: 20%;
+    color: white;
+    margin-left: 4px;
+    font-weight: bold;
+}
 #page-content {
     background: $white;
     flex-grow: 1;

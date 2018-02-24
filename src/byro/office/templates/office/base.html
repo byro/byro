@@ -66,11 +66,12 @@
                 <span class="fa fa-upload"></span> {% trans "Transaction Upload" %}
             </a>
             <a class="nav-link {% if url_name == "mails.outbox.list" %}active{% endif %}" href="{% url 'office:mails.outbox.list' %}">
-                <span class="fa fa-envelope-o"></span>
-                {% trans "Mails" %}
                 {% if pending_mails %}
                 <span class="pending-mails">{{ pending_mails }}</span>
+                {% else %}
+                <span class="fa fa-envelope-o"></span>
                 {% endif %}
+                {% trans "Mails" %}
             </a>
             {% endif %}
         </nav>
