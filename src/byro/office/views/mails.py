@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect, reverse
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import DetailView, ListView, UpdateView, View
+from django.views.generic import ListView, UpdateView, View
 
 from byro.mails.models import EMail, MailTemplate
 

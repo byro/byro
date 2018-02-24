@@ -69,12 +69,12 @@ class MemberCreateView(FormView):
                 'contact': config.mail_from,
                 'number': form.instance.number,
             }
-            responses = [r for r in new_member_mail_information.send_robust(sender=form.instance) if r]
+            responses = [r[1] for r in new_member_mail_information.send_robust(sender=form.instance) if r]
             context['additional_information'] = '\n'.join(responses).strip()
             config.welcome_member_template.to_mail(email=form.instance.email, context=context)
         if config.welcome_office_template:
             context = {'member_name': form.instance.name}
-            responses = [r for r in new_member_office_mail_information.send_robust(sender=form.instance) if r]
+            responses = [r[1] for r in new_member_office_mail_information.send_robust(sender=form.instance) if r]
             context['additional_information'] = '\n'.join(responses).strip()
             config.welcome_office_template.to_mail(email=form.instance.email, context=context)
         return super().form_valid(form)
