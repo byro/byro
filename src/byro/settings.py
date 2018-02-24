@@ -182,6 +182,20 @@ for entry_point in iter_entry_points(group='byro.plugin', name=None):
     PLUGINS.append(entry_point.module_name)
     INSTALLED_APPS.append(entry_point.module_name)
 
+
+## EMAIL SETTINGS
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    MAIL_FROM = SERVER_EMAIL = DEFAULT_FROM_EMAIL = ''
+    EMAIL_HOST = ''
+    EMAIL_PORT = ''
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
+    EMAIL_USE_TLS = True  # Only one of these
+    EMAIL_USE_SSL = False  # Only one of these
+
+
 try:
     from .local_settings import *
 except ImportError:
