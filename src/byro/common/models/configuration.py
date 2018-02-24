@@ -52,3 +52,28 @@ class Configuration(SingletonModel):
     )
 
     form_title = _('General settings')
+
+    welcome_member_template = models.ForeignKey(
+        to='mails.MailTemplate',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    welcome_office_template = models.ForeignKey(
+        to='mails.MailTemplate',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    leave_member_template = models.ForeignKey(
+        to='mails.MailTemplate',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    leave_office_template = models.ForeignKey(
+        to='mails.MailTemplate',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
