@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import messages
+from django.shortcuts import redirect, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView, View
 
@@ -7,7 +8,7 @@ from byro.mails.models import EMail, MailTemplate
 
 
 class MailDetail(UpdateView):
-    queryset = EMail.objects.filter(sent__isnull=True)
+    queryset = EMail.objects.all()
     template_name = 'office/mails/detail.html'
     context_object_name = 'mail'
     form_class = forms.modelform_factory(EMail, fields=['to', 'reply_to', 'cc', 'bcc', 'subject', 'text'])
@@ -20,10 +21,15 @@ class MailDetail(UpdateView):
         return super().form_valid(form)
 
 
-class MailCopy(View):  # TODO
+class MailCopy(View):
 
     def get_object(self):
         return EMail.objects.get(pk=self.kwargs['pk'])
+
+    def dispatch(self, request, *args, **kwargs):
+        new_mail = self.get_object().copy_to_draft()
+        messages.success(request, _('Here is your new mail draft!'))
+        return redirect(reverse('office:mails.mail.view', kwargs={'pk': new_mail.pk}))
 
 
 class OutboxList(ListView):
@@ -32,22 +38,49 @@ class OutboxList(ListView):
     context_object_name = 'mails'
 
 
-class OutboxPurge(View):  # TODO
+class OutboxPurge(View):
 
     def get_queryset(self):
-        qs = EMail.objects.filter(sent__isnull=True, pk=self.kwargs['pk'])
+        qs = EMail.objects.filter(sent__isnull=True)
         if 'pk' in self.kwargs:
             return qs.filter(pk=self.kwargs['pk'])
         return qs
 
+    def dispatch(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        length = len(qs)
+        qs.delete()
+        if length > 1:
+            message = _('{count} mails have been deleted.').format(count=length)
+        elif length == 1:
+            message = 'The mail has been deleted.'
+        else:
+            message = 'No mail has been deleted.'
+        messages.success(request, message)
+        return redirect(reverse('office:mails.outbox.list'))
 
-class OutboxSend(View):  # TODO
+
+class OutboxSend(View):
 
     def get_queryset(self):
-        qs = EMail.objects.filter(sent__isnull=True, pk=self.kwargs['pk'])
+        qs = EMail.objects.filter(sent__isnull=True)
         if 'pk' in self.kwargs:
             return qs.filter(pk=self.kwargs['pk'])
         return qs
+
+    def dispatch(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        length = len(qs)
+        for mail in qs:
+            mail.send()
+        if length > 1:
+            message = _('{count} mails have been sent.').format(count=length)
+        elif length == 1:
+            message = _('The mail has been sent.')
+        else:
+            message = _('No mail has been sent.')
+        messages.success(request, message)
+        return redirect(reverse('office:mails.outbox.list'))
 
 
 class SentMail(ListView):
