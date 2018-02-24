@@ -93,16 +93,14 @@ class EMail(Auditable, models.Model):
             raise Exception('This mail has been sent already. It cannot be sent again.')
 
         from byro.mails.send import mail_send_task
-        mail_send_task.apply_async(
-            kwargs={
-                'to': self.to.split(','),
-                'subject': self.subject,
-                'body': self.text,
-                'sender': self.reply_to,
-                'cc': (self.cc or '').split(','),
-                'bcc': (self.bcc or '').split(','),
-                'attachments': self.attachments.all().values_list('pk', flat=True),
-            }
+        mail_send_task(
+            to=self.to.split(','),
+            subject=self.subject,
+            body=self.text,
+            sender=self.reply_to,
+            cc=(self.cc or '').split(','),
+            bcc=(self.bcc or '').split(','),
+            attachments=list(self.attachments.all().values_list('pk', flat=True)),
         )
 
         self.sent = now()

@@ -7,7 +7,6 @@ from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import override
 from i18nfield.strings import LazyI18nString
 
-from byro.celery_app import app
 from byro.common.models import Configuration
 
 logger = logging.getLogger(__name__)
@@ -59,7 +58,6 @@ def mail(email: str, subject: str, template: Union[str, LazyI18nString],
         return mail_send_task.apply_async(args=([email], subject, body_plain, sender, headers))
 
 
-@app.task
 def mail_send_task(
         to: str, subject: str, body: str, sender: str, cc: list=None,
         bcc: list=None, headers: dict=None, attachments: list=None,
