@@ -31,6 +31,9 @@ class MailTemplate(Auditable, models.Model):
         help_text=_('Enter comma separated addresses. Will receive a blind copy of every mail sent from this template. This may be a LOT!'),
     )
 
+    def __str__(self):
+        return f'{self.subject}'
+
     def to_mail(self, email, locale=None, context=None, skip_queue=False):
         with override(locale):
             context = context or dict()
