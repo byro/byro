@@ -53,6 +53,12 @@ class Configuration(SingletonModel):
 
     form_title = _('General settings')
 
+    backoffice_mail = models.EmailField(
+        null=True, blank=True,
+        max_length=100,
+        verbose_name=_('e-mail of backoffice'),
+    )
+
     welcome_member_template = models.ForeignKey(
         to='mails.MailTemplate',
         null=True, blank=True,

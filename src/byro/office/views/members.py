@@ -68,6 +68,7 @@ class MemberCreateView(FormView):
                 'name': config.name,
                 'contact': config.mail_from,
                 'number': form.instance.number,
+                'member_name': form.instance.name,
             }
             responses = [r[1] for r in new_member_mail_information.send_robust(sender=form.instance) if r]
             context['additional_information'] = '\n'.join(responses).strip()
@@ -76,7 +77,7 @@ class MemberCreateView(FormView):
             context = {'member_name': form.instance.name}
             responses = [r[1] for r in new_member_office_mail_information.send_robust(sender=form.instance) if r]
             context['additional_information'] = '\n'.join(responses).strip()
-            config.welcome_office_template.to_mail(email=form.instance.email, context=context)
+            config.welcome_office_template.to_mail(email=config.backoffice_mail, context=context)
         return super().form_valid(form)
 
     def get_success_url(self):
