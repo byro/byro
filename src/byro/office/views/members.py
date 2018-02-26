@@ -9,7 +9,6 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, View
 
-from byro.bookkeeping.models import VirtualTransaction
 from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
@@ -167,16 +166,14 @@ class MemberDataView(MemberView):
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
 
 
-class MemberFinanceView(MemberView, ListView):
+class MemberFinanceView(MemberView):
     template_name = 'office/member/finance.html'
-    context_object_name = 'transactions'
-    model = VirtualTransaction
     paginate_by = 50
 
     def get_member(self):
         return Member.objects.get(pk=self.kwargs['pk'])
 
-    def get_queryset(self):
+    def get_transactions(self):
         return self.get_member().transactions.filter(
             Q(destination_account__account_category='member_fees') |
             Q(destination_account__account_category='member_donation'),
@@ -186,6 +183,7 @@ class MemberFinanceView(MemberView, ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['member'] = self.get_member()
+        context['transactions'] = self.get_transactions()
         return context
 
 
