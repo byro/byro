@@ -15,7 +15,11 @@ def get_member_statistics():
     """
     Returns a list of tuples of the form ((year, month), joins, quits).
     """
-    date = Membership.objects.order_by('start').first().start
+    first_member = Membership.objects.order_by('start').first()
+    if not first_member:
+        return []
+
+    date = first_member.start
     end = Membership.objects.filter(end__isnull=False).order_by('-end').first().end
     result = []
 
