@@ -29,6 +29,16 @@
         {% trans "Finance" %}
     </a>
   </li>
+  {% for view in member_views %}
+  <li class="nav-item">
+    <a
+      class="nav-link {% if view.url_name in url_name %}active{% endif %}"
+      href="{% url view.url %}"
+    >
+        {{ view.label }}
+    </a>
+  </li>
+  {% endfor %}
 </ul>
 
 {% block member_content %}

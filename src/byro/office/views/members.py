@@ -16,6 +16,18 @@ from byro.members.models import Member, Membership
 from byro.members.signals import (
     new_member, new_member_mail_information, new_member_office_mail_information,
 )
+from byro.office.signals import member_view
+
+
+class MemberView(DetailView):
+    context_object_name = 'member'
+    model = Member
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        responses = [r[1] for r in member_view.send_robust(self.get_object())]
+        ctx['member_views'] = responses
+        return ctx
 
 
 class MemberListView(ListView):
@@ -84,7 +96,7 @@ class MemberCreateView(FormView):
         return reverse('office:members.data', kwargs={'pk': self.form.instance.pk})
 
 
-class MemberDashboardView(DetailView):
+class MemberDashboardView(MemberView):
     template_name = 'office/member/dashboard.html'
     context_object_name = 'member'
     model = Member
@@ -109,7 +121,7 @@ class MemberDashboardView(DetailView):
         return context
 
 
-class MemberDataView(DetailView):
+class MemberDataView(MemberView):
     template_name = 'office/member/data.html'
     context_object_name = 'member'
     model = Member
@@ -155,7 +167,7 @@ class MemberDataView(DetailView):
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
 
 
-class MemberFinanceView(ListView):
+class MemberFinanceView(MemberView, ListView):
     template_name = 'office/member/finance.html'
     context_object_name = 'transactions'
     model = VirtualTransaction

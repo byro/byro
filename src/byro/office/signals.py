@@ -10,4 +10,5 @@ returns a dict:
         "url": "/member/123/foo/",
         "url_name": "plugins:myplugin:foo_view",
     }
+Please use byro.office.views.members.MemberView as base class for these views.
 """
