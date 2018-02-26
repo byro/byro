@@ -51,3 +51,6 @@ Thank you,
         if immediately:
             mail.send()
         return mail
+
+    def get_display(self):
+        return '{} Document: {}'.format(self.get_direction_display().capitalize(), self.category, self.title)
