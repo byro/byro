@@ -33,7 +33,7 @@ for app in apps.get_app_configs():
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'', include((raw_plugin_patterns, 'plugins'))),
     url(r'', include('byro.common.urls', namespace='common')),
     url(r'', include('byro.office.urls', namespace='office')),
-    url(r'', include((raw_plugin_patterns, 'plugins')))
 ]
