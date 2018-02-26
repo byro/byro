@@ -14,6 +14,7 @@ class DocumentDirection(Choices):
 
 class Document(Auditable, models.Model):
     document = models.FileField(upload_to='documents/')
+    title = models.CharField(max_length=300, null=True)
     category = models.CharField(max_length=300, null=True)
     direction = models.CharField(
         choices=DocumentDirection.choices,
