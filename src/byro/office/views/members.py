@@ -25,7 +25,7 @@ class MemberView(DetailView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
-        responses = [r[1] for r in member_view.send_robust(self.get_object())]
+        responses = [r[1] for r in member_view.send_robust(self.get_object(), request=self.request)]
         ctx['member_views'] = responses
         return ctx
 

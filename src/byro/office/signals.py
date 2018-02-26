@@ -2,8 +2,8 @@ import django.dispatch
 
 member_view = django.dispatch.Signal()
 """
-receives the member as sender.
-returns a dict:
+Receives the member as sender, and additionally the request
+Must return a dict:
 
     {
         "label": _("Fancy Member View"),

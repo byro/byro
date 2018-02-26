@@ -33,7 +33,7 @@
   <li class="nav-item">
     <a
       class="nav-link {% if view.url_name in url_name %}active{% endif %}"
-      href="{% url view.url %}"
+      href="{{ view.url }}"
     >
         {{ view.label }}
     </a>
