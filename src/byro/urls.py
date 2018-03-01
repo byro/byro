@@ -37,3 +37,6 @@ urlpatterns = [
     url(r'', include('byro.common.urls', namespace='common')),
     url(r'', include('byro.office.urls', namespace='office')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
