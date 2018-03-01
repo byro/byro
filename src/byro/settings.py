@@ -157,6 +157,14 @@ USE_L10N = True
 USE_TZ = True
 
 
+# ######### MEDIA CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
+MEDIA_ROOT = os.path.join(BASE_DIR, 'byro/media')
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
+MEDIA_URL = '/media/'
+# ######### END MEDIA CONFIGURATION
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
