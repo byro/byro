@@ -16,6 +16,7 @@ Including another URLconf
 import importlib.util
 
 from django.apps import apps
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 
