@@ -34,7 +34,7 @@ class MailTemplate(Auditable, models.Model):
     def __str__(self):
         return f'{self.subject}'
 
-    def to_mail(self, email, locale=None, context=None, skip_queue=False):
+    def to_mail(self, email, locale=None, context=None, skip_queue=False, attachments=None):
         with override(locale):
             context = context or dict()
             try:
@@ -54,6 +54,9 @@ class MailTemplate(Auditable, models.Model):
                 mail.send()
             else:
                 mail.save()
+                if attachments:
+                    for a in attachments:
+                        mail.attachments.add(a)
         return mail
 
 
