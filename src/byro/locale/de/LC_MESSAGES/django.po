@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-03 20:09+0000\n"
+"POT-Creation-Date: 2018-03-03 20:26+0000\n"
 "PO-Revision-Date: 2018-03-03 21:10+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -204,18 +204,18 @@ msgstr ""
 "Danke\n"
 "Das Helferlein"
 
-#: byro/mails/models.py:16 byro/mails/models.py:88
+#: byro/mails/models.py:16 byro/mails/models.py:91
 #: byro/office/templates/office/mails/outbox.html:23
 #: byro/office/templates/office/mails/sent.html:11
 #: byro/office/templates/office/mails/templates.html:17
 msgid "Subject"
 msgstr "Betreff"
 
-#: byro/mails/models.py:19 byro/mails/models.py:90
+#: byro/mails/models.py:19 byro/mails/models.py:93
 msgid "Text"
 msgstr "Text"
 
-#: byro/mails/models.py:24 byro/mails/models.py:72
+#: byro/mails/models.py:24 byro/mails/models.py:75
 msgid "Reply-To"
 msgstr "Reply-To"
 
@@ -227,7 +227,7 @@ msgstr ""
 "Ändere das Reply-To-Feld, wenn du Antworten nicht an die allgemeine Adresse "
 "geschickt haben möchtest"
 
-#: byro/mails/models.py:30 byro/mails/models.py:83
+#: byro/mails/models.py:30 byro/mails/models.py:86
 msgid "BCC"
 msgstr "BCC"
 
@@ -240,20 +240,20 @@ msgstr ""
 "jeder Mail, die durch dieses Template verschickt wird. Das können viele "
 "werden."
 
-#: byro/mails/models.py:66 byro/office/templates/office/mails/outbox.html:24
+#: byro/mails/models.py:69 byro/office/templates/office/mails/outbox.html:24
 #: byro/office/templates/office/mails/sent.html:12
 msgid "To"
 msgstr "To"
 
-#: byro/mails/models.py:67 byro/mails/models.py:78 byro/mails/models.py:84
+#: byro/mails/models.py:70 byro/mails/models.py:81 byro/mails/models.py:87
 msgid "One email address or several addresses separated by commas."
 msgstr "Eine Adresse oder mehrere durch Kommas getrennte."
 
-#: byro/mails/models.py:77
+#: byro/mails/models.py:80
 msgid "CC"
 msgstr "CC"
 
-#: byro/mails/models.py:91
+#: byro/mails/models.py:94
 msgid "Sent at"
 msgstr "Verschickt"
 
