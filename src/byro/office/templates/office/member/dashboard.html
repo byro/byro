@@ -33,7 +33,7 @@
                 {% endblocktrans %}
             {% endif %}
             <br>
-            {% blocktrans with start=member_since.first.isoformat %}
+            {% blocktrans with start=member_since.first.isoformat trimmed %}
                 Joined on {{ start }}.
             {% endblocktrans %}
         </span>
