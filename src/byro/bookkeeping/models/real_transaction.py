@@ -68,13 +68,13 @@ class RealTransaction(Auditable, models.Model):
         max_digits=8, decimal_places=2,
     )
     purpose = models.CharField(max_length=1000)
-    originator = models.CharField(max_length=200)
+    originator = models.CharField(max_length=500)
     reverses = models.ForeignKey(
         to='RealTransaction',
         on_delete=models.PROTECT,
         null=True,
     )
-    importer = models.CharField(null=True, max_length=200)
+    importer = models.CharField(null=True, max_length=500)
     data = JSONField(null=True)
     source = models.ForeignKey(
         to=RealTransactionSource,
