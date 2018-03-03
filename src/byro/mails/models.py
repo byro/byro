@@ -35,6 +35,9 @@ class MailTemplate(Auditable, models.Model):
         return f'{self.subject}'
 
     def to_mail(self, email, locale=None, context=None, skip_queue=False, attachments=None):
+        from byro.common.models import Configuration
+        config = Configuration.get_solo()
+        locale = locale or config.language
         with override(locale):
             context = context or dict()
             try:

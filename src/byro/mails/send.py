@@ -46,6 +46,8 @@ def mail(email: str, subject: str, template: Union[str, LazyI18nString],
          context: Dict[str, Any]=None, locale: str=None,
          headers: dict=None):
     headers = headers or {}
+    c = Configuration.get_solo()
+    locale = locale or c.language
 
     with override(locale):
         body = str(template)
