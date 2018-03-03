@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 from contextlib import suppress
 
+from django.utils.translation import ugettext_lazy as _
 from pkg_resources import iter_entry_points
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -146,15 +147,26 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
+LANGUAGES = [
+    ('en', _('English')),
+    ('de', _('German')),
+]
+LANGUAGES_NATURAL_NAMES = [
+    ('en', 'English'),
+    ('de', 'Deutsch'),
+]
+LANGUAGE_CODE = 'en'
+LOCALE_PATHS = (
+    os.path.join(os.path.dirname(__file__), 'locale'),
+)
+FORMAT_MODULE_PATH = [
+    'byro.common.formats',
+]
+
 
 
 # ######### MEDIA CONFIGURATION
