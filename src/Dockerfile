@@ -4,7 +4,7 @@ MAINTAINER byro team
 EXPOSE 8020
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get install -y zsh
+RUN apt-get update && apt-get install -y zsh gettext
 
 # user
 RUN useradd uid1000 -d /home/uid1000
