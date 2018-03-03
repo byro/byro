@@ -44,7 +44,7 @@ class RealTransactionMatchView(TemplateView):
         if formset.is_valid():
             for transaction in self.get_queryset():
                 for form in formset:
-                    if form.instance:
+                    if form.instance and (form.instance.source_account or form.instance_destination_account):
                         VirtualTransaction.objects.create(
                             real_transaction=transaction,
                             value_datetime=transaction.value_datetime,
