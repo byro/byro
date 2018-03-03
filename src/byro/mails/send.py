@@ -71,7 +71,7 @@ def mail_send_task(
     if attachments:
         from byro.documents.models import Document
         for attachment in attachments:
-            email.attach_file(Document.objects.get(pk=attachment).document.file)
+            email.attach_file(Document.objects.get(pk=attachment).document.path)
     backend = get_connection(fail_silently=False)
 
     try:
