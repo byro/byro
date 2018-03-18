@@ -112,7 +112,7 @@ class Member(Auditable, models.Model):
             for membership in self.memberships.all():
                 if vt.value_datetime.date() < membership.end:
                     delete_vt = False
-            if delete_vt:
+            if delete_vt and not vt.real_transaction:
                 vt.delete()
 
     def __str__(self):
