@@ -106,6 +106,15 @@ class Member(Auditable, models.Model):
                     )
                 date += relativedelta(months=membership.interval)
 
+    def remove_future_liabilites_on_leave(self):
+        for vt in self.transactions.all():
+            delete_vt = True
+            for membership in self.memberships.all():
+                if vt.value_datetime.date() < membership.end:
+                    delete_vt = False
+            if delete_vt:
+                vt.delete()
+
     def __str__(self):
         return f'Member {self.number} ({self.name})'
 
