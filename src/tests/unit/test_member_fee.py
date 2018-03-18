@@ -59,7 +59,6 @@ def test_liabilities_future_virtualtransactions(member_membership):
 
     # but the new (temporary?) helper cleans them
     member_membership.member.remove_future_liabilites_on_leave()
-    # NOTE: update liabilites doesn't delete transactions
     virtual_transactions = member_membership.member.transactions.all()
     assert len(virtual_transactions) == 2
     assert sum([i.amount for i in virtual_transactions]) == 40
@@ -107,7 +106,6 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
 
     # but the new (temporary?) helper cleans them
     member_membership.member.remove_future_liabilites_on_leave()
-    # NOTE: update liabilites doesn't delete transactions
     virtual_transactions = member_membership.member.transactions.all()
     assert len(virtual_transactions) == 4
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20
