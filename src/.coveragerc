@@ -7,6 +7,7 @@ omit = */admin.py
        */urls.py
        */tests/*
        */wsgi.py
+       */apps.py
        */__init__.py
        */__main__.py
        */celery_app.py
