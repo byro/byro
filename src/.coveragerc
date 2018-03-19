@@ -1,0 +1,12 @@
+[run]
+branch = True
+source = byro
+omit = */admin.py
+       */migrations/*
+       */settings*
+       */urls.py
+       */tests/*
+       */wsgi.py
+       */__init__.py
+       */__main__.py
+       */celery_app.py

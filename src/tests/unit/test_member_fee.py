@@ -15,7 +15,7 @@ def new_member():
 
 @pytest.fixture
 def member_membership(new_member):
-    today = timezone.now().date()
+    today = timezone.now()
     begin_last_month = today.replace(day=1) - relativedelta(months=+1)
     end_this_month = today.replace(day=1) + relativedelta(months=+1, days=-1)
     ms = Membership.objects.create(member=new_member,
