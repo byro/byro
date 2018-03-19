@@ -1,6 +1,6 @@
 import pytest
 
-from byro.mails.models import EMail, MailTemplate
+from byro.mails.models import EMail
 
 
 @pytest.mark.django_db
