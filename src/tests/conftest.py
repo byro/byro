@@ -1,11 +1,12 @@
 import decimal
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import RealTransaction, TransactionChannel
 from byro.mails.models import EMail, MailTemplate
-from byro.members.models import Member
+from byro.members.models import FeeIntervals, Member, Membership
 
 
 @pytest.fixture
@@ -13,6 +14,41 @@ def member():
     member = Member.objects.create(email='joe@hacker.space')
     yield member
 
+    [profile.delete() for profile in member.profiles]
+    member.transactions.all().delete()
+    member.delete()
+
+
+@pytest.fixture
+def membership(member):
+    today = now()
+    begin_last_month = today.replace(day=1) - relativedelta(months=+1)
+    end_this_month = today.replace(day=1) + relativedelta(months=+1, days=-1)
+    ms = Membership.objects.create(
+        member=member,
+        start=begin_last_month,
+        end=end_this_month,
+        amount=20,
+        interval=FeeIntervals.MONTHLY,
+    )
+    yield ms
+    ms.delete()
+
+
+@pytest.fixture
+def inactive_member():
+    member = Member.objects.create(email='joe@ex-hacker.space')
+    today = now()
+    begin = today.replace(day=1) - relativedelta(months=-2)
+    end = today.replace(day=1) + relativedelta(months=-1, days=-1)
+    Membership.objects.create(
+        member=member,
+        start=begin,
+        end=end,
+        amount=20,
+        interval=FeeIntervals.MONTHLY,
+    )
+    yield member
     [profile.delete() for profile in member.profiles]
     member.transactions.all().delete()
     member.delete()
