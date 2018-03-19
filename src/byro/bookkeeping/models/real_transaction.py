@@ -34,7 +34,7 @@ class RealTransactionSource(Auditable, models.Model):
         if len(responses) > 1:
             self.state = SourceState.FAILED
             self.save()
-            raise Exception('More than one plugin tried to process the CSV upload.')
+            raise Exception('More than one plugin tried to process the CSV upload: {}'.format([r[0].__module__ + '.' + r[0].__name__ for r in responses]))
         if len(responses) < 1:
             self.state = SourceState.FAILED
             self.save()
@@ -95,7 +95,7 @@ class RealTransaction(Auditable, models.Model):
         from byro.bookkeeping.signals import derive_virtual_transactions
         responses = derive_virtual_transactions.send_robust(sender=self)
         if len(responses) > 1:
-            raise Exception('More than one plugin tried to derive virtual transactions.')
+            raise Exception('More than one plugin tried to derive virtual transactions: {}'.format([r[0].__module__ + '.' + r[0].__name__ for r in responses]))
         if len(responses) < 1:
             raise Exception('No plugin tried to derive virtual transactions.')
         receiver, response = responses[0]
