@@ -96,6 +96,12 @@ class EMail(Auditable, models.Model):
         related_name='mails',
     )
 
+    @property
+    def attachment_ids(self):
+        if hasattr(self, 'attachments'):
+            return list(self.attachments.all().values_list('pk', flat=True))
+        return []
+
     def send(self):
         if self.sent:
             raise Exception('This mail has been sent already. It cannot be sent again.')
@@ -108,11 +114,11 @@ class EMail(Auditable, models.Model):
             sender=self.reply_to,
             cc=(self.cc or '').split(','),
             bcc=(self.bcc or '').split(','),
-            attachments=list(self.attachments.all().values_list('pk', flat=True)),
+            attachments=self.attachment_ids,
         )
 
         self.sent = now()
-        self.save()
+        self.save(update_fields=['sent'])
 
     def copy_to_draft(self):
         new_mail = deepcopy(self)
