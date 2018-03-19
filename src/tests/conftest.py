@@ -2,11 +2,25 @@ import decimal
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import RealTransaction, TransactionChannel
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
+
+
+@pytest.fixture
+def user():
+    user = get_user_model().objects.create(username='regular_user', is_staff=True)
+    yield user
+    user.delete()
+
+
+@pytest.fixture
+def logged_in_client(client, user):
+    client.force_login(user)
+    return client
 
 
 @pytest.fixture
