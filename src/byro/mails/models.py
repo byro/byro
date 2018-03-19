@@ -53,13 +53,12 @@ class MailTemplate(Auditable, models.Model):
                 subject=subject,
                 text=text,
             )
+            mail.save()
+            if attachments:
+                for a in attachments:
+                    mail.attachments.add(a)
             if skip_queue:
                 mail.send()
-            else:
-                mail.save()
-                if attachments:
-                    for a in attachments:
-                        mail.attachments.add(a)
         return mail
 
 
