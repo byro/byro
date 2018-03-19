@@ -13,6 +13,7 @@ class connected_signal:
         self.receiver = receiver
 
     def __enter__(self):
+        self.signal.receivers = []
         self.signal.connect(self.receiver, dispatch_uid='test-plugin')
 
     def __exit__(self, exc_type, exc_value, tb):
