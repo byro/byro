@@ -39,8 +39,8 @@ def membership(member):
 def inactive_member():
     member = Member.objects.create(email='joe@ex-hacker.space')
     today = now()
-    begin = today.replace(day=1) - relativedelta(months=-2)
-    end = today.replace(day=1) + relativedelta(months=-1, days=-1)
+    begin = today.replace(day=1) - relativedelta(months=3)
+    end = today.replace(day=1) - relativedelta(months=1, days=-1)
     Membership.objects.create(
         member=member,
         start=begin,
