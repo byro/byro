@@ -18,3 +18,13 @@ They show how to develop a byro plugin with some hopefully easy-to-follow exampl
 If any part of the documentation is unclear, please head over to the
 :doc:`documentation setup </developer/documentation>` to learn how to improve it, and then
 follow the :doc:`contributor documentation </developer/contributing>` to create a pull request.
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+   :caption: Developer documentation
+
+   setup
+   contributing
+   documentation
+   plugins/guides
