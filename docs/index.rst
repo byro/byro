@@ -22,3 +22,26 @@ We're organizing our documentation in the following categories:
    :caption: Developer documentation
    
    developer/index
+
+
+Features
+========
+
+As byro is under active development, this feature list may be outdated. Please
+`open issues`_ for features you are missing!
+
+- Member management: Add, and edit members and their data.
+- Membership management: Add and change the membership fees a member should pay.
+- Add custom member data: Track non-standard member data by adding a plugin to byro.
+- Import payment data: Inbuilt support for CSV imports.
+- Import and match payment data to members via custom methods, added by plugins.
+- Send mails, and review mails to be sent before they are sent out.
+- Edit the default mail templates and add new ones.
+- See member balances and transactions.
+- Upload member specific documents (either for or by them); optionally send them per mail automatically.
+
+Please note that currently byro is only suited for tracking member data and
+payments, and the various administrative acts around it. It is not a
+bookkeeping tool (yet?).
+
+.. _open issues: https://github.com/byro/byro/issues/new
