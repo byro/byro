@@ -84,7 +84,7 @@ class OutboxSend(View):
 
 
 class SentMail(ListView):
-    queryset = EMail.objects.filter(sent__isnull=False)
+    queryset = EMail.objects.filter(sent__isnull=False).order_by('-sent')
     template_name = 'office/mails/sent.html'
     context_object_name = 'mails'
 
