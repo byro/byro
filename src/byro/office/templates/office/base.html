@@ -74,6 +74,16 @@
                 {% trans "Mails" %}
             </a>
             {% endif %}
+            {% for nav_element in nav_event %}
+                <a class="nav-link nav-link-second-level{% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
+                    {% if nav_element.icon and "." in nav_element.icon %}
+                        <img src="{% static nav_element.icon %}" class="fa-img">
+                    {% elif nav_element.icon %}
+                        <i class="fa fa-{{ nav_element.icon }}"></i>
+                    {% endif %}
+                    <span class="sidebar-text">{{ nav_element.label }}</span>
+                </a>
+            {% endfor %}
         </nav>
         <div id="page-content" class="flex-column">
             <div class="container-fluid">

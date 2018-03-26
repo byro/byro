@@ -6,6 +6,7 @@ from django.urls import resolve
 
 from byro.common.models import Configuration
 from byro.mails.models import EMail
+from byro.office.signals import nav_event
 
 
 def byro_information(request):
@@ -26,3 +27,10 @@ def byro_information(request):
             ctx['byro_version'] = subprocess.check_output(['git', 'describe', '--always'])
 
     return ctx
+
+
+def sidebar_information(request):
+    _nav_event = []
+    for receiver, response in nav_event.send(request):
+        _nav_event.append(response)
+    return {'nav_event': _nav_event}

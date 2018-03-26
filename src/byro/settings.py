@@ -99,6 +99,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'byro.common.context_processors.byro_information',
+                'byro.common.context_processors.sidebar_information',
             ],
         },
     },
