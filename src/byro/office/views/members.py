@@ -71,7 +71,10 @@ class MemberCreateView(FormView):
         form.save()
         messages.success(self.request, _('The member was added, please edit additional details if applicable.'))
 
-        new_member.send_robust(sender=form.instance)
+        responses = new_member.send_robust(sender=form.instance)
+        for module, response in responses:
+            if isinstance(response, Exception):
+                messages.warning(self.request, _('Some post processing steps could not be completed: ') + str(response))
         config = Configuration.get_solo()
 
         if config.welcome_member_template:
