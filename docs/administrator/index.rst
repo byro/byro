@@ -1,0 +1,4 @@
+.. administrator-setup:
+
+Administration
+==============

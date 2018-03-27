@@ -18,9 +18,9 @@ We're organizing our documentation in the following categories:
 
 .. toctree::
    :maxdepth: 2
-   :glob:
    
    developer/index
+   administrator/index
 
 
 Features

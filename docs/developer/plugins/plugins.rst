@@ -1,6 +1,3 @@
-.. highlight:: python
-   :linenothreshold: 5
-
 .. _`pluginsetup`:
 
 Creating a plugin
