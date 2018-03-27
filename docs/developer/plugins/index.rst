@@ -1,5 +1,10 @@
-Plugin Guides
--------------
+Plugin Development
+------------------
 
-Once we have finished one or two core plugins, we'll offer guides on how to write an importer
-plugin, an exporter plugin, or a transaction plugin here.
+.. toctree::
+   :maxdepth: 1
+
+   plugins
+   general
+   member-data
+   payment-provider
