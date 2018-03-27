@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
+import sys
 
 # This file is execfile()d with the current directory set to its
 # containing directory.
 
 # -- General configuration ------------------------------------------------
 
+sys.path.insert(0, os.path.abspath('../src'))
+
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "byro.settings")
+django.setup()
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom

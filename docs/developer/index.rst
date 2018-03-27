@@ -12,7 +12,7 @@ It contains the contributing guidelines, an explanation on how to build a pull r
 style guidelines to follow, and an internal API documentation.
 
 If you want to develop (or improve) a plugin, have a look at our
-:doc:`plugin development guides </developer/plugins/guides>`:
+:doc:`plugin development guides </developer/plugins/index>`:
 They show how to develop a byro plugin with some hopefully easy-to-follow example plugins.
 
 If any part of the documentation is unclear, please head over to the
