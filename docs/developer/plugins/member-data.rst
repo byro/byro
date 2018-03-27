@@ -78,3 +78,26 @@ add a general newsletter view to the sidebar::
            'url': reverse('plugins:byro_newsletter:dashboard'),
            'active': 'byro_newsletter' in request.resolver_match.namespace and 'member' not in request.resolver_match.url_name,
        }
+
+
+Configuring you plugin
+----------------------
+
+If you'd like to provide additional configuration options (for example, the
+name or latest issue of your newsletter), you can add a special configuration
+related model. If the model class is derived from ``SingletonModel`` and ends
+in ``Configuration``, it will be automatically added to the settings page::
+
+   from django.db import models
+   from django.utils.translation import ugettext_lazy as _
+   from solo.models import SingletonModel
+
+
+   class NewsletterConfiguration(SingletonModel):
+
+       url = models.CharField(
+           null=True, blank=True,
+           max_length=300,
+           verbose_name=_('Newsletter information URL'),
+           help_text=_('e.g. https://foo.bar.de/news')
+       )
