@@ -19,7 +19,9 @@ class RegistrationConfigForm(forms.Form):
         for profile in Member.profile_classes:
             for field in profile._meta.fields:
                 if field.name not in ('id', 'member'):
-                    self.fields[f'{profile.__name__}__{field.name}'] = forms.IntegerField(required=False, label=f'{field.verbose_name or field.name} ({profile.__name__})')
+                    key = '{profile.__name__}__{field.name}'.format(profile=profile, field=field)
+                    label = '{field_name} ({profile.__name__})'.format(field_name=field.verbose_name or field.name, profile=profile)
+                    self.fields[key] = forms.IntegerField(required=False, label=label)
         config = Configuration.get_solo().registration_form or []
         for entry in config:
             field = self.fields.get(entry['name'])

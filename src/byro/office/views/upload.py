@@ -64,5 +64,5 @@ class UploadMatchView(DetailView):
                 success += 1
             except Exception as e:
                 errors += 1
-        messages.info(request, f'{success} successful matches, {errors} errors.')
+        messages.info(request, '{success} successful matches, {errors} errors.'.format(success=success, errors=errors))
         return redirect('office:uploads.list')

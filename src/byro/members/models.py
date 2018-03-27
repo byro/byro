@@ -116,7 +116,7 @@ class Member(Auditable, models.Model):
                 vt.delete()
 
     def __str__(self):
-        return f'Member {self.number} ({self.name})'
+        return 'Member {self.number} ({self.name})'.format(self=self)
 
 
 class FeeIntervals:

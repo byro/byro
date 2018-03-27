@@ -46,7 +46,7 @@ class Account(Auditable, models.Model):
     def __str__(self):
         if self.name:
             return self.name
-        return f'{self.account_category} account #{self.id}'
+        return '{self.account_category} account #{self.id}'.format(self=self)
 
     @property
     def transactions(self):

@@ -32,7 +32,7 @@ class MailTemplate(Auditable, models.Model):
     )
 
     def __str__(self):
-        return f'{self.subject}'
+        return '{self.subject}'.format(self=self)
 
     def to_mail(self, email, locale=None, context=None, skip_queue=False, attachments=None):
         from byro.common.models import Configuration
@@ -44,7 +44,7 @@ class MailTemplate(Auditable, models.Model):
                 subject = str(self.subject).format(**context)
                 text = str(self.text).format(**context)
             except KeyError as e:
-                raise SendMailException(f'Experienced KeyError when rendering Text: {str(e)}')
+                raise SendMailException('Experienced KeyError when rendering Text: {e}'.format(e=e))
 
             mail = EMail(
                 to=email,

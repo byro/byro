@@ -14,5 +14,5 @@ class PermissionMiddleware:
     def __call__(self, request):
         url = resolve(request.path_info)
         if request.user.is_anonymous and url.url_name not in self.UNAUTHENTICATED_URLS:
-            return redirect(reverse('common:login') + f'?next={request.path}')
+            return redirect(reverse('common:login') + '?next={request.path}'.format(request=request))
         return self.get_response(request)
