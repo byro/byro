@@ -1,8 +1,8 @@
 .. highlight:: python
    :linenothreshold: 5
 
-Plugin: Additional member data
-==============================
+Plugin: Custom member data
+==========================
 
 Most groups will need to save more data about their members than byro does by
 default.
@@ -10,9 +10,9 @@ default.
 General
 -------
 
-Saving additional member data will be done via a special model class, which
-**must** reference ``byro.members.Member`` in a OneToOne relation, and the
-related name **must** start with "profile".
+You can save custom member data via a special model class, which **must**
+reference ``byro.members.Member`` in a OneToOne relation, and the related name
+**must** start with "profile".
 
 Once you have generated this plugin (and have added the migrations, and run
 them), byro will discover the profile on its own, generate the fitting forms
@@ -37,10 +37,10 @@ you'd add a ``models.py`` file to your plugin, and put this inside::
        receives_newsletter = models.BooleanField(default=True)
 
 
-Additional views
-----------------
+Custom views
+------------
 
-If you want to add an additional tab to a member's view related to your new
+If you want to add an custom tab to a member's view related to your new
 content, you'll have to write a simple view, add its url in your ``urls.py``,
 and register it in your ``signals.py``::
 
@@ -83,9 +83,9 @@ add a general newsletter view to the sidebar::
 Configuring you plugin
 ----------------------
 
-If you'd like to provide additional configuration options (for example, the
+If you'd like to provide custom configuration options (for example, the
 name or latest issue of your newsletter), you can add a special configuration
-related model. If the model class is derived from ``SingletonModel`` and ends
+related model. If the model class inherits from ``SingletonModel`` and ends
 in ``Configuration``, it will be automatically added to the settings page::
 
    from django.db import models

@@ -29,8 +29,8 @@ Having the database server installed, we still need a database and a database us
   postgres=# GRANT ALL PRIVILEGES ON DATABASE byro to byro;
 
 Please create a user with the username **byro** and the password **byro**, as
-this is the default development setup. Needless to say, **do not run byro like
-this in production**.
+this is the default development setup. **Do not run byro like this in
+production**.
 
 Get a copy of the source code
 -----------------------------
