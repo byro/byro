@@ -134,4 +134,4 @@ To contribute to byro, please read the :doc:`contributing documentation </develo
 
 Head over to the :doc:`documentation patching section </developer/documentation>` if you want to improve the documentation.
 
-If you want to work on plugins, please go to the :doc:`plugin guides </developer/plugins>`.
+If you want to work on plugins, please go to the :doc:`plugin guides </developer/plugins/index>`.

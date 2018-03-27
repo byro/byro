@@ -1,4 +1,4 @@
-.. administrator-setup:
+.. _administrator-setup:
 
 Administration
 ==============
