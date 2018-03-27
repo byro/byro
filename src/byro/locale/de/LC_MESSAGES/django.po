@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-03 20:26+0000\n"
-"PO-Revision-Date: 2018-03-03 21:10+0100\n"
+"POT-Creation-Date: 2018-03-27 21:00+0000\n"
+"PO-Revision-Date: 2018-03-27 23:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -73,7 +73,7 @@ msgstr "Beitrag"
 msgid "Payment interval"
 msgstr "Zahlungsintervall"
 
-#: byro/common/models/configuration.py:13 byro/members/models.py:132
+#: byro/common/models/configuration.py:13 byro/members/models.py:141
 msgid "name"
 msgstr "Name"
 
@@ -117,6 +117,10 @@ msgstr "Allgemeine Einstellungen"
 #: byro/common/models/configuration.py:59
 msgid "e-mail of backoffice"
 msgstr "Verwaltungs-Mailadresse"
+
+#: byro/common/templates/common/auth/login.html:16
+msgid "Sign in"
+msgstr "Einloggen"
 
 #: byro/common/views.py:21
 msgid "No user account matches the entered credentials."
@@ -204,18 +208,18 @@ msgstr ""
 "Danke\n"
 "Das Helferlein"
 
-#: byro/mails/models.py:16 byro/mails/models.py:91
+#: byro/mails/models.py:16 byro/mails/models.py:90
 #: byro/office/templates/office/mails/outbox.html:23
 #: byro/office/templates/office/mails/sent.html:11
 #: byro/office/templates/office/mails/templates.html:17
 msgid "Subject"
 msgstr "Betreff"
 
-#: byro/mails/models.py:19 byro/mails/models.py:93
+#: byro/mails/models.py:19 byro/mails/models.py:92
 msgid "Text"
 msgstr "Text"
 
-#: byro/mails/models.py:24 byro/mails/models.py:75
+#: byro/mails/models.py:24 byro/mails/models.py:74
 msgid "Reply-To"
 msgstr "Reply-To"
 
@@ -227,7 +231,7 @@ msgstr ""
 "Ändere das Reply-To-Feld, wenn du Antworten nicht an die allgemeine Adresse "
 "geschickt haben möchtest"
 
-#: byro/mails/models.py:30 byro/mails/models.py:86
+#: byro/mails/models.py:30 byro/mails/models.py:85
 msgid "BCC"
 msgstr "BCC"
 
@@ -240,20 +244,20 @@ msgstr ""
 "jeder Mail, die durch dieses Template verschickt wird. Das können viele "
 "werden."
 
-#: byro/mails/models.py:69 byro/office/templates/office/mails/outbox.html:24
+#: byro/mails/models.py:68 byro/office/templates/office/mails/outbox.html:24
 #: byro/office/templates/office/mails/sent.html:12
 msgid "To"
 msgstr "To"
 
-#: byro/mails/models.py:70 byro/mails/models.py:81 byro/mails/models.py:87
+#: byro/mails/models.py:69 byro/mails/models.py:80 byro/mails/models.py:86
 msgid "One email address or several addresses separated by commas."
 msgstr "Eine Adresse oder mehrere durch Kommas getrennte."
 
-#: byro/mails/models.py:80
+#: byro/mails/models.py:79
 msgid "CC"
 msgstr "CC"
 
-#: byro/mails/models.py:94
+#: byro/mails/models.py:93
 msgid "Sent at"
 msgstr "Verschickt"
 
@@ -262,57 +266,68 @@ msgstr "Verschickt"
 msgid "Member"
 msgstr "Mitglied"
 
-#: byro/members/models.py:122
+#: byro/members/models.py:131
 msgid "monthly"
 msgstr "monatlich"
 
-#: byro/members/models.py:123
+#: byro/members/models.py:132
 msgid "quarterly"
 msgstr "pro Quartal"
 
-#: byro/members/models.py:124
+#: byro/members/models.py:133
 msgid "biannually"
 msgstr "halbjährlich"
 
-#: byro/members/models.py:125
+#: byro/members/models.py:134
 msgid "annually"
 msgstr "jährlich"
 
-#: byro/members/models.py:136
+#: byro/members/models.py:145
 msgid "amount"
 msgstr "Betrag"
 
-#: byro/members/models.py:137
+#: byro/members/models.py:146
 msgid "Please enter the yearly fee for this membership type."
 msgstr "Bitte gib den Jahresbeitrag für diesen Beitragstyp ein."
 
-#: byro/members/models.py:148
+#: byro/members/models.py:157
 msgid "start"
 msgstr "Beginn"
 
-#: byro/members/models.py:151
+#: byro/members/models.py:160
 msgid "end"
 msgstr "Ende"
 
-#: byro/members/models.py:156
+#: byro/members/models.py:165
 msgid "membership fee"
 msgstr "Beitrag"
 
-#: byro/members/models.py:157
+#: byro/members/models.py:166
 msgid "The amount to be paid in the chosen interval"
 msgstr "Der Beitrag, der im angegebenen Intervall gezahlt werden soll"
 
-#: byro/members/models.py:161
+#: byro/members/models.py:170
 msgid "payment interval"
 msgstr "Intervall"
 
-#: byro/members/models.py:162
+#: byro/members/models.py:171
 msgid "How often does the member pay their fees?"
 msgstr "Wie oft soll das Mitglied zahlen?"
 
-#: byro/members/models.py:165
+#: byro/members/models.py:174
 msgid "Membership"
 msgstr "Mitgliedschaft"
+
+#: byro/office/templates/office/account/add.html:10
+#: byro/office/templates/office/account/detail.html:10
+#: byro/office/templates/office/member/add.html:11
+#: byro/office/templates/office/member/data.html:19
+#: byro/office/templates/office/realtransaction/match.html:88
+#: byro/office/templates/office/settings/form.html:16
+#: byro/office/templates/office/settings/registration_form.html:9
+#: byro/office/templates/office/upload/add.html:12
+msgid "Save"
+msgstr "Speichern"
 
 #: byro/office/templates/office/account/base.html:4
 msgid "Default "
@@ -388,12 +403,12 @@ msgstr "Transaktions-Import"
 msgid "Mails"
 msgstr "E-Mails"
 
-#: byro/office/templates/office/base.html:98
+#: byro/office/templates/office/base.html:108
 #, python-format
 msgid "powered by <a %(a_attr)s>byro</a>"
 msgstr "powered by <a %(a_attr)s>byro</a>"
 
-#: byro/office/templates/office/base.html:103
+#: byro/office/templates/office/base.html:113
 msgid "running in development mode"
 msgstr "Entwicklungsmodus"
 
@@ -627,10 +642,6 @@ msgstr "Zuordnungen"
 msgid "Add a new VT"
 msgstr "Weitere Buchung"
 
-#: byro/office/templates/office/realtransaction/match.html:88
-msgid "Save"
-msgstr "Speichern"
-
 #: byro/office/templates/office/settings/base.html:13
 msgid "Base"
 msgstr "Standard"
@@ -673,7 +684,7 @@ msgstr ""
 "Diese E-Mail wurde schon verschickt und kann nicht mehr verändert werden. "
 "Kopiere sie stattdessen in einen Entwurf."
 
-#: byro/office/views/mails.py:20 byro/office/views/members.py:165
+#: byro/office/views/mails.py:20 byro/office/views/members.py:168
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
 
@@ -698,6 +709,12 @@ msgstr "Die Mail wurde verschickt."
 #: byro/office/views/mails.py:81
 msgid "No mail has been sent."
 msgstr "Keine Mail wurde verschickt."
+
+#: byro/office/views/members.py:77
+msgid "Some post processing steps could not be completed: "
+msgstr ""
+"Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht "
+"durchgeführt werden: "
 
 #: byro/office/views/settings.py:33 byro/office/views/settings.py:53
 msgid "The config was saved successfully."
@@ -766,10 +783,10 @@ msgstr ""
 "Mandatsgrund: {mandate_reason}\n"
 "\n"
 
-#: byro/settings.py:155
+#: byro/settings.py:156
 msgid "English"
 msgstr "Englisch"
 
-#: byro/settings.py:156
+#: byro/settings.py:157
 msgid "German"
 msgstr "Deutsch"
