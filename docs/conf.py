@@ -105,3 +105,5 @@ texinfo_documents = [
 # -- Options for internationalization -------------------------------------
 locale_dirs = ['locale']
 gettext_compact = False
+
+linkcheck_ignore = [r'http://localhost.*', r'https://pythonhosted.*']

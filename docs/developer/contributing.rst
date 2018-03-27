@@ -41,4 +41,4 @@ Please give us five to seven days to get back to you with a review or a direct m
 .. _open an issue: https://github.com/byro/byro/issues/new
 .. _open issues: https://github.com/byro/byro/issues
 .. _fork byor: https://github.com/byro/byro/fork
-.. _here: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+.. _here: https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
