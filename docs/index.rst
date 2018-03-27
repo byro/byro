@@ -19,7 +19,6 @@ We're organizing our documentation in the following categories:
 .. toctree::
    :maxdepth: 2
    :glob:
-   :caption: Developer documentation
    
    developer/index
 

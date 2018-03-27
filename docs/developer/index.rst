@@ -21,10 +21,9 @@ follow the :doc:`contributor documentation </developer/contributing>` to create 
 
 .. toctree::
    :maxdepth: 2
-   :glob:
-   :caption: Developer documentation
+   :caption: Contents:
 
    setup
    contributing
    documentation
-   plugins/guides
+   plugins/index
