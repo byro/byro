@@ -21,10 +21,10 @@ class RealTransactionSource(Auditable, models.Model):
     @transaction.atomic
     def process(self):
         """
-        Collects responses to the signal `derive_virtual_transactions`. Raises an
+        Collects responses to the signal `process_csv_upload`. Raises an
         exception if multiple results were found, and re-raises received Exceptions.
 
-        Returns a list of one or more VirtualTransaction objects if no Exception
+        Returns a list of one or more RealTransaction objects if no Exception
         was raised.
         """
         self.state = SourceState.PROCESSING
