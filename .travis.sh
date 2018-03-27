@@ -18,6 +18,7 @@ if [ "$1" == "style" ]; then
 fi
 
 if [ "$1" == "docs" ]; then
+    pip install src/requirements/documentation.txt
     cd docs
     make html
     make linkcheck

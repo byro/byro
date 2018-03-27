@@ -2,4 +2,4 @@ sphinx
 sphinx-autobuild
 sphinx-intl
 sphinx_rtd_theme
--r src/production.txt
+-r ./production.txt
