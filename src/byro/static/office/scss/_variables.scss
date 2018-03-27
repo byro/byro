@@ -1,14 +1,44 @@
+
+// $brand-primary: #00C853 !default;
+$brand-primary: #005da5 !default;
+$brand-success: $brand-primary !default;
+$brand-lighter: fade-out($brand-primary, 0.5) !default;
+$brand-lightest: fade-out($brand-primary, 0.8) !default;
+$brand-info: #0582ca !default;
+$brand-warning: #ffa14f !default;
+$brand-danger: #c60009 !default;
+
+$enable-shadows: true;
+$enable-gradients: true;
+
+$white:  #fff !default;
+$black: #000 !default;
+$offwhite: #f8f9fa !default;
+$gray: #8590a4 !default;
+
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dae0e4 !default;
+$gray-500: #636c72 !default;
+$gray-800: #343a40 !default;
+
+$gray-light: $gray-300 !default;
+$gray-lighter: $gray-200 !default;
+$gray-lightest: $gray-100 !default;
+
+$btn-primary-bg:                 $brand-success !default;
+$btn-primary-border:             $btn-primary-bg !default;
+$btn-primary-color:              $white !default;
+
 $theme-colors: (
-    primary: #00C853,
-    secondary: #FFD740,
-    success: #00C853,
-    info: #00B8D4,
-    warning: #FF9100,
-    danger: #FF6E40,
-    light: #f8f9fa,
-    dark: #343a40
+  primary: $brand-primary,
+  secondary: #FFD740,
+  success: $brand-primary,
+  info: $brand-info,
+  warning: $brand-warning,
+  danger: $brand-danger,
+  light: $gray-100,
+  dark: $gray-800
 );
 
-$primary-lighter: #B9F6CA;
-$primary-lightest: #E8F5E9;
 $enable-rounded: false;

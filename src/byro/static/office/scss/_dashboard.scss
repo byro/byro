@@ -10,7 +10,7 @@
     border: 5px solid white;
     min-height: 160px;
     width: 340px;
-    background: $primary-lightest;
+    background: $brand-lightest;
 
     h1 {
         display: block;
@@ -26,6 +26,6 @@
         padding-right: 8px;
     }
     &.block-danger {
-        background: $red;
+        background: $brand-danger;
     }
 }
