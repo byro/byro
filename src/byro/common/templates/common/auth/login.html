@@ -1,4 +1,5 @@
 {% extends "office/base.html" %}
+{% load i18n %}
 
 {% block headline %}
 Welcome to byro!
@@ -12,7 +13,7 @@ Welcome to byro!
                class="form-control" name="username">
         <input type="password" placeholder="Password" required id="password" autocomplete="off"
                class="form-control" name="password">
-        <button class="btn btn-lg btn-primary form-control" type="submit">Sign in</button>
+        <button class="btn btn-lg btn-success form-control" type="submit">{% trans "Sign in" %}</button>
     </form>
 </div>
 {% endblock %}

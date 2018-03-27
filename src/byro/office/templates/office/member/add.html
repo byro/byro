@@ -8,7 +8,7 @@
     <form method="post">
         {% csrf_token %}
         {% bootstrap_form form layout='horizontal' %}
-        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
     </form>
 {% else %}
     <div class="alert alert-danger">

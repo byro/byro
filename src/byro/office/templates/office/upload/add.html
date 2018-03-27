@@ -9,6 +9,6 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form form layout='horizontal' %}
-        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
     </form>
 {% endblock %}

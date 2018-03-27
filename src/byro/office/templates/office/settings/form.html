@@ -1,5 +1,6 @@
 {% extends "office/settings/base.html" %}
 {% load bootstrap4 %}
+{% load i18n %}
 
 {% block settings_content %}
 <form method="post">
@@ -12,6 +13,6 @@
             </div>
         </div>
     {% endfor %}
-    <button class="btn btn-primary" type="submit">Save</button>
+    <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
 </form>
 {% endblock %}

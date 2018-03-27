@@ -1,5 +1,6 @@
 {% extends "office/member/base.html" %}
 {% load bootstrap4 %}
+{% load i18n %}
 
 {% block member_content %}
 
@@ -15,7 +16,7 @@
     {% endfor %}
     <div class="card member-form-card">
         <div class="card-body">
-            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
         </div>
     </div>
 </form>
