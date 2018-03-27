@@ -6,11 +6,11 @@
 
 {% block content %}
 <p>
-<a href="{% url "office:accounts.add" %}" class="btn btn-primary">
+<a href="{% url "office:accounts.add" %}" class="btn btn-success">
     <span class="fa fa-plus"></span> {% trans "Add new account" %}
 </a>
 </p>
-<table class="table table-condensed">
+<table class="table table-sm">
     <thead>
         <tr>
             <th>{% trans "Name" %}</th>

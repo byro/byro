@@ -14,14 +14,14 @@
             <option value="unmatched" {% if "unmatched" == request.GET.filter %}selected{% endif %}>{% trans "Only unmatched transactions" %}</option>
         </select>
         <input name="q" class="form-control" type="text" placeholder="{% trans "Search" %}"/>
-        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+        <button type="submit" class="btn btn-success">{% trans "Filter" %}</button>
     </form>
 </div>
 <form action="match">
-<table class="table table-condensed table-bordered">
+<table class="table table-sm table-bordered">
     <thead>
         <tr>
-            <th><button type="submit" class="btn btn-xs btn-primary">{% trans "match" %}</button></th>
+            <th><button type="submit" class="btn btn-sm btn-success">{% trans "match" %}</button></th>
             <th class="table-column-small">{% trans "Value Date" %}</th>
             <th class="table-column-small">{% trans "Amount" %}</th>
             <th class="table-column-medium">{% trans "Purpose" %}</th>
@@ -44,7 +44,7 @@
                         {{ amount }} € from {{ source }} to {{ dest }} ({{ member }})
                     {% endblocktrans %}</li>
                     {% empty %}
-                        <a href="match?ids={{ rtrans.id }}" class="btn btn-xs btn-primary">{% trans "Match transaction" %}</a>
+                        <a href="match?ids={{ rtrans.id }}" class="btn btn-sm btn-success">{% trans "Match transaction" %}</a>
                     {% endfor %}
                     </ul>
                 </td>

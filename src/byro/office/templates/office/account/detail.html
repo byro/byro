@@ -7,10 +7,10 @@
 <form method='post' class="inline-form">
     {% csrf_token %}
     {% bootstrap_form form layout='inline' %}
-    <button class="btn btn-primary" type="submit">Save</button>
+    <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
 </form>
 
-<table class="table table-condensed">
+<table class="table table-sm">
     <thead>
         <tr>
             <th>{% trans "Date" %}</th>

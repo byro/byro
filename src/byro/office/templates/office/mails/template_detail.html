@@ -16,14 +16,14 @@
             <div class="card-body">
                 {% if not form.instance.sent %}
                     <button class="btn btn-info" type="submit">Save</button>
-                    <a href="{% url "office:mails.mail.send" pk=form.instance.pk %}" class="btn btn-xs btn-primary">
+                    <a href="{% url "office:mails.mail.send" pk=form.instance.pk %}" class="btn btn-sm btn-success">
                         {% trans "Send" %}
                     </a>
-                    <a href="{% url "office:mails.mail.delete" pk=form.instance.pk %}" class="btn btn-xs btn-danger">
+                    <a href="{% url "office:mails.mail.delete" pk=form.instance.pk %}" class="btn btn-sm btn-danger">
                         {% trans "Discard" %}
                     </a>
                 {% else %}
-                    <a href="{% url "office:mails.mail.copy" pk=form.instance.pk %}" class="btn btn-xs btn-danger">
+                    <a href="{% url "office:mails.mail.copy" pk=form.instance.pk %}" class="btn btn-sm btn-danger">
                         {% trans "Copy to new mail" %}
                     </a>
                 {% endif %}

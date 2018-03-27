@@ -7,7 +7,7 @@
 {% block content %}
 <h3>{% trans "Match transactions" %}</h3>
 <script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
-<table class="table table-condensed">
+<table class="table table-sm">
     <thead>
         <tr>
             <th class="table-column-small">{% trans "Value Date" %}</th>
@@ -50,7 +50,7 @@
                         <div class="sr-only">
                             {{ form.id }}
                         </div>
-                        <div class="question-option-row offset-3">
+                        <div class="question-option-row">
                             <div class="question-option-input{% if action == 'view' %} disabled{% endif %}">
                                 {% bootstrap_form_errors form %}
                                 {% bootstrap_form form layout='inline' form_group_class="" %}
@@ -71,7 +71,7 @@
                         <div class="sr-only">
                             {{ formset.empty_form.id }}
                         </div>
-                        <div class="question-option-row offset-3">
+                        <div class="question-option-row">
                             <div class="question-option-input">
                                 {% bootstrap_form formset.empty_form %}
                             </div>
@@ -80,11 +80,11 @@
                 {% endescapescript %}
             </script>
             {% if action != 'view' %}
-            <p class="offset-9">
-                <button type="button" class="btn btn-secondary" data-formset-add>
+            <p>
+                <button type="button" class="btn btn-info" data-formset-add>
                     <i class="fa fa-plus"></i> {% trans "Add a new VT" %}
                 </button>
-                <button type="submit" class="btn btn-primary" data-formset-add>
+                <button type="submit" class="btn btn-success" data-formset-add>
                     {% trans "Save" %}
                 </button>
             </p>

@@ -4,12 +4,12 @@
 
 {% block content %}
 <p>
-<a href="{% url "office:members.add" %}" class="btn btn-primary">
+<a href="{% url "office:members.add" %}" class="btn btn-success">
     <span class="fa fa-plus"></span> {% trans "Add new member" %}
 </a>
 <form method="post" class="form form-inline">
     {% csrf_token %}
-    <button type="submit" class="btn btn-primary">{% trans "Rebuild" %}</button>
+    <button type="submit" class="btn btn-success">{% trans "Rebuild" %}</button>
 </form>
 <div class="form-group">
     <form method="get" class="form form-inline">
@@ -19,11 +19,11 @@
             <option value="all" {% if "all" == request.GET.filter %}selected{% endif %}>{% trans "All members" %}</option>
         </select>
         <input name="q" class="form-control" type="text" placeholder="{% trans "Search" %}"/>
-        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+        <button type="submit" class="btn btn-success">{% trans "Filter" %}</button>
     </form>
 </div>
 </p>
-<table class="table table-condensed">
+<table class="table table-sm">
     <thead>
         <tr>
             <th>{% trans "Number" %}</th>

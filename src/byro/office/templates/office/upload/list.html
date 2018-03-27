@@ -6,11 +6,11 @@
 
 {% block content %}
 <p>
-<a href="{% url "office:uploads.add" %}" class="btn btn-primary">
+<a href="{% url "office:uploads.add" %}" class="btn btn-success">
     <span class="fa fa-plus"></span> {% trans "Add new import" %}
 </a>
 </p>
-<table class="table table-condensed">
+<table class="table table-sm">
     <thead>
         <tr>
             <th>{% trans "Name" %}</th>
@@ -23,14 +23,14 @@
             <tr>
                 <td class="text-md-left">{{ upload.source_file }}</td>
                 <td class="text-md-left">{{ upload.state }}</td>
-                <td>
+                <td class="row">
                     <form method="post" action="process/{{ upload.id }}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-xs btn-warning">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button>
+                        <button type="submit" class="btn btn-sm btn-warning">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button>
                     </form>
                     <form method="post" action="match/{{ upload.id }}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-xs btn-danger">{% trans "match" %}</button>
+                        <button type="submit" class="btn btn-sm btn-danger">{% trans "match" %}</button>
                     </form>
                 </td>
             </tr>
