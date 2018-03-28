@@ -17,7 +17,7 @@ If you run into trouble using this documentation, please `tell us about it`_,
 too.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    plugins
    general

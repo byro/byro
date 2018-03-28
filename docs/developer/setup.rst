@@ -1,5 +1,5 @@
 Development setup
------------------
+=================
 
 To contribute to byro, it's useful to run byro locally on your device so you can test your
 changes. First of all, you need install some packages on your operating system:
