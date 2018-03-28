@@ -106,4 +106,4 @@ texinfo_documents = [
 locale_dirs = ['locale']
 gettext_compact = False
 
-linkcheck_ignore = [r'http://localhost.*', r'https://pythonhosted.*']
+linkcheck_ignore = [r'http://localhost.*', ]
