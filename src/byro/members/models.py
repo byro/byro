@@ -11,6 +11,21 @@ from byro.common.models.auditable import Auditable
 from byro.common.models.configuration import Configuration
 
 
+class MembershipTypes:
+    MEMBER = 'member'
+    EXTERNAL = 'external'
+
+
+class MemberManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(membership_type=MembershipTypes.MEMBER)
+
+
+class AllMemberManager(models.Manager):
+    pass
+
+
 class Member(Auditable, models.Model):
 
     number = models.CharField(
@@ -34,8 +49,14 @@ class Member(Auditable, models.Model):
         verbose_name=_('E-Mail'),
         null=True, blank=True,
     )
+    membership_type = models.CharField(
+        max_length=40,
+        default=MembershipTypes.MEMBER,
+    )
 
     form_title = _('Member')
+    objects = MemberManager()
+    all_objects = AllMemberManager()
 
     @classproperty
     def profile_classes(cls) -> list:
