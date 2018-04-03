@@ -20,7 +20,10 @@ def get_member_statistics():
         return []
 
     date = first_member.start
-    end = Membership.objects.filter(end__isnull=False).order_by('-end').first().end
+    end_member = Membership.objects.filter(end__isnull=False).order_by('-end').first()
+    if not end_member:
+        return []
+    end = end_member.end
     result = []
 
     while date <= end:
