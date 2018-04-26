@@ -109,6 +109,9 @@ class MemberDashboardView(MemberView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         obj = self.get_object()
+        if not obj.memberships.count():
+            context['is_active'] = False
+            return context
         first = obj.memberships.first().start
         delta = now().date() - first
         context['member_since'] = {
