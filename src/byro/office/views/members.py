@@ -22,6 +22,9 @@ class MemberView(DetailView):
     context_object_name = 'member'
     model = Member
 
+    def get_queryset(self):
+        return Member.all_objects.all()
+
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
         responses = [r[1] for r in member_view.send_robust(self.get_object(), request=self.request)]
@@ -174,7 +177,7 @@ class MemberFinanceView(MemberView):
     paginate_by = 50
 
     def get_member(self):
-        return Member.objects.get(pk=self.kwargs['pk'])
+        return Member.all_objects.get(pk=self.kwargs['pk'])
 
     def get_transactions(self):
         return self.get_member().transactions.filter(
