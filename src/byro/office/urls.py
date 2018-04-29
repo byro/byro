@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^members/view/(?P<pk>\d+)/', include([
         url('data$', members.MemberDataView.as_view(), name='members.data'),
         url('finance$', members.MemberFinanceView.as_view(), name='members.finance'),
+        url('leave$', members.MemberLeaveView.as_view(), name='members.leave'),
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
 

@@ -12,10 +12,31 @@ you want to update your member data, please contact us at {contact}.
 
 Thanks,
 the robo clerk'''))
+
 WELCOME_OFFICE_SUBJECT = LazyI18nString.from_gettext(_('[byro] New member'))
 WELCOME_OFFICE_TEXT = LazyI18nString.from_gettext(_('''Hi,
 
 we have a new member: {member_name}
+
+{additional_information}
+
+Thanks,
+the robo clerk'''))
+
+LEAVE_MEMBER_SUBJECT = LazyI18nString.from_gettext(_('Goodbye!'))
+LEAVE_MEMBER_TEXT = LazyI18nString.from_gettext(_('''Hi,
+
+we are sorry that you will leave us at {end}.
+
+{additional_information}
+
+Thanks,
+the robo clerk'''))
+
+LEAVE_MEMBER_OFFICE_SUBJECT = LazyI18nString.from_gettext(_('[byro] member leaves'))
+LEAVE_MEMBER_OFFICE_TEXT = LazyI18nString.from_gettext(_('''Hi,
+
+a member will leave us at {end}
 
 {additional_information}
 
