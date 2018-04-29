@@ -29,6 +29,14 @@
         {% trans "Finance" %}
     </a>
   </li>
+  <li class="nav-item">
+    <a
+      class="nav-link {% if "members.leave" in url_name %}active{% endif %}"
+      href="{% url "office:members.leave" pk=member.pk %}"
+    >
+        {% trans "Leave" %}
+    </a>
+  </li>
   {% for view in member_views %}
   <li class="nav-item">
     <a

@@ -14,6 +14,7 @@ from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
     new_member, new_member_mail_information, new_member_office_mail_information,
+    leave_member_mail_information, leave_member_office_mail_information,
 )
 from byro.office.signals import member_view
 
@@ -194,6 +195,58 @@ class MemberFinanceView(MemberView):
         context['member'] = self.get_member()
         context['transactions'] = self.get_transactions()
         return context
+
+
+class MemberLeaveView(MemberView, FormView):
+    template_name = 'office/member/leave.html'
+    form_class = forms.modelform_factory(Membership,
+                                         fields=['start', 'end', 'interval', 'amount'])
+
+    def get_member(self):
+        return Member.all_objects.get(pk=self.kwargs['pk'])
+
+    def get_forms(self):
+        obj = self.get_object()
+        return [
+            self.form_class(instance=m, prefix=m.id,
+                            data=self.request.POST if self.request.method == 'POST' else None)
+            for m in obj.memberships.all().order_by('-start')
+        ]
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['forms'] = self.get_forms()
+        return context
+
+    def post(self, *args, **kwargs):
+        for form in self.get_forms():
+            if form.is_valid() and form.has_changed():
+                if not getattr(form.instance, 'member', False):
+                    form.instance.member = self.get_object()
+
+                config = Configuration.get_solo()
+
+                if config.leave_member_template:
+                    context = {
+                        'name': config.name,
+                        'contact': config.mail_from,
+                        'number': form.instance.member.number,
+                        'member_name': form.instance.member.name,
+                        'end': form.instance.end,
+                    }
+                    responses = [r[1] for r in leave_member_mail_information.send_robust(sender=form.instance) if r]
+                    context['additional_information'] = '\n'.join(responses).strip()
+                    config.leave_member_template.to_mail(email=form.instance.member.email, context=context)
+                if config.leave_office_template:
+                    context = {
+                        'member_name': form.instance.member.name,
+                        'end': form.instance.end,
+                    }
+                    responses = [r[1] for r in leave_member_office_mail_information.send_robust(sender=form.instance) if r]
+                    context['additional_information'] = '\n'.join(responses).strip()
+                    config.leave_office_template.to_mail(email=config.backoffice_mail, context=context)
+                form.save()
+        return redirect(reverse('office:members.leave', kwargs=self.kwargs))
 
 
 class MemberListTypeaheadView(View):
