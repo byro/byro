@@ -9,7 +9,7 @@ web:
   links:
    - db
   volumes:
-   - .:/opt/code
+   - .:/opt/code:z
   ports:
    - "127.0.0.1:8020:8020"
 db:
