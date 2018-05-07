@@ -4,6 +4,8 @@
 {% load static %}
 {% load formset_tags %}
 
+{% block title %}{% trans "Mail" %} :: {{ block.super }}{% endblock %}
+
 {% block mail_content %}
 <form method='post'>
     {% csrf_token %}

@@ -1,6 +1,8 @@
 {% extends "office/member/base.html" %}
 {% load i18n %}
 
+{% block title %}{{ block.super }} :: {% trans "Finance" %}{% endblock %}
+
 {% block member_content %}
 
 <table class="table table-sm">
