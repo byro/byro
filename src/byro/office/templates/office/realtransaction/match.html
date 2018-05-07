@@ -1,11 +1,12 @@
-{% extends "office/base.html" %}
+{% extends "office/base_headline.html" %}
 {% load i18n %}
 {% load bootstrap4 %}
 {% load static %}
 {% load formset_tags %}
 
+{% block headline %}{% trans "Match transactions" %}{% endblock %}
+
 {% block content %}
-<h3>{% trans "Match transactions" %}</h3>
 <script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
 <table class="table table-sm">
     <thead>

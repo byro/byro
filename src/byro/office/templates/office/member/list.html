@@ -2,6 +2,8 @@
 
 {% load i18n %}
 
+{% block title %}{% trans "Member List" %}{% endblock %}
+
 {% block content %}
 <p>
 <a href="{% url "office:members.add" %}" class="btn btn-success">

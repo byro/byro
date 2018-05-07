@@ -2,6 +2,8 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
+{% block title %}{{ block.super }} :: {% trans "Data" %}{% endblock %}
+
 {% block member_content %}
 
 <form method='post'>

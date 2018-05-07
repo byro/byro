@@ -4,6 +4,8 @@
 {% load static %}
 {% load formset_tags %}
 
+{% block title %}{% trans "Sent Mails" %} :: {{ block.super }}{% endblock %}
+
 {% block mail_content %}
 <table class="table table-sm">
     <thead>

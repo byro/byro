@@ -4,6 +4,8 @@
 {% load static %}
 {% load formset_tags %}
 
+{% block title %}{% trans "Mail Templates" %} :: {{ block.super }}{% endblock %}
+
 {% block mail_content %}
 <div class="alert alert-info">
     {% blocktrans trimmed %}

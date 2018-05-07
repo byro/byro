@@ -1,4 +1,4 @@
-{% extends "office/base.html" %}
+{% extends "office/base_headline.html" %}
 {% load i18n %}
 
 {% block headline %}{% if account.name %}{{ account.name }}{% else %}{% trans "Default " %} {{ account.get_account_category_display }}{% endif %}{% endblock %}
