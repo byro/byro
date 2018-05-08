@@ -120,3 +120,4 @@ ENV/
 local/
 static.dist/
 transaction_uploads/
+.pytest_cache/
