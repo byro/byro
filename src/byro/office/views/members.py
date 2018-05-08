@@ -220,7 +220,7 @@ class MemberLeaveView(MemberView, FormView):
 
     def post(self, *args, **kwargs):
         for form in self.get_forms():
-            if form.is_valid() and form.has_changed():
+            if form.is_valid() and form.has_changed() and form.instance.end:
                 if not getattr(form.instance, 'member', False):
                     form.instance.member = self.get_object()
 
