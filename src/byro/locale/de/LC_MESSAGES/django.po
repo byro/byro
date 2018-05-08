@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-27 21:00+0000\n"
-"PO-Revision-Date: 2018-03-27 23:01+0200\n"
+"POT-Creation-Date: 2018-05-08 22:56+0000\n"
+"PO-Revision-Date: 2018-05-09 00:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -42,22 +42,22 @@ msgstr "Erträge"
 msgid "Expense account"
 msgstr "Aufwendungen"
 
-#: byro/common/forms/registration.py:9 byro/members/models.py:18
+#: byro/common/forms/registration.py:9 byro/members/models.py:33
 msgid "Membership number/ID"
 msgstr "Mitgliedsnummer"
 
-#: byro/common/forms/registration.py:10 byro/members/models.py:24
+#: byro/common/forms/registration.py:10 byro/members/models.py:39
 #: byro/office/templates/office/account/list.html:16
-#: byro/office/templates/office/member/list.html:30
+#: byro/office/templates/office/member/list.html:32
 #: byro/office/templates/office/upload/list.html:16
 msgid "Name"
 msgstr "Name"
 
-#: byro/common/forms/registration.py:11 byro/members/models.py:29
+#: byro/common/forms/registration.py:11 byro/members/models.py:44
 msgid "Address"
 msgstr "Adresse"
 
-#: byro/common/forms/registration.py:12 byro/members/models.py:34
+#: byro/common/forms/registration.py:12 byro/members/models.py:49
 msgid "E-Mail"
 msgstr "E-Mail-Adresse"
 
@@ -73,7 +73,7 @@ msgstr "Beitrag"
 msgid "Payment interval"
 msgstr "Zahlungsintervall"
 
-#: byro/common/models/configuration.py:13 byro/members/models.py:141
+#: byro/common/models/configuration.py:13 byro/members/models.py:162
 msgid "name"
 msgstr "Name"
 
@@ -118,7 +118,15 @@ msgstr "Allgemeine Einstellungen"
 msgid "e-mail of backoffice"
 msgstr "Verwaltungs-Mailadresse"
 
-#: byro/common/templates/common/auth/login.html:16
+#: byro/common/templates/common/auth/login.html:4
+msgid "Login"
+msgstr "Anmelden"
+
+#: byro/common/templates/common/auth/login.html:7
+msgid "Welcome to byro!"
+msgstr "Willkommen zu byro!"
+
+#: byro/common/templates/common/auth/login.html:18
 msgid "Sign in"
 msgstr "Einloggen"
 
@@ -183,11 +191,11 @@ msgstr ""
 "Danke\n"
 "Das Helferlein"
 
-#: byro/mails/default.py:15
+#: byro/mails/default.py:16
 msgid "[byro] New member"
 msgstr "[byr] Neues Mitglied"
 
-#: byro/mails/default.py:16
+#: byro/mails/default.py:17
 #, python-brace-format
 msgid ""
 "Hi,\n"
@@ -208,10 +216,60 @@ msgstr ""
 "Danke\n"
 "Das Helferlein"
 
+#: byro/mails/default.py:26
+msgid "Goodbye!"
+msgstr "Tschüß!"
+
+#: byro/mails/default.py:27
+#, python-brace-format
+msgid ""
+"Hi,\n"
+"\n"
+"we are sorry that you will leave us at {end}.\n"
+"\n"
+"{additional_information}\n"
+"\n"
+"Thanks,\n"
+"the robo clerk"
+msgstr ""
+"Hi,\n"
+"\n"
+"schade, dass du uns zu {end} verlässt.\n"
+"\n"
+"{additional_information}\n"
+"\n"
+"Danke\n"
+"Das Helferlein"
+
+#: byro/mails/default.py:36
+msgid "[byro] Membership termination"
+msgstr "[byro] Austritt"
+
+#: byro/mails/default.py:37
+#, python-brace-format
+msgid ""
+"Hi,\n"
+"\n"
+"{member_name} will leave us at {end}.\n"
+"\n"
+"{additional_information}\n"
+"\n"
+"Thanks,\n"
+"the robo clerk"
+msgstr ""
+"Hi,\n"
+"\n"
+"{member_name} wird uns zu {end} verlassen.\n"
+"\n"
+"{additional_information}\n"
+"\n"
+"Danke\n"
+"Das Helferlein"
+
 #: byro/mails/models.py:16 byro/mails/models.py:90
-#: byro/office/templates/office/mails/outbox.html:23
-#: byro/office/templates/office/mails/sent.html:11
-#: byro/office/templates/office/mails/templates.html:17
+#: byro/office/templates/office/mails/outbox.html:25
+#: byro/office/templates/office/mails/sent.html:13
+#: byro/office/templates/office/mails/templates.html:19
 msgid "Subject"
 msgstr "Betreff"
 
@@ -244,8 +302,8 @@ msgstr ""
 "jeder Mail, die durch dieses Template verschickt wird. Das können viele "
 "werden."
 
-#: byro/mails/models.py:68 byro/office/templates/office/mails/outbox.html:24
-#: byro/office/templates/office/mails/sent.html:12
+#: byro/mails/models.py:68 byro/office/templates/office/mails/outbox.html:26
+#: byro/office/templates/office/mails/sent.html:14
 msgid "To"
 msgstr "To"
 
@@ -261,71 +319,76 @@ msgstr "CC"
 msgid "Sent at"
 msgstr "Verschickt"
 
-#: byro/members/models.py:38
+#: byro/members/models.py:57
 #: byro/office/templates/office/account/detail.html:17
 msgid "Member"
 msgstr "Mitglied"
 
-#: byro/members/models.py:131
+#: byro/members/models.py:152
 msgid "monthly"
 msgstr "monatlich"
 
-#: byro/members/models.py:132
+#: byro/members/models.py:153
 msgid "quarterly"
 msgstr "pro Quartal"
 
-#: byro/members/models.py:133
+#: byro/members/models.py:154
 msgid "biannually"
 msgstr "halbjährlich"
 
-#: byro/members/models.py:134
+#: byro/members/models.py:155
 msgid "annually"
 msgstr "jährlich"
 
-#: byro/members/models.py:145
+#: byro/members/models.py:166
 msgid "amount"
 msgstr "Betrag"
 
-#: byro/members/models.py:146
+#: byro/members/models.py:167
 msgid "Please enter the yearly fee for this membership type."
 msgstr "Bitte gib den Jahresbeitrag für diesen Beitragstyp ein."
 
-#: byro/members/models.py:157
+#: byro/members/models.py:178
 msgid "start"
 msgstr "Beginn"
 
-#: byro/members/models.py:160
+#: byro/members/models.py:181
 msgid "end"
 msgstr "Ende"
 
-#: byro/members/models.py:165
+#: byro/members/models.py:186
 msgid "membership fee"
 msgstr "Beitrag"
 
-#: byro/members/models.py:166
+#: byro/members/models.py:187
 msgid "The amount to be paid in the chosen interval"
 msgstr "Der Beitrag, der im angegebenen Intervall gezahlt werden soll"
 
-#: byro/members/models.py:170
+#: byro/members/models.py:191
 msgid "payment interval"
 msgstr "Intervall"
 
-#: byro/members/models.py:171
+#: byro/members/models.py:192
 msgid "How often does the member pay their fees?"
 msgstr "Wie oft soll das Mitglied zahlen?"
 
-#: byro/members/models.py:174
+#: byro/members/models.py:195
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
-#: byro/office/templates/office/account/add.html:10
+#: byro/office/templates/office/account/add.html:5
+msgid "Add Account …"
+msgstr "Konto hinzufügen …"
+
+#: byro/office/templates/office/account/add.html:12
 #: byro/office/templates/office/account/detail.html:10
-#: byro/office/templates/office/member/add.html:11
-#: byro/office/templates/office/member/data.html:19
-#: byro/office/templates/office/realtransaction/match.html:88
+#: byro/office/templates/office/member/add.html:13
+#: byro/office/templates/office/member/data.html:21
+#: byro/office/templates/office/member/leave.html:19
+#: byro/office/templates/office/realtransaction/match.html:89
 #: byro/office/templates/office/settings/form.html:16
 #: byro/office/templates/office/settings/registration_form.html:9
-#: byro/office/templates/office/upload/add.html:12
+#: byro/office/templates/office/upload/add.html:14
 msgid "Save"
 msgstr "Speichern"
 
@@ -334,14 +397,14 @@ msgid "Default "
 msgstr "Standard"
 
 #: byro/office/templates/office/account/detail.html:16
-#: byro/office/templates/office/member/finance.html:9
+#: byro/office/templates/office/member/finance.html:11
 msgid "Date"
 msgstr "Datum"
 
 #: byro/office/templates/office/account/detail.html:18
-#: byro/office/templates/office/member/finance.html:11
-#: byro/office/templates/office/realtransaction/list.html:27
-#: byro/office/templates/office/realtransaction/match.html:15
+#: byro/office/templates/office/member/finance.html:13
+#: byro/office/templates/office/realtransaction/list.html:29
+#: byro/office/templates/office/realtransaction/match.html:16
 msgid "Purpose"
 msgstr "Zweck"
 
@@ -369,7 +432,7 @@ msgid "Type"
 msgstr "Art"
 
 #: byro/office/templates/office/account/list.html:20
-#: byro/office/templates/office/member/list.html:31
+#: byro/office/templates/office/member/list.html:33
 msgid "Balance"
 msgstr "Kontostand"
 
@@ -378,7 +441,9 @@ msgid "Default"
 msgstr "Standard"
 
 #: byro/office/templates/office/base.html:51
+#: byro/office/templates/office/dashboard.html:4
 #: byro/office/templates/office/member/base.html:13
+#: byro/office/templates/office/member/dashboard.html:4
 msgid "Dashboard"
 msgstr "Überblick"
 
@@ -391,6 +456,7 @@ msgid "Members"
 msgstr "Mitglieder"
 
 #: byro/office/templates/office/base.html:63
+#: byro/office/templates/office/realtransaction/list.html:7
 msgid "Real Transactions"
 msgstr "Bank-Transaktionen"
 
@@ -412,34 +478,36 @@ msgstr "powered by <a %(a_attr)s>byro</a>"
 msgid "running in development mode"
 msgstr "Entwicklungsmodus"
 
-#: byro/office/templates/office/dashboard.html:9
+#: byro/office/templates/office/dashboard.html:11
 #, python-format
 msgid "%(count)s members"
 msgstr "%(count)s Mitglieder"
 
-#: byro/office/templates/office/dashboard.html:14
+#: byro/office/templates/office/dashboard.html:16
 msgid "(all time)"
 msgstr "(insgesamt)"
 
-#: byro/office/templates/office/dashboard.html:19
+#: byro/office/templates/office/dashboard.html:21
 #, python-format
 msgid "%(count)s active members"
 msgstr "%(count)s aktive Mitglieder"
 
-#: byro/office/templates/office/dashboard.html:24
+#: byro/office/templates/office/dashboard.html:26
 msgid "(currently)"
 msgstr "(aktuell)"
 
-#: byro/office/templates/office/dashboard.html:29
+#: byro/office/templates/office/dashboard.html:31
 #, python-format
 msgid "%(count)s unmapped transactions"
 msgstr "%(count)s nicht zugeordnete Buchungen"
 
 #: byro/office/templates/office/mails/base.html:11
+#: byro/office/templates/office/mails/outbox.html:7
 msgid "Outbox"
 msgstr "Postausgang"
 
 #: byro/office/templates/office/mails/base.html:17
+#: byro/office/templates/office/mails/sent.html:7
 msgid "Sent Mails"
 msgstr "Verschickte Mails"
 
@@ -447,45 +515,57 @@ msgstr "Verschickte Mails"
 msgid "Templates"
 msgstr "Vorlagen"
 
-#: byro/office/templates/office/mails/detail.html:13
+#: byro/office/templates/office/mails/detail.html:7
+msgid "Mail"
+msgstr "E-Mail"
+
+#: byro/office/templates/office/mails/detail.html:15
 #, python-format
 msgid "Mail, sent at %(when)s"
 msgstr "E-Mail, verschickt am %(when)s"
 
-#: byro/office/templates/office/mails/detail.html:17
+#: byro/office/templates/office/mails/detail.html:19
 msgid "Mail, unsent"
 msgstr "E-Mail, noch nicht verschickt"
 
-#: byro/office/templates/office/mails/detail.html:28
-#: byro/office/templates/office/mails/outbox.html:39
-#: byro/office/templates/office/mails/template_detail.html:20
+#: byro/office/templates/office/mails/detail.html:30
+#: byro/office/templates/office/mails/outbox.html:41
+#: byro/office/templates/office/mails/template_detail.html:22
 msgid "Send"
 msgstr "Verschicken"
 
-#: byro/office/templates/office/mails/detail.html:31
-#: byro/office/templates/office/mails/outbox.html:42
-#: byro/office/templates/office/mails/template_detail.html:23
+#: byro/office/templates/office/mails/detail.html:33
+#: byro/office/templates/office/mails/outbox.html:44
+#: byro/office/templates/office/mails/template_detail.html:25
 msgid "Discard"
 msgstr "Verwerfen"
 
-#: byro/office/templates/office/mails/detail.html:35
-#: byro/office/templates/office/mails/template_detail.html:27
+#: byro/office/templates/office/mails/detail.html:37
+#: byro/office/templates/office/mails/template_detail.html:29
 msgid "Copy to new mail"
 msgstr "Zu neuer Mail kopieren"
 
-#: byro/office/templates/office/mails/outbox.html:12
+#: byro/office/templates/office/mails/outbox.html:14
 msgid "Send All"
 msgstr "Alle verschicken"
 
-#: byro/office/templates/office/mails/outbox.html:16
+#: byro/office/templates/office/mails/outbox.html:18
 msgid "Discard all"
 msgstr "Alle verwerfen"
 
-#: byro/office/templates/office/mails/sent.html:13
+#: byro/office/templates/office/mails/sent.html:15
 msgid "Sent"
 msgstr "Verschickt"
 
-#: byro/office/templates/office/mails/templates.html:9
+#: byro/office/templates/office/mails/template_detail.html:7
+msgid "Mail Template"
+msgstr "Vorlage"
+
+#: byro/office/templates/office/mails/templates.html:7
+msgid "Mail Templates"
+msgstr "Vorlagen"
+
+#: byro/office/templates/office/mails/templates.html:11
 msgid ""
 "There are a couple of default templates provided by byro, mostly revolving "
 "around members coming and going."
@@ -493,89 +573,103 @@ msgstr ""
 "Es gibt eine Reihe Standardvorlagen von byro, vor allem für den Beginn und "
 "das Ende einer Mitgliedschaft."
 
-#: byro/office/templates/office/member/add.html:15
+#: byro/office/templates/office/member/add.html:5
+msgid "Add Member …"
+msgstr "Mitglied hinzufügen"
+
+#: byro/office/templates/office/member/add.html:17
 msgid ""
 "Please configure the fields you want to display in your member registration "
 "form."
 msgstr ""
 "Bitte konfiguriere die Felder, die du im Beitrittsformular stehen hast."
 
-#: byro/office/templates/office/member/add.html:18
+#: byro/office/templates/office/member/add.html:20
 msgid "here!"
 msgstr "hier!"
 
 #: byro/office/templates/office/member/base.html:21
+#: byro/office/templates/office/member/data.html:5
 msgid "Data"
 msgstr "Daten"
 
 #: byro/office/templates/office/member/base.html:29
+#: byro/office/templates/office/member/finance.html:4
 msgid "Finance"
 msgstr "Finanzen"
 
-#: byro/office/templates/office/member/dashboard.html:16
+#: byro/office/templates/office/member/base.html:37
+msgid "Leave"
+msgstr "Austritt"
+
+#: byro/office/templates/office/member/dashboard.html:18
 msgid "current balance"
 msgstr "aktueller Kontostand"
 
-#: byro/office/templates/office/member/dashboard.html:21
+#: byro/office/templates/office/member/dashboard.html:23
 #, python-format
 msgid "%(count)s days"
 msgstr "%(count)s Tage"
 
-#: byro/office/templates/office/member/dashboard.html:27
+#: byro/office/templates/office/member/dashboard.html:29
 #, python-format
 msgid "or %(count)s years of membership"
 msgstr "oder %(count)s Jahre Mitglied"
 
-#: byro/office/templates/office/member/dashboard.html:31
+#: byro/office/templates/office/member/dashboard.html:33
 msgid "until this person becomes a member."
 msgstr "bis diese Person Mitglied wird."
 
-#: byro/office/templates/office/member/dashboard.html:36
+#: byro/office/templates/office/member/dashboard.html:38
 #, python-format
 msgid "Joined on %(start)s."
 msgstr "Beigetreten am %(start)s."
 
-#: byro/office/templates/office/member/finance.html:10
-#: byro/office/templates/office/realtransaction/list.html:26
-#: byro/office/templates/office/realtransaction/match.html:14
+#: byro/office/templates/office/member/finance.html:12
+#: byro/office/templates/office/realtransaction/list.html:28
+#: byro/office/templates/office/realtransaction/match.html:15
 msgid "Amount"
 msgstr "Betrag"
 
-#: byro/office/templates/office/member/finance.html:12
+#: byro/office/templates/office/member/finance.html:14
 msgid "Category"
 msgstr "Kategorie"
 
-#: byro/office/templates/office/member/list.html:8
+#: byro/office/templates/office/member/list.html:5
+msgid "Member List"
+msgstr "Mitglieder"
+
+#: byro/office/templates/office/member/list.html:10
 msgid "Add new member"
 msgstr "Mitglied hinzufügen"
 
-#: byro/office/templates/office/member/list.html:12
+#: byro/office/templates/office/member/list.html:14
 msgid "Rebuild"
 msgstr "Neu berechnen"
 
-#: byro/office/templates/office/member/list.html:17
+#: byro/office/templates/office/member/list.html:19
 msgid "Active members"
 msgstr "Aktive Mitglieder"
 
-#: byro/office/templates/office/member/list.html:18
+#: byro/office/templates/office/member/list.html:20
 msgid "Only inactive members"
 msgstr "Inaktive Mitglieder"
 
-#: byro/office/templates/office/member/list.html:19
+#: byro/office/templates/office/member/list.html:21
 msgid "All members"
 msgstr "Alle Mitglieder"
 
-#: byro/office/templates/office/member/list.html:21
-#: byro/office/templates/office/realtransaction/list.html:16
+#: byro/office/templates/office/member/list.html:23
+#: byro/office/templates/office/realtransaction/list.html:18
 msgid "Search"
 msgstr "Suchen"
 
-#: byro/office/templates/office/member/list.html:22
-#: byro/office/templates/office/realtransaction/list.html:17
+#: byro/office/templates/office/member/list.html:24
+#: byro/office/templates/office/realtransaction/list.html:19
 msgid "Filter"
 msgstr "Filtern"
 
-#: byro/office/templates/office/member/list.html:29
+#: byro/office/templates/office/member/list.html:31
 msgid "Number"
 msgstr "Zahl"
 
@@ -589,56 +683,56 @@ msgstr "Seite %(page)s von %(of)s (%(count)s Treffer)"
 msgid "%(count)s elements"
 msgstr "%(count)s Treffer"
 
-#: byro/office/templates/office/realtransaction/list.html:12
+#: byro/office/templates/office/realtransaction/list.html:14
 msgid "All transactions"
 msgstr "Alle Buchungen"
 
-#: byro/office/templates/office/realtransaction/list.html:13
+#: byro/office/templates/office/realtransaction/list.html:15
 msgid "Only matched transactions"
 msgstr "Nur zugeordnete Buchungen"
 
-#: byro/office/templates/office/realtransaction/list.html:14
+#: byro/office/templates/office/realtransaction/list.html:16
 msgid "Only unmatched transactions"
 msgstr "Nur unzugeordnete Buchungen"
 
-#: byro/office/templates/office/realtransaction/list.html:24
+#: byro/office/templates/office/realtransaction/list.html:26
 #: byro/office/templates/office/upload/list.html:33
 msgid "match"
 msgstr "zuordnen"
 
-#: byro/office/templates/office/realtransaction/list.html:25
-#: byro/office/templates/office/realtransaction/match.html:13
+#: byro/office/templates/office/realtransaction/list.html:27
+#: byro/office/templates/office/realtransaction/match.html:14
 msgid "Value Date"
 msgstr "Wertstellungstag"
 
-#: byro/office/templates/office/realtransaction/list.html:28
-#: byro/office/templates/office/realtransaction/match.html:16
+#: byro/office/templates/office/realtransaction/list.html:30
+#: byro/office/templates/office/realtransaction/match.html:17
 msgid "Originator"
 msgstr "Urheber"
 
-#: byro/office/templates/office/realtransaction/list.html:29
+#: byro/office/templates/office/realtransaction/list.html:31
 msgid "Virtual Transactions"
 msgstr "Virtuelle Buchungen"
 
-#: byro/office/templates/office/realtransaction/list.html:43
-#: byro/office/templates/office/realtransaction/match.html:30
+#: byro/office/templates/office/realtransaction/list.html:45
+#: byro/office/templates/office/realtransaction/match.html:31
 #, python-format
 msgid "%(amount)s € from %(source)s to %(dest)s (%(member)s)"
 msgstr "%(amount)s € von %(source)s nach %(dest)s (%(member)s)"
 
-#: byro/office/templates/office/realtransaction/list.html:47
+#: byro/office/templates/office/realtransaction/list.html:49
 msgid "Match transaction"
 msgstr "Buchung zuordnen"
 
-#: byro/office/templates/office/realtransaction/match.html:8
+#: byro/office/templates/office/realtransaction/match.html:7
 msgid "Match transactions"
 msgstr "Buchungen zuordnen"
 
-#: byro/office/templates/office/realtransaction/match.html:17
+#: byro/office/templates/office/realtransaction/match.html:18
 msgid "Matches"
 msgstr "Zuordnungen"
 
-#: byro/office/templates/office/realtransaction/match.html:85
+#: byro/office/templates/office/realtransaction/match.html:86
 msgid "Add a new VT"
 msgstr "Weitere Buchung"
 
@@ -649,6 +743,10 @@ msgstr "Standard"
 #: byro/office/templates/office/settings/base.html:21
 msgid "Registration form"
 msgstr "Beitrittsformular"
+
+#: byro/office/templates/office/upload/add.html:7
+msgid "Upload Transaction …"
+msgstr "Bank-Transaktionen"
 
 #: byro/office/templates/office/upload/list.html:5
 msgid "Transaction Imports"
@@ -670,7 +768,7 @@ msgstr "Verarbeiten"
 msgid "reprocess"
 msgstr "Noch mal verarbeiten"
 
-#: byro/office/views/accounts.py:26 byro/office/views/members.py:72
+#: byro/office/views/accounts.py:26 byro/office/views/members.py:76
 msgid "The member was added, please edit additional details if applicable."
 msgstr ""
 "Das Mitglied wurde gespeichert, bitte füge zusätzliche Informationen hinzu, "
@@ -684,7 +782,7 @@ msgstr ""
 "Diese E-Mail wurde schon verschickt und kann nicht mehr verändert werden. "
 "Kopiere sie stattdessen in einen Entwurf."
 
-#: byro/office/views/mails.py:20 byro/office/views/members.py:168
+#: byro/office/views/mails.py:20 byro/office/views/members.py:175
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
 
@@ -710,11 +808,19 @@ msgstr "Die Mail wurde verschickt."
 msgid "No mail has been sent."
 msgstr "Keine Mail wurde verschickt."
 
-#: byro/office/views/members.py:77
+#: byro/office/views/members.py:81
 msgid "Some post processing steps could not be completed: "
 msgstr ""
-"Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht "
-"durchgeführt werden: "
+"Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht durchgeführt "
+"werden: "
+
+#: byro/office/views/members.py:249
+msgid ""
+"The membership has been terminated. Please check the outbox for the "
+"notifications."
+msgstr ""
+"Die Mitgliedschaft wurde beendet. Bitte sieh dir die Benachrichtigungsmails "
+"im Postausgang an."
 
 #: byro/office/views/settings.py:33 byro/office/views/settings.py:53
 msgid "The config was saved successfully."
@@ -754,11 +860,11 @@ msgstr "Allgemeine Informationen"
 msgid "SEPA information"
 msgstr "SEPA-Informationen"
 
-#: byro/plugins/sepa/signals.py:13
+#: byro/plugins/sepa/signals.py:14
 msgid "Your SEPA mandate reference is {}."
 msgstr "Deine SEPA-Mandatsreferenz ist {}."
 
-#: byro/plugins/sepa/signals.py:35
+#: byro/plugins/sepa/signals.py:36
 #, python-brace-format
 msgid ""
 "The new member has given us a SEPA mandate for {amount} ({interval}), "
@@ -774,6 +880,29 @@ msgid ""
 msgstr ""
 "Das neue Mitglied hat uns ein SEPA-Mandat über {amount}€ ({interval}) "
 "erteilt, beginnend am {start}:\n"
+"\n"
+"Name: {name}\n"
+"IBAN: {iban}\n"
+"BIC: {bic} ({institute})\n"
+"Mandatsdatum: {issue_date}\n"
+"Mandatsreferenz: {mandate_reference}\n"
+"Mandatsgrund: {mandate_reason}\n"
+"\n"
+
+#: byro/plugins/sepa/signals.py:66
+#, python-brace-format
+msgid ""
+"Please terminate SEPA mandate member number: {number} to {end}:\n"
+"\n"
+"Name: {name}\n"
+"IBAN: {iban}\n"
+"BIC: {bic} ({institute})\n"
+"Mandate date: {issue_date}\n"
+"Mandate reference: {mandate_reference}\n"
+"Mandate reason: {mandate_reason}\n"
+"\n"
+msgstr ""
+"Bitte beende das SEPA-Lastschriftmandat {number} zu {end}:\n"
 "\n"
 "Name: {name}\n"
 "IBAN: {iban}\n"
