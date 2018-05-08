@@ -2,8 +2,8 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 from byro.members.signals import (
+    leave_member_office_mail_information,
     new_member_mail_information, new_member_office_mail_information,
-    leave_member_office_mail_information
 )
 
 

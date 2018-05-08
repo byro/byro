@@ -13,8 +13,8 @@ from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
-    new_member, new_member_mail_information, new_member_office_mail_information,
     leave_member_mail_information, leave_member_office_mail_information,
+    new_member, new_member_mail_information, new_member_office_mail_information,
 )
 from byro.office.signals import member_view
 

@@ -3,9 +3,8 @@ from .accounts import (
 )
 from .dashboard import DashboardView
 from .members import (
-    MemberCreateView, MemberDashboardView,
-    MemberDataView, MemberFinanceView,
-    MemberLeaveView, MemberListView,
+    MemberCreateView, MemberDashboardView, MemberDataView,
+    MemberFinanceView, MemberLeaveView, MemberListView,
 )
 from .realtransactions import RealTransactionListView
 from .settings import ConfigurationView, RegistrationConfigView
