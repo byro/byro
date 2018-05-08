@@ -33,10 +33,10 @@ we are sorry that you will leave us at {end}.
 Thanks,
 the robo clerk'''))
 
-LEAVE_MEMBER_OFFICE_SUBJECT = LazyI18nString.from_gettext(_('[byro] member leaves'))
+LEAVE_MEMBER_OFFICE_SUBJECT = LazyI18nString.from_gettext(_('[byro] Membership termination'))
 LEAVE_MEMBER_OFFICE_TEXT = LazyI18nString.from_gettext(_('''Hi,
 
-a member will leave us at {end}
+{member_name} will leave us at {end}.
 
 {additional_information}
 
