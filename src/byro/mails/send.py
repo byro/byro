@@ -43,8 +43,8 @@ class SendMailException(Exception):
 
 
 def mail(email: str, subject: str, template: Union[str, LazyI18nString],
-         context: Dict[str, Any]=None, locale: str=None,
-         headers: dict=None):
+         context: Dict[str, Any] = None, locale: str = None,
+         headers: dict = None):
     headers = headers or {}
     c = Configuration.get_solo()
     locale = locale or c.language
@@ -61,8 +61,8 @@ def mail(email: str, subject: str, template: Union[str, LazyI18nString],
 
 
 def mail_send_task(
-        to: str, subject: str, body: str, sender: str, cc: list=None,
-        bcc: list=None, headers: dict=None, attachments: list=None,
+        to: str, subject: str, body: str, sender: str, cc: list = None,
+        bcc: list = None, headers: dict = None, attachments: list = None,
 ):
     email = EmailMultiAlternatives(
         subject, body, sender,
