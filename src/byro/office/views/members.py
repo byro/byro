@@ -246,6 +246,7 @@ class MemberLeaveView(MemberView, FormView):
                     context['additional_information'] = '\n'.join(responses).strip()
                     config.leave_office_template.to_mail(email=config.backoffice_mail, context=context)
                 form.save()
+                messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
         return redirect(reverse('office:members.leave', kwargs=self.kwargs))
 
 
