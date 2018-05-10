@@ -21,6 +21,14 @@
         {% trans "Registration form" %}
     </a>
   </li>
+  <li class="nav-item">
+    <a
+      class="nav-link {% if "settings.plugins" in url_name %}active{% endif %}"
+      href="{% url "office:settings.plugins" %}"
+    >
+        {% trans "Plugins" %}
+    </a>
+  </li>
 </ul>
 
 {% block settings_content %}

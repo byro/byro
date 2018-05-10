@@ -3,7 +3,7 @@ from django.apps import apps
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 from solo.models import SingletonModel
 
 from byro.common.forms import ConfigurationForm, RegistrationConfigForm
@@ -55,3 +55,16 @@ class RegistrationConfigView(FormView):
 
     def get_success_url(self):
         return reverse('office:settings.registration')
+
+class PluginsView(TemplateView):
+    template_name = 'office/settings/plugins.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['plugins'] = []
+        for app in apps.get_app_configs():
+            if hasattr(app, 'ByroPluginMeta'):
+                context['plugins'].append({
+                    'meta': app.ByroPluginMeta,
+                })
+        return context
