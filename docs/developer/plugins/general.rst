@@ -26,3 +26,9 @@ Display
 
 .. automodule:: byro.office.signals
    :members: nav_event, member_view
+
+General
+-------
+
+.. automodule:: byro.common.signals
+   :members: periodic_task
