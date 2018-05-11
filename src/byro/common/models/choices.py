@@ -3,9 +3,10 @@ from django.utils.decorators import classproperty
 
 class ChoicesMeta(type):
     def __new__(cls, name, parents, dct):
-        if not 'valid_choices' in dct:
+        if 'valid_choices' not in dct:
             dct['valid_choices'] = [dct[key] for key in dct if isinstance(key, str) and key.upper() == key]
         return super(ChoicesMeta, cls).__new__(cls, name, parents, dct)
+
 
 class Choices(object, metaclass=ChoicesMeta):
     """
