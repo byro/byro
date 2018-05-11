@@ -8,7 +8,9 @@ from solo.models import SingletonModel
 class ByroConfiguration(SingletonModel):
     """ Use this class to build a configuration set that will automatically
     show up on the office settings interface. """
-    pass
+
+    class Meta:
+        abstract = True
 
 
 class Configuration(ByroConfiguration):
