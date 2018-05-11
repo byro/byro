@@ -25,7 +25,7 @@ def logged_in_client(client, user):
 
 @pytest.fixture
 def member():
-    member = Member.objects.create(email='joe@hacker.space')
+    member = Member.objects.create(email='joe@hacker.space', number='1')
     yield member
 
     [profile.delete() for profile in member.profiles]

@@ -28,7 +28,7 @@ class AllMemberManager(models.Manager):
 
 def get_next_member_number():
     all_numbers = Member.all_objects.all().values_list('number', flat=True)
-    numeric_numbers = [n for n in all_numbers if n.isdigit()]
+    numeric_numbers = [n for n in all_numbers if n is not None and n.isdigit()]
     try:
         return max(int(n) for n in numeric_numbers) + 1
     except Exception:
