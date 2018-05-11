@@ -85,15 +85,16 @@ Configuring you plugin
 
 If you'd like to provide custom configuration options (for example, the
 name or latest issue of your newsletter), you can add a special configuration
-related model. If the model class inherits from ``SingletonModel`` and ends
+related model. If the model class inherits from ``ByroConfiguration`` and ends
 in ``Configuration``, it will be automatically added to the settings page::
 
    from django.db import models
    from django.utils.translation import ugettext_lazy as _
-   from solo.models import SingletonModel
+
+   from byro.common.models.configuration import ByroConfiguration
 
 
-   class NewsletterConfiguration(SingletonModel):
+   class NewsletterConfiguration(ByroConfiguration):
 
        url = models.CharField(
            null=True, blank=True,

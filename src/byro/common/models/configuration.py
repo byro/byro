@@ -5,7 +5,13 @@ from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
 
 
-class Configuration(SingletonModel):
+class ByroConfiguration(SingletonModel):
+    """ Use this class to build a configuration set that will automatically
+    show up on the office settings interface. """
+    pass
+
+
+class Configuration(ByroConfiguration):
 
     name = models.CharField(
         null=True, blank=True,

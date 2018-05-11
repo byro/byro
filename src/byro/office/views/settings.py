@@ -4,10 +4,9 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView
-from solo.models import SingletonModel
 
 from byro.common.forms import ConfigurationForm, RegistrationConfigForm
-from byro.common.models import Configuration
+from byro.common.models import Configuration, ByroConfiguration
 
 
 class ConfigurationView(FormView):
@@ -20,7 +19,7 @@ class ConfigurationView(FormView):
         return form_kwargs
 
     def get_form(self):
-        config_models = [model for model in apps.get_models() if issubclass(model, SingletonModel)]
+        config_models = [model for model in apps.get_models() if issubclass(model, ByroConfiguration)]
         data = self.request.POST if self.request.method == 'POST' else None
         return [
             forms.modelform_factory(model, fields='__all__')(prefix=model.__name__, instance=model.get_solo(), data=data)
