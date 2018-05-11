@@ -11,8 +11,6 @@ class SourceState(Choices):
     PROCESSED = 'processed'
     FAILED = 'failed'
 
-    valid_choices = [NEW, PROCESSING, PROCESSED, FAILED]
-
 
 class RealTransactionSource(Auditable, models.Model):
     source_file = models.FileField(upload_to='transaction_uploads/')
@@ -53,8 +51,6 @@ class RealTransactionSource(Auditable, models.Model):
 class TransactionChannel(Choices):
     BANK = 'bank'
     CASH = 'cash'
-
-    valid_choices = [BANK, CASH]
 
 
 class RealTransaction(Auditable, models.Model):

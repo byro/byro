@@ -9,8 +9,6 @@ class DocumentDirection(Choices):
     INCOMING = 'incoming'
     OUTGOING = 'outgoing'
 
-    valid_choices = [INCOMING, OUTGOING]
-
 
 class Document(Auditable, models.Model):
     document = models.FileField(upload_to='documents/')

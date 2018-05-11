@@ -1,7 +1,13 @@
 from django.utils.decorators import classproperty
 
 
-class Choices:
+class ChoicesMeta(type):
+    def __new__(cls, name, parents, dct):
+        if not 'valid_choices' in dct:
+            dct['valid_choices'] = [dct[key] for key in dct if isinstance(key, str) and key.upper() == key]
+        return super(ChoicesMeta, cls).__new__(cls, name, parents, dct)
+
+class Choices(object, metaclass=ChoicesMeta):
     """
     Helper class to make choices available as class variables, expose a list
     with valid choices and at the same time generate the choices tuples for
@@ -11,14 +17,14 @@ class Choices:
         class MyChoices(Choices):
             ONE = 'one'
             TWO = 'dwa'
-            valid_choices = [ONE, TWO]
 
         class MyModel(models.Model):
             variant = models.CharField(
-                max_length=MyChoices.get_max_length(),
-                choices=MyChoices.get_choices(),
+                max_length=MyChoices.max_length,
+                choices=MyChoices.choices,
             )
     """
+
     @classproperty
     def choices(cls):
         return (
