@@ -9,11 +9,17 @@ from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models.auditable import Auditable
 from byro.common.models.configuration import Configuration
+from byro.common.models.choices import Choices
 
 
 class MemberTypes:
     MEMBER = 'member'
     EXTERNAL = 'external'
+
+class MemberContactTypes(Choices):
+    ORGANIZATION = 'organization'
+    PERSON = 'person'
+    ROLE = 'role'
 
 
 class MemberManager(models.Manager):
@@ -61,6 +67,11 @@ class Member(Auditable, models.Model):
     membership_type = models.CharField(
         max_length=40,
         default=MemberTypes.MEMBER,
+    )
+    member_contact_type = models.CharField(
+        max_length=MemberContactTypes.max_length,
+        choices=MemberContactTypes.choices,
+        default=MemberContactTypes.PERSON,
     )
 
     form_title = _('Member')

@@ -10,6 +10,7 @@ class RegistrationConfigForm(forms.Form):
     member__name = forms.IntegerField(required=False, label=_('Name'))
     member__address = forms.IntegerField(required=False, label=_('Address'))
     member__email = forms.IntegerField(required=False, label=_('E-Mail'))
+    member__member_contact_type = forms.IntegerField(required=False, label=_('Contact type'))
     membership__start = forms.IntegerField(required=False, label=_('Join date'))
     membership__amount = forms.IntegerField(required=False, label=_('Membership fee'))
     membership__interval = forms.IntegerField(required=False, label=_('Payment interval'))
