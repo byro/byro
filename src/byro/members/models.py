@@ -26,6 +26,15 @@ class AllMemberManager(models.Manager):
     pass
 
 
+def get_next_member_number():
+    all_numbers = Member.all_objects.all().values_list('number', flat=True)
+    numeric_numbers = [n for n in all_numbers if n.isdigit()]
+    try:
+        return max(int(n) for n in numeric_numbers) + 1
+    except Exception:
+        return 1
+
+
 class Member(Auditable, models.Model):
 
     number = models.CharField(

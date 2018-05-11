@@ -2,7 +2,7 @@ from django import forms
 from django.db.models.fields.related import OneToOneRel
 
 from byro.common.models import Configuration
-from byro.members.models import Member, Membership
+from byro.members.models import Member, Membership, get_next_member_number
 
 MAPPING = {
     'member': Member,
@@ -36,6 +36,8 @@ class CreateMemberForm(forms.Form):
             form_field = [field for field in temp_form.fields.values()][0]
             form_field.model = model
             self.fields[field['name']] = form_field
+        if 'member__number' in self.fields:
+            self.fields['member__number'].initial = get_next_member_number()
 
     def save(self):
         profiles = {
