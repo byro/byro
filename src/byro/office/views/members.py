@@ -13,8 +13,9 @@ from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
-    leave_member_mail_information, leave_member_office_mail_information,
-    new_member, new_member_mail_information, new_member_office_mail_information,
+    leave_member, leave_member_mail_information,
+    leave_member_office_mail_information, new_member,
+    new_member_mail_information, new_member_office_mail_information,
 )
 from byro.office.signals import member_view
 
@@ -224,8 +225,15 @@ class MemberLeaveView(MemberView, FormView):
                 if not getattr(form.instance, 'member', False):
                     form.instance.member = self.get_object()
 
-                config = Configuration.get_solo()
+                form.save()
+                messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
 
+                responses = leave_member.send_robust(sender=form.instance)
+                for module, response in responses:
+                    if isinstance(response, Exception):
+                        messages.warning(self.request, _('Some post processing steps could not be completed: ') + str(response))
+
+                config = Configuration.get_solo()
                 if config.leave_member_template:
                     context = {
                         'name': config.name,
@@ -245,8 +253,6 @@ class MemberLeaveView(MemberView, FormView):
                     responses = [r[1] for r in leave_member_office_mail_information.send_robust(sender=form.instance) if r]
                     context['additional_information'] = '\n'.join(responses).strip()
                     config.leave_office_template.to_mail(email=config.backoffice_mail, context=context)
-                form.save()
-                messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
         return redirect(reverse('office:members.leave', kwargs=self.kwargs))
 
 
