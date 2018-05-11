@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView
 
 from byro.common.forms import ConfigurationForm, RegistrationConfigForm
-from byro.common.models import Configuration, ByroConfiguration
+from byro.common.models.configuration import Configuration, ByroConfiguration
 
 
 class ConfigurationView(FormView):
