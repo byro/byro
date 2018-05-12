@@ -16,3 +16,11 @@ def test_profiles(member, membership):
 @pytest.mark.django_db
 def test_next_member_number(member):
     assert get_next_member_number() == Member.objects.count() + 1
+
+
+@pytest.mark.django_db
+def test_member_model_methods(member):
+    assert member.balance == 0
+    assert not member.donations
+    assert not member.fee_payments
+    assert str(member)
