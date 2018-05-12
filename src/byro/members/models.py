@@ -71,6 +71,7 @@ class Member(Auditable, models.Model):
     )
     member_contact_type = models.CharField(
         max_length=MemberContactTypes.max_length,
+        verbose_name=_('Contact type'),
         choices=MemberContactTypes.choices,
         default=MemberContactTypes.PERSON,
     )

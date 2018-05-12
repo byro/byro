@@ -150,9 +150,9 @@ class MemberDataView(MemberView):
         for key in membership_create_form.base_fields:
             setattr(membership_create_form.base_fields[key], 'required', False)
         return [
-            self._instantiate(forms.modelform_factory(Member, fields=['name', 'number', 'address', 'email']), member=obj, instance=obj),
+            self._instantiate(forms.modelform_factory(Member, exclude=['membership_type']), member=obj, instance=obj),
         ] + [
-            self._instantiate(forms.modelform_factory(Membership, fields=['start', 'end', 'interval', 'amount']), member=obj, instance=m, prefix=m.id)
+            self._instantiate(forms.modelform_factory(Membership, exclude=['member']), member=obj, instance=m, prefix=m.id)
             for m in obj.memberships.all()
         ] + [self._instantiate(membership_create_form, member=obj, profile_class=Membership, empty=True)] + [
             self._instantiate(forms.modelform_factory(
