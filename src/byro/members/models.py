@@ -8,13 +8,14 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models.auditable import Auditable
-from byro.common.models.configuration import Configuration
 from byro.common.models.choices import Choices
+from byro.common.models.configuration import Configuration
 
 
 class MemberTypes:
     MEMBER = 'member'
     EXTERNAL = 'external'
+
 
 class MemberContactTypes(Choices):
     ORGANIZATION = 'organization'
