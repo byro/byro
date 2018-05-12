@@ -9,9 +9,10 @@ class request:
         self.GET = QueryDict(get)
 
 
-@pytest.mark.parametrize('GET,key,value,result', (
-    ('foo=bar', 'foo', 'baz', 'foo=baz'),
-    ('foo=bar', 'fork', 'baz', 'foo=bar&fork=baz'),
+@pytest.mark.parametrize('GET,key,value,expected', (
+    ('foo=bar', 'foo', 'baz', ['foo=baz']),
+    ('foo=bar', 'fork', 'baz', ['foo=bar', 'fork=baz']),
 ))
-def test_templatetag_url_replace(GET, key, value, result):
-    assert url_replace(request(GET), key, value) == result
+def test_templatetag_url_replace(GET, key, value, expected):
+    result = url_replace(request(GET), key, value)
+    assert all(e in result for e in expected)
