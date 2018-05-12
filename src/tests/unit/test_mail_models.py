@@ -1,6 +1,7 @@
 import pytest
 
 from byro.mails.models import EMail
+from byro.mails.send import SendMailException
 
 
 @pytest.mark.django_db
@@ -14,6 +15,15 @@ def test_template_to_mail(mail_template, skip_queue):
     assert obj.text == mail_template.text
     assert obj.to == 'test@localhost'
     assert (obj.sent is None) is not skip_queue
+
+
+@pytest.mark.django_db
+def test_template_to_mail_fail(mail_template):
+    mail_template.subject = '{incorrect_key}'
+    count = EMail.objects.count()
+    with pytest.raises(SendMailException):
+        mail_template.to_mail('test@localhost')
+    assert EMail.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -40,3 +50,8 @@ def test_mail_can_send_regular_mail(email):
     email.send()
     email.refresh_from_db()
     assert email.sent is not None
+
+
+@pytest.mark.django_db
+def test_attachment_ids(email):
+    assert email.attachment_ids == []

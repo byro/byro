@@ -5,7 +5,9 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 
-from byro.bookkeeping.models import RealTransaction, TransactionChannel
+from byro.bookkeeping.models import (
+    Account, AccountCategory, RealTransaction, TransactionChannel,
+)
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
 
@@ -105,3 +107,8 @@ def sent_email():
         text='Hi!\nThis is just a nice test mail.\nThe robo clerk',
         sent=now(),
     )
+
+
+@pytest.fixture
+def fee_account():
+    return Account.objects.create(account_category=AccountCategory.MEMBER_FEES)
