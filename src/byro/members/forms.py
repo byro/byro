@@ -1,5 +1,6 @@
 from django import forms
 from django.db.models.fields.related import OneToOneRel
+from django.utils.timezone import now
 
 from byro.common.models import Configuration
 from byro.members.models import Member, Membership, get_next_member_number
@@ -38,6 +39,8 @@ class CreateMemberForm(forms.Form):
             self.fields[field['name']] = form_field
         if 'member__number' in self.fields:
             self.fields['member__number'].initial = get_next_member_number()
+        if 'membership__start' in self.fields:
+            self.fields['membership__start'].initial = now().date()
 
     def save(self):
         profiles = {
