@@ -42,19 +42,20 @@ class MemberListView(ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('q')
-        _filter = self.request.GET.get('filter')
+        _filter = self.request.GET.get('filter', 'active')
         qs = Member.objects.all()
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(number=search))
-        if _filter:
-            if _filter == 'inactive':
-                qs = qs.filter(memberships__end__isnull=False)
-            elif _filter == 'all':
-                pass
-            else:
-                qs = qs.filter(memberships__end__isnull=True)
-        else:
-            qs = qs.filter(memberships__end__isnull=True)
+        # Logic:
+        #  + Active members have membership with start <= today and (end is null or end >= today)
+        active_q = Q(memberships__start__lte=now().date()) & (Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date()))
+        inactive_q = ~active_q
+        if _filter == 'all':
+            pass
+        elif _filter == 'inactive':
+            qs = qs.filter(inactive_q)
+        else:  # Default to 'active'
+            qs = qs.filter(active_q)
         return qs.order_by('-id').distinct()
 
     def post(self, request, *args, **kwargs):
@@ -125,9 +126,9 @@ class MemberDashboardView(MemberView):
             'amount': obj.memberships.last().amount,
             'interval': obj.memberships.last().get_interval_display()
         }
-        context['is_active'] = True
+        context['is_active'] = (obj.memberships.last().start <= now().date())
         if obj.memberships.last().end:
-            context['is_active'] = not (obj.memberships.last().end < now().date())
+            context['is_active'] = context['is_active'] and not (obj.memberships.last().end < now().date())
         return context
 
 
