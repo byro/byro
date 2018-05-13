@@ -82,7 +82,7 @@ class MemberCreateView(FormView):
                 messages.warning(self.request, _('Some post processing steps could not be completed: ') + str(response))
         config = Configuration.get_solo()
 
-        if config.welcome_member_template:
+        if config.welcome_member_template and form.instance.email:
             context = {
                 'name': config.name,
                 'contact': config.mail_from,
