@@ -1,9 +1,59 @@
 {% extends "office/settings/base.html" %}
 {% load bootstrap4 %}
+{% load compress %}
 {% load i18n %}
+{% load staticfiles %}
+
+
+{% block stylesheets %}
+{{ block.super }}
+{% compress css %}
+<style type="text/css">
+	.field-placeholder { height: 2.5em; background-color: #ffa;}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static "vendored/jquery-ui/jquery-ui.min.css" %}"/>
+{% endcompress %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% compress js %}
+    <script type="text/javascript" src="{% static "vendored/jquery-ui/jquery-ui.min.js" %}"></script>
+{% endcompress %}
+<script type="text/javascript">
+	$(function(){
+		var form = $('#fancy-registration-form');
+		form.prepend($.parseHTML('<h4>{% trans "Fields currently in the registration form" %}</h4><div class="current-fields"></div><h4>{% trans "Fields not in the registration form" %}</h4><div class="available-fields"></div>' ));
+		var current = form.find('.current-fields');
+		var avail = form.find('.available-fields');
+		form.find('.form-group').each(function(i, elem){
+			var elem = $(elem);
+			var number_input = elem.find('input');
+			elem.remove();
+			if(number_input.val()) {
+				current.append(elem);
+			} else {
+				avail.append(elem);
+			}
+			number_input.attr('type', 'hidden');
+
+		});
+		form.find('.current-fields, .available-fields').sortable({
+			connectWith: ".current-fields, .available-fields",
+			update: function(event, ui) {
+				current.find('input').each(function(i, elem){
+					$(elem).val(i+1);
+				});
+				avail.find('input').val('');
+			},
+			placeholder: 'field-placeholder',
+		});
+	});
+</script>
+{% endblock %}
 
 {% block settings_content %}
-<form method="post">
+<form method="post" id='fancy-registration-form'>
     {% csrf_token %}
     {% bootstrap_form form layout='horizontal' %}
     <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
