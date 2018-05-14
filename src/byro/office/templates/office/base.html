@@ -13,13 +13,13 @@
     {% endcompress %}
     {% block stylesheets %}
     {% endblock %}
-    {% block scripts %}
-    {% endblock %}
     {% compress js %}
         <script type="text/javascript" src="{% static "vendored/jquery-3.1.1.js" %}"></script>
         <script type="text/javascript" src="{% static "vendored/tether/tether.min.js" %}"></script>
         <script type="text/javascript" src="{% static "vendored/bootstrap/js/bootstrap.min.js" %}"></script>
     {% endcompress %}
+    {% block scripts %}
+    {% endblock %}
 </head>
 
 <body>
