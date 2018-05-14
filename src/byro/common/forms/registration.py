@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -28,6 +30,9 @@ class RegistrationConfigForm(forms.Form):
             field = self.fields.get(entry['name'])
             if field:
                 field.initial = entry['position']
+        self.fields = OrderedDict(sorted(self.fields.items(), key=lambda x: getattr(x[1], 'initial', None) or 999))
+        for field in self.fields.values():
+            field.widget.attrs['placeholder'] = _('Position in form')
 
     def clean(self):
         ret = super().clean()
