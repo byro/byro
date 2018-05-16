@@ -30,7 +30,7 @@
 		var avail = form.find('.available-fields');
 		form.find('div.fancy-entry').each(function(i, elem){
 			var elem = $(elem);
-			var number_input = elem.find('.fancy-position input');
+			var number_input = elem.find('input[name$=__position]');
 			elem.remove();
 			if(number_input.val()) {
 				current.append(elem);
@@ -43,10 +43,10 @@
 		form.find('.current-fields, .available-fields').sortable({
 			connectWith: ".current-fields, .available-fields",
 			update: function(event, ui) {
-				current.find('.fancy-position input').each(function(i, elem){
+				current.find('input[name$=__position]').each(function(i, elem){
 					$(elem).val(i+1);
 				});
-				avail.find('.fancy-position input').val('');
+				avail.find('input[name$=__position]').val('');
 			},
 			placeholder: 'field-placeholder',
 		});
@@ -57,20 +57,16 @@
 {% block settings_content %}
 <form method="post" id='fancy-registration-form'>
     {% csrf_token %}
-    {% for field in form %}
-    {% if field.name|default:""|slice:"-9:" == "_position" %}
-    {% if not forloop.first %}
-	</div></div>
-    {% endif %}
+    {% for key, field_info in form.fields_extra.items %}
     <div class="card fancy-entry my-2">
     	<div class="card-body">
-    		<h5 class="card-title">{{field.label}}</h5>
-    {% bootstrap_field field layout='horizontal' form_group_class='form-group fancy-position' %}
-    {% else %}
-    {% bootstrap_field field layout='horizontal' %}
-    {% endif %}
+    		<h5 class="card-title">{{field_info.0}}</h5>
+    		{% for field in field_info.1 %}
+    			{% bootstrap_field field layout='horizontal' %}
+    		{% endfor %}
+    	</div>
+    </div>
     {% endfor %}
-	</div></div>
     <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
 </form>
 {% endblock %}
