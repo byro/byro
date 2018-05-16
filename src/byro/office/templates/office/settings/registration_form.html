@@ -9,7 +9,7 @@
 {{ block.super }}
 {% compress css %}
 <style type="text/css">
-	.field-placeholder { height: 2.5em; background-color: #ffa;}
+	.field-placeholder { height: 5em; background-color: #ffa;}
 	#fancy-registration-form .form-group { background-color: white; }
 	.available-fields, .current-fields { min-height: 2em; }
 </style>
@@ -25,12 +25,12 @@
 <script type="text/javascript">
 	$(function(){
 		var form = $('#fancy-registration-form');
-		form.prepend($.parseHTML('<h4 class="my-3">{% trans "Fields currently in the registration form" %}</h4><div class="current-fields"></div><h4 class="my-3">{% trans "Fields not in the registration form" %}</h4><div class="available-fields"></div>' ));
+		form.prepend($.parseHTML('<div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div>' ));
 		var current = form.find('.current-fields');
 		var avail = form.find('.available-fields');
-		form.find('div.card').each(function(i, elem){
+		form.find('div.fancy-entry').each(function(i, elem){
 			var elem = $(elem);
-			var number_input = elem.find('.position input');
+			var number_input = elem.find('.fancy-position input');
 			elem.remove();
 			if(number_input.val()) {
 				current.append(elem);
@@ -43,10 +43,10 @@
 		form.find('.current-fields, .available-fields').sortable({
 			connectWith: ".current-fields, .available-fields",
 			update: function(event, ui) {
-				current.find('.position input').each(function(i, elem){
+				current.find('.fancy-position input').each(function(i, elem){
 					$(elem).val(i+1);
 				});
-				avail.find('.position input').val('');
+				avail.find('.fancy-position input').val('');
 			},
 			placeholder: 'field-placeholder',
 		});
@@ -62,10 +62,10 @@
     {% if not forloop.first %}
 	</div></div>
     {% endif %}
-    <div class="card my-2">
+    <div class="card fancy-entry my-2">
     	<div class="card-body">
     		<h5 class="card-title">{{field.label}}</h5>
-    {% bootstrap_field field layout='horizontal' form_group_class='form-group position' %}
+    {% bootstrap_field field layout='horizontal' form_group_class='form-group fancy-position' %}
     {% else %}
     {% bootstrap_field field layout='horizontal' %}
     {% endif %}
