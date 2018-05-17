@@ -28,26 +28,52 @@
 		form.prepend($.parseHTML('<div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div>' ));
 		var current = form.find('.current-fields');
 		var avail = form.find('.available-fields');
+		var form_sortable;
+		var update_states = function() {
+			current.find('input[name$=__position]').each(function(i, elem){
+				$(elem).val(i+1);
+			});
+			avail.find('input[name$=__position]').val('');
+			current.find('.add-button').hide();
+			avail.find('.remove-button').hide();
+			current.find('.remove-button').show();
+			avail.find('.add-button').show();
+		};
 		form.find('div.fancy-entry').each(function(i, elem){
 			var elem = $(elem);
 			var number_input = elem.find('input[name$=__position]');
-			elem.remove();
+			var button_area = $($.parseHTML('<div class="col-md-1"></div>'));
+			var add_button = $($.parseHTML('<button type="button" class="btn add-button"><i class="fa fa-arrow-up"></i>{% trans "Add" %}</button>'));
+			var remove_button = $($.parseHTML('<button type="button" class="btn remove-button"><i class="fa fa-arrow-down"></i>{% trans "Remove" %}</button>'));
+			button_area.append(add_button);
+			button_area.append(remove_button);
+			add_button.click(function(){
+				elem.detach();
+				current.append(elem);
+				update_states();
+				form_sortable.sortable("refresh");
+			});
+			remove_button.click(function(){
+				elem.detach();
+				avail.prepend(elem);
+				update_states();
+				form_sortable.sortable("refresh");
+			});
+			elem.detach();
+			elem.find(".card-title").parent().prepend(button_area);
 			if(number_input.val()) {
 				current.append(elem);
+				$(add_button).hide();
 			} else {
 				avail.append(elem);
+				$(remove_button).hide();
 			}
 			number_input.closest('.form-group').hide();
 
 		});
-		form.find('.current-fields, .available-fields').sortable({
+		form_sortable = form.find('.current-fields, .available-fields').sortable({
 			connectWith: ".current-fields, .available-fields",
-			update: function(event, ui) {
-				current.find('input[name$=__position]').each(function(i, elem){
-					$(elem).val(i+1);
-				});
-				avail.find('input[name$=__position]').val('');
-			},
+			update: update_states,
 			placeholder: 'field-placeholder',
 		});
 	});
@@ -60,7 +86,7 @@
     {% for key, field_info in form.fields_extra.items %}
     <div class="card fancy-entry my-2">
     	<div class="card-body">
-    		<h5 class="card-title">{{field_info.0}}</h5>
+    		<div class="row"><h5 class="card-title col-md-11">{{field_info.0}}</h5></div>
     		{% for field in field_info.1 %}
     			{% bootstrap_field field layout='horizontal' %}
     		{% endfor %}

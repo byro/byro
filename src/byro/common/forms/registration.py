@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from decimal import Decimal
 
 from django import forms
 from django.db import models
@@ -12,6 +13,7 @@ class DefaultDates:
     TODAY = 'today'
     BEGINNING_MONTH = 'beginning_month'
     BEGINNING_YEAR = 'beginning_year'
+    FIXED_DATE = 'fixed_date'
 
     @classproperty
     def choices(cls):
@@ -20,6 +22,7 @@ class DefaultDates:
             (cls.TODAY, _('Current day')),
             (cls.BEGINNING_MONTH, _('Beginning of current month')),
             (cls.BEGINNING_YEAR, _('Beginning of current year')),
+            (cls.FIXED_DATE, _('Other/fixed date')),
         )
 
 class DefaultBoolean:
@@ -35,6 +38,15 @@ SPECIAL_NAMES = {
     Member: 'member',
     Membership: 'membership',
 }
+SPECIAL_ORDER = [
+    'member__number',
+    'member__name',
+    'member__address',
+    'member__email',
+    'membership__start',
+    'membership__interval',
+    'membership__amount',
+]
 
 class RegistrationConfigForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -74,24 +86,23 @@ class RegistrationConfigForm(forms.Form):
                     default_field = forms.ChoiceField(
                         required=False, 
                         label=_('Default value'),
-                        choices=[(None, '-----------')]+list(choices),
-                        initial=field.default)
+                        choices=[(None, '-----------')]+list(choices))
                 elif not(model is Member and field.name == 'number'):
                     if isinstance(field, models.CharField):
                         default_field = forms.CharField(required=False,
-                            label=_('Default value'),
-                            initial=field.default)
+                            label=_('Default value'))
                     elif isinstance(field, models.DecimalField):
                         default_field = forms.DecimalField(required=False, 
                             label=_('Default value'), 
                             max_digits=field.max_digits,
-                            decimal_places=field.decimal_places,
-                            initial=field.default)
+                            decimal_places=field.decimal_places)
                     elif isinstance(field, models.BooleanField):
                         default_field = forms.ChoiceField(required=False,
                             label=_('Default value'),
-                            choices=DefaultBoolean.choices,
-                            initial=field.default)
+                            choices=DefaultBoolean.choices)
+                    elif isinstance(field, models.DateField):
+                        default_field = forms.DateField(required=False,
+                            label=_('Other/fixed date'))
 
                 if default_field:
                     form_fields['{}__default'.format(key)] = default_field
@@ -102,6 +113,7 @@ class RegistrationConfigForm(forms.Form):
 
                 field_data.append((
                     data.get(key, {}).get('position', None) or 998,
+                    SPECIAL_ORDER.index(key) if key in SPECIAL_ORDER else 66,
                     0 if model in SPECIAL_NAMES else 1,
                     key,
                     verbose_name,
@@ -110,11 +122,12 @@ class RegistrationConfigForm(forms.Form):
 
         # Sort model fields, by:
         #  + Position in form, if set (use 998 as default)
+        #  + SPECIAL_ORDER first
         #  + SPECIAL_NAMES first
         #  + key ({model.name}__{field.name})
         field_data.sort()
 
-        for _ignore, _ignore, key, verbose_name, form_fields in field_data:
+        for _ignore, _ignore, _ignore, key, verbose_name, form_fields in field_data:
             self.fields_extra[key] = (verbose_name, (self[name] for name in form_fields.keys()))
             self.fields.update(form_fields)
 
@@ -129,7 +142,10 @@ class RegistrationConfigForm(forms.Form):
         data = {}
         for full_name, value in self.cleaned_data.items():
             name, key = full_name.rsplit("__",1)
-            data.setdefault(name, {})[key] = value
+            if not (value == "" or value is None):
+                if isinstance(value, Decimal):
+                    value = str(value)
+                data.setdefault(name, {})[key] = value
         data = [dict(name=key, **value) for (key, value) in data.items()]
         config = Configuration.get_solo()
         config.registration_form = list(data)
