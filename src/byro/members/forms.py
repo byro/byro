@@ -3,6 +3,7 @@ from django.db.models.fields.related import OneToOneRel
 from django.utils.timezone import now
 
 from byro.common.models import Configuration
+from byro.common.forms.registration import DefaultDates
 from byro.members.models import Member, Membership, get_next_member_number
 
 MAPPING = {
@@ -37,10 +38,23 @@ class CreateMemberForm(forms.Form):
             form_field = [field for field in temp_form.fields.values()][0]
             form_field.model = model
             self.fields[field['name']] = form_field
+            if 'default_date' in field:
+                today = now().date()
+                if field['default_date'] == DefaultDates.TODAY:
+                    form_field.initial = today
+                elif field['default_date'] == DefaultDates.BEGINNING_MONTH:
+                    form_field.initial = today.replace(day=1)
+                elif field['default_date'] == DefaultDates.BEGINNING_YEAR:
+                    form_field.initial = today.replace(day=1, month=1)
+                elif field['default_date'] == DefaultDates.FIXED_DATE:
+                    form_field.initial = field.get('default', None)
+            elif 'default_boolean' in field:
+                form_field.initial = field['default_boolean']
+            elif 'default' in field:
+                form_field.initial = field['default']
+
         if 'member__number' in self.fields:
             self.fields['member__number'].initial = get_next_member_number()
-        if 'membership__start' in self.fields:
-            self.fields['membership__start'].initial = now().date()
 
     def save(self):
         profiles = {

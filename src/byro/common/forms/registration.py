@@ -88,7 +88,11 @@ class RegistrationConfigForm(forms.Form):
                         label=_('Default value'),
                         choices=[(None, '-----------')]+list(choices))
                 elif not(model is Member and field.name == 'number'):
-                    if isinstance(field, models.CharField):
+                    if isinstance(field, models.BooleanField):
+                        form_fields['{}__default_boolean'.format(key)] = forms.ChoiceField(required=False,
+                            label=_('Default value'),
+                            choices=DefaultBoolean.choices)
+                    elif isinstance(field, models.CharField):
                         default_field = forms.CharField(required=False,
                             label=_('Default value'))
                     elif isinstance(field, models.DecimalField):
@@ -96,12 +100,8 @@ class RegistrationConfigForm(forms.Form):
                             label=_('Default value'), 
                             max_digits=field.max_digits,
                             decimal_places=field.decimal_places)
-                    elif isinstance(field, models.BooleanField):
-                        default_field = forms.ChoiceField(required=False,
-                            label=_('Default value'),
-                            choices=DefaultBoolean.choices)
                     elif isinstance(field, models.DateField):
-                        default_field = forms.DateField(required=False,
+                        default_field = forms.CharField(required=False,
                             label=_('Other/fixed date'))
 
                 if default_field:
@@ -145,6 +145,8 @@ class RegistrationConfigForm(forms.Form):
             if not (value == "" or value is None):
                 if isinstance(value, Decimal):
                     value = str(value)
+                if key == 'default_boolean':
+                    value = bool(value == 'True')
                 data.setdefault(name, {})[key] = value
         data = [dict(name=key, **value) for (key, value) in data.items()]
         config = Configuration.get_solo()
