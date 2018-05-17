@@ -55,6 +55,7 @@ class RegistrationConfigView(FormView):
     def get_success_url(self):
         return reverse('office:settings.registration')
 
+
 class PluginsView(TemplateView):
     template_name = 'office/settings/plugins.html'
 

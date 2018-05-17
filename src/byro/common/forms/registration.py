@@ -7,7 +7,8 @@ from django.utils.decorators import classproperty
 from django.utils.translation import ugettext_lazy as _
 
 from byro.common.models import Configuration
-from byro.members.models import Member, Membership, FeeIntervals
+from byro.members.models import Member, Membership
+
 
 class DefaultDates:
     TODAY = 'today'
@@ -25,6 +26,7 @@ class DefaultDates:
             (cls.FIXED_DATE, _('Other/fixed date')),
         )
 
+
 class DefaultBoolean:
     @classproperty
     def choices(cls):
@@ -33,6 +35,7 @@ class DefaultBoolean:
             (False, _('False')),
             (True, _('True')),
         )
+
 
 SPECIAL_NAMES = {
     Member: 'member',
@@ -47,6 +50,7 @@ SPECIAL_ORDER = [
     'membership__interval',
     'membership__amount',
 ]
+
 
 class RegistrationConfigForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -84,7 +88,7 @@ class RegistrationConfigForm(forms.Form):
                 choices = getattr(field, 'choices', None)
                 if choices:
                     default_field = forms.ChoiceField(
-                        required=False, 
+                        required=False,
                         label=_('Default value'),
                         choices=[(None, '-----------')]+list(choices))
                 elif not(model is Member and field.name == 'number'):
@@ -96,8 +100,8 @@ class RegistrationConfigForm(forms.Form):
                         default_field = forms.CharField(required=False,
                             label=_('Default value'))
                     elif isinstance(field, models.DecimalField):
-                        default_field = forms.DecimalField(required=False, 
-                            label=_('Default value'), 
+                        default_field = forms.DecimalField(required=False,
+                            label=_('Default value'),
                             max_digits=field.max_digits,
                             decimal_places=field.decimal_places)
                     elif isinstance(field, models.DateField):
@@ -108,8 +112,8 @@ class RegistrationConfigForm(forms.Form):
                     form_fields['{}__default'.format(key)] = default_field
 
                 for full_name, form_field in form_fields.items():
-                    value_name = full_name.rsplit('__',1)[-1]
-                    form_field.initial = entry.get(value_name, form_field.initial) 
+                    value_name = full_name.rsplit('__', 1)[-1]
+                    form_field.initial = entry.get(value_name, form_field.initial)
 
                 field_data.append((
                     data.get(key, {}).get('position', None) or 998,
@@ -133,7 +137,7 @@ class RegistrationConfigForm(forms.Form):
 
     def clean(self):
         ret = super().clean()
-        positions = [value for (key,value) in ret.items() if key.endswith("__position") and value is not None]
+        positions = [value for (key, value) in ret.items() if key.endswith("__position") and value is not None]
         if not len(list(positions)) == len(set(positions)):
             raise forms.ValidationError('Every position must be unique!')
         return ret
@@ -141,7 +145,7 @@ class RegistrationConfigForm(forms.Form):
     def save(self):
         data = {}
         for full_name, value in self.cleaned_data.items():
-            name, key = full_name.rsplit("__",1)
+            name, key = full_name.rsplit("__", 1)
             if not (value == "" or value is None):
                 if isinstance(value, Decimal):
                     value = str(value)

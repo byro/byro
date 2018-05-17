@@ -2,8 +2,8 @@ from django import forms
 from django.db.models.fields.related import OneToOneRel
 from django.utils.timezone import now
 
-from byro.common.models import Configuration
 from byro.common.forms.registration import DefaultDates
+from byro.common.models import Configuration
 from byro.members.models import Member, Membership, get_next_member_number
 
 MAPPING = {
