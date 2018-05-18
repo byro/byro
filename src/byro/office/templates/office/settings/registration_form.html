@@ -14,6 +14,7 @@
     .available-fields, .current-fields { min-height: 2em; }
     .available-fields .remove-button { display: none; }
     .current-fields .add-button { display: none; }
+    #fancy-registration-form > .card { width: 50%; min-width: 34em; display: inline-block; vertical-align: top; }
 </style>
 <link rel="stylesheet" type="text/css" href="{% static "vendored/jquery-ui/jquery-ui.min.css" %}"/>
 {% endcompress %}
@@ -27,7 +28,7 @@
 <script type="text/javascript">
     $(function(){
         var form = $('#fancy-registration-form');
-        form.prepend($.parseHTML('<div class="row"><div class="col-md-6"><div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div></div><div class="col-md-6"><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div></div></div>' ));
+        form.prepend($.parseHTML('<div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div>'));
         var current = form.find('.current-fields');
         var avail = form.find('.available-fields');
         var form_sortable;
@@ -89,6 +90,7 @@
         </div>
     </div>
     {% endfor %}
+    <div class="clearfix"></div>
     <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
 </form>
 {% endblock %}
