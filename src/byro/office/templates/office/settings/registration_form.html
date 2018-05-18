@@ -12,6 +12,8 @@
     .field-placeholder { height: 5em; background-color: #ffa;}
     #fancy-registration-form .form-group { background-color: white; }
     .available-fields, .current-fields { min-height: 2em; }
+    .available-fields .remove-button { display: none; }
+    .current-fields .add-button { display: none; }
 </style>
 <link rel="stylesheet" type="text/css" href="{% static "vendored/jquery-ui/jquery-ui.min.css" %}"/>
 {% endcompress %}
@@ -25,7 +27,7 @@
 <script type="text/javascript">
     $(function(){
         var form = $('#fancy-registration-form');
-        form.prepend($.parseHTML('<div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div>' ));
+        form.prepend($.parseHTML('<div class="row"><div class="col-md-6"><div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div></div><div class="col-md-6"><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div></div></div>' ));
         var current = form.find('.current-fields');
         var avail = form.find('.available-fields');
         var form_sortable;
@@ -34,17 +36,13 @@
                 $(elem).val(i+1);
             });
             avail.find('input[name$=__position]').val('');
-            current.find('.add-button').hide();
-            avail.find('.remove-button').hide();
-            current.find('.remove-button').show();
-            avail.find('.add-button').show();
         };
         form.find('div.fancy-entry').each(function(i, elem){
             var elem = $(elem);
             var number_input = elem.find('input[name$=__position]');
-            var button_area = $($.parseHTML('<div class="col-md-1"></div>'));
-            var add_button = $($.parseHTML('<button type="button" class="btn add-button"><i class="fa fa-arrow-up"></i>{% trans "Add" %}</button>'));
-            var remove_button = $($.parseHTML('<button type="button" class="btn remove-button"><i class="fa fa-arrow-down"></i>{% trans "Remove" %}</button>'));
+            var button_area = $($.parseHTML('<div class="col-md-3"></div>'));
+            var add_button = $($.parseHTML('<button type="button" class="btn add-button"><i class="fa fa-arrow-left"></i>&nbsp;{% trans "Add" %}</button>'));
+            var remove_button = $($.parseHTML('<button type="button" class="btn remove-button">{% trans "Remove" %}&nbsp;<i class="fa fa-arrow-right"></i></button>'));
             button_area.append(add_button);
             button_area.append(remove_button);
             add_button.click(function(){
@@ -63,10 +61,8 @@
             elem.find(".card-title").parent().prepend(button_area);
             if(number_input.val()) {
                 current.append(elem);
-                $(add_button).hide();
             } else {
                 avail.append(elem);
-                $(remove_button).hide();
             }
             number_input.closest('.form-group').hide();
 
@@ -86,7 +82,7 @@
     {% for key, field_info in form.fields_extra.items %}
     <div class="card fancy-entry my-2">
         <div class="card-body">
-            <div class="row"><h5 class="card-title col-md-11">{{field_info.0}}</h5></div>
+            <div class="row"><h5 class="card-title col-md-9">{{field_info.0}}</h5></div>
             {% for field in field_info.1 %}
                 {% bootstrap_field field layout='horizontal' %}
             {% endfor %}
