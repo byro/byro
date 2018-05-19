@@ -120,7 +120,7 @@ class RegistrationConfigForm(forms.Form):
                     key,
                     verbose_name,
                     OrderedDict(("{key}__{name}".format(key=key, name=name), value)
-                                for name, value in fields)
+                                for name, value in fields.items())
                 ))
 
         # Sort model fields, by:
