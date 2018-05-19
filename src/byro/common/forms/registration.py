@@ -76,44 +76,42 @@ class RegistrationConfigForm(forms.Form):
                 verbose_name = field.verbose_name or field.name
                 if model not in SPECIAL_NAMES:
                     verbose_name = '{verbose_name} ({model.__name__})'.format(verbose_name=verbose_name, model=model)
-                form_fields = OrderedDict()
+                fields = OrderedDict()
 
-                position_field = forms.IntegerField(required=False, label=_("Position in form"))
-                form_fields['{}__position'.format(key)] = position_field
+                fields['position'] = forms.IntegerField(required=False, label=_("Position in form"))
 
                 if isinstance(field, models.DateField):
-                    form_fields['{}__default_date'.format(key)] = forms.ChoiceField(required=False, label=_('Default date'), choices=DefaultDates.choices)
+                    fields['default_date'] = forms.ChoiceField(required=False, label=_('Default date'), choices=DefaultDates.choices)
 
-                default_field = None
                 choices = getattr(field, 'choices', None)
                 if choices:
-                    default_field = forms.ChoiceField(
+                    fields['default'] = forms.ChoiceField(
                         required=False,
                         label=_('Default value'),
                         choices=[(None, '-----------')]+list(choices))
                 elif not(model is Member and field.name == 'number'):
                     if isinstance(field, models.BooleanField):
-                        form_fields['{}__default_boolean'.format(key)] = forms.ChoiceField(required=False,
+                        fields['default_boolean'] = forms.ChoiceField(
+                            required=False,
                             label=_('Default value'),
                             choices=DefaultBoolean.choices)
                     elif isinstance(field, models.CharField):
-                        default_field = forms.CharField(required=False,
+                        fields['default'] = forms.CharField(
+                            required=False,
                             label=_('Default value'))
                     elif isinstance(field, models.DecimalField):
-                        default_field = forms.DecimalField(required=False,
+                        fields['default'] = forms.DecimalField(
+                            required=False,
                             label=_('Default value'),
                             max_digits=field.max_digits,
                             decimal_places=field.decimal_places)
                     elif isinstance(field, models.DateField):
-                        default_field = forms.CharField(required=False,
+                        fields['default'] = forms.CharField(
+                            required=False,
                             label=_('Other/fixed date'))
 
-                if default_field:
-                    form_fields['{}__default'.format(key)] = default_field
-
-                for full_name, form_field in form_fields.items():
-                    value_name = full_name.rsplit('__', 1)[-1]
-                    form_field.initial = entry.get(value_name, form_field.initial)
+                for name, form_field in fields.items():
+                    form_field.initial = entry.get(name, form_field.initial)
 
                 field_data.append((
                     data.get(key, {}).get('position', None) or 998,
@@ -121,7 +119,8 @@ class RegistrationConfigForm(forms.Form):
                     0 if model in SPECIAL_NAMES else 1,
                     key,
                     verbose_name,
-                    form_fields
+                    OrderedDict(("{key}__{name}".format(key=key, name=name), value)
+                                for name, value in fields)
                 ))
 
         # Sort model fields, by:
