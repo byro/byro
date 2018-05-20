@@ -20,6 +20,13 @@ class MailDetail(UpdateView):
         messages.success(self.request, _('Your changes have been saved.'))
         return super().form_valid(form)
 
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        if form.instance.sent:
+            for field in form.fields.values():
+                field.disabled = True
+        return form
+
 
 class MailCopy(View):
 
