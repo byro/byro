@@ -61,3 +61,17 @@ form .form-group {
         }
     }
 }
+.i18n-form-group input[lang] {
+  background: no-repeat 10px center;
+  padding-left: 34px;
+}
+.i18n-form-group textarea[lang] {
+  background: no-repeat 10px 10px;
+  padding-left: 34px;
+}
+.i18n-form-group input[lang=de], .i18n-form-group textarea[lang=de] {
+  background-image: url('/static/office/img/flags/de.png');
+}
+.i18n-form-group input[lang=en], .i18n-form-group textarea[lang=en] {
+  background-image: url('/static/office/img/flags/en.png');
+}
