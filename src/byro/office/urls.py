@@ -43,7 +43,7 @@ urlpatterns = [
     url('^mails/outbox/purge$', mails.OutboxPurge.as_view(), name='mails.outbox.purge'),
 
     url('^mails/templates$', mails.TemplateList.as_view(), name='mails.templates.list'),
-    url('^mails/templates/new$', mails.TemplateDetail.as_view(), name='mails.templates.create'),
+    url('^mails/templates/add$', mails.TemplateCreate.as_view(), name='mails.templates.add'),
     url('^mails/templates/(?P<pk>[0-9]+)$', mails.TemplateDetail.as_view(), name='mails.templates.view'),
     url('^templates/(?P<pk>[0-9]+)/delete$', mails.TemplateDelete.as_view(), name='mails.templates.delete'),
 ]

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect, reverse
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import ListView, UpdateView, View
+from django.views.generic import CreateView, ListView, UpdateView, View
 
 from byro.mails.models import EMail, MailTemplate
 
@@ -106,7 +106,15 @@ class TemplateDetail(UpdateView):
     queryset = MailTemplate.objects.all()
     template_name = 'office/mails/template_detail.html'
     context_object_name = 'template'
-    form_class = forms.modelform_factory(EMail, fields=['subject', 'text', 'reply_to', 'bcc'])
+    fields = ['subject', 'text', 'reply_to', 'bcc']
+    success_url = '/mails/templates'
+
+
+class TemplateCreate(CreateView):
+    model = MailTemplate
+    template_name = 'office/mails/template_detail.html'
+    context_object_name = 'template'
+    fields = ['subject', 'text', 'reply_to', 'bcc']
     success_url = '/mails/templates'
 
 
