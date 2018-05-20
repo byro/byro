@@ -10,11 +10,43 @@
 {% compress css %}
 <style type="text/css">
     .field-placeholder { height: 5em; background-color: #ffa;}
-    #fancy-registration-form .form-group { background-color: white; }
     .available-fields, .current-fields { min-height: 2em; }
+    .add-button, .remove-button { font-size: 90%; }
     .available-fields .remove-button { display: none; }
     .current-fields .add-button { display: none; }
-    #fancy-registration-form > .card { width: 50%; min-width: 34em; display: inline-block; vertical-align: top; }
+    #fancy-registration-form > .card {
+        width: 50%;
+        min-width: 34em;
+        display: inline-block;
+        vertical-align: top;
+        background-color: white;
+    }
+    .ui-sortable .card { cursor: move; }
+    div.grab-parent {
+        display: table;
+        height: 100%;
+        position: absolute;
+        width: 1.8em;
+        margin-right: -1.8em;
+    }
+    div.grab-child {
+        width: 1.8em;
+        display: table-cell;
+        vertical-align: middle;
+        overflow: hidden;
+        line-height: 5px;
+        padding: 3px 4px;
+        cursor: move;
+        vertical-align: middle;
+        font-size: 12px;
+        font-family: sans-serif;
+        letter-spacing: 2px;
+        color: #cccccc;
+        text-shadow: 1px 0 1px black;
+    }
+    div.grab-child::after {
+        content: '.. .. .. .. .. .. .. .. .. ..';
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="{% static "vendored/jquery-ui/jquery-ui.min.css" %}"/>
 {% endcompress %}
@@ -60,6 +92,7 @@
             });
             elem.detach();
             elem.find(".card-title").parent().prepend(button_area);
+            elem.prepend($('<div class="grab-parent"><div class="grab-child"></div></div>'));
             if(number_input.val()) {
                 current.append(elem);
             } else {
