@@ -1,0 +1,53 @@
+{% extends "office/base_headline.html" %}
+
+{% load i18n %}
+
+{% block headline %}{% trans "Users" %}{% endblock %}
+
+{% block content %}
+<p>
+<a href="{% url "office:users.add" %}" class="btn btn-success">
+    <span class="fa fa-plus"></span> {% trans "Add new user" %}
+</a>
+</p>
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>{% trans "Type" %}</th>
+            <th>{% trans "Username" %}</th>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "E-Mail" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>
+                    {% if not user.is_active %}
+                        <span class="fa fa-times-circle" title="{% trans "User deactivated" %}"></span><span class="sr-only">{% trans "User deactivated" %}</span>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                        <span class="fa fa-wrench" title="{% trans "Superuser" %}"></span><span class="sr-only">{% trans "Superuser" %}</span>
+                    {% else %}
+                        {% if user.is_staff %}
+                            <span class="fa fa-user" title="{% trans "Backend user" %}"></span><span class="sr-only">{% trans "Backend user" %}</span>
+                        {% else %}
+                            <span class="sr-only">{% trans "Frontend user" %}</span>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td><a href="{% url "office:users.detail" pk=user.pk %}">
+                    {{ user.username }}
+                </a></td>
+                <td>
+                    {{ user.last_name }}
+                </td>
+                <td>
+                    {{ user.email }}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "office/pagination.html" %}
+{% endblock %}

@@ -1,7 +1,8 @@
 from django.conf.urls import include, url
 
 from .views import (
-    accounts, dashboard, mails, members, realtransactions, settings, upload,
+    accounts, dashboard, mails, members,
+    realtransactions, settings, upload, users,
 )
 
 app_name = 'office'
@@ -46,4 +47,8 @@ urlpatterns = [
     url('^mails/templates/add$', mails.TemplateCreate.as_view(), name='mails.templates.add'),
     url('^mails/templates/(?P<pk>[0-9]+)$', mails.TemplateDetail.as_view(), name='mails.templates.view'),
     url('^templates/(?P<pk>[0-9]+)/delete$', mails.TemplateDelete.as_view(), name='mails.templates.delete'),
+
+    url('^users/$', users.UserListView.as_view(), name='users.list'),
+    url('^users/add$', users.UserCreateView.as_view(), name='users.add'),
+    url(r'^users/(?P<pk>\d+)/$', users.UserDetailView.as_view(), name='users.detail'),
 ]
