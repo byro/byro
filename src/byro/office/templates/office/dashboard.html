@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="dashboard-list">
-    <div class="dashboard-block">
+    <a class="dashboard-block" href="{% url "office:members.list" %}?filter=all">
         <h1>
             {% blocktrans with count=member_count trimmed %}
             {{ count }} members
@@ -15,8 +15,8 @@
         <span class="dashboard-description">
             {% trans "(all time)" %}
         </span>
-    </div>
-    <div class="dashboard-block">
+    </a>
+    <a class="dashboard-block" href="{% url "office:members.list" %}">
         <h1>
             {% blocktrans with count=active_count trimmed %}
             {{ count }} active members
@@ -25,13 +25,17 @@
         <span class="dashboard-description">
             {% trans "(currently)" %}
         </span>
-    </div>
-    <div class="dashboard-block">
+    </a>
+    <a class="dashboard-block" href="{% url "office:realtransactions.list" %}?filter=unmatched">
         <h1>
-            {% blocktrans with count=unmapped_transactions_count trimmed %}
-            {{ count }} unmapped transactions
-            {% endblocktrans %}
+            {% if unmapped_transactions_count > 0 %}
+                {% blocktrans with count=unmapped_transactions_count trimmed %}
+                {{ count }} unmapped transactions
+                {% endblocktrans %}
+            {% else %}
+                {% trans "Transactions all processed!" %}
+            {% endif %}
         </h1>
-    </div>
+    </a>
 </div>
 {% endblock %}
