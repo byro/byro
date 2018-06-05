@@ -34,8 +34,7 @@ class CreateMemberForm(forms.Form):
                 model = MAPPING[model_name]
             else:
                 model = profiles[field['name'].split('__')[0]]
-            temp_form = forms.modelform_factory(model, fields=[field['name'].split('__')[-1]])()
-            form_field = [field for field in temp_form.fields.values()][0]
+            form_field = model._meta.get_field(field['name'].split('__')[-1]).formfield()
             form_field.model = model
             self.fields[field['name']] = form_field
             if 'default_date' in field:
