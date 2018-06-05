@@ -62,7 +62,7 @@ class UploadMatchView(DetailView):
             try:
                 real_transaction.derive_virtual_transactions()
                 success += 1
-            except Exception as e:
+            except Exception:
                 errors += 1
         messages.info(request, '{success} successful matches, {errors} errors.'.format(success=success, errors=errors))
         return redirect('office:uploads.list')
