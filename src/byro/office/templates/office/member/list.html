@@ -42,7 +42,11 @@
                 <td><a href="{% url "office:members.dashboard" pk=member.pk %}">
                     {{ member.name }}
                 </a></td>
-                <td>{{ member.balance }}</td>
+                <td>
+                    <span{% if member.balance < 0 %} class="text-danger"{% endif %}>
+                        {{ member.balance }}
+                    </span>
+                </td>
             </tr>
         {% endfor %}
     </tbody>
