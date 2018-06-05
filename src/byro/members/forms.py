@@ -29,31 +29,34 @@ class CreateMemberForm(forms.Form):
             if isinstance(profile, OneToOneRel) and profile.name.startswith('profile_')
         }
         for field in config:
-            model_name = field['name'].split('__')[0]
-            if model_name in MAPPING:
-                model = MAPPING[model_name]
-            else:
-                model = profiles[field['name'].split('__')[0]]
-            form_field = model._meta.get_field(field['name'].split('__')[-1]).formfield()
-            form_field.model = model
-            self.fields[field['name']] = form_field
-            if 'default_date' in field:
-                today = now().date()
-                if field['default_date'] == DefaultDates.TODAY:
-                    form_field.initial = today
-                elif field['default_date'] == DefaultDates.BEGINNING_MONTH:
-                    form_field.initial = today.replace(day=1)
-                elif field['default_date'] == DefaultDates.BEGINNING_YEAR:
-                    form_field.initial = today.replace(day=1, month=1)
-                elif field['default_date'] == DefaultDates.FIXED_DATE:
-                    form_field.initial = field.get('default', None)
-            elif 'default_boolean' in field:
-                form_field.initial = field['default_boolean']
-            elif 'default' in field:
-                form_field.initial = field['default']
+            self.build_field(field, profiles)
 
         if 'member__number' in self.fields:
             self.fields['member__number'].initial = get_next_member_number()
+
+    def build_field(self, field, profiles):
+        model_name = field['name'].split('__')[0]
+        if model_name in MAPPING:
+            model = MAPPING[model_name]
+        else:
+            model = profiles[field['name'].split('__')[0]]
+        form_field = model._meta.get_field(field['name'].split('__')[-1]).formfield()
+        form_field.model = model
+        self.fields[field['name']] = form_field
+        if 'default_date' in field:
+            today = now().date()
+            if field['default_date'] == DefaultDates.TODAY:
+                form_field.initial = today
+            elif field['default_date'] == DefaultDates.BEGINNING_MONTH:
+                form_field.initial = today.replace(day=1)
+            elif field['default_date'] == DefaultDates.BEGINNING_YEAR:
+                form_field.initial = today.replace(day=1, month=1)
+            elif field['default_date'] == DefaultDates.FIXED_DATE:
+                form_field.initial = field.get('default', None)
+        elif 'default_boolean' in field:
+            form_field.initial = field['default_boolean']
+        elif 'default' in field:
+            form_field.initial = field['default']
 
     def save(self):
         profiles = {
