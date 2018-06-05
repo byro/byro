@@ -59,7 +59,7 @@ class RegistrationConfigForm(forms.Form):
         self.fields_extra = OrderedDict()
         fieldsets = []
         config = Configuration.get_solo().registration_form or []
-        data = {entry['name']: entry for entry in config if entry['name']}
+        data = {entry['name']: entry for entry in config if 'name' in entry}
 
         for model, field in self.get_form_fields():
 
