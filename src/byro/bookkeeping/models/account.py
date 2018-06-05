@@ -55,21 +55,18 @@ class Account(Auditable, models.Model):
             Q(source_account=self) | Q(destination_account=self)
         )
 
-    def total_in(self, start=None, end=now()):
-        qs = self.incoming_transactions
+    def _aggregate_by_date(self, qs, start, end):
         if start:
             qs = qs.filter(value_datetime__gte=start)
         if end:
             qs = qs.filter(value_datetime__lte=end)
-        return qs.aggregate(incoming=models.Sum('amount'))['incoming'] or 0
+        return qs.aggregate(total=models.Sum('amount'))['total'] or 0
+
+    def total_in(self, start=None, end=now()):
+        return self._aggregate_by_date(self.incoming_transactions, start=start, end=end)
 
     def total_out(self, start=None, end=now()):
-        qs = self.outgoing_transactions
-        if start:
-            qs = qs.filter(value_datetime__gte=start)
-        if end:
-            qs = qs.filter(value_datetime__lte=end)
-        return qs.aggregate(outgoing=models.Sum('amount'))['outgoing'] or 0
+        return self._aggregate_by_date(self.outgoing_transactions, start=start, end=end)
 
     def balance(self, start=None, end=now()):
         incoming_sum = self.total_in(start=start, end=end)
