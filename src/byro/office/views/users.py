@@ -45,7 +45,7 @@ class UserCreateView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:users.detail', kwargs={'pk': self.form.instance.pk})
+        return reverse('office:settings.users.detail', kwargs={'pk': self.form.instance.pk})
 
 
 class UserDetailView(UpdateView):
@@ -58,7 +58,7 @@ class UserDetailView(UpdateView):
         return User.objects.get(pk=self.kwargs['pk'])
 
     def get_success_url(self):
-        return reverse('office:users.detail', kwargs={'pk': self.kwargs['pk']})
+        return reverse('office:settings.users.detail', kwargs={'pk': self.kwargs['pk']})
 
 
 # FIXME No implemented yet

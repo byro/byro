@@ -9,6 +9,9 @@ app_name = 'office'
 urlpatterns = [
     url('^settings/plugins$', settings.PluginsView.as_view(), name='settings.plugins'),
     url('^settings/registration$', settings.RegistrationConfigView.as_view(), name='settings.registration'),
+    url('^settings/users/$', users.UserListView.as_view(), name='settings.users.list'),
+    url('^settings/users/add$', users.UserCreateView.as_view(), name='settings.users.add'),
+    url(r'^settings/users/(?P<pk>\d+)/$', users.UserDetailView.as_view(), name='settings.users.detail'),
     url('^settings$', settings.ConfigurationView.as_view(), name='settings.base'),
     url('^$', dashboard.DashboardView.as_view(), name='dashboard'),
     url(r'^members/typeahead', members.MemberListTypeaheadView.as_view(), name='members.typeahead'),
@@ -48,7 +51,4 @@ urlpatterns = [
     url('^mails/templates/(?P<pk>[0-9]+)$', mails.TemplateDetail.as_view(), name='mails.templates.view'),
     url('^templates/(?P<pk>[0-9]+)/delete$', mails.TemplateDelete.as_view(), name='mails.templates.delete'),
 
-    url('^users/$', users.UserListView.as_view(), name='users.list'),
-    url('^users/add$', users.UserCreateView.as_view(), name='users.add'),
-    url(r'^users/(?P<pk>\d+)/$', users.UserDetailView.as_view(), name='users.detail'),
 ]

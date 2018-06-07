@@ -6,7 +6,7 @@
 
 {% block content %}
 <p>
-<a href="{% url "office:users.add" %}" class="btn btn-success">
+<a href="{% url "office:settings.users.add" %}" class="btn btn-success">
     <span class="fa fa-plus"></span> {% trans "Add new user" %}
 </a>
 </p>
@@ -36,7 +36,7 @@
                         {% endif %}
                     {% endif %}
                 </td>
-                <td><a href="{% url "office:users.detail" pk=user.pk %}">
+                <td><a href="{% url "office:settings.users.detail" pk=user.pk %}">
                     {{ user.username }}
                 </a></td>
                 <td>
