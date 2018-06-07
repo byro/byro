@@ -11,6 +11,9 @@
     min-height: 160px;
     width: 340px;
     background: $brand-lightest;
+    &:hover {
+        text-decoration: none;
+    }
 
     h1 {
         display: block;
