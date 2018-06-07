@@ -15,11 +15,11 @@ class MemberProfile(Auditable, models.Model):
     nick = models.CharField(
         verbose_name=_('Nick'),
         max_length=200,
-        null=True
+        blank=True, null=True
     )
     birth_date = models.DateField(
         verbose_name=_('Birth date'),
-        null=True
+        blank=True, null=True
     )
     phone_number = models.CharField(
         verbose_name=_('Phone number'),
