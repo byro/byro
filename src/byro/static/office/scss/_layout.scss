@@ -36,6 +36,23 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     z-index: 1;
 
+    .has-children {
+        display: flex;
+        flex-direction: row;
+        a {
+          flex-grow: 1;
+        }
+        .arrow {
+          flex-grow: 0;
+          width: 50px;
+          border: none;
+          display: flex;
+          justify-content: center;
+          border-bottom: 1px solid $gray-light;
+          i {padding-top: 4px;}
+        }
+    }
+
     .nav-link {
         color: $gray-800;
         text-decoration: none;
@@ -46,6 +63,9 @@ body {
         }
         .fa {
             padding-right: 5px;
+        }
+        &.nav-link-second-level {
+            padding-left: 2.6em;
         }
         &.active {
             background-color: $brand-lightest;

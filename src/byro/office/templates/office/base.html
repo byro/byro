@@ -50,9 +50,34 @@
             <a class="nav-link {% if url_name == "dashboard" %}active{% endif %}" href="/">
                 <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
             </a>
-            <a class="nav-link {% if "settings" in url_name %}active{% endif %}" href="{% url 'office:settings.base' %}">
-                <span class="fa fa-wrench"></span> {% trans "Settings" %}
-            </a>
+            <li class="nav-fold">
+                <span class="has-children">
+                    <a class="nav-link nav-link-inner" href="{% url 'office:settings.base' %}">
+                        <i class="fa fa-wrench"></i>
+                            <span class="sidebar-text">{% trans "Settings" %}</span>
+                        </a>
+                        <a class="arrow nav-link" data-toggle="collapse" href="#collapseSettings" aria-controls="collapseSettings">
+                            <i class="fa fa-angle-down"></i>
+                        </a>
+                    </span>
+                    <div class="collapse in{% if "settings." in url_name %} show{% endif %}" aria-expand="true" id="collapseSettings">
+                        <a class="nav-link nav-link-second-level {% if "settings.base" in url_name %}active{% endif %}" href="{% url 'office:settings.base' %}">
+                            {% trans "General" %}
+                        </a>
+                        <a
+                          class="nav-link nav-link-second-level {% if "settings.registration" in url_name %}active{% endif %}"
+                          href="{% url "office:settings.registration" %}"
+                        >
+                            {% trans "Registration form" %}
+                        </a>
+                        <a
+                          class="nav-link nav-link-second-level {% if "settings.plugins" in url_name %}active{% endif %}"
+                          href="{% url "office:settings.plugins" %}"
+                        >
+                            {% trans "Plugins" %}
+                        </a>
+                    </div>
+                </li>
             <a class="nav-link {% if url_name == "users.list" %}active{% endif %}" href="{% url 'office:users.list' %}">
                 <span class="fa fa-users"></span> {% trans "Users" %}
             </a>

@@ -4,32 +4,6 @@
 {% block headline %}Settings{% endblock %}
 
 {% block content %}
-<ul class="nav nav-pills">
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "settings.base" in url_name %}active{% endif %}"
-      href="{% url "office:settings.base" %}"
-    >
-        {% trans "Base" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "settings.registration" in url_name %}active{% endif %}"
-      href="{% url "office:settings.registration" %}"
-    >
-        {% trans "Registration form" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "settings.plugins" in url_name %}active{% endif %}"
-      href="{% url "office:settings.plugins" %}"
-    >
-        {% trans "Plugins" %}
-    </a>
-  </li>
-</ul>
 
 {% block settings_content %}
 {% endblock %}
