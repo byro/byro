@@ -54,45 +54,58 @@
                 <span class="has-children">
                     <a class="nav-link nav-link-inner" href="{% url 'office:settings.base' %}">
                         <i class="fa fa-wrench"></i>
-                            <span class="sidebar-text">{% trans "Settings" %}</span>
-                        </a>
-                        <a class="arrow nav-link" data-toggle="collapse" href="#collapseSettings" aria-controls="collapseSettings">
-                            <i class="fa fa-angle-down"></i>
-                        </a>
-                    </span>
-                    <div class="collapse in{% if "settings." in url_name %} show{% endif %}" aria-expand="true" id="collapseSettings">
-                        <a class="nav-link nav-link-second-level {% if "settings.base" in url_name %}active{% endif %}" href="{% url 'office:settings.base' %}">
-                            {% trans "General" %}
-                        </a>
-                        <a
-                          class="nav-link nav-link-second-level {% if "settings.registration" in url_name %}active{% endif %}"
-                          href="{% url "office:settings.registration" %}"
-                        >
-                            {% trans "Registration form" %}
-                        </a>
-                        <a class="nav-link nav-link-second-level {% if "settings.users" in url_name %}active{% endif %}" href="{% url 'office:settings.users.list' %}">
-                            {% trans "Users" %}
-                        </a>
-                        <a
-                          class="nav-link nav-link-second-level {% if "settings.plugins" in url_name %}active{% endif %}"
-                          href="{% url "office:settings.plugins" %}"
-                        >
-                            {% trans "Plugins" %}
-                        </a>
-                    </div>
-                </li>
+                        <span class="sidebar-text">{% trans "Settings" %}</span>
+                    </a>
+                    <a class="arrow nav-link" data-toggle="collapse" href="#collapseSettings" aria-controls="collapseSettings">
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                </span>
+                <div class="collapse in{% if "settings." in url_name %} show{% endif %}" aria-expand="true" id="collapseSettings">
+                    <a class="nav-link nav-link-second-level {% if "settings.base" in url_name %}active{% endif %}" href="{% url 'office:settings.base' %}">
+                        {% trans "General" %}
+                    </a>
+                    <a
+                      class="nav-link nav-link-second-level {% if "settings.registration" in url_name %}active{% endif %}"
+                      href="{% url "office:settings.registration" %}"
+                    >
+                        {% trans "Registration form" %}
+                    </a>
+                    <a class="nav-link nav-link-second-level {% if "settings.users" in url_name %}active{% endif %}" href="{% url 'office:settings.users.list' %}">
+                        {% trans "Users" %}
+                    </a>
+                    <a
+                      class="nav-link nav-link-second-level {% if "settings.plugins" in url_name %}active{% endif %}"
+                      href="{% url "office:settings.plugins" %}"
+                    >
+                        {% trans "Plugins" %}
+                    </a>
+                </div>
+            </li>
             <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">
                 <span class="fa fa-address-book"></span> {% trans "Members" %}
             </a>
-            <a class="nav-link {% if url_name == "accounts.list" %}active{% endif %}" href="{% url 'office:accounts.list' %}">
-                <span class="fa fa-credit-card"></span> {% trans "Accounts" %}
-            </a>
-            <a class="nav-link {% if url_name == "realtransactions.list" %}active{% endif %}" href="{% url 'office:realtransactions.list' %}">
-                <span class="fa fa-money"></span> {% trans "Real Transactions" %}
-            </a>
-            <a class="nav-link {% if url_name == "uploads.list" %}active{% endif %}" href="{% url 'office:uploads.list' %}">
-                <span class="fa fa-upload"></span> {% trans "Transaction Upload" %}
-            </a>
+            <li class="nav-fold">
+                <span class="has-children">
+                    <a class="nav-link nav-link-inner" href="{% url 'office:finance.transactions.list' %}">
+                        <i class="fa fa-money"></i>
+                        <span class="sidebar-text">{% trans "Finance" %}</span>
+                    </a>
+                    <a class="arrow nav-link" data-toggle="collapse" href="#collapseFinance" aria-controls="collapseFinance">
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                </span>
+                <div class="collapse in{% if "finance." in url_name %} show{% endif %}" aria-expand="true" id="collapseFinance">
+                    <a class="nav-link nav-link-second-level {% if "finance.transactions" in url_name %}active{% endif %}" href="{% url 'office:finance.transactions.list' %}">
+                        {% trans "Transactions" %}
+                    </a>
+                    <a class="nav-link nav-link-second-level {% if "finance.uploads" in url_name %}active{% endif %}" href="{% url 'office:finance.uploads.list' %}">
+                        {% trans "Transaction Upload" %}
+                    </a>
+                    <a class="nav-link nav-link-second-level {% if "finance.accounts" in url_name %}active{% endif %}" href="{% url 'office:finance.accounts.list' %}">
+                        {% trans "Accounts" %}
+                    </a>
+                </div>
+            </li>
             <a class="nav-link {% if url_name == "mails.outbox.list" %}active{% endif %}" href="{% url 'office:mails.outbox.list' %}">
                 {% if pending_mails %}
                 <span class="pending-mails">{{ pending_mails }}</span>
@@ -103,7 +116,7 @@
             </a>
             {% endif %}
             {% for nav_element in nav_event %}
-                <a class="nav-link nav-link-second-level{% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
+                <a class="nav-link {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
                     {% if nav_element.icon and "." in nav_element.icon %}
                         <img src="{% static nav_element.icon %}" class="fa-img">
                     {% elif nav_element.icon %}

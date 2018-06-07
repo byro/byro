@@ -28,7 +28,7 @@ class AccountCreateView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:accounts.detail', kwargs={'pk': self.form.instance.pk})
+        return reverse('office:finance.accounts.detail', kwargs={'pk': self.form.instance.pk})
 
 
 class AccountDetailView(ListView):

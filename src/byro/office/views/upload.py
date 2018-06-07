@@ -49,7 +49,7 @@ class UploadProcessView(DetailView):
             messages.success(self.request, _('The upload was processed successfully.'))
         except Exception as e:
             messages.error(self.request, _('The upload could not be processed: ') + str(e))
-        return redirect('office:uploads.list')
+        return redirect('office:finance.uploads.list')
 
 
 class UploadMatchView(DetailView):
@@ -65,4 +65,4 @@ class UploadMatchView(DetailView):
             except Exception:
                 errors += 1
         messages.info(request, '{success} successful matches, {errors} errors.'.format(success=success, errors=errors))
-        return redirect('office:uploads.list')
+        return redirect('office:finance.uploads.list')

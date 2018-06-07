@@ -16,7 +16,7 @@
             {% trans "(currently)" %}
         </span>
     </a>
-    <a class="dashboard-block" href="{% url "office:realtransactions.list" %}?filter=unmatched">
+    <a class="dashboard-block" href="{% url "office:finance.transactions.list" %}?filter=unmatched">
         <h1>
             {% if unmapped_transactions_count > 0 %}
                 {% blocktrans with count=unmapped_transactions_count trimmed %}

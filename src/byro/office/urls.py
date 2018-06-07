@@ -24,18 +24,18 @@ urlpatterns = [
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
 
-    url('^realtransaction/list', realtransactions.RealTransactionListView.as_view(), name='realtransactions.list'),
-    url('^realtransaction/match', realtransactions.RealTransactionMatchView.as_view(), name='realtransactions.match'),
+    url('^realtransaction/list', realtransactions.RealTransactionListView.as_view(), name='finance.transactions.list'),
+    url('^realtransaction/match', realtransactions.RealTransactionMatchView.as_view(), name='finance.transactions.match'),
 
-    url('^upload/list', upload.UploadListView.as_view(), name='uploads.list'),
-    url(r'^upload/process/(?P<pk>\d+)', upload.UploadProcessView.as_view(), name='uploads.process'),
-    url(r'^upload/match/(?P<pk>\d+)', upload.UploadMatchView.as_view(), name='uploads.match'),
-    url('^upload/add', upload.CsvUploadView.as_view(), name='uploads.add'),
+    url('^upload/list', upload.UploadListView.as_view(), name='finance.uploads.list'),
+    url(r'^upload/process/(?P<pk>\d+)', upload.UploadProcessView.as_view(), name='finance.uploads.process'),
+    url(r'^upload/match/(?P<pk>\d+)', upload.UploadMatchView.as_view(), name='finance.uploads.match'),
+    url('^upload/add', upload.CsvUploadView.as_view(), name='finance.uploads.add'),
 
-    url('^accounts/$', accounts.AccountListView.as_view(), name='accounts.list'),
-    url('^accounts/add$', accounts.AccountCreateView.as_view(), name='accounts.add'),
-    url(r'^accounts/(?P<pk>\d+)/$', accounts.AccountDetailView.as_view(), name='accounts.detail'),
-    url(r'^accounts/(?P<pk>\d+)/delete$', accounts.AccountDeleteView.as_view(), name='accounts.delete'),
+    url('^accounts/$', accounts.AccountListView.as_view(), name='finance.accounts.list'),
+    url('^accounts/add$', accounts.AccountCreateView.as_view(), name='finance.accounts.add'),
+    url(r'^accounts/(?P<pk>\d+)/$', accounts.AccountDetailView.as_view(), name='finance.accounts.detail'),
+    url(r'^accounts/(?P<pk>\d+)/delete$', accounts.AccountDeleteView.as_view(), name='finance.accounts.delete'),
 
     url('^mails/(?P<pk>[0-9]+)$', mails.MailDetail.as_view(), name='mails.mail.view'),
     url('^mails/(?P<pk>[0-9]+)/copy$', mails.MailCopy.as_view(), name='mails.mail.copy'),

@@ -57,7 +57,7 @@ class RealTransactionMatchView(TemplateView):
             # TODO: messages
             raise Exception('invalid data: ' + str(formset.errors))
 
-        return HttpResponseRedirect(reverse('office:realtransactions.list'))
+        return HttpResponseRedirect(reverse('office:finance.transactions.list'))
 
     @cached_property
     def formset_class(self):

@@ -6,7 +6,7 @@
 
 {% block content %}
 <p>
-<a href="{% url "office:accounts.add" %}" class="btn btn-success">
+<a href="{% url "office:finance.accounts.add" %}" class="btn btn-success">
     <span class="fa fa-plus"></span> {% trans "Add new account" %}
 </a>
 </p>
@@ -23,7 +23,7 @@
     <tbody>
         {% for account in accounts %}
             <tr>
-                <td><a href="{% url "office:accounts.detail" pk=account.pk %}">
+                <td><a href="{% url "office:finance.accounts.detail" pk=account.pk %}">
                     {% if account.name %}
                         {{ account.name }}
                     {% else %}
