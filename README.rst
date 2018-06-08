@@ -76,6 +76,18 @@ using Docker
 
   docker-compose run --rm web makemigrate
 
+- stop the django server
+
+.. code:: shell
+
+  docker-compose stop
+
+- Show logs
+
+.. code:: shell
+
+  docker-compose logs
+
 Not using Docker
 ^^^^^^^^^^^^^^^^
 
