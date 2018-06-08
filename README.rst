@@ -9,6 +9,10 @@ byro
    :target: https://codecov.io/gh/byro/byro
    :alt: Code coverage
 
+.. image:: https://img.shields.io/codeclimate/maintainability/byro/byro.svg
+   :target: https://codeclimate.com/github/byro/byro
+   :alt: Code maintainability
+
 .. image:: https://readthedocs.org/projects/byro/badge/?version=latest
    :target: http://byro.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation
