@@ -10,14 +10,14 @@ from byro.common.models.choices import Choices
 
 class AccountCategory(Choices):
     # Regular Categories
-    MEMBER_DONATION = 'member_donation'
-    MEMBER_FEES = 'member_fees'
+    MEMBER_DONATION = 'member_donation'  # deprecated
+    MEMBER_FEES = 'member_fees'  # deprecated
 
     # Categories for double-entry bookkeeping
-    ASSET = 'asset'
-    LIABILITY = 'liability'
-    INCOME = 'income'
-    EXPENSE = 'expense'
+    ASSET = 'asset'  # de: Aktiva, for example your bank account or cash
+    LIABILITY = 'liability'  # de: Passiva, for example invoices you have to pay
+    INCOME = 'income'  # de: Ertragskonten, for example for fees paid
+    EXPENSE = 'expense'  # de: Aufwandskonten, for example for fees to be paid
 
     @classproperty
     def choices(cls):
