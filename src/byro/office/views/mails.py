@@ -41,19 +41,21 @@ class MailCopy(View):
         return redirect(reverse('office:mails.mail.view', kwargs={'pk': new_mail.pk}))
 
 
-class OutboxList(ListView):
-    queryset = EMail.objects.filter(sent__isnull=True)
-    template_name = 'office/mails/outbox.html'
-    context_object_name = 'mails'
-
-
-class OutboxPurge(View):
+class OutboxQueryset:
 
     def get_queryset(self):
         qs = EMail.objects.filter(sent__isnull=True)
         if 'pk' in self.kwargs:
             return qs.filter(pk=self.kwargs['pk'])
         return qs
+
+
+class OutboxList(OutboxQueryset, ListView):
+    template_name = 'office/mails/outbox.html'
+    context_object_name = 'mails'
+
+
+class OutboxPurge(OutboxQueryset, View):
 
     def dispatch(self, request, *args, **kwargs):
         qs = self.get_queryset()
@@ -69,13 +71,7 @@ class OutboxPurge(View):
         return redirect(reverse('office:mails.outbox.list'))
 
 
-class OutboxSend(View):
-
-    def get_queryset(self):
-        qs = EMail.objects.filter(sent__isnull=True)
-        if 'pk' in self.kwargs:
-            return qs.filter(pk=self.kwargs['pk'])
-        return qs
+class OutboxSend(OutboxQueryset, View):
 
     def dispatch(self, request, *args, **kwargs):
         qs = self.get_queryset()
