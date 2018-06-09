@@ -1,7 +1,13 @@
+from collections import OrderedDict
+
 from django.utils.decorators import classproperty
 
 
 class ChoicesMeta(type):
+    @classmethod
+    def __prepare__(self, name, bases):
+        return OrderedDict()
+
     def __new__(cls, name, parents, dct):
         if 'valid_choices' not in dct:
             dct['valid_choices'] = [dct[key] for key in dct if isinstance(key, str) and key.upper() == key]
