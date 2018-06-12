@@ -120,11 +120,11 @@ class Member(Auditable, models.Model):
         from byro.bookkeeping.models import Account, VirtualTransaction
 
         config = Configuration.get_solo()
-        booking_date = now()
-        cutoff = (booking_date - relativedelta(months=config.liability_interval)).date()
         account = Account.objects.filter(account_category='member_fees').first()
 
         for membership in self.memberships.all():
+            booking_date = now().replace(day=membership.start.day)
+            cutoff = (booking_date - relativedelta(months=config.liability_interval)).date()
             date = membership.start
             if date < cutoff:
                 date = cutoff
