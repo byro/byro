@@ -109,6 +109,19 @@ def sent_email():
     )
 
 
-@pytest.fixture
-def fee_account():
-    return Account.objects.create(account_category=AccountCategory.MEMBER_FEES)
+def account_helper(name, cat, **kwargs):
+    def f():
+        account = Account.objects.create(account_category=cat, **kwargs)
+        yield account
+        account.debits.all().delete()
+        account.credits.all().delete()
+        account.delete()
+    f.__name__ = name
+    return pytest.fixture(f)
+
+
+fee_account = account_helper('fee_account', AccountCategory.MEMBER_FEES)
+
+income_account = account_helper('income_account', AccountCategory.INCOME)
+receivable_account = account_helper('receivable_account', AccountCategory.ASSET)
+bank_account = account_helper('asset_account', AccountCategory.ASSET)
