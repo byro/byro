@@ -1,7 +1,10 @@
 import pytest
 from django.utils.timezone import now
 
-from byro.bookkeeping.models import AccountTag, Booking, Transaction
+from byro.bookkeeping.models import (
+    AccountCategory, AccountTag, Booking, Transaction,
+)
+from byro.bookkeeping.special_accounts import SpecialAccounts
 
 
 @pytest.mark.django_db
@@ -24,6 +27,17 @@ def test_account_tags(fee_account):
     fee_account.tags.get_or_create(name='fees')
     assert fee_account.tags.all().count() == 1
     assert fee_account in AccountTag.objects.get_or_create(name='fees')[0].account_set.all()
+
+
+@pytest.mark.django_db
+def test_special_accounts():
+    donations = SpecialAccounts.donations
+    fees = SpecialAccounts.fees
+    fees_receivable = SpecialAccounts.fees_receivable
+
+    assert donations.account_category == AccountCategory.INCOME
+    assert fees_receivable.account_category == AccountCategory.ASSET
+    assert fees_receivable != fees
 
 
 @pytest.mark.django_db
