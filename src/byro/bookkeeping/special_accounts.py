@@ -9,7 +9,7 @@ class SpecialAccounts:
     @classmethod
     def special_account(cls, tag, category, name=None):
         tag, _ignore = AccountTag.objects.get_or_create(name=str(tag).lower())
-        account = tag.account_set.filter(account_category=category).first()
+        account = Account.objects.filter(account_category=category, tags=tag).first()
         if not account:
             account = Account.objects.filter(account_category=category, name=name).first()
             if not account:

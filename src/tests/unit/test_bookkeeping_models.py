@@ -2,7 +2,7 @@ import pytest
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import (
-    AccountCategory, AccountTag, Booking, Transaction,
+    Account, AccountCategory, AccountTag, Booking, Transaction,
 )
 from byro.bookkeeping.special_accounts import SpecialAccounts
 
@@ -24,7 +24,8 @@ def test_account_methods(fee_account):
 @pytest.mark.django_db
 def test_account_tags(fee_account):
     assert fee_account.tags.all().count() == 0
-    fee_account.tags.get_or_create(name='fees')
+    tag, _ignore = AccountTag.objects.get_or_create(name='fees')
+    fee_account.tags.add(tag)
     assert fee_account.tags.all().count() == 1
     assert fee_account in AccountTag.objects.get_or_create(name='fees')[0].account_set.all()
 
@@ -38,6 +39,10 @@ def test_special_accounts():
     assert donations.account_category == AccountCategory.INCOME
     assert fees_receivable.account_category == AccountCategory.ASSET
     assert fees_receivable != fees
+
+    bank = SpecialAccounts.bank
+    assert Account.objects.filter(tags__name='bank').count() == 1
+    assert bank in Account.objects.filter(tags__name='bank').all()
 
 
 @pytest.mark.django_db

@@ -42,7 +42,7 @@ class Transaction(models.Model):
         null=True
     )
 
-    reverses = models.ForeignKey(  # TODO, maybe generic relations?
+    reverses = models.ForeignKey(
         to='Transaction',
         on_delete=models.PROTECT,
         related_name='reversed_by',
@@ -162,7 +162,7 @@ class Booking(models.Model):
 
     class Meta:
         # This is defense in depth, per django-db-constraints module.
-        # FIXME: Should also add a signal or save handler for the same
+        # FUTURE: Should also add a signal or save handler for the same
         #   constraint in pure python
         db_constraints = {
             'exactly_either_debit_or_credit':
