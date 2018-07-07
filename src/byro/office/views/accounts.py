@@ -56,11 +56,10 @@ class AccountDetailView(ListView):
         return self.object
 
     def get_queryset(self):
-        qs = self.get_object().bookings_with_transaction_balances
-        ## FIXME qs = qs.prefetch_related('account', 'transaction__bookings__account', 'transaction__bookings__member')
+        qs = self.get_object().bookings_with_transaction_data
         if self.request.GET.get('filter') == 'unbalanced':
             qs = qs.exclude(transaction_balances_debit=models.F('transaction_balances_credit'))
-        qs = qs.prefetch_related('transaction').filter(transaction__value_datetime__lte=now()).order_by('-transaction__value_datetime')
+        qs = qs.filter(transaction__value_datetime__lte=now()).order_by('-transaction__value_datetime')
         return qs
 
     def get_form(self, request=None):

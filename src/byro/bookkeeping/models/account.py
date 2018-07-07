@@ -62,9 +62,9 @@ class Account(Auditable, models.Model):
         )
 
     @property
-    def bookings_with_transaction_balances(self):
+    def bookings_with_transaction_data(self):
         from byro.bookkeeping.models import Booking
-        return Booking.objects.with_transaction_balances().filter(
+        return Booking.objects.with_transaction_data().filter(
             Q(debit_account=self) | Q(credit_account=self)
         )
 

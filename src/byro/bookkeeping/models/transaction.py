@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import Prefetch
 from django.utils.functional import cached_property
 
 
@@ -98,9 +99,16 @@ class Transaction(models.Model):
     def find_memo(self):
         if self.memo:
             return self.memo
+
+        if hasattr(self, 'cached_bookings'):
+            for booking in self.cached_bookings:
+                if booking.memo:
+                    return booking.memo
+
         booking = self.bookings.exclude(memo=None).first()
         if booking:
             return booking.memo
+
         return None
 
 
@@ -124,6 +132,22 @@ class BookingsQuerySet(models.QuerySet):
         )
         return qs
 
+
+    def with_transaction_data(self):
+        qs = self.with_transaction_balances()
+        qs = qs.select_related(
+            'member',
+            'transaction',
+            'credit_account',
+            'debit_account',
+        )
+        qs = qs.prefetch_related(
+            Prefetch('transaction__bookings', to_attr='cached_bookings'),
+            'transaction__cached_bookings__credit_account',
+            'transaction__cached_bookings__debit_account',
+            'transaction__cached_bookings__member',
+        )
+        return qs
 
 class Booking(models.Model):
     objects = BookingsQuerySet.as_manager()
@@ -199,8 +223,15 @@ class Booking(models.Model):
 
     @property
     def counter_bookings(self):
-        if self.debit_account:
-            return self.transaction.credits
-        elif self.credit_account:
-            return self.transaction.debits
+        if hasattr(self.transaction, 'cached_bookings'):
+            # Was prefetched with with_transaction_data()
+            if self.debit_account:
+                return [b for b in self.transaction.cached_bookings if b.credit_account]
+            elif self.credit_account:
+                return [b for b in self.transaction.cached_bookings if b.debit_account]
+        else:
+            if self.debit_account:
+                return self.transaction.credits
+            elif self.credit_account:
+                return self.transaction.debits
         return None
