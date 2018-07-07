@@ -16,6 +16,44 @@ class TestMigrations(TestCase):
     migrate_fixtures = None
     migrate_to = None
 
+    def load_fixtures(self, fixtures, apps):
+        # Via https://stackoverflow.com/questions/25960850/loading-initial-data-with-django-1-7-and-data-migrations/39743581#39743581
+        #  we need to monkeypatch a Django internal in order to provide it with
+        #  the correct (old) view of the model
+        from django.core.serializers import base, python
+
+        # Define new _get_model() function here, which utilizes the apps argument to
+        # get the historical version of a model. This piece of code is directly stolen
+        # from django.core.serializers.python._get_model, unchanged.
+        def _get_model(model_identifier):
+            try:
+                return apps.get_model(model_identifier)
+            except (LookupError, TypeError):
+                raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
+
+        # Save the old _get_model() function
+        old_get_model = python._get_model
+
+        # Replace the _get_model() function on the module, so loaddata can utilize it.
+        python._get_model = _get_model
+
+        try:
+            # From django/test/testcases.py
+            for db_name in self._databases_names(include_mirrors=False):
+                    try:
+                        call_command('loaddata', *fixtures, **{
+                            'verbosity': 0,
+                            'commit': False,
+                            'database': db_name,
+                        })
+                    except Exception:
+                        self._rollback_atomics(self.cls_atomics)
+                        raise
+
+        finally:
+            # Restore old _get_model() function
+            python._get_model = old_get_model
+
     def setUp(self):
         assert self.migrate_from and self.migrate_to, \
             "TestCase '{}' must define migrate_from and migrate_to properties".format(type(self).__name__)
@@ -27,18 +65,8 @@ class TestMigrations(TestCase):
         # Reverse to the original migration
         executor.migrate(self.migrate_from)
 
-        # From django/test/testcases.py
         if self.migrate_fixtures:
-            for db_name in self._databases_names(include_mirrors=False):
-                    try:
-                        call_command('loaddata', *self.migrate_fixtures, **{
-                            'verbosity': 0,
-                            'commit': False,
-                            'database': db_name,
-                        })
-                    except Exception:
-                        self._rollback_atomics(self.cls_atomics)
-                        raise
+            self.load_fixtures(self.migrate_fixtures, apps=old_apps)
 
         self.setUpBeforeMigration(old_apps)
 
