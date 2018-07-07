@@ -3,11 +3,14 @@ from django.db.models import Q
 from helper import TestMigrations
 
 
-@pytest.mark.django_db
-class TestBookkeepingMigrationsFirst(TestMigrations):
+class TestWithShackdataBase(TestMigrations):
     app = 'bookkeeping'
-    migrate_fixtures = ['test_shackspace_transactions.json']
+    migrate_fixtures = ['tests/fixtures/test_shackspace_transactions.json']
     migrate_from = '0012_auto_20180617_1926'
+
+
+@pytest.mark.django_db
+class TestBookkeepingMigrationsFirst(TestWithShackdataBase):
     migrate_to = '0013_new_data_model'
 
     def setUpBeforeMigration(self, apps):
@@ -70,10 +73,7 @@ class TestBookkeepingMigrationsFirst(TestMigrations):
 
 
 @pytest.mark.django_db
-class TestBookkeepingMigrationsFinal(TestMigrations):
-    app = 'bookkeeping'
-    migrate_fixtures = ['test_shackspace_transactions.json']
-    migrate_from = '0012_auto_20180617_1926'
+class TestBookkeepingMigrationsFinal(TestWithShackdataBase):
     migrate_to = '0014_auto_20180707_1410'
 
     def test_accounts_migrated_fully(self):
