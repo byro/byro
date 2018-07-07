@@ -11,14 +11,14 @@ class TransactionQuerySet(models.QuerySet):
                 models.Case(
                     models.When(~models.Q(bookings__debit_account=None), then="bookings__amount"),
                     default=0,
-                    output_field=models.IntegerField()
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
                 )
             ),
             balances_credit=models.Sum(
                 models.Case(
                     models.When(~models.Q(bookings__credit_account=None), then="bookings__amount"),
                     default=0,
-                    output_field=models.IntegerField()
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
                 )
             )
         )
@@ -111,14 +111,14 @@ class BookingsQuerySet(models.QuerySet):
                 models.Case(
                     models.When(~models.Q(transaction__bookings__debit_account=None), then="transaction__bookings__amount"),
                     default=0,
-                    output_field=models.IntegerField()
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
                 )
             ),
             transaction_balances_credit=models.Sum(
                 models.Case(
                     models.When(~models.Q(transaction__bookings__credit_account=None), then="transaction__bookings__amount"),
                     default=0,
-                    output_field=models.IntegerField()
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
                 )
             )
         )

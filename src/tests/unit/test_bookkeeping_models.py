@@ -57,6 +57,18 @@ def test_transaction_balances(receivable_account, income_account):
 
 
 @pytest.mark.django_db
+def test_transaction_balances_decimal(bank_account, receivable_account):
+    t = Transaction.objects.create(value_datetime=now())
+    for booking in [
+            dict(amount=9.5, debit_account=bank_account),
+            dict(amount=9.95, credit_account=receivable_account)
+    ]:
+        Booking.objects.create(transaction=t, **booking)
+    t = Transaction.objects.with_balances().get(pk=t.pk)
+    assert not t.balances_credit == t.balances_debit
+
+
+@pytest.mark.django_db
 def test_transaction_methods(bank_account):
     t = Transaction.objects.create(value_datetime=now())
     t.debit(amount=10, account=bank_account)
