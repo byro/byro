@@ -10,10 +10,6 @@ from byro.common.models.choices import Choices
 from decimal import Decimal
 
 class AccountCategory(Choices):
-    # Regular Categories
-    MEMBER_DONATION = 'member_donation'  # deprecated
-    MEMBER_FEES = 'member_fees'  # deprecated
-
     # Categories for double-entry bookkeeping
     ASSET = 'asset'  # de: Aktiva, for example your bank account or cash
     LIABILITY = 'liability'  # de: Passiva, for example invoices you have to pay
@@ -24,8 +20,6 @@ class AccountCategory(Choices):
     @classproperty
     def choices(cls):
         return (
-            (cls.MEMBER_DONATION, _('Donation account')),
-            (cls.MEMBER_FEES, _('Membership fee account')),
             (cls.ASSET, _('Asset account')),
             (cls.LIABILITY, _('Liability account')),
             (cls.INCOME, _('Income account')),

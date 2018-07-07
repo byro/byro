@@ -4,7 +4,7 @@ from helper import TestMigrations
 
 
 @pytest.mark.django_db
-class TestBookkeepingMigrations(TestMigrations):
+class TestBookkeepingMigrationsFirst(TestMigrations):
     app = 'bookkeeping'
     migrate_fixtures = ['test_shackspace_transactions.json']
     migrate_from = '0012_auto_20180617_1926'
@@ -68,12 +68,12 @@ class TestBookkeepingMigrations(TestMigrations):
 
         assert Booking.objects.filter(amount__lt=0).count() == 0
 
-class DisabledForNow:
-    def setUpBeforeMigration(self, apps):
-        Account = apps.get_model('bookkeeping', 'Account')
-
-        # Sanity check on the test fixture
-        assert Account.objects.all().count() == 4
+@pytest.mark.django_db
+class TestBookkeepingMigrationsFinal(TestMigrations):
+    app = 'bookkeeping'
+    migrate_fixtures = ['test_shackspace_transactions.json']
+    migrate_from = '0012_auto_20180617_1926'
+    migrate_to = '0014_auto_20180707_1410'
 
     def test_accounts_migrated_fully(self):
         from byro.bookkeeping.models import Account, AccountCategory

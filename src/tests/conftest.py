@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import (
-    Account, AccountCategory, RealTransaction, TransactionChannel,
+    Account, AccountCategory
 )
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
@@ -31,7 +31,7 @@ def member():
     yield member
 
     [profile.delete() for profile in member.profiles]
-    member.transactions.all().delete()
+    [booking.transaction.delete() for booking in member.bookings.all()]
     member.delete()
 
 
@@ -66,20 +66,8 @@ def inactive_member():
     )
     yield member
     [profile.delete() for profile in member.profiles]
-    member.transactions.all().delete()
+    [booking.transaction.delete() for booking in member.bookings.all()]
     member.delete()
-
-
-@pytest.fixture
-def real_transaction():
-    return RealTransaction.objects.create(
-        channel=TransactionChannel.BANK,
-        booking_datetime=now(),
-        value_datetime=now(),
-        amount=decimal.Decimal('20.00'),
-        purpose='Erm, this is my fees for today',
-        originator='Jane Doe',
-    )
 
 
 @pytest.fixture
@@ -120,7 +108,7 @@ def account_helper(name, cat, **kwargs):
     return pytest.fixture(f)
 
 
-fee_account = account_helper('fee_account', AccountCategory.MEMBER_FEES)
+fee_account = account_helper('fee_account', 'member_fees')
 
 income_account = account_helper('income_account', AccountCategory.INCOME)
 receivable_account = account_helper('receivable_account', AccountCategory.ASSET)

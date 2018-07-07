@@ -111,14 +111,11 @@
                     </a>
                 </span>
                 <div class="collapse in{% if "finance." in url_name %} show{% endif %}" aria-expand="true" id="collapseFinance">
-                    <a class="nav-link nav-link-second-level {% if "finance.transactions" in url_name %}active{% endif %}" href="{% url 'office:finance.transactions.list' %}">
-                        {% trans "Transactions" %}
+                    <a class="nav-link nav-link-second-level {% if "finance.accounts" in url_name %}active{% endif %}" href="{% url 'office:finance.accounts.list' %}">
+                        {% trans "Accounts" %}
                     </a>
                     <a class="nav-link nav-link-second-level {% if "finance.uploads" in url_name %}active{% endif %}" href="{% url 'office:finance.uploads.list' %}">
                         {% trans "Transaction Upload" %}
-                    </a>
-                    <a class="nav-link nav-link-second-level {% if "finance.accounts" in url_name %}active{% endif %}" href="{% url 'office:finance.accounts.list' %}">
-                        {% trans "Accounts" %}
                     </a>
                     {% for nav_element in nav_event %}
                         {% if nav_element.section == 'finance' %}

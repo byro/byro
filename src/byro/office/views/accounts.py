@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView
 
 from byro.bookkeeping.models import (
-    Account, AccountCategory, Transaction, VirtualTransaction
+    Account, AccountCategory, Transaction
 )
 
 FORM_CLASS = forms.modelform_factory(Account, fields=['name', 'account_category'])

@@ -8,7 +8,7 @@ from django.db import migrations
 def create_accounts(apps, schema_editor):
     from byro.bookkeeping.models import AccountCategory
     Account = apps.get_model("bookkeeping", "Account")
-    for category in (AccountCategory.MEMBER_DONATION, AccountCategory.MEMBER_FEES):
+    for category in ("member_donation", "member_fees"):  # Not the constants, because the class got refactored
         Account.objects.create(
             account_category=category
         )
