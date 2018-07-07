@@ -1,13 +1,26 @@
 from django import forms
+from django.db import models
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView
 
-from byro.bookkeeping.models import Account, VirtualTransaction
+from byro.bookkeeping.models import (
+    Account, AccountCategory, Transaction, VirtualTransaction
+)
 
 FORM_CLASS = forms.modelform_factory(Account, fields=['name', 'account_category'])
+
+TRANSLATED_NAMES = {
+    # FIXME Check this with an accountant who is a native english speaker
+    AccountCategory.INCOME: (_('Charge'), _('Revenue')),
+    AccountCategory.ASSET: (_('Increase'), _('Decrease')),
+    AccountCategory.EQUITY: (_('Decrease'), _('Increase')),
+    AccountCategory.LIABILITY: (_('Decrease'), _('Increase')),
+    AccountCategory.EXPENSE: (_('Expense'), _('Rebate')),
+}
 
 
 class AccountListView(ListView):
@@ -33,24 +46,44 @@ class AccountCreateView(FormView):
 
 class AccountDetailView(ListView):
     template_name = 'office/account/detail.html'
-    context_object_name = 'transactions'
-    model = VirtualTransaction
+    context_object_name = 'bookings'
+    model = Transaction
     paginate_by = 25
 
     def get_object(self):
-        return Account.objects.get(pk=self.kwargs['pk'])
+        if not hasattr(self, 'object'):
+            self.object = Account.objects.get(pk=self.kwargs['pk'])
+        return self.object
 
     def get_queryset(self):
-        return self.get_object().transactions.filter(value_datetime__lte=now()).order_by('-value_datetime')
+        qs = self.get_object().bookings_with_transaction_balances
+        ## FIXME qs = qs.prefetch_related('account', 'transaction__bookings__account', 'transaction__bookings__member')
+        if self.request.GET.get('filter') == 'unbalanced':
+            qs = qs.exclude(transaction_balances_debit=models.F('transaction_balances_credit'))
+        qs = qs.prefetch_related('transaction').filter(transaction__value_datetime__lte=now()).order_by('-transaction__value_datetime')
+        return qs
 
-    def get_form(self):
-        return FORM_CLASS(instance=self.get_object(), data=self.request.POST if self.request.method == 'post' else None)
+    def get_form(self, request=None):
+        form = FORM_CLASS(request.POST if request else None, instance=self.get_object())
+        form.fields['account_category'].disabled = True
+        return form
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['form'] = self.get_form()
         context['account'] = self.get_object()
+        context['TRANSLATED_NAMES'] = TRANSLATED_NAMES.get(
+            self.get_object().account_category,
+            (_("Debit"), _("Credit"))
+        )
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form(request)
+        if form.is_valid() and form.has_changed():
+            form.save()
+            messages.success(self.request, _('Your changes have been saved.'))
+        return redirect(reverse('office:finance.accounts.detail', kwargs=self.kwargs))
 
 
 class AccountDeleteView(DetailView):

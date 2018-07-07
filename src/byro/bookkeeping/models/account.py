@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 
+from decimal import Decimal
 
 class AccountCategory(Choices):
     # Regular Categories
@@ -60,9 +61,30 @@ class Account(Auditable, models.Model):
         return '{self.account_category} account #{self.id}'.format(self=self)
 
     @property
+    def bookings(self):
+        from byro.bookkeeping.models import Booking
+        return Booking.objects.filter(
+            Q(debit_account=self) | Q(credit_account=self)
+        )
+
+    @property
+    def bookings_with_transaction_balances(self):
+        from byro.bookkeeping.models import Booking
+        return Booking.objects.with_transaction_balances().filter(
+            Q(debit_account=self) | Q(credit_account=self)
+        )
+
+    @property
     def transactions(self):
         from byro.bookkeeping.models import Transaction
         return Transaction.objects.filter(
+            Q(bookings__debit_account=self) | Q(bookings__credit_account=self)
+        )
+
+    @property
+    def unbalanced_transactions(self):
+        from byro.bookkeeping.models import Transaction
+        return Transaction.objects.unbalanced_transactions().filter(
             Q(bookings__debit_account=self) | Q(bookings__credit_account=self)
         )
 
@@ -88,5 +110,7 @@ class Account(Auditable, models.Model):
             result['net'] = result['credit'] - result['debit']
         else:
             result['net'] = result['debit'] - result['credit']
+
+        result = {k: Decimal(v).quantize(Decimal('0.01')) for k,v in result.items()}
 
         return result

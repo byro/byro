@@ -98,8 +98,12 @@
             </a>
             <li class="nav-fold">
                 <span class="has-children">
-                    <a class="nav-link nav-link-inner" href="{% url 'office:finance.transactions.list' %}">
-                        <i class="fa fa-money"></i>
+                    <a class="nav-link nav-link-inner" href="{% url 'office:finance.accounts.list' %}">
+                        {% if pending_transactions %}
+                        <span class="pending-mails">{{ pending_transactions }}</span>
+                        {% else %}
+                        <span class="fa fa-money"></span>
+                        {% endif %}
                         <span class="sidebar-text">{% trans "Finance" %}</span>
                     </a>
                     <a class="arrow nav-link" data-toggle="collapse" href="#collapseFinance" aria-controls="collapseFinance">

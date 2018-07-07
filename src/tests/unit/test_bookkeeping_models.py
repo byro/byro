@@ -8,26 +8,26 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 
 
 @pytest.mark.django_db
-def test_account_model_str(fee_account):
-    assert str(fee_account) == 'member_fees account #{}'.format(fee_account.id)
-    fee_account.name = 'foo'
-    assert str(fee_account) == 'foo'
+def test_account_model_str(bank_account):
+    assert str(bank_account) == 'asset account #{}'.format(bank_account.id)
+    bank_account.name = 'foo'
+    assert str(bank_account) == 'foo'
 
 
 @pytest.mark.django_db
-def test_account_methods(fee_account):
-    assert not fee_account.transactions
-    assert fee_account.balances(start=now())['credit'] == 0
-    assert fee_account.balances(start=now())['debit'] == 0
+def test_account_methods(bank_account):
+    assert not bank_account.transactions
+    assert bank_account.balances(start=now())['credit'] == 0
+    assert bank_account.balances(start=now())['debit'] == 0
 
 
 @pytest.mark.django_db
-def test_account_tags(fee_account):
-    assert fee_account.tags.all().count() == 0
-    tag, _ignore = AccountTag.objects.get_or_create(name='fees')
-    fee_account.tags.add(tag)
-    assert fee_account.tags.all().count() == 1
-    assert fee_account in AccountTag.objects.get_or_create(name='fees')[0].account_set.all()
+def test_account_tags(bank_account):
+    assert bank_account.tags.all().count() == 0
+    tag, _ignore = AccountTag.objects.get_or_create(name='TEST')
+    bank_account.tags.add(tag)
+    assert bank_account.tags.all().count() == 1
+    assert bank_account in AccountTag.objects.get_or_create(name='TEST')[0].account_set.all()
 
 
 @pytest.mark.django_db

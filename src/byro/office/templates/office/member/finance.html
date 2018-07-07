@@ -15,12 +15,12 @@
         </tr>
     </thead>
     <tbody>
-        {% for transaction in transactions %}
-            <tr class="transaction {% if not transaction.real_transaction %}unmatched{% endif %}">
-                <td>{{ transaction.value_datetime.date }}</td>
-                <td class="text-md-right{% if transaction.amount < 0 %} text-danger{% endif %}">{{ transaction.amount }}</td>
-                <td>{{ transaction.real_transaction.purpose }}</td>
-                <td>{{ transaction.destination_account.get_account_category_display }}</td>
+        {% for booking in bookings %}
+            <tr class="transaction {% if not booking.transaction.is_balanced %}unmatched{% endif %}">
+                <td>{{ booking.transaction.value_datetime.date }}</td>
+                <td class="text-md-right{% if booking.debit_account %} text-danger{% endif %}">{% if booking.debit_account %}-{% endif %}{{ booking.amount }}</td>
+                <td>{{ booking.transaction.find_memo }}</td>
+                <td>{{ booking.debit_account|default:booking.credit_account }}</td>
             </tr>
         {% endfor %}
     </tbody>

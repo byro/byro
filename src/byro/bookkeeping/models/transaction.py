@@ -104,7 +104,30 @@ class Transaction(models.Model):
         return None
 
 
+class BookingsQuerySet(models.QuerySet):
+    def with_transaction_balances(self):
+        qs = self.annotate(
+            transaction_balances_debit=models.Sum(
+                models.Case(
+                    models.When(~models.Q(transaction__bookings__debit_account=None), then="transaction__bookings__amount"),
+                    default=0,
+                    output_field=models.IntegerField()
+                )
+            ),
+            transaction_balances_credit=models.Sum(
+                models.Case(
+                    models.When(~models.Q(transaction__bookings__credit_account=None), then="transaction__bookings__amount"),
+                    default=0,
+                    output_field=models.IntegerField()
+                )
+            )
+        )
+        return qs
+
+
 class Booking(models.Model):
+    objects = BookingsQuerySet.as_manager()
+
     memo = models.CharField(max_length=1000, null=True)
 
     booking_datetime = models.DateTimeField(null=True)

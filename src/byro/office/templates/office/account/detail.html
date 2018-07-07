@@ -1,5 +1,6 @@
 {% extends "office/account/base.html" %}
 {% load bootstrap4 %}
+{% load extract_property %}
 {% load i18n %}
 
 {% block account_content %}
@@ -13,30 +14,75 @@
 <table class="table table-sm">
     <thead>
         <tr>
+            <th></th>
             <th>{% trans "Date" %}</th>
-            <th>{% trans "Member" %}</th>
             <th>{% trans "Purpose" %}</th>
-            <th class="text-md-right">{% trans "Incoming" %}</th>
-            <th class="text-md-right">{% trans "Outgoing" %}</th>
+            <th>{% trans "Member" %}</th>
+            <th>{% trans "Account" %}</th>
+            <th class="text-md-right">{{ TRANSLATED_NAMES.0 }}</th>
+            <th class="text-md-right">{{ TRANSLATED_NAMES.1 }}</th>
         </tr>
     </thead>
     <tbody>
-        {% for transaction in transactions %}
-            <tr>
-                <td>{{ transaction.value_datetime.date }}</td>
-                <td>{{ transaction.member.name }}</td>
-                <td>{{ transaction.real_transaction.purpose }}</td>
-                <td class="text-md-right">
-                    {% if transaction.destination_account == account %}
-                        {{ transaction.amount }}
+        {% for booking in bookings %}
+            {% with transaction=booking.transaction %}
+            {% with related_bookings=transaction.bookings.all %}
+                <tr class="transaction-{% if not booking.transaction_balances_debit == booking.transaction_balances_credit %}unbalanced-{% endif %}{% cycle 'row-odd' 'row-even' as account_row %}">
+                    {% if booking.transaction_balances_debit == booking.transaction_balances_credit %}
+                        <td></td>
+                    {% else %}
+                        <td>
+                            <a href="{% url "office:finance.transactions.detail" pk=transaction.pk %}?in_account={{account.pk}}"><span class="fa fa-pencil"></span></a>
+                        </td>
                     {% endif %}
-                </td>
-                <td class="text-md-right">
-                    {% if transaction.source_account == account %}
-                        {{ transaction.amount }}
-                    {% endif %}
-                </td>
-            </tr>
+                    <td style="white-space: nowrap;">{{ transaction.value_datetime.date }}</td>
+                    <td>
+                        <a data-toggle="collapse" data-target=".collapse-{{transaction.id}}" aria-controls="collapse-{{transaction.id}}">
+                            <span class="fa fa-angle-down"></span>
+                            {{ transaction.find_memo }}
+                        </a>
+                    </td>
+                    <td>{{ booking.member.name }}</td>
+                    <td>
+                        {% if booking.debit_account %}
+                            {{ booking.counter_bookings | extract_property:"credit_account" | join:", <br/> "}}
+                        {% elif booking.credit_account %}
+                            {{ booking.counter_bookings | extract_property:"debit_account" | join:", <br/> "}}
+                        {% endif %}
+                    </td>
+                    <td class="text-md-right">
+                        {% if booking.debit_account %}
+                            {{ booking.amount }}
+                        {% endif %}
+                    </td>
+                    <td class="text-md-right">
+                        {% if booking.credit_account %}
+                            {{ booking.amount }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% for related_booking in related_bookings %}
+                <tr class="collapse in related-{{ account_row }}-{% cycle 'related-odd' 'related-even' as related_row %} collapse-{{transaction.id}} {% if forloop.first %}related-first{% endif %} {% if forloop.last %}related-last{% endif %}">
+                    <td class="related-empty"></td>
+                    <td class="related-empty"></td>
+                    <td>{{ related_booking.memo|default:"" }}</td>
+                    <td>{{ related_booking.member.name }}</td>
+                    <td>{{ related_booking.debit_account|default:related_booking.credit_account }}</td>
+                    <td class="text-md-right">
+                        {% if related_booking.debit_account %}
+                            {{ related_booking.amount }}
+                        {% endif %}
+                    </td>
+                    <td class="text-md-right">
+                        {% if related_booking.credit_account %}
+                            {{ related_booking.amount }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% resetcycle related_row %}
+            {% endwith %}
+            {% endwith %}
         {% endfor %}
     </tbody>
 </table>

@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 
 from .views import (
-    accounts, dashboard, mails, members,
+    accounts, dashboard, mails, members, transactions,
     realtransactions, settings, upload, users,
 )
 
@@ -23,6 +23,8 @@ urlpatterns = [
         url('leave$', members.MemberLeaveView.as_view(), name='members.leave'),
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
+
+    url(r'^transactions/(?P<pk>\d+)/', transactions.TransactionDetailView.as_view(), name='finance.transactions.detail'),
 
     url('^realtransaction/list', realtransactions.RealTransactionListView.as_view(), name='finance.transactions.list'),
     url('^realtransaction/match', realtransactions.RealTransactionMatchView.as_view(), name='finance.transactions.match'),

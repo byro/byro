@@ -18,6 +18,7 @@ from byro.members.signals import (
     new_member_mail_information, new_member_office_mail_information,
 )
 from byro.office.signals import member_view
+from byro.bookkeeping.special_accounts import SpecialAccounts
 
 
 class MemberView(DetailView):
@@ -185,17 +186,18 @@ class MemberFinanceView(MemberView):
     def get_member(self):
         return Member.all_objects.get(pk=self.kwargs['pk'])
 
-    def get_transactions(self):
-        return self.get_member().transactions.filter(
-            Q(destination_account__account_category='member_fees') |
-            Q(destination_account__account_category='member_donation'),
-            value_datetime__lte=now(),
-        ).order_by('-value_datetime')
+    def get_bookings(self):
+        account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
+        return self.get_member().bookings.filter(
+            Q(debit_account__in=account_list) |
+            Q(credit_account__in=account_list),
+            transaction__value_datetime__lte=now(),
+        ).order_by('-transaction__value_datetime')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['member'] = self.get_member()
-        context['transactions'] = self.get_transactions()
+        context['bookings'] = self.get_bookings()
         return context
 
 

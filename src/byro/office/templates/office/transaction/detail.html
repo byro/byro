@@ -1,0 +1,59 @@
+{% extends "office/base_headline.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+{% load formset_tags %}
+
+{% block headline %}{% trans "Edit transaction" %}{% endblock %}
+
+{% block content %}
+{# FIXME Deduplicate with account/detail.html? #}
+<form method="POST">
+{% csrf_token %}
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>{% trans "Date" %}</th>
+            <th>{% trans "Purpose" %}</th>
+            <th>{% trans "Member" %}</th>
+            <th>{% trans "Account" %}</th>
+            <th class="text-md-right">{% trans "Incoming" %}</th>
+            <th class="text-md-right">{% trans "Outgoing" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in bookings %}
+            <tr class="transaction-{% cycle 'row-odd' 'row-even' as account_row %}">
+                <td class="related-empty"></td>
+                <td>{{ booking.memo|default:"" }}</td>
+                <td>{{ booking.member.name }}</td>
+                <td>{{ booking.debit_account|default:booking.credit_account }}</td>
+                <td class="text-md-right">
+                    {% if booking.debit_account %}
+                        {{ booking.amount }}
+                    {% endif %}
+                </td>
+                <td class="text-md-right">
+                    {% if booking.credit_account %}
+                        {{ booking.amount }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        {% if transaction.balances_debit != transaction.balances_credit %}
+            <tr>
+                <td class="related-empty"></td>
+                <td>{{form.memo}}</td>
+                <td>{{form.member}}</td>
+                <td>{{form.account}}</td>
+                <td class="text-md-right">{{form.debit_value}}</td>
+                <td class="text-md-right">{{form.credit_value}}</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% if transaction.balances_debit != transaction.balances_credit %}
+    <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
+{% endif %}
+</form>
+{% endblock %}

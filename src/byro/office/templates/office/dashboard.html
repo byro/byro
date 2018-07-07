@@ -16,10 +16,10 @@
             {% trans "(currently)" %}
         </span>
     </a>
-    <a class="dashboard-block" href="{% url "office:finance.transactions.list" %}?filter=unmatched">
-        <h1>
-            {% if unmapped_transactions_count > 0 %}
-                {% blocktrans with count=unmapped_transactions_count trimmed %}
+    <a class="dashboard-block" href="{% url "office:finance.accounts.list" %}">
+        <h1> {# FIXME Direct link to matching, maybe? #}
+            {% if pending_transactions > 0 %}
+                {% blocktrans with count=pending_transactions trimmed %}
                 {{ count }} unmapped transactions
                 {% endblocktrans %}
             {% else %}

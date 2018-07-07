@@ -2,6 +2,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
+from byro.bookkeeping.models import Transaction
 from byro.members.models import FeeIntervals, Member, Membership
 
 
@@ -24,43 +25,45 @@ def member_membership(new_member):
                                    amount=20,
                                    interval=FeeIntervals.MONTHLY)
     yield ms
-    ms.member.transactions.all().delete()
+    [ (t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all() ]
     ms.delete()
 
 
 @pytest.mark.django_db
 def test_liabilities_easy(member_membership):
     member_membership.member.update_liabilites()
-    virtual_transactions = member_membership.member.transactions.all()
-    assert len(virtual_transactions) == 2
-    assert sum([i.amount for i in virtual_transactions]) == 40
+    bookings = member_membership.member.bookings.all()
+    credits = member_membership.member.bookings.filter(credit_account__isnull=False).all()
+    assert len(bookings) == 4
+    assert sum([i.amount for i in bookings]) == 80
+    assert sum([i.amount for i in credits]) == 40
 
 
 @pytest.mark.django_db
-def test_liabilities_future_virtualtransactions(member_membership):
+def test_liabilities_future_transactions(member_membership):
     end_this_month = member_membership.end
     end_next_month = member_membership.end + relativedelta(months=+1)
     member_membership.end = end_next_month
     member_membership.save()
 
     member_membership.member.update_liabilites()
-    virtual_transactions = member_membership.member.transactions.all()
-    assert len(virtual_transactions) == 3
-    assert sum([i.amount for i in virtual_transactions]) == 60
+    bookings = member_membership.member.bookings.filter(credit_account__isnull=False).all()
+    assert len(bookings) == 3
+    assert sum([i.amount for i in bookings]) == 60
 
     # set back to current month, this leaves a transaction in the future
     member_membership.end = end_this_month
     member_membership.save()
     member_membership.member.update_liabilites()
     # NOTE: update liabilites doesn't delete transactions
-    virtual_transactions = member_membership.member.transactions.all()
-    assert len(virtual_transactions) == 3
+    bookings = member_membership.member.bookings.filter(credit_account__isnull=False).all()
+    assert len(bookings) == 3
 
     # but the new (temporary?) helper cleans them
     member_membership.member.remove_future_liabilites_on_leave()
-    virtual_transactions = member_membership.member.transactions.all()
-    assert len(virtual_transactions) == 2
-    assert sum([i.amount for i in virtual_transactions]) == 40
+    bookings = member_membership.member.bookings.filter(credit_account__isnull=False).all()
+    assert len(bookings) == 2
+    assert sum([i.amount for i in bookings]) == 40
 
 
 @pytest.fixture
@@ -74,14 +77,14 @@ def member_membership_second(new_member):
                                    amount=8,
                                    interval=FeeIntervals.MONTHLY)
     yield ms
-    ms.member.transactions.all().delete()
+    [ (t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all() ]
     ms.delete()
 
 
 @pytest.mark.django_db
 def test_liabilities_complicated_example(member_membership, member_membership_second):
     member_membership.member.update_liabilites()
-    virtual_transactions = member_membership.member.transactions.all()
+    virtual_transactions = member_membership.member.bookings.filter(credit_account__isnull=False).all()
     assert len(virtual_transactions) == 4
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20
 
@@ -91,7 +94,7 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
     member_membership.save()
 
     member_membership.member.update_liabilites()
-    virtual_transactions = member_membership.member.transactions.all()
+    virtual_transactions = member_membership.member.bookings.filter(credit_account__isnull=False).all()
     assert len(virtual_transactions) == 5
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20 + 20
 
@@ -99,12 +102,12 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
     member_membership.save()
     member_membership.member.update_liabilites()
     # NOTE: update liabilites doesn't delete transactions
-    virtual_transactions = member_membership.member.transactions.all()
+    virtual_transactions = member_membership.member.bookings.filter(credit_account__isnull=False).all()
     assert len(virtual_transactions) == 5
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20 + 20
 
     # but the new (temporary?) helper cleans them
     member_membership.member.remove_future_liabilites_on_leave()
-    virtual_transactions = member_membership.member.transactions.all()
+    virtual_transactions = member_membership.member.bookings.filter(credit_account__isnull=False).all()
     assert len(virtual_transactions) == 4
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20

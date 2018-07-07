@@ -4,11 +4,12 @@ from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
-from byro.bookkeeping.models import Account, VirtualTransaction
+from byro.bookkeeping.models import Account, AccountCategory, Transaction
 from byro.common.models.configuration import Configuration
 from byro.members.models import FeeIntervals, Member, Membership, MembershipType
-
+from byro.bookkeeping.special_accounts import SpecialAccounts
 
 def make_date(delta, end=False):
     date = (now() - delta).date()
@@ -21,6 +22,7 @@ def make_date(delta, end=False):
 
 class Command(BaseCommand):
     help = "Introduce test data, including members and payments"
+    leave_locale_alone = True
 
     def create_configs(self):
         config = Configuration.get_solo()
@@ -33,18 +35,40 @@ class Command(BaseCommand):
         config.backoffice_mail = 'vorstanz@dervereindervere.in'
         config.save()
 
-    def make_paid(self, member, vaguely=False, overly=False):
+    def make_paid(self, member, vaguely=False, overly=False, donates=0, pays_for=None):
+        config = Configuration.get_solo()
         member.update_liabilites()
-        account = Account.objects.filter(account_category='member_fees').first()
-        for index, liability in enumerate(member.transactions.filter(value_datetime__lte=now(), source_account__account_category='member_fees')):
+        for index, liability in enumerate(member.bookings.filter(debit_account=SpecialAccounts.fees_receivable, transaction__value_datetime__lte=now()).all()):
             if vaguely and index % 2 == 0:
                 continue
-            VirtualTransaction.objects.create(
-                destination_account=account,
-                amount=liability.amount if not overly else liability.amount * 2,
-                value_datetime=liability.value_datetime,
-                member=member,
+
+            pure_amount = liability.amount if not overly else liability.amount * 2
+
+            text = _("Member fee for {number}").format(number=member.number)
+
+            if pays_for:
+                amount = pure_amount * 2
+                text += ", " + _("and for {number}").format(number=pays_for.number)
+            else:
+                amount = pure_amount
+
+            if donates:
+                amount += donates
+                text += ", " + _("EUR {amount} donation").format(amount=donates)
+
+            t = Transaction.objects.create(
+                value_datetime=liability.transaction.value_datetime
             )
+            t.debit(
+                memo=text,
+                account=SpecialAccounts.bank, amount=amount
+            )
+            if donates:
+                t.credit(account=SpecialAccounts.donations, member=member, amount=donates)
+            t.credit(account=SpecialAccounts.fees_receivable, member=member, amount=pure_amount)
+            if pays_for:
+                t.credit(account=SpecialAccounts.fees_receivable, member=pays_for, amount=pure_amount)
+            t.save()
 
     def create_membership_types(self):
         MembershipType.objects.create(name='Standard membership', amount=120)
@@ -128,9 +152,99 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
+        giver = Member.objects.create(
+            number='7',
+            name='George Giver',
+            address='Generous St 3\nEnd-of-the-rainbow Hearth',
+            email='george@group.org',
+        )
+        Membership.objects.create(
+            member=giver,
+            start=make_date(relativedelta(years=1)),
+            interval=FeeIntervals.MONTHLY,
+            amount=10,
+        )
+        self.make_paid(giver, donates=5)
+        is_payed_for = Member.objects.create(
+            number='8',
+            name='Peter Partner',
+            address='Commune St 3\nFamily Shire',
+            email='peter@group.org',
+        )
+        Membership.objects.create(
+            member=is_payed_for,
+            start=make_date(relativedelta(months=3)),
+            interval=FeeIntervals.MONTHLY,
+            amount=10,
+        )
+        is_payed_for.update_liabilites()
+        pays_other = Member.objects.create(
+            number='9',
+            name='Aaron Alsopayer',
+            address='Commune St 3\nFamily Shire',
+            email='aaron@group.org',
+        )
+        Membership.objects.create(
+            member=pays_other,
+            start=make_date(relativedelta(months=3)),
+            interval=FeeIntervals.MONTHLY,
+            amount=10,
+        )
+        self.make_paid(pays_other, pays_for=is_payed_for)
+
+    def create_bank_chaff(self):
+        "Create some dummy traffic, and a couple of unmatched transactions on the bank account"
+        bank_account = SpecialAccounts.bank
+
+        t = Transaction.objects.create(
+            value_datetime=(now()-relativedelta(days=23)).date(),
+        )
+        t.debit(
+            memo=_("Belated member fee payment for Olga"),
+            account=bank_account, amount=20
+        )
+        t.save()
+
+        t = Transaction.objects.create(
+            value_datetime=(now()-relativedelta(days=17)).date(),
+        )
+        t.debit(
+            memo=_("George lives to give, donation"),
+            account=bank_account, amount=42.23
+        )
+        t.save()
+
+        for i in range(1, 4):
+            t = Transaction.objects.create(
+                value_datetime=(now()-relativedelta(months=i)).date(),
+            )
+            t.credit(
+                memo=_("Bank fees"),
+                account=bank_account, amount=9.95
+            )
+            t.save()
+
+        t = Transaction.objects.create(
+            value_datetime=(now()-relativedelta(days=21)).date(),
+        )
+        t.credit(
+            memo=_("ACME Inc. thanks you for your patronage, sale of one halo kite"),
+            account=bank_account, amount=123
+        )
+        t.save()
+
+        t = Transaction.objects.create(
+            value_datetime=(now()-relativedelta(days=20)).date(),
+        )
+        t.credit(
+            memo=_("ACME Inc. thanks you for your patronage, sale of one emergency medkit"),
+            account=bank_account, amount=666
+        )
+        t.save()
 
     @transaction.atomic()
     def handle(self, *args, **options):
         self.create_configs()
         self.create_membership_types()
         self.create_members()
+        self.create_bank_chaff()

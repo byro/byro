@@ -18,6 +18,16 @@
             {% trans "current balance" %}
         </span>
     </div>
+    {% if member.donation_balance %}
+        <div class="dashboard-block">
+            <h1>
+                {{ member.donation_balance }} €
+            </h1>
+            <span class="dashboard-description">
+                {% trans "donations" %}
+            </span>
+        </div>
+    {% endif %}
     <div class="dashboard-block">
         <h1>
             {% blocktrans with count=member_since.days trimmed %}
