@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 
 from byro.common.models.auditable import Auditable
@@ -46,4 +45,3 @@ class RealTransactionSource(Auditable, models.Model):
         self.state = SourceState.PROCESSED
         self.save()
         return response
-

@@ -7,11 +7,11 @@ from django.utils.decorators import classproperty
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
+from byro.bookkeeping.models import Booking, Transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 from byro.common.models.configuration import Configuration
-from byro.bookkeeping.special_accounts import SpecialAccounts
-from byro.bookkeeping.models import Transaction, Booking
 
 
 class MemberTypes:
@@ -139,7 +139,7 @@ class Member(Auditable, models.Model):
 
                 if t:
                     if t.balances['credit'] != membership.amount:
-                        ## FIXME This MUST NOT be used. Cancel and re-create transaction instead
+                        # FIXME This MUST NOT be used. Cancel and re-create transaction instead
                         for b in t.bookings:
                             b.amount = membership.amount
                         t.save()
@@ -151,7 +151,7 @@ class Member(Auditable, models.Model):
                 date += relativedelta(months=membership.interval)
 
     def remove_future_liabilites_on_leave(self):
-       # FIXME WRONG   Create reverse booking.
+        # FIXME WRONG   Create reverse booking.
         for b in self.bookings.all():
             do_delete = True
             for membership in self.memberships.all():

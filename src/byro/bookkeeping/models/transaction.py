@@ -132,7 +132,6 @@ class BookingsQuerySet(models.QuerySet):
         )
         return qs
 
-
     def with_transaction_data(self):
         qs = self.with_transaction_balances()
         qs = qs.select_related(
@@ -148,6 +147,7 @@ class BookingsQuerySet(models.QuerySet):
             'transaction__cached_bookings__member',
         )
         return qs
+
 
 class Booking(models.Model):
     objects = BookingsQuerySet.as_manager()

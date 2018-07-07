@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.db.models import Q
 from django.utils.decorators import classproperty
@@ -7,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 
-from decimal import Decimal
 
 class AccountCategory(Choices):
     # Categories for double-entry bookkeeping
@@ -105,6 +106,6 @@ class Account(Auditable, models.Model):
         else:
             result['net'] = result['debit'] - result['credit']
 
-        result = {k: Decimal(v).quantize(Decimal('0.01')) for k,v in result.items()}
+        result = {k: Decimal(v).quantize(Decimal('0.01')) for k, v in result.items()}
 
         return result

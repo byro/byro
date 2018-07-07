@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, View
 
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
@@ -18,7 +19,6 @@ from byro.members.signals import (
     new_member_mail_information, new_member_office_mail_information,
 )
 from byro.office.signals import member_view
-from byro.bookkeeping.special_accounts import SpecialAccounts
 
 
 class MemberView(DetailView):

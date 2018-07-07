@@ -25,7 +25,7 @@ def member_membership(new_member):
                                    amount=20,
                                    interval=FeeIntervals.MONTHLY)
     yield ms
-    [ (t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all() ]
+    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all()]
     ms.delete()
 
 
@@ -77,7 +77,7 @@ def member_membership_second(new_member):
                                    amount=8,
                                    interval=FeeIntervals.MONTHLY)
     yield ms
-    [ (t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all() ]
+    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all()]
     ms.delete()
 
 

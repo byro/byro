@@ -6,10 +6,11 @@ from django.db import transaction
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from byro.bookkeeping.models import Account, AccountCategory, Transaction
+from byro.bookkeeping.models import Transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration
 from byro.members.models import FeeIntervals, Member, Membership, MembershipType
-from byro.bookkeeping.special_accounts import SpecialAccounts
+
 
 def make_date(delta, end=False):
     date = (now() - delta).date()
@@ -36,7 +37,6 @@ class Command(BaseCommand):
         config.save()
 
     def make_paid(self, member, vaguely=False, overly=False, donates=0, pays_for=None):
-        config = Configuration.get_solo()
         member.update_liabilites()
         for index, liability in enumerate(member.bookings.filter(debit_account=SpecialAccounts.fees_receivable, transaction__value_datetime__lte=now()).all()):
             if vaguely and index % 2 == 0:

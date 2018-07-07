@@ -68,6 +68,7 @@ class TestBookkeepingMigrationsFirst(TestMigrations):
 
         assert Booking.objects.filter(amount__lt=0).count() == 0
 
+
 @pytest.mark.django_db
 class TestBookkeepingMigrationsFinal(TestMigrations):
     app = 'bookkeeping'
