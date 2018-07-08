@@ -1,92 +1,95 @@
+from collections import Counter
+
 import pytest
 
-from byro.bookkeeping.models import Account, AccountCategory
-from byro.bookkeeping.signals import derive_virtual_transactions
+from byro.bookkeeping.signals import process_transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.members.models import Member
 
 
 class connected_signal:
     """ connect a signal and make sure it is disconnected after use, so it doesn't leak into other tests. """
 
-    def __init__(self, signal, receiver):
+    def __init__(self, signal, receiver, uid='test-plugin'):
         self.signal = signal
         self.receiver = receiver
+        self.dispatch_uid = uid
 
     def __enter__(self):
-        self.signal.receivers = []
-        self.signal.connect(self.receiver, dispatch_uid='test-plugin')
+        self.signal.connect(self.receiver, dispatch_uid=self.dispatch_uid)
 
     def __exit__(self, exc_type, exc_value, tb):
-        self.signal.disconnect(self.receiver, dispatch_uid='test-plugin')
+        self.signal.disconnect(self.receiver, dispatch_uid=self.dispatch_uid)
 
 
 @pytest.mark.django_db
-@pytest.mark.skip("FIXME: Transitioning")
-def test_match_single_fee(member, real_transaction):
+def test_match_single_fee(member, partial_transaction):
+    call_log = []
 
     def derive_test_transaction(sender, signal):
-        member = Member.objects.first()
-        account = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-        transaction = VirtualTransaction.objects.create(
-            real_transaction=sender,
-            destination_account=account,
-            amount=sender.amount,
-            value_datetime=sender.value_datetime,
-            member=member,
-        )
-        return [transaction]
+        call_log.append(True)
+        if sender.is_read_only:
+            return False
+        if not sender.is_balanced:
+            member = Member.objects.first()
+            sender.credit(account=SpecialAccounts.fees_receivable, amount=10, member=member)
+            return True
+        return False
 
-    with connected_signal(derive_virtual_transactions, derive_test_transaction):
-        real_transaction.derive_virtual_transactions()
+    with connected_signal(process_transaction, derive_test_transaction):
+        assert partial_transaction.process_transaction() == 1
 
-    account = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-    assert account.balance(end=None) == real_transaction.amount
+    assert len(call_log) == 2
+
+    assert partial_transaction.is_balanced
+    assert SpecialAccounts.fees_receivable.balances(end=None)['credit'] == partial_transaction.bookings.first().amount
 
 
 @pytest.mark.django_db
-@pytest.mark.skip("FIXME: Transitioning")
-def test_match_no_fee(member, real_transaction):
+def test_match_no_fee(member, partial_transaction):
 
     def derive_test_transaction(sender, signal):
-        return []
+        return False
 
     with pytest.raises(Exception) as excinfo:
-        with connected_signal(derive_virtual_transactions, derive_test_transaction):
-            real_transaction.derive_virtual_transactions()
+        with connected_signal(process_transaction, derive_test_transaction):
+            partial_transaction.process_transaction()
 
-    assert 'Transaction could not be matched' in str(excinfo)
+    assert 'No plugin tried to augment' in str(excinfo)
 
-    account = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-    assert account.balance(end=None) == 0
+    assert not partial_transaction.is_balanced
+    assert SpecialAccounts.fees_receivable.balances(end=None)['credit'] == 0
 
 
 @pytest.mark.django_db
-@pytest.mark.skip("FIXME: Transitioning")
-def test_match_multiple_fees(member, real_transaction):
+def test_match_multiple_fees(member, partial_transaction):
+    call_log = Counter()
 
-    def derive_test_transaction(sender, signal):
-        member = Member.objects.first()
-        account = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-        fee = VirtualTransaction.objects.create(
-            real_transaction=sender,
-            destination_account=account,
-            amount=sender.amount / 2,
-            value_datetime=sender.value_datetime,
-            member=member,
-        )
-        account = Account.objects.get(account_category=AccountCategory.MEMBER_DONATION)
-        donation = VirtualTransaction.objects.create(
-            real_transaction=sender,
-            destination_account=account,
-            amount=sender.amount / 2,
-            value_datetime=sender.value_datetime,
-            member=member,
-        )
-        return [fee, donation]
+    def derive_test_transaction_donation(sender, signal):
+        call_log['d'] += 1
+        if sender.is_read_only:
+            return False
+        if not sender.is_balanced:
+            member = Member.objects.first()
+            sender.credit(account=SpecialAccounts.donations, amount=5, member=member)
+            return True
+        return False
 
-    with connected_signal(derive_virtual_transactions, derive_test_transaction):
-        real_transaction.derive_virtual_transactions()
+    def derive_test_transaction_fee(sender, signal):
+        call_log['f'] += 1
+        if sender.is_read_only:
+            return False
+        if not sender.is_balanced:
+            member = Member.objects.first()
+            sender.credit(account=SpecialAccounts.fees_receivable, amount=5, member=member)
+            return True
+        return False
 
-    fees = Account.objects.get(account_category=AccountCategory.MEMBER_FEES)
-    donations = Account.objects.get(account_category=AccountCategory.MEMBER_DONATION)
-    assert fees.balance(end=None) + donations.balance(end=None) == real_transaction.amount
+    with connected_signal(process_transaction, derive_test_transaction_donation, 'test-donation'):
+        with connected_signal(process_transaction, derive_test_transaction_fee, 'test-fee'):
+            partial_transaction.process_transaction()
+
+    assert dict(call_log) == {'d': 2, 'f': 2}
+
+    assert SpecialAccounts.fees_receivable.balances(end=None)['credit'] == 5
+    assert SpecialAccounts.donations.balances(end=None)['credit'] == 5

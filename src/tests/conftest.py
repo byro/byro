@@ -1,5 +1,3 @@
-import decimal
-
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
@@ -7,6 +5,7 @@ from django.core.management import call_command
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import Account, AccountCategory, Transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
 
@@ -73,6 +72,15 @@ def inactive_member():
     [profile.delete() for profile in member.profiles]
     [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
     member.delete()
+
+
+@pytest.fixture
+def partial_transaction():
+    t = Transaction.objects.create(value_datetime=now())
+    t.debit(account=SpecialAccounts.bank, amount=10, memo="Fee ID 3")
+    yield t
+    t.bookings.all().delete()
+    t.delete()
 
 
 @pytest.fixture

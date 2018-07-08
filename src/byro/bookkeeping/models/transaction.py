@@ -1,8 +1,9 @@
+from collections import Counter
+
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import JSONField
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Prefetch
-from django.utils.functional import cached_property
 
 
 class TransactionQuerySet(models.QuerySet):
@@ -81,13 +82,19 @@ class Transaction(models.Model):
     def credits(self):
         return self.bookings.exclude(credit_account=None)
 
-    @cached_property
+    @property
     def balances(self):
         balances = {
             'debit': self.debits.aggregate(total=models.Sum('amount'))['total'] or 0,
             'credit': self.credits.aggregate(total=models.Sum('amount'))['total'] or 0,
         }
         return balances
+
+    @property
+    def is_read_only(self):
+        "Advisory property: don't modify this Transaction or its Bookings"
+        # Future proof: For now, don't modify balanced transactions
+        return self.is_balanced
 
     @property
     def is_balanced(self):
@@ -110,6 +117,34 @@ class Transaction(models.Model):
             return booking.memo
 
         return None
+
+    @transaction.atomic
+    def process_transaction(self):
+        """
+        Collects responses to the signal `process_transaction`.
+        Re-raises received Exceptions.
+
+        Returns the number of receivers that augmented the Transaction.
+        """
+        from byro.bookkeeping.signals import process_transaction
+        response_counter = Counter()
+        this_counter = Counter('dummy')
+
+        while (not response_counter or response_counter.most_common(1)[0][1] < 5) and sum(this_counter.values()) > 0:
+            responses = process_transaction.send_robust(sender=self)
+            this_counter = Counter(receiver for receiver, response in responses if response)
+
+            for receiver, response in responses:
+                if isinstance(response, Exception):
+                    raise response
+
+            response_counter += this_counter
+
+        if sum(response_counter.values()) < 1:
+            raise Exception('No plugin tried to augment the transaction.')
+
+        response_counter += Counter()   # Remove zero and negative elements
+        return len(response_counter)
 
 
 class BookingsQuerySet(models.QuerySet):
