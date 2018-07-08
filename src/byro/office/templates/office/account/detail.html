@@ -16,7 +16,7 @@
         <tr>
             <th></th>
             <th>{% trans "Date" %}</th>
-            <th>{% trans "Purpose" %}</th>
+            <th>{% trans "Purpose" %}<br><i>{% trans "Originator/Recipient" %}</i></th>
             <th>{% trans "Member" %}</th>
             <th>{% trans "Account" %}</th>
             <th class="text-md-right">{{ TRANSLATED_NAMES.0 }}</th>
@@ -40,6 +40,9 @@
                         <a data-toggle="collapse" data-target=".collapse-{{transaction.id}}" aria-controls="collapse-{{transaction.id}}">
                             <span class="fa fa-angle-down"></span>
                             {{ transaction.find_memo }}
+                            {% if booking.data.other_party %}
+                                <br><i>{{ booking.data.other_party }}</i>
+                            {% endif %}
                         </a>
                     </td>
                     <td>{{ booking.member.name }}</td>
@@ -65,7 +68,12 @@
                 <tr class="collapse in related-{{ account_row }}-{% cycle 'related-odd' 'related-even' as related_row %} collapse-{{transaction.id}} {% if forloop.first %}related-first{% endif %} {% if forloop.last %}related-last{% endif %}">
                     <td class="related-empty"></td>
                     <td class="related-empty"></td>
-                    <td>{{ related_booking.memo|default:"" }}</td>
+                    <td>
+                        {{ related_booking.memo|default:"" }}
+                        {% if related_booking.data.other_party %}
+                            <br><i>{{ related_booking.data.other_party }}</i>
+                        {% endif %}
+                    </td>
                     <td>{{ related_booking.member.name }}</td>
                     <td>{{ related_booking.debit_account|default:related_booking.credit_account }}</td>
                     <td class="text-md-right">
