@@ -143,26 +143,27 @@ class Member(Auditable, models.Model):
 
                 if t:
                     if t.balances['credit'] != membership.amount:
-                        # FIXME This MUST NOT be used. Cancel and re-create transaction instead
-                        for b in t.bookings:
-                            b.amount = membership.amount
-                        t.save()
-                else:
+                        if not t.reversed_by.count():
+                            # Cancel transaction, create a new one
+                            t.reverse(memo=_('Due amount canceled because of change in membership amount'))
+                        t = False
+
+                if not t:
                     t = Transaction.objects.create(value_datetime=date, memo=_("Membership due"), booking_datetime=booking_date)
                     t.credit(account=src_account, amount=membership.amount, member=self)
                     t.debit(account=dst_account, amount=membership.amount, member=self)
                     t.save()
+
                 date += relativedelta(months=membership.interval)
 
     def remove_future_liabilites_on_leave(self):
-        # FIXME WRONG   Create reverse booking.
-        for b in self.bookings.all():
+        for t in Transaction.objects.filter(bookings__debit_account=SpecialAccounts.fees_receivable, bookings__member=self):
             do_delete = True
             for membership in self.memberships.all():
-                if b.transaction.value_datetime.date() < membership.end:
+                if t.value_datetime.date() < membership.end:
                     do_delete = False
-            if do_delete:
-                b.delete()
+            if do_delete and not t.reversed_by.count():
+                t.reverse(memo=_("Due amount canceled on leave"))
 
     def __str__(self):
         return 'Member {self.number} ({self.name})'.format(self=self)
