@@ -4,11 +4,16 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
+from django.core.management import call_command
 
 from byro.bookkeeping.models import Account, AccountCategory
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
 
+@pytest.fixture
+def full_testdata(django_db_setup, django_db_blocker):
+    with django_db_blocker.unblock():
+        call_command('loaddata', 'tests/fixtures/test_full_testdata.json')
 
 @pytest.fixture
 def user():
