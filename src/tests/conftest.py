@@ -3,17 +3,19 @@ import decimal
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
-from django.utils.timezone import now
 from django.core.management import call_command
+from django.utils.timezone import now
 
-from byro.bookkeeping.models import Account, AccountCategory
+from byro.bookkeeping.models import Account, AccountCategory, Transaction
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
+
 
 @pytest.fixture
 def full_testdata(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         call_command('loaddata', 'tests/fixtures/test_full_testdata.json')
+
 
 @pytest.fixture
 def user():
@@ -34,7 +36,7 @@ def member():
     yield member
 
     [profile.delete() for profile in member.profiles]
-    [booking.transaction.delete() for booking in member.bookings.all()]
+    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
     member.delete()
 
 
@@ -69,7 +71,7 @@ def inactive_member():
     )
     yield member
     [profile.delete() for profile in member.profiles]
-    [booking.transaction.delete() for booking in member.bookings.all()]
+    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
     member.delete()
 
 

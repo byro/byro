@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import messages
 from django.db import transaction
@@ -130,6 +131,10 @@ class MemberDashboardView(MemberView):
         context['is_active'] = (obj.memberships.last().start <= now().date())
         if obj.memberships.last().end:
             context['is_active'] = context['is_active'] and not (obj.memberships.last().end < now().date())
+        context['statute_barred_debt'] = {
+            'now': obj.statute_barred_debt(),
+        }
+        context['statute_barred_debt']['in1year'] = obj.statute_barred_debt(relativedelta(years=1)) - context['statute_barred_debt']['now']
         return context
 
 

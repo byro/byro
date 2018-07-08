@@ -97,14 +97,22 @@ class Member(Auditable, models.Model):
             if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
         ]
 
-    @property
-    def balance(self) -> Decimal:
+    def _calc_balance(self, liability_cutoff=None) -> Decimal:
         fees_receivable_account = SpecialAccounts.fees_receivable
-        debits = Booking.objects.filter(debit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=now())
+        debits = Booking.objects.filter(debit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=liability_cutoff or now())
         credits = Booking.objects.filter(credit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=now())
         liability = debits.aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
         asset = credits.aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
         return asset - liability
+
+    @property
+    def balance(self) -> Decimal:
+        return self._calc_balance()
+
+    def statute_barred_debt(self, future_limit=relativedelta()) -> Decimal:
+        limit = relativedelta(months=Configuration.get_solo().liability_interval) - future_limit
+        last_unenforceable_date = now().replace(month=12, day=31) - limit - relativedelta(years=1)
+        return max(Decimal('0.00'), -self._calc_balance(last_unenforceable_date))
 
     @property
     def donation_balance(self) -> Decimal:
@@ -119,16 +127,12 @@ class Member(Auditable, models.Model):
         return Booking.objects.filter(debit_account=SpecialAccounts.fees_receivable, member=self, transaction__value_datetime__lte=now())
 
     def update_liabilites(self):
-        config = Configuration.get_solo()
         src_account = SpecialAccounts.fees
         dst_account = SpecialAccounts.fees_receivable
 
         for membership in self.memberships.all():
             booking_date = now().replace(day=membership.start.day)
-            cutoff = (booking_date - relativedelta(months=config.liability_interval)).date()
             date = membership.start
-            if date < cutoff:
-                date = cutoff
             end = membership.end or booking_date.date()
             while date <= end:
                 t = Transaction.objects.filter(

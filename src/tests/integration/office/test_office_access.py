@@ -2,6 +2,7 @@ import pytest
 from django.shortcuts import reverse
 from django.utils.timezone import now
 
+
 @pytest.mark.parametrize('url', (
     'settings.base',
     'settings.registration',
@@ -29,20 +30,24 @@ def test_office_access_urls(client, user, url, logged_in):
     assert response.status_code == 200
     assert (response.resolver_match.url_name == 'login') is not logged_in
 
+
 @pytest.mark.django_db
 def test_member_dashboard(full_testdata, logged_in_client, user):
     response = logged_in_client.get(reverse('office:members.dashboard', kwargs={'pk': 3}), follow=True)
     assert response.status_code == 200
+
 
 @pytest.mark.django_db
 def test_member_data(full_testdata, logged_in_client, user):
     response = logged_in_client.get(reverse('office:members.data', kwargs={'pk': 3}), follow=True)
     assert response.status_code == 200
 
+
 @pytest.mark.django_db
 def test_member_finance(full_testdata, logged_in_client, user):
     response = logged_in_client.get(reverse('office:members.finance', kwargs={'pk': 3}), follow=True)
     assert response.status_code == 200
+
 
 @pytest.mark.django_db
 def test_member_add(full_testdata, logged_in_client, user):
@@ -60,6 +65,7 @@ def test_member_add(full_testdata, logged_in_client, user):
     assert b'"alert alert-success"' in response.content
     assert response.resolver_match.url_name == 'members.data'
 
+
 @pytest.mark.django_db
 def test_transaction_detail(full_testdata, logged_in_client, user):
     # Balanced transaction
@@ -73,6 +79,7 @@ def test_transaction_detail(full_testdata, logged_in_client, user):
     # Unbalanced transaction, debit
     response = logged_in_client.get(reverse('office:finance.transactions.detail', kwargs={'pk': 163}), follow=True)
     assert response.status_code == 200
+
 
 @pytest.mark.django_db
 def test_account_detail(full_testdata, logged_in_client, user):

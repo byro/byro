@@ -96,7 +96,7 @@ class Command(BaseCommand):
         )
         Membership.objects.create(
             member=does_not_pay,
-            start=make_date(relativedelta(years=2)),
+            start=make_date(relativedelta(years=4)),
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
@@ -109,7 +109,7 @@ class Command(BaseCommand):
         )
         Membership.objects.create(
             member=pays_occasionally,
-            start=make_date(relativedelta(years=1, months=6)),
+            start=make_date(relativedelta(years=4, months=6)),
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )

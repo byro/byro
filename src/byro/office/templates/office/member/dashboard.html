@@ -18,6 +18,26 @@
             {% trans "current balance" %}
         </span>
     </div>
+    {% if statute_barred_debt.in1year %}
+        <div class="dashboard-block block-warning">
+            <h1>
+                {{ statute_barred_debt.in1year }} €
+            </h1>
+            <span class="dashboard-description">
+                {% trans "in liabilities will expire end of this year" %}
+            </span>
+        </div>
+    {% endif %}
+    {% if statute_barred_debt.now %}
+        <div class="dashboard-block block-danger">
+            <h1>
+                {{ statute_barred_debt.now }} €
+            </h1>
+            <span class="dashboard-description">
+                {% trans "in expired liabilities" %}
+            </span>
+        </div>
+    {% endif %}
     {% if member.donation_balance %}
         <div class="dashboard-block">
             <h1>

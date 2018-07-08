@@ -1,8 +1,11 @@
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from freezegun import freeze_time
 
 from byro.bookkeeping.models import Transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
+from byro.common.models import Configuration
 from byro.members.models import FeeIntervals, Member, Membership
 
 
@@ -111,3 +114,56 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
     virtual_transactions = member_membership.member.bookings.filter(credit_account__isnull=False).all()
     assert len(virtual_transactions) == 4
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20
+
+
+@pytest.mark.django_db
+def test_liabilities_limit(member):
+    config = Configuration.get_solo()
+    config.liability_interval = 36
+    config.save()
+
+    test_date = timezone.now().date().replace(year=2010, month=12, day=31)
+
+    with freeze_time(test_date) as frozen_time:
+        Membership.objects.create(
+            member=member,
+            start=test_date.replace(year=2007, month=5, day=1),
+            amount=20,
+            interval=FeeIntervals.MONTHLY,
+        )
+        member.update_liabilites()
+
+        assert member.balance == -880.0
+        assert member.statute_barred_debt() == 0
+
+        frozen_time.move_to(test_date.replace(year=2011, month=1, day=1))
+        member.update_liabilites()
+
+        assert member.balance == -900.0
+        assert member.statute_barred_debt() == 160.0
+
+        t = Transaction.objects.create(value_datetime=test_date)
+        t.debit(account=SpecialAccounts.bank, amount=12)
+        t.credit(account=SpecialAccounts.fees_receivable, amount=12, member=member)
+        t.save()
+
+        assert member.balance == -888.0
+        assert member.statute_barred_debt() == 148.0
+
+        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=7, day=1))
+        t.debit(account=SpecialAccounts.bank, amount=13)
+        t.credit(account=SpecialAccounts.fees_receivable, amount=13, member=member)
+        t.save()
+
+        assert member.balance == -875.0
+        assert member.statute_barred_debt() == 135.0
+
+        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=12, day=31))
+        t.debit(account=SpecialAccounts.bank, amount=136)
+        t.credit(account=SpecialAccounts.fees_receivable, amount=136, member=member)
+        t.save()
+
+        assert member.balance == -739.0
+        assert member.statute_barred_debt() == 0
+
+        assert member.statute_barred_debt(relativedelta(years=1)) == 239.0
