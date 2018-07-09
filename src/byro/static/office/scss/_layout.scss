@@ -71,6 +71,19 @@ body {
             background-color: $brand-lightest;
         }
     }
+
+    > .nav-link, .nav-link-inner {
+        > .fa {
+            min-width: 40px;
+            text-align: right;
+        }
+    }
+
+    .nav-fold {
+        .collapse, .collapsing {
+            padding-left: 40px;
+        }
+    }
 }
 .pending-mails {
     background-color: #FF6E40;
