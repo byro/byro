@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='account',
             name='tags',
-            field=models.ManyToManyField(to='bookkeeping.AccountTag'),
+            field=models.ManyToManyField(related_name='accounts', to='bookkeeping.AccountTag'),
         ),
         django_db_constraints.operations.AlterConstraints(
             name='Booking',

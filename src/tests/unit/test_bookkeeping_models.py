@@ -27,7 +27,7 @@ def test_account_tags(bank_account):
     tag, _ignore = AccountTag.objects.get_or_create(name='TEST')
     bank_account.tags.add(tag)
     assert bank_account.tags.all().count() == 1
-    assert bank_account in AccountTag.objects.get_or_create(name='TEST')[0].account_set.all()
+    assert bank_account in AccountTag.objects.get_or_create(name='TEST')[0].accounts.all()
 
 
 @pytest.mark.django_db

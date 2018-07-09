@@ -43,7 +43,7 @@ class Account(Auditable, models.Model):
         max_length=AccountCategory.max_length,
     )
     name = models.CharField(max_length=300, null=True)  # e.g. 'Laser donations'
-    tags = models.ManyToManyField(AccountTag)
+    tags = models.ManyToManyField(AccountTag, related_name='accounts')
 
     class Meta:
         unique_together = (
