@@ -11,7 +11,7 @@ from byro.bookkeeping.models import Account, AccountCategory, Transaction
 
 FORM_CLASS = forms.modelform_factory(Account, fields=['name', 'account_category'])
 
-TRANSLATED_NAMES = {
+ACCOUNT_COLUMN_HEADERS = {
     # FIXME Check this with an accountant who is a native english speaker
     AccountCategory.INCOME: (_('Charge'), _('Revenue')),
     AccountCategory.ASSET: (_('Increase'), _('Decrease')),
@@ -69,7 +69,7 @@ class AccountDetailView(ListView):
         context = super().get_context_data(*args, **kwargs)
         context['form'] = self.get_form()
         context['account'] = self.get_object()
-        context['TRANSLATED_NAMES'] = TRANSLATED_NAMES.get(
+        context['ACCOUNT_COLUMN_HEADERS'] = ACCOUNT_COLUMN_HEADERS.get(
             self.get_object().account_category,
             (_("Debit"), _("Credit"))
         )
