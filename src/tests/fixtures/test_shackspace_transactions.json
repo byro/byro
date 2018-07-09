@@ -1,0 +1,517 @@
+[
+  {
+    "model": "bookkeeping.account",
+    "pk": 11,
+    "fields": {
+      "account_category": "member_donation",
+      "name": null
+    }
+  },
+  {
+    "model": "bookkeeping.account",
+    "pk": 12,
+    "fields": {
+      "account_category": "member_fees",
+      "name": null
+    }
+  },
+  {
+    "model": "bookkeeping.account",
+    "pk": 13,
+    "fields": {
+      "account_category": "expense",
+      "name": "Einkauf"
+    }
+  },
+  {
+    "model": "bookkeeping.account",
+    "pk": 14,
+    "fields": {
+      "account_category": "expense",
+      "name": "Kosten"
+    }
+  },
+  {
+    "model": "bookkeeping.realtransactionsource",
+    "pk": 1,
+    "fields": {
+      "source_file": "transaction_uploads\/transactions_c21iqRj.csv",
+      "state": "processed"
+    }
+  },
+  {
+    "model": "bookkeeping.realtransaction",
+    "pk": 1,
+    "fields": {
+      "channel": "bank",
+      "booking_datetime": "2018-06-26T19:55:44.428Z",
+      "value_datetime": "2017-11-30T00:00:00Z",
+      "amount": "-1.50",
+      "purpose": "            Abrechnung vom  30.11.2017  ",
+      "originator": "",
+      "reverses": null,
+      "importer": "shack_bank_csv_importer",
+      "data": {
+        "VWZ11": "",
+        "VWZ7": "",
+        "VWZ12": "",
+        "Kontonummer": "7016809500",
+        "VWZ10": "",
+        "VWZ13": "",
+        "VWZ1": "Abrechnung vom  30.11.2017",
+        "VWZ6": "",
+        "Wertstellung": "30.11.2017",
+        "Buchungstext": "Kontof\u00fchrung",
+        "Buchungstag": "30.11.2017",
+        "VWZ9": "",
+        "W\u00e4hrung": "EUR",
+        "Auftraggeber\/Empf\u00e4nger": "",
+        "VWZ5": "",
+        "VWZ14": "",
+        "Betrag": "-1,50",
+        "VWZ4": "",
+        "Kontostand": "",
+        "VWZ2": "",
+        "VWZ3": "",
+        "VWZ8": ""
+      },
+      "source": 1
+    }
+  },
+  {
+    "model": "bookkeeping.realtransaction",
+    "pk": 2,
+    "fields": {
+      "channel": "bank",
+      "booking_datetime": "2018-06-26T19:55:44.428Z",
+      "value_datetime": "2017-11-30T00:00:00Z",
+      "amount": "20.00",
+      "purpose": "            Mitgliedsbeitrag ID 1  ",
+      "originator": "Ernie u. Bert",
+      "reverses": null,
+      "importer": "shack_bank_csv_importer",
+      "data": {
+        "VWZ11": "",
+        "VWZ7": "",
+        "VWZ12": "",
+        "Kontonummer": "7016809500",
+        "VWZ10": "",
+        "VWZ13": "",
+        "VWZ1": "Mitgliedsbeitrag ID 1",
+        "VWZ6": "",
+        "Wertstellung": "30.11.2017",
+        "Buchungstext": "Dauerauftrag-Gutschrift",
+        "Buchungstag": "30.11.2017",
+        "VWZ9": "",
+        "W\u00e4hrung": "EUR",
+        "Auftraggeber\/Empf\u00e4nger": "Ernie u. Bert",
+        "VWZ5": "",
+        "VWZ14": "",
+        "Betrag": "20,00",
+        "VWZ4": "",
+        "Kontostand": "",
+        "VWZ2": "",
+        "VWZ3": "",
+        "VWZ8": ""
+      },
+      "source": 1
+    }
+  },
+  {
+    "model": "bookkeeping.realtransaction",
+    "pk": 102,
+    "fields": {
+      "channel": "bank",
+      "booking_datetime": "2018-06-26T19:55:23.428Z",
+      "value_datetime": "2017-11-30T00:00:00Z",
+      "amount": "8.00",
+      "purpose": "Einzug       Mitgliedsbeitrag ID 3  ",
+      "originator": "Horst, Voll",
+      "reverses": null,
+      "importer": "shack_bank_csv_importer",
+      "data": {
+        "__META_COMMENT__": "Test case for reversing.",
+        "VWZ11": "",
+        "VWZ7": "",
+        "VWZ12": "",
+        "Kontonummer": "7016809500",
+        "VWZ10": "",
+        "VWZ13": "",
+        "VWZ1": "Mitgliedsbeitrag ID 3",
+        "VWZ6": "",
+        "Wertstellung": "30.11.2017",
+        "Buchungstext": "SEPA-Einzug",
+        "Buchungstag": "30.11.2017",
+        "VWZ9": "",
+        "W\u00e4hrung": "EUR",
+        "Auftraggeber\/Empf\u00e4nger": "Ernie u. Bert",
+        "VWZ5": "",
+        "VWZ14": "",
+        "Betrag": "8,00",
+        "VWZ4": "",
+        "Kontostand": "",
+        "VWZ2": "SEPA-Lastschrift",
+        "VWZ3": "",
+        "VWZ8": ""
+      },
+      "source": 1
+    }
+  },
+  {
+    "model": "bookkeeping.realtransaction",
+    "pk": 3,
+    "fields": {
+      "channel": "bank",
+      "booking_datetime": "2018-06-26T19:55:44.428Z",
+      "value_datetime": "2017-11-03T00:00:00Z",
+      "amount": "20.00",
+      "purpose": "            Monatsbeitrag  ",
+      "originator": "Unf\u00e4hig zu \u00dcberweisen",
+      "reverses": null,
+      "importer": "shack_bank_csv_importer",
+      "data": {
+        "VWZ11": "",
+        "VWZ7": "",
+        "VWZ12": "",
+        "Kontonummer": "7016809500",
+        "VWZ10": "",
+        "VWZ13": "",
+        "VWZ1": "Monatsbeitrag",
+        "VWZ6": "",
+        "Wertstellung": "03.11.2017",
+        "Buchungstext": "Dauerauftrag-Gutschrift",
+        "Buchungstag": "03.11.2017",
+        "VWZ9": "",
+        "W\u00e4hrung": "EUR",
+        "Auftraggeber\/Empf\u00e4nger": "Unf\u00e4hig zu \u00dcberweisen",
+        "VWZ5": "",
+        "VWZ14": "",
+        "Betrag": "20,00",
+        "VWZ4": "",
+        "Kontostand": "",
+        "VWZ2": "",
+        "VWZ3": "",
+        "VWZ8": ""
+      },
+      "source": 1
+    }
+  },
+  {
+    "model": "bookkeeping.realtransaction",
+    "pk": 4,
+    "fields": {
+      "channel": "bank",
+      "booking_datetime": "2018-06-26T19:55:44.428Z",
+      "value_datetime": "2017-11-30T00:00:00Z",
+      "amount": "-555.00",
+      "purpose": "            104223-11\/2017 STROM  ",
+      "originator": "Strom Schmeckt Aua",
+      "reverses": null,
+      "importer": "shack_bank_csv_importer",
+      "data": {
+        "VWZ11": "",
+        "VWZ7": "",
+        "VWZ12": "",
+        "Kontonummer": "7016809500",
+        "VWZ10": "",
+        "VWZ13": "",
+        "VWZ1": "104223-11\/2017 STROM",
+        "VWZ6": "",
+        "Wertstellung": "30.11.2017",
+        "Buchungstext": "SEPA-Basislastschrift",
+        "Buchungstag": "30.11.2017",
+        "VWZ9": "",
+        "W\u00e4hrung": "EUR",
+        "Auftraggeber\/Empf\u00e4nger": "Strom Schmeckt Aua",
+        "VWZ5": "",
+        "VWZ14": "",
+        "Betrag": "-555,00",
+        "VWZ4": "",
+        "Kontostand": "",
+        "VWZ2": "",
+        "VWZ3": "",
+        "VWZ8": ""
+      },
+      "source": 1
+    }
+  },
+  {
+    "model": "bookkeeping.realtransaction",
+    "pk": 5,
+    "fields": {
+      "channel": "bank",
+      "booking_datetime": "2018-06-26T19:55:44.428Z",
+      "value_datetime": "2017-11-03T00:00:00Z",
+      "amount": "-103.90",
+      "purpose": " Erstattung Einkauf        IBAN:DE42422300200008416523 Datum: 03.11.17 Zeit: 14:04 UFT 0000000000 TAN 444444 BIC:SOLADECHAOS  ",
+      "originator": "Tolles Mitglied",
+      "reverses": null,
+      "importer": "shack_bank_csv_importer",
+      "data": {
+        "VWZ11": "",
+        "VWZ7": "",
+        "VWZ12": "",
+        "Kontonummer": "7016809500",
+        "VWZ10": "",
+        "VWZ13": "",
+        "VWZ1": "BIC:SOLADECHAOS",
+        "VWZ6": "",
+        "Wertstellung": "03.11.2017",
+        "Buchungstext": "Internet-Euro-\u00dcberweisung",
+        "Buchungstag": "03.11.2017",
+        "VWZ9": "",
+        "W\u00e4hrung": "EUR",
+        "Auftraggeber\/Empf\u00e4nger": "Tolles Mitglied",
+        "VWZ5": "Erstattung Einkauf",
+        "VWZ14": "",
+        "Betrag": "-103,90",
+        "VWZ4": "UFT 0000000000 TAN 444444",
+        "Kontostand": "",
+        "VWZ2": "IBAN:DE42422300200008416523",
+        "VWZ3": "Datum: 03.11.17 Zeit: 14:04",
+        "VWZ8": ""
+      },
+      "source": 1
+    }
+  },
+  {
+    "model": "bookkeeping.realtransaction",
+    "pk": 6,
+    "fields": {
+      "channel": "bank",
+      "booking_datetime": "2018-06-26T19:55:44.428Z",
+      "value_datetime": "2017-11-03T00:00:00Z",
+      "amount": "-12.40",
+      "purpose": " Grund\/R\u00fcckscheck Originalbetr.:      8,00 EUR ID 2 Fremdentgelte: 1,90 EUR MS03: Institut ohne R\u00fcckg.- shack e.V. Mitgliedsbeitrag Eigene Geb.:   2,50 EUR ",
+      "originator": "Doofes Mitglied",
+      "reverses": 102,
+      "importer": "shack_bank_csv_importer",
+      "data": {
+        "VWZ11": "",
+        "VWZ7": "8,00 EUR",
+        "VWZ12": "",
+        "Kontonummer": "7016809500",
+        "VWZ10": "",
+        "VWZ13": "",
+        "VWZ1": "shack e.V. Mitgliedsbeitrag",
+        "VWZ6": "Originalbetr.:",
+        "Wertstellung": "03.11.2017",
+        "Buchungstext": "R\u00fccklastschrift",
+        "Buchungstag": "03.11.2017",
+        "VWZ9": "",
+        "W\u00e4hrung": "EUR",
+        "Auftraggeber\/Empf\u00e4nger": "Doofes Mitglied",
+        "VWZ5": "Grund\/R\u00fcckscheck",
+        "VWZ14": "",
+        "Betrag": "-12,40",
+        "VWZ4": "MS03: Institut ohne R\u00fcckg.-",
+        "Kontostand": "",
+        "VWZ2": "ID 2",
+        "VWZ3": "Fremdentgelte: 1,90 EUR",
+        "VWZ8": "Eigene Geb.:   2,50 EUR"
+      },
+      "source": 1
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 1,
+    "fields": {
+      "real_transaction": null,
+      "source_account": 12,
+      "destination_account": null,
+      "member": 2,
+      "amount": "10.00",
+      "value_datetime": "2018-06-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 2,
+    "fields": {
+      "real_transaction": null,
+      "source_account": 12,
+      "destination_account": null,
+      "member": 3,
+      "amount": "10.00",
+      "value_datetime": "2018-06-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 3,
+    "fields": {
+      "real_transaction": null,
+      "source_account": 12,
+      "destination_account": null,
+      "member": 4,
+      "amount": "10.00",
+      "value_datetime": "2018-06-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 4,
+    "fields": {
+      "real_transaction": 2,
+      "source_account": null,
+      "destination_account": 12,
+      "member": 2,
+      "amount": "20.00",
+      "value_datetime": "2017-11-30T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 5,
+    "fields": {
+      "real_transaction": 3,
+      "source_account": null,
+      "destination_account": 12,
+      "member": 3,
+      "amount": "20.00",
+      "value_datetime": "2017-11-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 6,
+    "fields": {
+      "real_transaction": 5,
+      "source_account": 13,
+      "destination_account": null,
+      "member": null,
+      "amount": "103.90",
+      "value_datetime": "2017-11-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 7,
+    "fields": {
+      "real_transaction": 6,
+      "source_account": 12,
+      "destination_account": null,
+      "member": 3,
+      "amount": "8.00",
+      "value_datetime": "2017-11-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 9,
+    "fields": {
+      "real_transaction": 6,
+      "source_account": 14,
+      "destination_account": null,
+      "member": null,
+      "amount": "2.50",
+      "value_datetime": "2017-11-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 10,
+    "fields": {
+      "real_transaction": 6,
+      "source_account": 14,
+      "destination_account": null,
+      "member": null,
+      "amount": "1.90",
+      "value_datetime": "2017-11-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 11,
+    "fields": {
+      "real_transaction": 4,
+      "source_account": 14,
+      "destination_account": null,
+      "member": null,
+      "amount": "555.00",
+      "value_datetime": "2017-11-30T00:00:00Z"
+    }
+  },
+  {
+    "model": "bookkeeping.virtualtransaction",
+    "pk": 12,
+    "fields": {
+      "real_transaction": 1,
+      "source_account": 14,
+      "destination_account": null,
+      "member": null,
+      "amount": "1.50",
+      "value_datetime": "2017-11-30T00:00:00Z"
+    }
+  },
+  {
+    "model": "members.member",
+    "pk": 2,
+    "fields": {
+      "number": "1",
+      "name": "Mitglied 1",
+      "address": null,
+      "email": null,
+      "membership_type": "member",
+      "member_contact_type": "person"
+    }
+  },
+  {
+    "model": "members.member",
+    "pk": 3,
+    "fields": {
+      "number": "2",
+      "name": "Mitglied 2",
+      "address": null,
+      "email": null,
+      "membership_type": "member",
+      "member_contact_type": "person"
+    }
+  },
+  {
+    "model": "members.member",
+    "pk": 4,
+    "fields": {
+      "number": "3",
+      "name": "Mitglied 3",
+      "address": null,
+      "email": null,
+      "membership_type": "member",
+      "member_contact_type": "person"
+    }
+  },
+  {
+    "model": "members.membership",
+    "pk": 2,
+    "fields": {
+      "member": 2,
+      "start": "2018-06-01",
+      "end": null,
+      "amount": "10.00",
+      "interval": 1
+    }
+  },
+  {
+    "model": "members.membership",
+    "pk": 3,
+    "fields": {
+      "member": 3,
+      "start": "2018-06-01",
+      "end": null,
+      "amount": "10.00",
+      "interval": 1
+    }
+  },
+  {
+    "model": "members.membership",
+    "pk": 4,
+    "fields": {
+      "member": 4,
+      "start": "2018-06-01",
+      "end": null,
+      "amount": "10.00",
+      "interval": 1
+    }
+  }
+]

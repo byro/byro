@@ -1,15 +1,19 @@
-import decimal
-
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.utils.timezone import now
 
-from byro.bookkeeping.models import (
-    Account, AccountCategory, RealTransaction, TransactionChannel,
-)
+from byro.bookkeeping.models import Account, AccountCategory, Transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
+
+
+@pytest.fixture
+def full_testdata(django_db_setup, django_db_blocker):
+    with django_db_blocker.unblock():
+        call_command('loaddata', 'tests/fixtures/test_full_testdata.json')
 
 
 @pytest.fixture
@@ -31,7 +35,7 @@ def member():
     yield member
 
     [profile.delete() for profile in member.profiles]
-    member.transactions.all().delete()
+    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
     member.delete()
 
 
@@ -66,20 +70,17 @@ def inactive_member():
     )
     yield member
     [profile.delete() for profile in member.profiles]
-    member.transactions.all().delete()
+    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
     member.delete()
 
 
 @pytest.fixture
-def real_transaction():
-    return RealTransaction.objects.create(
-        channel=TransactionChannel.BANK,
-        booking_datetime=now(),
-        value_datetime=now(),
-        amount=decimal.Decimal('20.00'),
-        purpose='Erm, this is my fees for today',
-        originator='Jane Doe',
-    )
+def partial_transaction():
+    t = Transaction.objects.create(value_datetime=now())
+    t.debit(account=SpecialAccounts.bank, amount=10, memo="Fee ID 3")
+    yield t
+    t.bookings.all().delete()
+    t.delete()
 
 
 @pytest.fixture
@@ -109,6 +110,19 @@ def sent_email():
     )
 
 
-@pytest.fixture
-def fee_account():
-    return Account.objects.create(account_category=AccountCategory.MEMBER_FEES)
+def account_helper(name, cat, **kwargs):
+    def f():
+        account = Account.objects.create(account_category=cat, **kwargs)
+        yield account
+        account.debits.all().delete()
+        account.credits.all().delete()
+        account.delete()
+    f.__name__ = name
+    return pytest.fixture(f)
+
+
+fee_account = account_helper('fee_account', 'member_fees')
+
+income_account = account_helper('income_account', AccountCategory.INCOME)
+receivable_account = account_helper('receivable_account', AccountCategory.ASSET)
+bank_account = account_helper('asset_account', AccountCategory.ASSET)

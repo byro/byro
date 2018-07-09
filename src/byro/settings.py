@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'byro.plugins.sepa.SepaPluginConfig',
 
     'annoying',
+    'django_db_constraints',
 ]
 
 with suppress(ImportError):

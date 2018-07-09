@@ -28,6 +28,9 @@
         padding-left: 8px;
         padding-right: 8px;
     }
+    &.block-warning {
+        background: $brand-warning;
+    }
     &.block-danger {
         background: $brand-danger;
     }

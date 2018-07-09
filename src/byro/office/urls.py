@@ -1,8 +1,7 @@
 from django.conf.urls import include, url
 
 from .views import (
-    accounts, dashboard, mails, members,
-    realtransactions, settings, upload, users,
+    accounts, dashboard, mails, members, settings, transactions, upload, users,
 )
 
 app_name = 'office'
@@ -24,8 +23,7 @@ urlpatterns = [
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
 
-    url('^realtransaction/list', realtransactions.RealTransactionListView.as_view(), name='finance.transactions.list'),
-    url('^realtransaction/match', realtransactions.RealTransactionMatchView.as_view(), name='finance.transactions.match'),
+    url(r'^transactions/(?P<pk>\d+)/', transactions.TransactionDetailView.as_view(), name='finance.transactions.detail'),
 
     url('^upload/list', upload.UploadListView.as_view(), name='finance.uploads.list'),
     url(r'^upload/process/(?P<pk>\d+)', upload.UploadProcessView.as_view(), name='finance.uploads.process'),

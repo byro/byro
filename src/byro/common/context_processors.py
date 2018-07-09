@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import Http404
 from django.urls import resolve
 
+from byro.bookkeeping.models import Transaction
 from byro.common.models import Configuration
 from byro.mails.models import EMail
 from byro.office.signals import nav_event
@@ -13,6 +14,7 @@ def byro_information(request):
     ctx = {
         'config': Configuration.get_solo(),
         'pending_mails': EMail.objects.filter(sent__isnull=True).count(),
+        'pending_transactions': Transaction.objects.unbalanced_transactions().count(),
     }
 
     try:

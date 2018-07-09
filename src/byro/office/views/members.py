@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import messages
 from django.db import transaction
@@ -9,6 +10,8 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, View
 
+from byro.bookkeeping.models import Booking
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
@@ -129,6 +132,10 @@ class MemberDashboardView(MemberView):
         context['is_active'] = (obj.memberships.last().start <= now().date())
         if obj.memberships.last().end:
             context['is_active'] = context['is_active'] and not (obj.memberships.last().end < now().date())
+        context['statute_barred_debt'] = {
+            'now': obj.statute_barred_debt(),
+        }
+        context['statute_barred_debt']['in1year'] = obj.statute_barred_debt(relativedelta(years=1)) - context['statute_barred_debt']['now']
         return context
 
 
@@ -185,17 +192,19 @@ class MemberFinanceView(MemberView):
     def get_member(self):
         return Member.all_objects.get(pk=self.kwargs['pk'])
 
-    def get_transactions(self):
-        return self.get_member().transactions.filter(
-            Q(destination_account__account_category='member_fees') |
-            Q(destination_account__account_category='member_donation'),
-            value_datetime__lte=now(),
-        ).order_by('-value_datetime')
+    def get_bookings(self):
+        account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
+        return Booking.objects.with_transaction_data().filter(
+            Q(debit_account__in=account_list) |
+            Q(credit_account__in=account_list),
+            member=self.get_member(),
+            transaction__value_datetime__lte=now(),
+        ).order_by('-transaction__value_datetime')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['member'] = self.get_member()
-        context['transactions'] = self.get_transactions()
+        context['bookings'] = self.get_bookings()
         return context
 
 

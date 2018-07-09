@@ -1,0 +1,39 @@
+.transaction-row-odd {
+    background-color: rgba($gray, 0.1);
+}
+
+.transaction-row-even {
+    background-color: rgba($gray, 0.3);
+}
+
+.transaction-unbalanced-row-odd {
+    background-color: rgba($brand-warning, 0.2);
+}
+
+.transaction-unbalanced-row-even {
+    background-color: rgba($brand-warning, 0.4);
+}
+
+.related-row-odd-related-odd td:not(.related-empty) {
+    background-color: mix(rgba($brand-info, 0.5), rgba($gray, 0.1));
+}
+
+.related-row-odd-related-even td:not(.related-empty) {
+    background-color: mix(rgba($brand-info, 0.3), rgba($gray, 0.1));
+}
+
+.related-row-even-related-even td:not(.related-empty) {
+    background-color: mix(rgba($brand-info, 0.5), rgba($gray, 0.3));
+}
+
+.related-row-even-related-odd td:not(.related-empty) {
+    background-color: mix(rgba($brand-info, 0.3), rgba($gray, 0.3));
+}
+
+.related-first td:not(.related-empty) {
+    border-top: 2px solid black;
+}
+
+.related-last td:not(.related-empty) {
+    border-bottom: 3px solid black;
+}

@@ -1,14 +1,12 @@
-from .account import Account, AccountCategory
-from .real_transaction import (
-    RealTransaction, RealTransactionSource, TransactionChannel,
-)
-from .virtual_transaction import VirtualTransaction
+from .account import Account, AccountCategory, AccountTag
+from .real_transaction import RealTransactionSource
+from .transaction import Booking, Transaction
 
 __all__ = (
     'Account',
+    'AccountTag',
     'AccountCategory',
-    'RealTransaction',
     'RealTransactionSource',
-    'TransactionChannel',
-    'VirtualTransaction'
+    'Transaction',
+    'Booking',
 )

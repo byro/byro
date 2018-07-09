@@ -7,6 +7,8 @@ from django.utils.decorators import classproperty
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
+from byro.bookkeeping.models import Booking, Transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 from byro.common.models.configuration import Configuration
@@ -95,68 +97,73 @@ class Member(Auditable, models.Model):
             if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
         ]
 
-    @property
-    def balance(self) -> Decimal:
-        config = Configuration.get_solo()
-        cutoff = now() - relativedelta(months=config.liability_interval)
-        qs = self.transactions.filter(value_datetime__lte=now(), value_datetime__gte=cutoff)
-        liability = qs.filter(source_account__account_category='member_fees').aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
-        asset = qs.filter(destination_account__account_category='member_fees').aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
+    def _calc_balance(self, liability_cutoff=None) -> Decimal:
+        fees_receivable_account = SpecialAccounts.fees_receivable
+        debits = Booking.objects.filter(debit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=liability_cutoff or now())
+        credits = Booking.objects.filter(credit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=now())
+        liability = debits.aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
+        asset = credits.aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
         return asset - liability
 
     @property
+    def balance(self) -> Decimal:
+        return self._calc_balance()
+
+    def statute_barred_debt(self, future_limit=relativedelta()) -> Decimal:
+        limit = relativedelta(months=Configuration.get_solo().liability_interval) - future_limit
+        last_unenforceable_date = now().replace(month=12, day=31) - limit - relativedelta(years=1)
+        return max(Decimal('0.00'), -self._calc_balance(last_unenforceable_date))
+
+    @property
+    def donation_balance(self) -> Decimal:
+        return self.donations.aggregate(donations=models.Sum('amount'))['donations'] or Decimal('0.00')
+
+    @property
     def donations(self):
-        return self.transactions.filter(value_datetime__lte=now()).filter(
-            destination_account__account_category='member_donation'
-        )
+        return Booking.objects.filter(credit_account=SpecialAccounts.donations, member=self, transaction__value_datetime__lte=now())
 
     @property
     def fee_payments(self):
-        return self.transactions.filter(value_datetime__lte=now()).filter(
-            destination_account__account_category='member_fees'
-        )
+        return Booking.objects.filter(debit_account=SpecialAccounts.fees_receivable, member=self, transaction__value_datetime__lte=now())
 
     def update_liabilites(self):
-        from byro.bookkeeping.models import Account, VirtualTransaction
-
-        config = Configuration.get_solo()
-        account = Account.objects.filter(account_category='member_fees').first()
+        src_account = SpecialAccounts.fees
+        dst_account = SpecialAccounts.fees_receivable
 
         for membership in self.memberships.all():
             booking_date = now().replace(day=membership.start.day)
-            cutoff = (booking_date - relativedelta(months=config.liability_interval)).date()
             date = membership.start
-            if date < cutoff:
-                date = cutoff
             end = membership.end or booking_date.date()
             while date <= end:
-                vt = VirtualTransaction.objects.filter(
-                    source_account=account,
+                t = Transaction.objects.filter(
                     value_datetime=date,
-                    member=self,
+                    bookings__credit_account=src_account,
+                    bookings__member=self,
                 ).first()
 
-                if vt:
-                    if vt.amount != membership.amount:
-                        vt.amount = membership.amount
-                        vt.save()
-                else:
-                    VirtualTransaction.objects.create(
-                        source_account=account,
-                        value_datetime=date,
-                        amount=membership.amount,
-                        member=self,
-                    )
+                if t:
+                    if t.balances['credit'] != membership.amount:
+                        if not t.reversed_by.count():
+                            # Cancel transaction, create a new one
+                            t.reverse(memo=_('Due amount canceled because of change in membership amount'))
+                        t = False
+
+                if not t:
+                    t = Transaction.objects.create(value_datetime=date, memo=_("Membership due"), booking_datetime=booking_date)
+                    t.credit(account=src_account, amount=membership.amount, member=self)
+                    t.debit(account=dst_account, amount=membership.amount, member=self)
+                    t.save()
+
                 date += relativedelta(months=membership.interval)
 
     def remove_future_liabilites_on_leave(self):
-        for vt in self.transactions.all():
-            delete_vt = True
+        for t in Transaction.objects.filter(bookings__debit_account=SpecialAccounts.fees_receivable, bookings__member=self):
+            do_delete = True
             for membership in self.memberships.all():
-                if vt.value_datetime.date() < membership.end:
-                    delete_vt = False
-            if delete_vt and not vt.real_transaction:
-                vt.delete()
+                if t.value_datetime.date() < membership.end:
+                    do_delete = False
+            if do_delete and not t.reversed_by.count():
+                t.reverse(memo=_("Due amount canceled on leave"))
 
     def __str__(self):
         return 'Member {self.number} ({self.name})'.format(self=self)
