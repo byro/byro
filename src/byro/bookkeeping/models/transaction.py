@@ -101,7 +101,8 @@ class Transaction(models.Model):
         if hasattr(self, 'balances_debit'):
             return self.balances_debit == self.balances_credit
         else:
-            return self.balances['debit'] == self.balances['credit']
+            balances = self.balances
+            return balances['debit'] == balances['credit']
 
     def find_memo(self):
         if self.memo:
