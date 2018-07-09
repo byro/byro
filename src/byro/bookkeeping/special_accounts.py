@@ -9,8 +9,14 @@ class SpecialAccounts:
     @classmethod
     def special_account(cls, tag, category, name=None):
         tag, _ignore = AccountTag.objects.get_or_create(name=str(tag).lower())
-        account = Account.objects.filter(account_category=category, tags=tag).first()
-        if not account:
+        accounts = list(Account.objects.filter(account_category=category, tags=tag).all())
+        if len(accounts) > 1:
+            raise Account.MultipleObjectsReturned()
+        if accounts:
+            account = accounts[0]
+        else:
+            # Old mechanism: Return an account that is named as the special one would.
+            #  But also tag it.
             account = Account.objects.filter(account_category=category, name=name).first()
             if not account:
                 account = Account.objects.create(account_category=category, name=name)
