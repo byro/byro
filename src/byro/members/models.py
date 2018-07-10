@@ -114,7 +114,7 @@ class Member(Auditable, models.Model):
     def waive_debts_before_date(self, date):
         cutoff_date = date - timedelta(days=1)
         amount = self._calc_balance(cutoff_date, cutoff_date)
-        if amount >=0:
+        if amount >= 0:
             return
         amount = abs(amount)
         src_account = SpecialAccounts.fees_receivable
@@ -124,7 +124,6 @@ class Member(Auditable, models.Model):
         t.debit(account=dst_account, amount=amount, member=self)
         t.save()
         return amount
-
 
     def statute_barred_debt(self, future_limit=relativedelta()) -> Decimal:
         limit = relativedelta(months=Configuration.get_solo().liability_interval) - future_limit
