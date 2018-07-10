@@ -99,10 +99,10 @@ class Member(Auditable, models.Model):
         ]
 
     def _calc_balance(self, liability_cutoff=None, asset_cutoff=None) -> Decimal:
+        _now = now()
         fees_receivable_account = SpecialAccounts.fees_receivable
-        asset_cutoff = asset_cutoff or now()
-        debits = Booking.objects.filter(debit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=liability_cutoff or now())
-        credits = Booking.objects.filter(credit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=asset_cutoff)
+        debits = Booking.objects.filter(debit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=liability_cutoff or _now)
+        credits = Booking.objects.filter(credit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=asset_cutoff or _now)
         liability = debits.aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
         asset = credits.aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
         return asset - liability
@@ -114,8 +114,11 @@ class Member(Auditable, models.Model):
     def waive_debts_before_date(self, date):
         cutoff_date = date - timedelta(days=1)
         amount = self._calc_balance(cutoff_date, cutoff_date)
-        dst_account = SpecialAccounts.fees_receivable
-        src_account = SpecialAccounts.fees
+        if amount >=0:
+            return
+        amount = abs(amount)
+        src_account = SpecialAccounts.fees_receivable
+        dst_account = SpecialAccounts.fees
         t = Transaction.objects.create(value_datetime=date, memo=_("Membership debts waived"), booking_datetime=now())
         t.credit(account=src_account, amount=amount, member=self)
         t.debit(account=dst_account, amount=amount, member=self)
