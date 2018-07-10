@@ -7,7 +7,10 @@
 <head>
     <title>{% block title %}{% endblock %} :: byro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{% static "office/img/byro-logo_32.png" %}">
+    <link rel="icon" href="{% static "office/img/byro_32.png" %}">
+    <link rel="icon" type="image/png" href="{% static "office/img/byro_16.png" %}" sizes="16x16">
+    <link rel="icon" type="image/png" href="{% static "office/img/byro_32.png" %}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{% static "office/img/byro_128.png" %}" sizes="128x128">
     {% compress css %}
         <link rel="stylesheet" type="text/x-scss" href="{% static "office/scss/main.scss" %}"/>
     {% endcompress %}
@@ -25,7 +28,7 @@
 <body>
     <nav class="navbar navbar-static-top bg-primary">
         <a class="navbar-brand" href="/">
-            <img src="{% static "office/img/byro-logo_32.png" %}" class="d-inline-block align-top">
+            <img src="{% static "office/img/byro.svg" %}" width="40" class="d-inline-block align-top">
             {{ config.name }}
         </a>
         {% if not request.user.is_anonymous %}
