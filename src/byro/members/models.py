@@ -151,15 +151,20 @@ class Member(Auditable, models.Model):
             booking_date = now().replace(day=membership.start.day)
             date = membership.start
             end = membership.end or booking_date.date()
-            while date <= end:
-                t = Transaction.objects.filter(
-                    value_datetime=date,
+            transactions_by_date = {
+                t.value_datetime.date(): t
+                for t in Transaction.objects.with_balances().filter(
+                    value_datetime__gte=date,
+                    value_datetime__lte=end,
                     bookings__credit_account=src_account,
                     bookings__member=self,
-                ).first()
+                ).prefetch_related('bookings').all()
+            }
+            while date <= end:
+                t = transactions_by_date.get(date, None)
 
                 if t:
-                    if t.balances['credit'] != membership.amount:
+                    if t.balances_credit != membership.amount:
                         if not t.reversed_by.count():
                             # Cancel transaction, create a new one
                             t.reverse(memo=_('Due amount canceled because of change in membership amount'))
