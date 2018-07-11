@@ -1,8 +1,9 @@
 from datetime import timedelta
 from decimal import Decimal
+from functools import reduce
 
 from dateutil.relativedelta import relativedelta
-from django.db import models
+from django.db import models, transaction
 from django.db.models.fields.related import OneToOneRel
 from django.utils.decorators import classproperty
 from django.utils.timezone import now
@@ -142,49 +143,80 @@ class Member(Auditable, models.Model):
     def fee_payments(self):
         return Booking.objects.filter(debit_account=SpecialAccounts.fees_receivable, member=self, transaction__value_datetime__lte=now())
 
+    @transaction.atomic
     def update_liabilites(self):
         src_account = SpecialAccounts.fees
         dst_account = SpecialAccounts.fees_receivable
 
+        # Step 1: Identify all dates and amounts that should be due at those dates
+        #  (in python, store as a list; hits database once to get list of memberships)
+        # Step 2: Find all due amounts within the data ranges, ignore reversed liabilities
+        #  (hits database)
+        # Step 3: Compare due date and amounts with list from step 1
+        #  (in Python)
+        # Step 4: Cancel all liabilities that didn't match in step 3
+        #  (hits database, once per mismatch)
+        # Step 5: Add all missing liabilities
+        #  (hits database, once per new due)
+        # Step 6: Find and cancel all liabilities outside of membership dates, replaces remove_future_liabilites_on_leave()
+        #  (hits database, once for search, once per stray liability)
+
+        dues = set()
+        membership_ranges = []
+        _now = now()
+
+        # Step 1
         for membership in self.memberships.all():
-            booking_date = now().replace(day=membership.start.day)
+            booking_date = _now.replace(day=membership.start.day)
             date = membership.start
             end = membership.end or booking_date.date()
-            transactions_by_date = {
-                t.value_datetime.date(): t
-                for t in Transaction.objects.with_balances().filter(
-                    value_datetime__gte=date,
-                    value_datetime__lte=end,
-                    bookings__credit_account=src_account,
-                    bookings__member=self,
-                ).prefetch_related('bookings').all()
-            }
+            membership_ranges.append( (date, end) )
             while date <= end:
-                t = transactions_by_date.get(date, None)
-
-                if t:
-                    if t.balances_credit != membership.amount:
-                        if not t.reversed_by.count():
-                            # Cancel transaction, create a new one
-                            t.reverse(memo=_('Due amount canceled because of change in membership amount'))
-                        t = False
-
-                if not t:
-                    t = Transaction.objects.create(value_datetime=date, memo=_("Membership due"), booking_datetime=booking_date)
-                    t.credit(account=src_account, amount=membership.amount, member=self)
-                    t.debit(account=dst_account, amount=membership.amount, member=self)
-                    t.save()
-
+                dues.add( (date, membership.amount) )
                 date += relativedelta(months=membership.interval)
 
-    def remove_future_liabilites_on_leave(self):
-        for t in Transaction.objects.filter(bookings__debit_account=SpecialAccounts.fees_receivable, bookings__member=self):
-            do_delete = True
-            for membership in self.memberships.all():
-                if t.value_datetime.date() < membership.end:
-                    do_delete = False
-            if do_delete and not t.reversed_by.count():
-                t.reverse(memo=_("Due amount canceled on leave"))
+        # Step 2
+        date_range_q = reduce(
+            lambda a,b: a | b, [
+                models.Q(transaction__value_datetime__gte=start) & models.Q(transaction__value_datetime__lte=end)
+                for start, end in membership_ranges
+            ]
+        )
+        dues_qs = Booking.objects.filter(
+            member=self,
+            credit_account=src_account,
+            transaction__reversed_by__isnull=True,
+        ).filter(date_range_q)
+        dues_in_db = { # Must be a dictionary instead of set, to retrieve b later on
+            (b.transaction.value_datetime.date(), b.amount): b
+            for b in dues_qs.all()
+        }
+
+        # Step 3
+        dues_in_db_as_set = set(dues_in_db.keys())
+        wrong_dues_in_db = dues_in_db_as_set - dues
+        missing_dues = dues - dues_in_db_as_set
+
+        # Step 4
+        for wrong_due in wrong_dues_in_db:
+            booking = dues_in_db[wrong_due]
+            booking.transaction.reverse(memo=_('Due amount canceled because of change in membership amount'))
+
+        # Step 5:
+        for (date, amount) in missing_dues:
+            t = Transaction.objects.create(value_datetime=date, booking_datetime=_now, memo=_("Membership due"))
+            t.credit(account=src_account, amount=amount, member=self)
+            t.debit(account=dst_account, amount=amount, member=self)
+            t.save()
+
+        # Step 6:
+        stray_liabilities_qs = Booking.objects.filter(
+            member=self,
+            credit_account=src_account,
+            transaction__reversed_by__isnull=True,            
+        ).exclude(date_range_q).prefetch_related('transaction')
+        for stray_liability in stray_liabilities_qs.all():
+            stray_liability.transaction.reverse(memo=_("Due amount outside of membership canceled"))
 
     def __str__(self):
         return 'Member {self.number} ({self.name})'.format(self=self)

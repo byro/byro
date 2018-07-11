@@ -238,6 +238,8 @@ class MemberLeaveView(MemberView, FormView):
                 form.save()
                 messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
 
+                form.instance.member.update_liabilites()
+
                 responses = leave_member.send_robust(sender=form.instance)
                 for module, response in responses:
                     if isinstance(response, Exception):

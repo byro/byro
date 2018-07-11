@@ -58,12 +58,7 @@ def test_liabilities_future_transactions(member_membership):
     member_membership.end = end_this_month
     member_membership.save()
     member_membership.member.update_liabilites()
-    # NOTE: update liabilites doesn't delete transactions
-    bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
-    assert len(bookings) == 3
 
-    # but the new (temporary?) helper creates correction bookings
-    member_membership.member.remove_future_liabilites_on_leave()
     bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
     assert len(bookings) == 3
     assert sum([i.amount for i in bookings]) == 60
@@ -127,21 +122,17 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
 
     member_membership.end = end_this_month
     member_membership.save()
-    member_membership.member.update_liabilites()
-    # NOTE: update liabilites doesn't delete transactions
-    virtual_transactions = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
-    assert len(virtual_transactions) == 5
-    assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20 + 20
 
-    # but the new (temporary?) helper creates correction bookings
-    member_membership.member.remove_future_liabilites_on_leave()
-    virtual_transactions = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
-    assert len(virtual_transactions) == 5
-    assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20 + 20
+    for repeat in range(2): # Ensure that update_liabilities() is idempotent
+        member_membership.member.update_liabilites()
 
-    virtual_transactions_counter = member_membership.member.bookings.filter(credit_account=SpecialAccounts.fees_receivable).all()
-    assert len(virtual_transactions_counter) == 1
-    assert sum([i.amount for i in virtual_transactions_counter]) == 20
+        bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+        assert len(bookings) == 5
+        assert sum([i.amount for i in bookings]) == 8 + 8 + 20 + 20 + 20
+
+        correction_bookings = member_membership.member.bookings.filter(credit_account=SpecialAccounts.fees_receivable).all()
+        assert len(correction_bookings) == 1
+        assert sum([i.amount for i in correction_bookings]) == 20
 
 
 @pytest.mark.django_db
