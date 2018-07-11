@@ -170,14 +170,14 @@ class Member(Auditable, models.Model):
             booking_date = _now.replace(day=membership.start.day)
             date = membership.start
             end = membership.end or booking_date.date()
-            membership_ranges.append( (date, end) )
+            membership_ranges.append((date, end))
             while date <= end:
-                dues.add( (date, membership.amount) )
+                dues.add((date, membership.amount))
                 date += relativedelta(months=membership.interval)
 
         # Step 2
         date_range_q = reduce(
-            lambda a,b: a | b, [
+            lambda a, b: a | b, [
                 models.Q(transaction__value_datetime__gte=start) & models.Q(transaction__value_datetime__lte=end)
                 for start, end in membership_ranges
             ]
@@ -187,7 +187,7 @@ class Member(Auditable, models.Model):
             credit_account=src_account,
             transaction__reversed_by__isnull=True,
         ).filter(date_range_q)
-        dues_in_db = { # Must be a dictionary instead of set, to retrieve b later on
+        dues_in_db = {  # Must be a dictionary instead of set, to retrieve b later on
             (b.transaction.value_datetime.date(), b.amount): b
             for b in dues_qs.all()
         }
@@ -213,7 +213,7 @@ class Member(Auditable, models.Model):
         stray_liabilities_qs = Booking.objects.filter(
             member=self,
             credit_account=src_account,
-            transaction__reversed_by__isnull=True,            
+            transaction__reversed_by__isnull=True,
         ).exclude(date_range_q).prefetch_related('transaction')
         for stray_liability in stray_liabilities_qs.all():
             stray_liability.transaction.reverse(memo=_("Due amount outside of membership canceled"))

@@ -123,7 +123,7 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
     member_membership.end = end_this_month
     member_membership.save()
 
-    for repeat in range(2): # Ensure that update_liabilities() is idempotent
+    for repeat in range(2):  # Ensure that update_liabilities() is idempotent
         member_membership.member.update_liabilites()
 
         bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
