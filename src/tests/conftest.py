@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.shortcuts import reverse
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import (
@@ -34,15 +35,24 @@ def full_testdata(django_db_setup, django_db_blocker):
 
 
 @pytest.fixture
-def user():
+def login_user():
+    def do_login(client, user):
+        client.post(reverse('common:login'), {'username': user.username, 'password': 'test_password'})
+    return do_login
+
+
+@pytest.fixture
+def user(login_user):
     user = get_user_model().objects.create(username='regular_user', is_staff=True)
+    user.set_password('test_password')
+    user.save()
     yield user
     user.delete()
 
 
 @pytest.fixture
-def logged_in_client(client, user):
-    client.force_login(user)
+def logged_in_client(login_user, client, user):
+    login_user(client, user)
     return client
 
 

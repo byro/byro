@@ -24,9 +24,9 @@ from byro.common.models import LogEntry
 ))
 @pytest.mark.parametrize('logged_in', (True, False))
 @pytest.mark.django_db
-def test_office_access_urls(client, user, url, logged_in):
+def test_office_access_urls(client, user, login_user, url, logged_in):
     if logged_in:
-        client.force_login(user)
+        login_user(client, user)
 
     response = client.get(reverse('office:{}'.format(url)), follow=True)
     assert response.status_code == 200
