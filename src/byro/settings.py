@@ -90,6 +90,11 @@ MIDDLEWARE = [
 ]
 
 with suppress(ImportError):
+    import django_securebox
+    INSTALLED_APPS.append('django_securebox')
+    MIDDLEWARE.insert(2, 'django_securebox.middleware.SecureBoxMiddleware')
+
+with suppress(ImportError):
     import debug_toolbar
     INSTALLED_APPS.append('debug_toolbar')
     MIDDLEWARE.insert(2, 'debug_toolbar.middleware.DebugToolbarMiddleware')
