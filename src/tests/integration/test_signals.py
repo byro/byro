@@ -1,9 +1,11 @@
 from collections import Counter
 
 import pytest
+from django.shortcuts import reverse
 
 from byro.bookkeeping.signals import process_transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
+from byro.common.signals import unauthenticated_urls
 from byro.members.models import Member
 
 
@@ -93,3 +95,24 @@ def test_match_multiple_fees(member, partial_transaction):
 
     assert SpecialAccounts.fees_receivable.balances(end=None)['credit'] == 5
     assert SpecialAccounts.donations.balances(end=None)['credit'] == 5
+
+
+def direct_match(sender, **kwargs):
+    return ['office:dashboard', ]
+
+
+def lambda_match(sender, **kwargs):
+    return [lambda request, resolver_match: resolver_match.view_name == 'office:dashboard']
+
+
+@pytest.mark.parametrize('variant', (direct_match, lambda_match))
+@pytest.mark.django_db
+def test_unauthenticated_urls(client, variant):
+    with connected_signal(unauthenticated_urls, variant):
+        response = client.get(reverse('office:dashboard'))
+        assert response.status_code == 200
+        assert response.resolver_match.url_name != 'login'
+
+        response = client.get(reverse('office:settings.base'), follow=True)
+        assert response.status_code == 200
+        assert response.resolver_match.url_name == 'login'
