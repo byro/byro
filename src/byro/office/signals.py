@@ -25,4 +25,6 @@ set to ``True`` if this item should be marked as active.
 If you want your Plugin to appear in the "Finance" or "Settings" submenu in the
 side bar, please set ``section`` in your return dict to either ``finance`` or
 ``settings``, and don't set an ``icon``.
+
+May return an iterable of multiple dictionaries as described above.
 """

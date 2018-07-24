@@ -1,3 +1,4 @@
+import collections
 from contextlib import suppress
 
 from django.conf import settings
@@ -34,5 +35,11 @@ def byro_information(request):
 def sidebar_information(request):
     _nav_event = []
     for receiver, response in nav_event.send(request):
-        _nav_event.append(response)
+        if not response:
+            continue
+        if isinstance(response, collections.Mapping):
+            _nav_event.append(response)
+        else:
+            _nav_event.extend(response)
+
     return {'nav_event': _nav_event}
