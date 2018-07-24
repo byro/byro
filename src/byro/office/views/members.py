@@ -116,7 +116,6 @@ class MemberDashboardView(MemberView):
         context = super().get_context_data(*args, **kwargs)
         obj = self.get_object()
         if not obj.memberships.count():
-            context['is_active'] = False
             return context
         first = obj.memberships.first().start
         delta = now().date() - first
@@ -129,9 +128,6 @@ class MemberDashboardView(MemberView):
             'amount': obj.memberships.last().amount,
             'interval': obj.memberships.last().get_interval_display()
         }
-        context['is_active'] = (obj.memberships.last().start <= now().date())
-        if obj.memberships.last().end:
-            context['is_active'] = context['is_active'] and not (obj.memberships.last().end < now().date())
         context['statute_barred_debt'] = {
             'now': obj.statute_barred_debt(),
         }

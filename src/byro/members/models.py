@@ -143,6 +143,15 @@ class Member(Auditable, models.Model):
     def fee_payments(self):
         return Booking.objects.filter(debit_account=SpecialAccounts.fees_receivable, member=self, transaction__value_datetime__lte=now())
 
+    @property
+    def is_active(self):
+        if not self.memberships.count():
+            return False
+        result = (self.memberships.last().start <= now().date())
+        if self.memberships.last().end:
+            result = result and not (self.memberships.last().end < now().date())
+        return result
+
     @transaction.atomic
     def update_liabilites(self):
         src_account = SpecialAccounts.fees
