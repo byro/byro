@@ -5,26 +5,6 @@
 
 {% block member_content %}
 
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th>{% trans "Date" %}</th>
-            <th class="text-md-right">{% trans "Amount" %}</th>
-            <th>{% trans "Purpose" %}</th>
-            <th>{% trans "Category" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for booking in bookings %}
-            <tr class="transaction {% if not booking.transaction_balances_credit == booking.transaction_balances_debit %}unmatched{% endif %}">
-                <td>{{ booking.transaction.value_datetime.date }}</td>
-                <td class="text-md-right{% if booking.debit_account %} text-danger{% endif %}">{% if booking.debit_account %}-{% endif %}{{ booking.amount }}</td>
-                <td>{{ booking.transaction.find_memo|default:'-' }}</td>
-                <td>{{ booking.debit_account|default:booking.credit_account }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+{% include "office/member/finance_table.html" %}
 {% include "office/pagination.html" %}
 {% endblock %}
