@@ -9,6 +9,7 @@ class TestWithShackdataBase(TestMigrations):
     migrate_from = '0012_auto_20180617_1926'
 
 
+@pytest.mark.xfail
 @pytest.mark.django_db
 class TestBookkeepingMigrationsFirst(TestWithShackdataBase):
     migrate_to = '0013_new_data_model'
@@ -72,6 +73,7 @@ class TestBookkeepingMigrationsFirst(TestWithShackdataBase):
         assert Booking.objects.filter(amount__lt=0).count() == 0
 
 
+@pytest.mark.xfail
 @pytest.mark.django_db
 class TestBookkeepingMigrationsFinal(TestWithShackdataBase):
     migrate_to = '0014_auto_20180707_1410'

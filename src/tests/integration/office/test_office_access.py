@@ -83,5 +83,5 @@ def test_transaction_detail(full_testdata, logged_in_client, user):
 
 @pytest.mark.django_db
 def test_account_detail(full_testdata, logged_in_client, user):
-    response = logged_in_client.get(reverse('office:finance.accounts.detail', kwargs={'pk': 3}), follow=True)
+    response = logged_in_client.get(reverse('office:finance.accounts.detail', kwargs={'pk': '3'}), follow=True)
     assert response.status_code == 200
