@@ -20,7 +20,6 @@ from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
-from django.contrib import admin
 
 raw_plugin_patterns = []
 for app in apps.get_app_configs():
@@ -35,7 +34,6 @@ for app in apps.get_app_configs():
             )
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
     url(r'', include((raw_plugin_patterns, 'plugins'))),
     url(r'', include('byro.common.urls', namespace='common')),
     url(r'', include('byro.office.urls', namespace='office')),
