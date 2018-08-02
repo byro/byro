@@ -18,9 +18,11 @@ from pkg_resources import iter_entry_points
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOG_DIR = os.path.join(BASE_DIR, 'byro/logs')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static.dist')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'byro/media')
 
-for directory in (BASE_DIR, STATIC_ROOT):
+for directory in (BASE_DIR, LOG_DIR, STATIC_ROOT, MEDIA_ROOT):
     if not os.path.exists(directory):
         os.mkdir(directory)
 
@@ -179,7 +181,6 @@ FORMAT_MODULE_PATH = [
 
 # ######### MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = os.path.join(BASE_DIR, 'byro/media')
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = '/media/'
@@ -209,6 +210,50 @@ PLUGINS = []
 for entry_point in iter_entry_points(group='byro.plugin', name=None):
     PLUGINS.append(entry_point.module_name)
     INSTALLED_APPS.append(entry_point.module_name)
+
+
+## LOGGING SETTINGS
+loglevel = 'DEBUG' if DEBUG else 'INFO'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(module)s %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': loglevel,
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+        'file': {
+            'level': loglevel,
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'byro.log'),
+            'formatter': 'default',
+        },
+    },
+    'loggers': {
+        '': {'handlers': ['file', 'console'], 'level': loglevel, 'propagate': True},
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': loglevel,
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['file', 'console'],
+            'level': loglevel,
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',  # Do not output all the queries
+            'propagate': True,
+        },
+    },
+}
 
 
 ## EMAIL SETTINGS
