@@ -2,13 +2,14 @@
 # Copyright (C) 2018 rixx
 # This file is distributed under the same license as the byro package.
 # rixx <r@rixx.de> 2018.
+# Henryk Plötz <henryk@ploetzli.ch>, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-24 11:01+0200\n"
-"PO-Revision-Date: 2018-07-24 11:40+0200\n"
+"POT-Creation-Date: 2018-09-05 23:55+0000\n"
+"PO-Revision-Date: 2018-09-06 03:31+0200\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -16,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.8\n"
+"X-Generator: Gtranslator 2.91.7\n"
 
 #: byro/bookkeeping/models/account.py:24
 msgid "Asset account"
@@ -450,7 +451,7 @@ msgid "end"
 msgstr "Ende"
 
 #: byro/members/models.py:277
-#: byro/office/templates/office/member/dashboard.html:84
+#: byro/office/templates/office/member/dashboard.html:88
 msgid "membership fee"
 msgstr "Beitrag"
 
@@ -494,13 +495,13 @@ msgid "Default "
 msgstr "Standard"
 
 #: byro/office/templates/office/account/detail.html:18
-#: byro/office/templates/office/member/finance.html:11
+#: byro/office/templates/office/member/finance_table.html:6
 #: byro/office/templates/office/transaction/detail.html:16
 msgid "Date"
 msgstr "Datum"
 
 #: byro/office/templates/office/account/detail.html:19
-#: byro/office/templates/office/member/finance.html:13
+#: byro/office/templates/office/member/finance_table.html:8
 #: byro/office/templates/office/realtransaction/list.html:29
 #: byro/office/templates/office/realtransaction/match.html:16
 #: byro/office/templates/office/transaction/detail.html:17
@@ -611,28 +612,35 @@ msgstr "Entwicklungsmodus"
 
 #: byro/office/templates/office/dashboard.html:11
 #, python-format
-msgid "%(count)s active members"
-msgstr "%(count)s aktive Mitglieder"
+msgid "%(n)s active member"
+msgid_plural "%(n)s active members"
+msgstr[0] "%(n)s aktives Mitglied"
+msgstr[1] "%(n)s aktive Mitglieder"
 
-#: byro/office/templates/office/dashboard.html:16
+#: byro/office/templates/office/dashboard.html:18
 msgid "(currently)"
 msgstr "(aktuell)"
 
-#: byro/office/templates/office/dashboard.html:22
+#: byro/office/templates/office/dashboard.html:24
 #, python-format
-msgid "%(count)s unmapped transactions"
-msgstr "%(count)s nicht zugeordnete Buchungen"
+msgid "1 unmapped transaction"
+msgid_plural "%(n)s unmapped transactions"
+msgstr[0] "%(n)s nicht zugeordnete Buchung"
+msgstr[1] "%(n)s nicht zugeordnete Buchungen"
 
-#: byro/office/templates/office/dashboard.html:26
+#: byro/office/templates/office/dashboard.html:30
 msgid "Transactions all processed!"
 msgstr "Alle Transaktionen verarbeitet!"
 
-#: byro/office/templates/office/dashboard.html:32
+# python-format
+#: byro/office/templates/office/dashboard.html:36
 #, python-format
-msgid "%(count)s members"
-msgstr "%(count)s Mitglieder"
+msgid "%(n)s member"
+msgid_plural "%(n)s members"
+msgstr[0] "%(n)s Mitglied"
+msgstr[1] "%(n)s Mitglieder"
 
-#: byro/office/templates/office/dashboard.html:37
+#: byro/office/templates/office/dashboard.html:43
 msgid "(all time)"
 msgstr "(insgesamt)"
 
@@ -763,30 +771,34 @@ msgstr "Spenden"
 
 #: byro/office/templates/office/member/dashboard.html:59
 #, python-format
-msgid "%(count)s days"
-msgstr "%(count)s Tage"
+msgid "%(n)s day"
+msgid_plural "%(n)s days"
+msgstr[0] "%(n)s Tag"
+msgstr[1] "%(n)s Tage"
 
-#: byro/office/templates/office/member/dashboard.html:65
+#: byro/office/templates/office/member/dashboard.html:67
 #, python-format
-msgid "or %(count)s years of membership"
-msgstr "oder %(count)s Jahre Mitglied"
+msgid "or %(n)s year of membership"
+msgid_plural "or %(n)s years of membership"
+msgstr[0] "oder %(n)s Jahr Mitglied"
+msgstr[1] "oder %(n)s Jahre Mitglied"
 
-#: byro/office/templates/office/member/dashboard.html:69
+#: byro/office/templates/office/member/dashboard.html:73
 msgid "until this person becomes a member."
 msgstr "bis diese Person Mitglied wird."
 
-#: byro/office/templates/office/member/dashboard.html:74
+#: byro/office/templates/office/member/dashboard.html:78
 #, python-format
 msgid "Joined on %(start)s."
 msgstr "Beigetreten am %(start)s."
 
-#: byro/office/templates/office/member/finance.html:12
+#: byro/office/templates/office/member/finance_table.html:7
 #: byro/office/templates/office/realtransaction/list.html:28
 #: byro/office/templates/office/realtransaction/match.html:15
 msgid "Amount"
 msgstr "Betrag"
 
-#: byro/office/templates/office/member/finance.html:14
+#: byro/office/templates/office/member/finance_table.html:9
 msgid "Category"
 msgstr "Kategorie"
 
@@ -1162,22 +1174,10 @@ msgstr ""
 "Mandatsgrund: {mandate_reason}\n"
 "\n"
 
-#: byro/settings.py:168
+#: byro/settings.py:165
 msgid "English"
 msgstr "Englisch"
 
-#: byro/settings.py:169
+#: byro/settings.py:166
 msgid "German"
 msgstr "Deutsch"
-
-#~ msgid "Membership fee account"
-#~ msgstr "Beitragskonto"
-
-#~ msgid "Base"
-#~ msgstr "Standard"
-
-#~ msgid "Join date"
-#~ msgstr "Beitrittsdatum"
-
-#~ msgid "Payment interval"
-#~ msgstr "Zahlungsintervall"
