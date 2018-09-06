@@ -8,8 +8,10 @@
 <div class="dashboard-list">
     <a class="dashboard-block" href="{% url "office:members.list" %}">
         <h1>
-            {% blocktrans with count=active_count trimmed %}
-            {{ count }} active members
+            {% blocktrans trimmed count n=active_count %}
+            {{ n }} active member
+            {% plural %}
+            {{ n }} active members
             {% endblocktrans %}
         </h1>
         <span class="dashboard-description">
@@ -19,8 +21,10 @@
     <a class="dashboard-block" href="{% url "office:finance.accounts.list" %}">
         <h1> {# FIXME Direct link to matching, maybe? #}
             {% if pending_transactions > 0 %}
-                {% blocktrans with count=pending_transactions trimmed %}
-                {{ count }} unmapped transactions
+                {% blocktrans trimmed count n=pending_transactions %}
+                1 unmapped transaction
+                {% plural %}
+                {{ n }} unmapped transactions
                 {% endblocktrans %}
             {% else %}
                 {% trans "Transactions all processed!" %}
@@ -29,8 +33,10 @@
     </a>
     <a class="dashboard-block" href="{% url "office:members.list" %}?filter=all">
         <h1>
-            {% blocktrans with count=member_count trimmed %}
-            {{ count }} members
+            {% blocktrans trimmed count n=member_count %}
+            {{ n }} member
+            {% plural %}
+            {{ n }} members
             {% endblocktrans %}
         </h1>
         <span class="dashboard-description">
