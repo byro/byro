@@ -75,7 +75,7 @@
                 {% endblocktrans %}
             {% endif %}
             <br>
-            {% blocktrans with start=member_since.first.isoformat trimmed %}
+            {% blocktrans with start=member_since.first|date trimmed %}
                 Joined on {{ start }}.
             {% endblocktrans %}
         </span>
