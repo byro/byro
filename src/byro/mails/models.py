@@ -52,6 +52,7 @@ class MailTemplate(Auditable, models.Model):
                 bcc=self.bcc,
                 subject=subject,
                 text=text,
+                template=self,
             )
             mail.save()
             if attachments:
@@ -91,6 +92,7 @@ class EMail(Auditable, models.Model):
     )
     text = models.TextField(verbose_name=_('Text'))
     sent = models.DateTimeField(null=True, blank=True, verbose_name=_('Sent at'))
+    template = models.ForeignKey(to=MailTemplate, null=True, blank=True, on_delete=models.SET_NULL)
     attachments = models.ManyToManyField(
         to='documents.Document',
         related_name='mails',
