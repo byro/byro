@@ -90,6 +90,10 @@ class EMail(Auditable, models.Model):
         max_length=200,
         verbose_name=_('Subject'),
     )
+    members = models.ManyToManyField(
+        to='members.Member',
+        related_name='emails',
+    )
     text = models.TextField(verbose_name=_('Text'))
     sent = models.DateTimeField(null=True, blank=True, verbose_name=_('Sent at'))
     template = models.ForeignKey(to=MailTemplate, null=True, blank=True, on_delete=models.SET_NULL)
