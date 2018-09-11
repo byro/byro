@@ -18,14 +18,14 @@ Payment
 -------
 
 .. automodule:: byro.bookkeeping.signals
-   :members: derive_virtual_transactions, process_csv_upload
+   :members: process_transaction, process_csv_upload
 
 
 Display
 -------
 
 .. automodule:: byro.office.signals
-   :members: nav_event, member_view
+   :members: nav_event, unauthenticated_urls, member_view
 
 General
 -------
