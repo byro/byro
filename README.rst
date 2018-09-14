@@ -17,8 +17,9 @@ byro
    :target: http://byro.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation
 
-byro is currently very very much work in progress. It will be a membership administration tool
-for small and medium sized clubs/NGOs/associations of all kinds, with a focus on the DACH region.
+byro is a membership administration tool for small and medium sized
+clubs/NGOs/associations of all kinds, with a focus on the DACH region. While it
+is still a work in progress, it is already usable and in active use.
 
 Development Setup
 -----------------
