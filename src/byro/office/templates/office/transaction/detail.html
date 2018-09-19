@@ -14,7 +14,7 @@
     <thead>
         <tr>
             <th>{% trans "Date" %}</th>
-            <th>{% trans "Purpose" %}</th>
+            <th>{% trans "Purpose" %}<br><i>{% trans "Originator/Recipient" %}</i></th>
             <th>{% trans "Member" %}</th>
             <th>{% trans "Account" %}</th>
             <th class="text-md-right">{% trans "Incoming" %}</th>
@@ -25,7 +25,12 @@
         {% for booking in bookings %}
             <tr class="transaction-{% cycle 'row-odd' 'row-even' as account_row %}">
                 <td class="related-empty"></td>
-                <td>{{ booking.memo|default:"" }}</td>
+                <td>
+                    {{ booking.memo|default:"" }}
+                    {% if booking.data.other_party %}
+                        <br><i>{{ booking.data.other_party }}</i>
+                    {% endif %}
+                </td>
                 <td>{{ booking.member.name }}</td>
                 <td>{{ booking.debit_account|default:booking.credit_account }}</td>
                 <td class="text-md-right">
