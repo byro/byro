@@ -6,8 +6,19 @@ from django.utils.timezone import now
 
 from byro.bookkeeping.models import Account, AccountCategory, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
+from byro.common.models.configuration import Configuration
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
+
+
+@pytest.fixture
+def configuration():
+    config = Configuration.get_solo()
+    config.name = 'Association Name'
+    config.backoffice_mail = 'associationname@example.com'
+    config.mail_from = 'associationname@example.com'
+    config.save()
+    return config
 
 
 @pytest.fixture
