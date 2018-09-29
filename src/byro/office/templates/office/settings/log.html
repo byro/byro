@@ -18,7 +18,7 @@
         {% for entry in log_entries %}
             <tr>
                 <td>{{entry.datetime}}</td>
-                <td>{{entry.user}}</td>
+                <td>{{entry | format_log_source}}</td>
                 <td>{{entry | format_log_entry}}</td>
             </tr>
         {% endfor %}

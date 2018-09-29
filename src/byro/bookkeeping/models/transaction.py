@@ -5,6 +5,8 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models import Prefetch
 
+from byro.common.models import LogTargetMixin
+
 
 class TransactionQuerySet(models.QuerySet):
     def with_balances(self):
@@ -30,7 +32,7 @@ class TransactionQuerySet(models.QuerySet):
         return self.with_balances().exclude(balances_debit=models.F('balances_credit'))
 
 
-class Transaction(models.Model):
+class Transaction(models.Model, LogTargetMixin):
     objects = TransactionQuerySet.as_manager()
 
     memo = models.CharField(max_length=1000, null=True)

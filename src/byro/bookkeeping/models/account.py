@@ -2,10 +2,12 @@ from decimal import Decimal
 
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.decorators import classproperty
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
+from byro.common.models import LogTargetMixin
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 
@@ -37,7 +39,7 @@ class AccountTag(models.Model):
         return self.name
 
 
-class Account(Auditable, models.Model):
+class Account(Auditable, models.Model, LogTargetMixin):
     account_category = models.CharField(
         choices=AccountCategory.choices,
         max_length=AccountCategory.max_length,
@@ -109,3 +111,6 @@ class Account(Auditable, models.Model):
         result = {k: Decimal(v).quantize(Decimal('0.01')) for k, v in result.items()}
 
         return result
+
+    def get_absolute_url(self):
+        return reverse('office:finance.accounts.detail', kwargs={'pk': self.pk})

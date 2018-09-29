@@ -42,3 +42,14 @@ def format_log_entry(entry):
                 FORMATTER_REGISTRY.update(response)
 
     return FORMATTER_REGISTRY.get(entry.action_type, default_formatter)(entry)
+
+
+@register.filter(name='format_log_source')
+def format_log_source(entry):
+    if entry.user:
+        if entry.data.get('source', None) == str(entry.user):
+            return entry.user
+        else:
+            return "{} (via {})".format(entry.data['source'], entry.user)
+    else:
+        return entry.data['source']
