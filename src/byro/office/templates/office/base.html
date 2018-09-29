@@ -94,6 +94,12 @@
                             </a>
                         {% endif %}
                     {% endfor %}
+                    <a
+                      class="nav-link nav-link-second-level {% if "settings.log" in url_name %}active{% endif %}"
+                      href="{% url "office:settings.log" %}"
+                    >
+                        {% trans "Log" %}
+                    </a>
                 </div>
             </li>
             <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">

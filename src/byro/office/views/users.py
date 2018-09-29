@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, UpdateView
+from byro.common.models import LogEntry
 
 
 class UserForm(forms.ModelForm):
@@ -42,6 +43,7 @@ class UserCreateView(FormView):
     def form_valid(self, form):
         form.save()
         self.form = form
+        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.create")
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -53,6 +55,10 @@ class UserDetailView(UpdateView):
     context_object_name = 'user'
     model = User
     form_class = UserForm
+
+    def form_valid(self, form):
+        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.update")
+        return super().form_valid(form)
 
     def get_object(self):
         return User.objects.get(pk=self.kwargs['pk'])

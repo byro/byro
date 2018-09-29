@@ -1,0 +1,28 @@
+{% extends "office/settings/base.html" %}
+
+{% load i18n %}
+{% load log_entry %}
+
+{% block title %}{% trans "Audit Log" %}{% endblock %}
+
+{% block settings_content %}
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th class="table-column-small">{% trans "Date / Time" %}</th>
+            <th class="table-column-small">{% trans "Source" %}</th>
+            <th class="table-column-large">{% trans "Operation" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in log_entries %}
+            <tr>
+                <td>{{entry.datetime}}</td>
+                <td>{{entry.user}}</td>
+                <td>{{entry | format_log_entry}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "office/pagination.html" %}
+{% endblock %}

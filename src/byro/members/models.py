@@ -5,12 +5,14 @@ from functools import reduce
 from dateutil.relativedelta import relativedelta
 from django.db import models, transaction
 from django.db.models.fields.related import OneToOneRel
+from django.urls import reverse
 from django.utils.decorators import classproperty
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
+from byro.common.models import LogTargetMixin
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 from byro.common.models.configuration import Configuration
@@ -46,7 +48,7 @@ def get_next_member_number():
         return 1
 
 
-class Member(Auditable, models.Model):
+class Member(Auditable, models.Model, LogTargetMixin):
 
     number = models.CharField(
         max_length=100,
@@ -230,6 +232,9 @@ class Member(Auditable, models.Model):
     def __str__(self):
         return 'Member {self.number} ({self.name})'.format(self=self)
 
+    def get_absolute_url(self):
+        return reverse('office:members.data', kwargs={'pk': self.pk})
+
 
 class FeeIntervals:
     MONTHLY = 1
@@ -259,7 +264,7 @@ class MembershipType(Auditable, models.Model):
     )
 
 
-class Membership(Auditable, models.Model):
+class Membership(Auditable, models.Model, LogTargetMixin):
     member = models.ForeignKey(
         to='members.Member',
         on_delete=models.CASCADE,
@@ -284,3 +289,6 @@ class Membership(Auditable, models.Model):
     )
 
     form_title = _('Membership')
+
+    def get_absolute_url(self):
+        return reverse('office:members.data', kwargs={'pk': self.member.pk})

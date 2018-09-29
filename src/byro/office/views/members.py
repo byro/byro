@@ -79,6 +79,7 @@ class MemberCreateView(FormView):
         self.form = form
         form.save()
         messages.success(self.request, _('The member was added, please edit additional details if applicable.'))
+        form.instance.log(self, 'byro.members.add')
 
         responses = new_member.send_robust(sender=form.instance)
         for module, response in responses:
@@ -171,13 +172,18 @@ class MemberDataView(MemberView):
         context['forms'] = self.get_forms()
         return context
 
+    @transaction.atomic
     def post(self, *args, **kwargs):
+        any_changed = False
         for form in self.get_forms():
             if form.is_valid() and form.has_changed():
                 if not getattr(form.instance, 'member', False):
                     form.instance.member = self.get_object()
+                any_changed = True
                 form.save()
-        messages.success(self.request, _('Your changes have been saved.'))
+        if any_changed:
+            form.instance.log(self, 'byro.members.update')
+            messages.success(self.request, _('Your changes have been saved.'))
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
 
 
@@ -225,6 +231,7 @@ class MemberLeaveView(MemberView, FormView):
         context['forms'] = self.get_forms()
         return context
 
+    @transaction.atomic
     def post(self, *args, **kwargs):
         for form in self.get_forms():
             if form.is_valid() and form.has_changed() and form.instance.end:
@@ -232,6 +239,7 @@ class MemberLeaveView(MemberView, FormView):
                     form.instance.member = self.get_object()
 
                 form.save()
+                form.instance.log(self, 'byro.members.membership.end')
                 messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
 
                 form.instance.member.update_liabilites()

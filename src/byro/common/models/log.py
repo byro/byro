@@ -61,3 +61,11 @@ class LogEntry(models.Model):
             raise ValueError("Need to provide at least user or data['source']")
 
         return super().save(*args, **kwargs)
+
+
+class LogTargetMixin:
+    def log(self, context, action, user=None, **kwargs):
+        if hasattr(context, 'request'):
+            context = context.request
+
+        LogEntry.objects.create(content_object=self, user=user or getattr(context, 'user', None), action_type=action, data=dict(kwargs))

@@ -8,6 +8,8 @@ from django.utils.http import is_safe_url
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 
+from byro.common.models import LogEntry
+
 
 class LoginView(TemplateView):
     template_name = 'common/auth/login.html'
@@ -23,9 +25,11 @@ class LoginView(TemplateView):
 
         if not user.is_active:
             messages.error(request, _('User account is deactivated.'))
+            LogEntry.objects.create(content_object=user, user=user, action_type="byro.common.login.deactivated")
             return redirect('common:login')
 
         login(request, user)
+        LogEntry.objects.create(content_object=user, user=user, action_type="byro.common.login.success")
         url = urllib.parse.unquote(request.GET.get('next', ''))
         if url and is_safe_url(url, request.get_host()):
             return redirect(url)
@@ -34,5 +38,7 @@ class LoginView(TemplateView):
 
 
 def logout_view(request: HttpRequest) -> HttpResponseRedirect:
+    if(request.user):
+        LogEntry.objects.create(content_object=request.user, user=request.user, action_type="byro.common.logout")
     logout(request)
     return redirect('/')

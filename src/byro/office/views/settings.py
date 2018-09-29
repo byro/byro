@@ -3,11 +3,12 @@ from django.apps import apps
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView, TemplateView, ListView
 
 from byro.common.forms import ConfigurationForm, RegistrationConfigForm, InitialForm
 from byro.common.models.configuration import Configuration, ByroConfiguration
 
+from byro.common.models import LogEntry
 
 class InitialSettings(FormView):
     form_class = InitialForm
@@ -86,3 +87,9 @@ class PluginsView(TemplateView):
                     'meta': app.ByroPluginMeta,
                 })
         return context
+
+class LogView(ListView):
+    template_name = 'office/settings/log.html'
+    context_object_name = 'log_entries'
+    model = LogEntry
+    paginate_by = 50

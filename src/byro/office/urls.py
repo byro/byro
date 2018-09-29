@@ -7,6 +7,7 @@ from .views import (
 app_name = 'office'
 urlpatterns = [
     url('^settings/initial$', settings.InitialSettings.as_view(), name='settings.initial'),
+    url('^settings/log$', settings.LogView.as_view(), name='settings.log'),
     url('^settings/plugins$', settings.PluginsView.as_view(), name='settings.plugins'),
     url('^settings/registration$', settings.RegistrationConfigView.as_view(), name='settings.registration'),
     url('^settings/users/$', users.UserListView.as_view(), name='settings.users.list'),

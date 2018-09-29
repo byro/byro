@@ -19,3 +19,9 @@ Note: in case a) only the local name must be provided, not with the
 "plugins:$plugin_name:" namespace prefix, in case b) the callable will see
 the request and resolver_match with the full name, including namespace prefix.
 """
+
+log_formatters = django.dispatch.Signal()
+"""
+This signal is used to compile a list of log entry formatters.
+The return value must be a mapping of action_type: callable(LogEntry) -> html_fragment: str
+"""
