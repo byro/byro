@@ -37,6 +37,14 @@
         {% trans "Leave" %}
     </a>
   </li>
+  <li class="nav-item">
+    <a
+      class="nav-link {% if "members.record-disclosure" in url_name %}active{% endif %}"
+      href="{% url "office:members.record-disclosure" pk=member.pk %}"
+    >
+        {% trans "Record Disclosure" %}
+    </a>
+  </li>
   {% for view in member_views %}
   <li class="nav-item">
     <a

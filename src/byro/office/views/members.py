@@ -279,3 +279,17 @@ class MemberListTypeaheadView(View):
                 for member in queryset
             ],
         })
+
+
+class MemberRecordDisclosureView(MemberView):
+    template_name = 'office/member/data_disclosure.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['mail'] = self.get_member().record_disclosure_email
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        self.get_member().record_disclosure_email.save()
+        messages.success(request, _('The email was generated and can be sent in the outbox.'))
+        return redirect(reverse('office:members.dashboard', kwargs=self.kwargs))
