@@ -27,7 +27,7 @@ def byro_information(request):
         ctx['development_warning'] = True
         with suppress(Exception):
             import subprocess
-            ctx['byro_version'] = subprocess.check_output(['git', 'describe', '--always'])
+            ctx['byro_version'] = subprocess.check_output(['git', 'describe', '--always']).decode()
 
     return ctx
 
