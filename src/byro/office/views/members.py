@@ -182,7 +182,7 @@ class MemberDataView(MemberView):
                 any_changed = True
                 form.save()
         if any_changed:
-            form.instance.log(self, 'byro.members.update')
+            self.get_object().log(self, 'byro.members.update')
             messages.success(self.request, _('Your changes have been saved.'))
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
 
