@@ -40,7 +40,7 @@ class ConfigurationView(FormView):
         config_models = [model for model in apps.get_models() if issubclass(model, ByroConfiguration)]
         data = self.request.POST if self.request.method == 'POST' else None
         return [
-            forms.modelform_factory(model, fields='__all__')(prefix=model.__name__, instance=model.get_solo(), data=data)
+            forms.modelform_factory(model, fields='__all__', exclude=('registration_form', ))(prefix=model.__name__, instance=model.get_solo(), data=data)
             for model in config_models
         ]
 
