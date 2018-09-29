@@ -62,6 +62,7 @@ class Configuration(ByroConfiguration):
     form_title = _('General settings')
 
     backoffice_mail = models.EmailField(
+        null=True, blank=True,
         max_length=100,
         verbose_name=_('e-mail of backoffice'),
     )
