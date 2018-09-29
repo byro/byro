@@ -100,6 +100,22 @@
             }
             number_input.closest('.form-group').hide();
 
+            var default_date = elem.find('select[name$=__default_date]');
+
+            if(default_date) {
+                var other = elem.find('input[name$=__default]');
+                var update_func = function() {
+                    console.log( $(default_date).val() );
+                    if(default_date.val() == 'fixed_date') {
+                        other.closest('.form-group').show();
+                    } else {
+                        other.closest('.form-group').hide();
+                    }
+                }
+                update_func();
+                $(default_date).on('change', update_func);
+            }
+
         });
         form_sortable = form.find('.current-fields, .available-fields').sortable({
             connectWith: ".current-fields, .available-fields",
