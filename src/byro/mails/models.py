@@ -34,7 +34,7 @@ class MailTemplate(Auditable, models.Model):
     def __str__(self):
         return '{self.subject}'.format(self=self)
 
-    def to_mail(self, email, locale=None, context=None, skip_queue=False, attachments=None):
+    def to_mail(self, email, locale=None, context=None, skip_queue=False, attachments=None, save=True):
         from byro.common.models import Configuration
         config = Configuration.get_solo()
         locale = locale or config.language
@@ -54,12 +54,13 @@ class MailTemplate(Auditable, models.Model):
                 text=text,
                 template=self,
             )
-            mail.save()
-            if attachments:
-                for a in attachments:
-                    mail.attachments.add(a)
-            if skip_queue:
-                mail.send()
+            if save:
+                mail.save()
+                if attachments:
+                    for a in attachments:
+                        mail.attachments.add(a)
+                if skip_queue:
+                    mail.send()
         return mail
 
 

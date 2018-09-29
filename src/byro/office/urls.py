@@ -22,6 +22,7 @@ urlpatterns = [
         url('data$', members.MemberDataView.as_view(), name='members.data'),
         url('finance$', members.MemberFinanceView.as_view(), name='members.finance'),
         url('leave$', members.MemberLeaveView.as_view(), name='members.leave'),
+        url('record-disclosure$', members.MemberRecordDisclosureView.as_view(), name='members.record-disclosure'),
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
 

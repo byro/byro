@@ -86,5 +86,11 @@ class Configuration(ByroConfiguration):
         on_delete=models.SET_NULL,
         related_name='+',
     )
+    record_disclosure_template = models.ForeignKey(
+        to='mails.MailTemplate',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
 
     form_title = _('General settings')
