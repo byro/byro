@@ -96,7 +96,9 @@ To run the local development server, execute::
     (env)$ python manage.py runserver
 
 Now point your browser to http://localhost:8000/ – You should be able to log in and play
-around!
+around! You can use the following command to generate example data::
+
+    (env)$ python manage.py make_testdata
 
 .. _`checksandtests`:
 
