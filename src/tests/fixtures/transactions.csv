@@ -1,0 +1,7 @@
+Kontonummer;Buchungstag;Wertstellung;Auftraggeber/Empfänger;Buchungstext;VWZ1;VWZ2;VWZ3;VWZ4;VWZ5;VWZ6;VWZ7;VWZ8;VWZ9;VWZ10;VWZ11;VWZ12;VWZ13;VWZ14;Betrag;Kontostand;Währung
+7016809500;30.11.2017;30.11.2017;;"Kontoführung";Abrechnung vom  30.11.2017;;;;;;;;;;;;;;-1,50;;EUR
+7016809500;30.11.2017;30.11.2017;Ernie u. Bert;"Dauerauftrag-Gutschrift";Mitgliedsbeitrag ID 1;;;;;;;;;;;;;;20,00;;EUR
+7016809500;03.11.2017;03.11.2017;Unfähig zu Überweisen;"Dauerauftrag-Gutschrift";Monatsbeitrag;;;;;;;;;;;;;;20,00;;EUR
+7016809500;30.11.2017;30.11.2017;Strom Schmeckt Aua;"SEPA-Basislastschrift";104223-11/2017 STROM;;;;;;;;;;;;;;-555,00;;EUR
+7016809500;03.11.2017;03.11.2017;Tolles Mitglied;"Internet-Euro-Überweisung";BIC:SOLADECHAOS;IBAN:DE42422300200008416523;Datum: 03.11.17 Zeit: 14:04;UFT 0000000000 TAN 444444;Erstattung Einkauf;;;;;;;;;;-103,90;;EUR
+7016809500;03.11.2017;03.11.2017;Doofes Mitglied;"Rücklastschrift";shack e.V. Mitgliedsbeitrag;ID 2;Fremdentgelte: 1,90 EUR;MS03: Institut ohne Rückg.-;Grund/Rückscheck;Originalbetr.:;8,00 EUR;Eigene Geb.:   2,50 EUR;;;;;;;-12,40;;EUR

@@ -15,6 +15,7 @@ def test_template_to_mail(mail_template, skip_queue):
     assert obj.text == mail_template.text
     assert obj.to == 'test@localhost'
     assert (obj.sent is None) is not skip_queue
+    assert str(mail_template) == mail_template.subject
 
 
 @pytest.mark.django_db

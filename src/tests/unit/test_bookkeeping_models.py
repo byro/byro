@@ -26,6 +26,9 @@ def test_account_tags(bank_account):
     assert bank_account.tags.all().count() == 0
     tag, _ignore = AccountTag.objects.get_or_create(name='TEST')
     bank_account.tags.add(tag)
+    assert not bank_account.bookings
+    assert not bank_account.unbalanced_transactions
+    assert str(tag) == tag.name
     assert bank_account.tags.all().count() == 1
     assert bank_account in AccountTag.objects.get_or_create(name='TEST')[0].accounts.all()
 
@@ -112,3 +115,8 @@ def test_account_balances(bank_account, receivable_account, income_account):
     assert income_account.balances(end=None)['net'] == 10
     assert receivable_account.balances(end=None)['net'] == 0
     assert bank_account.balances(end=None)['net'] == 10
+
+
+@pytest.mark.django_db
+def test_real_transaction_source_process(real_transaction_source):
+    real_transaction_source.process()

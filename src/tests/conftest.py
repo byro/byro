@@ -1,14 +1,20 @@
+import os.path
+
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.utils.timezone import now
 
-from byro.bookkeeping.models import Account, AccountCategory, Transaction
+from byro.bookkeeping.models import (
+    Account, AccountCategory, RealTransactionSource, Transaction,
+)
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
+from byro.plugins.sepa.models import MemberSepa
 
 
 @pytest.fixture
@@ -42,12 +48,18 @@ def logged_in_client(client, user):
 
 @pytest.fixture
 def member():
-    member = Member.objects.create(email='joe@hacker.space', number='1')
+    member = Member.objects.create(email='joe@hacker.space', number='1', name='Jo Ey')
     yield member
 
     [profile.delete() for profile in member.profiles]
     [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
     member.delete()
+
+
+@pytest.fixture
+def member_with_sepa_profile(member):
+    MemberSepa.objects.create(member=member, iban='DE89370400440532013000', bic='COBADEFFXXX', issue_date=now().date(), fullname=member.name, address='Somewhere', mandate_reference='\'tis a reference')
+    return member
 
 
 @pytest.fixture
@@ -121,6 +133,13 @@ def sent_email():
     )
 
 
+@pytest.fixture
+def real_transaction_source():
+    csv = open(os.path.join(os.path.dirname(__file__), 'fixtures/transactions.csv')).read()
+    f = SimpleUploadedFile('testresource.csv', csv.encode())
+    return RealTransactionSource.objects.create(source_file=f)
+
+
 def account_helper(name, cat, **kwargs):
     def f():
         account = Account.objects.create(account_category=cat, **kwargs)
@@ -133,7 +152,6 @@ def account_helper(name, cat, **kwargs):
 
 
 fee_account = account_helper('fee_account', 'member_fees')
-
 income_account = account_helper('income_account', AccountCategory.INCOME)
 receivable_account = account_helper('receivable_account', AccountCategory.ASSET)
 bank_account = account_helper('asset_account', AccountCategory.ASSET)
