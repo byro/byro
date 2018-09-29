@@ -62,7 +62,7 @@ The first thing you need are all the main application's dependencies::
     (env)$ cd src/
     (env)$ pip3 install -r requirements/production.txt -r requirements/development.txt
 
-Next, if you have custom database settings or other settings you need to modify, make a new
+Next, if you have custom database settings or other settings you need, make a new
 file ``pretalx/local_settings.py`` with contents like these::
 
     DATABASES = {
