@@ -1,3 +1,6 @@
+from contextlib import suppress
+
+import django.db.utils
 from django.utils.decorators import classproperty
 from django.utils.translation import ugettext_lazy as _
 
@@ -20,7 +23,8 @@ class SpecialAccounts:
             account = Account.objects.filter(account_category=category, name=name).first()
             if not account:
                 account = Account.objects.create(account_category=category, name=name)
-                account.log(None, 'byro.bookkeeping.account.created', source="Automatic creation of special account")
+                with suppress(django.db.utils.ProgrammingError):
+                    account.log(None, 'byro.bookkeeping.account.created', source="Automatic creation of special account")
             account.tags.add(tag)
             account.save()
         return account
