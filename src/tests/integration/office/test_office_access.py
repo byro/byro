@@ -32,6 +32,20 @@ def test_office_access_urls(client, user, url, logged_in):
 
 
 @pytest.mark.django_db
+def test_office_login_client(client, user):
+    user.set_password('thepassword')
+    user.save()
+    response = client.post(reverse('common:login'), {'username': user.username, 'password': 'thepassword'}, follow=True)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_office_logout(logged_in_client):
+    response = logged_in_client.post(reverse('common:logout'), follow=True)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_member_dashboard(full_testdata, logged_in_client, user):
     response = logged_in_client.get(reverse('office:members.dashboard', kwargs={'pk': 3}), follow=True)
     assert response.status_code == 200
