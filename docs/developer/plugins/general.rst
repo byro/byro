@@ -25,7 +25,7 @@ Display
 -------
 
 .. automodule:: byro.office.signals
-   :members: nav_event, unauthenticated_urls, member_view
+   :members: nav_event, unauthenticated_urls, member_view, log_formatters
 
 General
 -------

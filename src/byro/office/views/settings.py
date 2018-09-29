@@ -21,6 +21,7 @@ class InitialSettings(FormView):
 
     def form_valid(self, form):
         form.save()
+        LogEntry.objects.create(content_object=Configuration.get_solo(), user=self.request.user, action_type="byro.settings.initial")
         messages.success(self.request, _('You\'re nearly ready to go – configure how you want to add new members, and you\'re done.'))
         return super().form_valid(form)
 
@@ -48,6 +49,7 @@ class ConfigurationView(FormView):
     def form_valid(self, form):
         for form in self.get_form():
             form.save()
+        LogEntry.objects.create(content_object=Configuration.get_solo(), user=self.request.user, action_type="byro.settings.changed")
         messages.success(self.request, _('The config was saved successfully.'))
         return super().form_valid(form)
 
@@ -69,6 +71,7 @@ class RegistrationConfigView(FormView):
     def form_valid(self, form):
         form.save()
         messages.success(self.request, _('The config was saved successfully.'))
+        LogEntry.objects.create(content_object=Configuration.get_solo(), user=self.request.user, action_type="byro.settings.registration.changed")
         return super().form_valid(form)
 
     def get_success_url(self):
