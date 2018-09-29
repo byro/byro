@@ -18,55 +18,50 @@ class Configuration(ByroConfiguration):
     name = models.CharField(
         null=True, blank=True,
         max_length=100,
-        verbose_name=_('name'),
+        verbose_name=_('Association name'),
     )
     address = models.TextField(
         null=True, blank=True,
         max_length=500,
-        verbose_name=_('address'),
+        verbose_name=_('Association address'),
     )
     url = models.CharField(
         null=True, blank=True,
         max_length=200,
-        verbose_name=_('url'),
+        verbose_name=_('Association URL'),
     )
     liability_interval = models.IntegerField(
         default=36,
-        verbose_name=_('Liability interval'),
-        help_text=_('For which interval should remaining fees be calculated?'),
+        verbose_name=_('Statute of limitations'),
+        help_text=_('For which interval can you make members pay their outstanding fees?'),
     )
 
     language = models.CharField(
         choices=LANGUAGES,
         null=True, blank=True,
         max_length=5,
-        verbose_name=_('language'),
+        verbose_name=_('Language'),
     )
     currency = models.CharField(
         null=True, blank=True,
         max_length=3,
-        verbose_name=_('currency'),
+        verbose_name=_('Currency'),
+        help_text=_('E.g. EUR')
     )
-
+    # Registration form configuration, contains settings for the fields to include when adding a new member
     registration_form = JSONField(
         null=True, blank=True,
-        verbose_name=_('registration form configuration'),
     )
-
     mail_from = models.EmailField(
         null=True, blank=True,
         max_length=100,
-        verbose_name=_('e-mail sender address'),
+        verbose_name=_('E-mail address used as sender'),
     )
-
-    form_title = _('General settings')
-
     backoffice_mail = models.EmailField(
         null=True, blank=True,
         max_length=100,
-        verbose_name=_('e-mail of backoffice'),
+        verbose_name=_('E-mail address for notifications'),
     )
-
     welcome_member_template = models.ForeignKey(
         to='mails.MailTemplate',
         null=True, blank=True,
@@ -91,3 +86,5 @@ class Configuration(ByroConfiguration):
         on_delete=models.SET_NULL,
         related_name='+',
     )
+
+    form_title = _('General settings')
