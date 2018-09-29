@@ -48,6 +48,8 @@ RECORD_DISCLOSURE_TEXT = LazyI18nString.from_gettext(_('''Hi,
 We're writing you to let you know about the data we have currently stored about
 yourself and your membership.
 
+Your current balance is {balance}.
+
 {data}
 
 If these records are outdated or incorrect, please let us know as a response to

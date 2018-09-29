@@ -164,7 +164,8 @@ class Member(Auditable, models.Model):
 
     @property
     def record_disclosure_email(self):
-        template = Configuration.get_solo().record_disclosure_template
+        config = Configuration.get_solo()
+        template = config.record_disclosure_template
         data = get_member_data(self)
         for profile in self.profiles:
             data += get_member_data(profile)
@@ -175,9 +176,10 @@ class Member(Auditable, models.Model):
         if text_data:
             key_value_text += '\n' + '\n'.join(text_data)
         context = {
-            'association_name': Configuration.get_solo().name,
+            'association_name': config.name,
             'data': key_value_text,
             'number': self.number,
+            'balance': '{currency} {balance}'.format(currency=config.currency, balance=self.balance)
         }
         return template.to_mail(self.email, context=context, save=False)
 
