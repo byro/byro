@@ -16,28 +16,24 @@ Some Python dependencies might also need a compiler during installation, the Deb
 ``build-essential`` or something similar should suffice.
 
 
-Database setup
---------------
-
-Having the database server installed, we still need a database and a database user::
-
-  postgres $ createuser byro -P
-  Enter password for new role:
-  Enter it again:
-  postgres $ createdb byro
-  postgres $ psql
-  postgres=# GRANT ALL PRIVILEGES ON DATABASE byro to byro;
-
-Please create a user with the username **byro** and the password **byro**, as
-this is the default development setup. **Do not run byro like this in
-production**.
-
 Get a copy of the source code
 -----------------------------
 You can clone our git repository::
 
     git clone https://github.com/byro/byro.git
     cd byro/
+
+
+Database setup
+--------------
+
+Having the database server installed, we still need a database and a database user::
+
+  sudo -u postgres -i
+  postgres $ createuser <yourusername>
+  postgres $ createdb byro -O <yourusername>
+
+Substitute your system username for ``<yourusername>``.
 
 
 Your local python environment
@@ -48,7 +44,7 @@ installed. Also make sure you have pip for Python 3 installed, you can execute `
 Then use Python's internal tools to create a virtual environment and activate it for your current
 session::
 
-    python3 -m venv env
+    python3 -m venv env  # or virtualenv -p /usr/bin/python3 env, or ...
     source env/bin/activate
 
 You should now see a ``(env)`` prepended to your shell prompt. You have to do this in every shell
@@ -65,6 +61,19 @@ The first thing you need are all the main application's dependencies::
 
     (env)$ cd src/
     (env)$ pip3 install -r requirements/production.txt -r requirements/development.txt
+
+Next, if you have custom database settings or other settings you need to modify, make a new
+file ``pretalx/local_settings.py`` with contents like these::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'byro',
+            'USER': 'byro',
+            'PASSWORD': 'byro',
+            'HOST': 'localhost',
+        }
+    }
 
 Then, create the local database::
 
