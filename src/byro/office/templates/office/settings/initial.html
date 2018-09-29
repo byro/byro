@@ -1,0 +1,16 @@
+{% extends "office/settings/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block settings_content %}
+<form method="post">
+    {% csrf_token %}
+    <div class="card member-form-card">
+        <div class="card-header">{% trans "Initial settings" %}</div>
+        <div class="card-body">
+            {% bootstrap_form form layout='horizontal' %}
+        </div>
+    </div>
+    <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
+</form>
+{% endblock %}
