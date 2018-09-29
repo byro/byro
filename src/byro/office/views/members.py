@@ -27,6 +27,9 @@ class MemberView(DetailView):
     context_object_name = 'member'
     model = Member
 
+    def get_member(self):
+        return Member.all_objects.get(pk=self.kwargs.get('pk'))
+
     def get_queryset(self):
         return Member.all_objects.all()
 
@@ -34,6 +37,7 @@ class MemberView(DetailView):
         ctx = super().get_context_data(*args, **kwargs)
         responses = [r[1] for r in member_view.send_robust(self.get_object(), request=self.request)]
         ctx['member_views'] = responses
+        ctx['member'] = self.get_member()
         return ctx
 
 
@@ -109,8 +113,6 @@ class MemberCreateView(FormView):
 
 class MemberDashboardView(MemberView):
     template_name = 'office/member/dashboard.html'
-    context_object_name = 'member'
-    model = Member
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -137,8 +139,6 @@ class MemberDashboardView(MemberView):
 
 class MemberDataView(MemberView):
     template_name = 'office/member/data.html'
-    context_object_name = 'member'
-    model = Member
 
     def _instantiate(self, form_class, member, profile_class=None, instance=None, prefix=None, empty=False):
         params = {
@@ -185,9 +185,6 @@ class MemberFinanceView(MemberView):
     template_name = 'office/member/finance.html'
     paginate_by = 50
 
-    def get_member(self):
-        return Member.all_objects.get(pk=self.kwargs['pk'])
-
     def get_bookings(self):
         account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
         return Booking.objects.with_transaction_data().filter(
@@ -208,9 +205,6 @@ class MemberLeaveView(MemberView, FormView):
     template_name = 'office/member/leave.html'
     form_class = forms.modelform_factory(Membership,
                                          fields=['start', 'end', 'interval', 'amount'])
-
-    def get_member(self):
-        return Member.all_objects.get(pk=self.kwargs['pk'])
 
     def get_forms(self):
         obj = self.get_object()
