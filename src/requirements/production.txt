@@ -7,7 +7,7 @@ django-extensions==2.1.*
 django-formset-js-improved==0.5.0.2
 django-i18nfield==1.4.*
 django-libsass==0.7
-django-localflavor==1.5.2
+django-localflavor==2.1.*
 django-solo==1.1.*
 django-db-constraints==0.3.*
 jinja2==2.10.*
