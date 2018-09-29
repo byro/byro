@@ -42,3 +42,16 @@ LEAVE_MEMBER_OFFICE_TEXT = LazyI18nString.from_gettext(_('''Hi,
 
 Thanks,
 the robo clerk'''))
+RECORD_DISCLOSURE_SUBJECT = LazyI18nString.from_gettext((_('Your {association_name} data record (#{number})')))
+RECORD_DISCLOSURE_TEXT = LazyI18nString.from_gettext(_('''Hi,
+
+We're writing you to let you know about the data we have currently saved about
+yourself and your membership.
+
+{data}
+
+If these records are outdated or incorrect, please let us know as a response to
+this email.
+
+Thanks,
+the robo clerk'''))
