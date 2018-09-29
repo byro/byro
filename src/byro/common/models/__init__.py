@@ -1,3 +1,4 @@
 from .configuration import Configuration
+from .log import LogEntry
 
-__all__ = ['Configuration']
+__all__ = ['Configuration', 'LogEntry']
