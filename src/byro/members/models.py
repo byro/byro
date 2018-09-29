@@ -46,6 +46,16 @@ def get_next_member_number():
         return 1
 
 
+def get_member_data(obj):
+    if hasattr(obj, 'get_member_data'):
+        return obj.get_member_data()
+    return [
+        (field.verbose_name, str(getattr(obj, field.name)))
+        for field in obj._meta.fields
+        if field.name not in ('id', 'created_by', 'modified_by', 'created', 'modified', 'member')
+    ]
+
+
 class Member(Auditable, models.Model):
 
     number = models.CharField(
@@ -151,6 +161,25 @@ class Member(Auditable, models.Model):
         if self.memberships.last().end:
             result = result and not (self.memberships.last().end < now().date())
         return result
+
+    @property
+    def record_disclosure_email(self):
+        template = Configuration.get_solo().record_disclosure_template
+        data = get_member_data(self)
+        for profile in self.profiles:
+            data += get_member_data(profile)
+        key_value_data = [d for d in data if len(d) == 2 and not isinstance(d, str)]
+        text_data = [d for d in data if isinstance(d, str)]
+        key_length = min(max(len(d[0]) for d in key_value_data), 20)
+        key_value_text = '\n'.join((key + ':').ljust(key_length) + ' ' + value for key, value in key_value_data)
+        if text_data:
+            key_value_text += '\n' + '\n'.join(text_data)
+        context = {
+            'association_name': Configuration.get_solo().name,
+            'data': key_value_text,
+            'number': self.number,
+        }
+        return template.to_mail(self.email, context=context, save=False)
 
     @transaction.atomic
     def update_liabilites(self):

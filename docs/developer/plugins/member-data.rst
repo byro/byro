@@ -36,6 +36,17 @@ you'd add a ``models.py`` file to your plugin, and put this inside::
        )
        receives_newsletter = models.BooleanField(default=True)
 
+       def get_member_data(self):
+            return [
+               "You have opted in to receive our newsletter." if self.receives_newsletter else "",
+            ]
+
+Members will receive occasional emails with all data that is saved about them –
+you can either return a list of strings, or a list of tuples (of keys and
+values, such as ``("Has agreed to receive the newsletter", "True"))``. If you
+do not implement this method, byro will display all relevant data from this
+profile directly.
+
 
 Custom views
 ------------

@@ -45,7 +45,7 @@ the robo clerk'''))
 RECORD_DISCLOSURE_SUBJECT = LazyI18nString.from_gettext((_('Your {association_name} data record (#{number})')))
 RECORD_DISCLOSURE_TEXT = LazyI18nString.from_gettext(_('''Hi,
 
-We're writing you to let you know about the data we have currently saved about
+We're writing you to let you know about the data we have currently stored about
 yourself and your membership.
 
 {data}
