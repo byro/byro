@@ -1,7 +1,28 @@
 from django.shortcuts import redirect, reverse
 from django.urls import resolve
 
+from byro.common.models.configuration import Configuration
 from byro.common.signals import unauthenticated_urls
+
+
+class SettingsMiddleware:
+    ALLOWED_URLS = (
+        'settings.registration',
+        'settings.initial',
+        'settings.plugins',
+    )
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        url = resolve(request.path_info)
+        if not request.user.is_anonymous and url.url_name not in self.ALLOWED_URLS:
+            config = Configuration.get_solo()
+            values = ('name', 'backoffice_mail', 'mail_from')
+            if not all(getattr(config, value, None) for value in values):
+                return redirect('office:settings.initial')
+        return self.get_response(request)
 
 
 class PermissionMiddleware:

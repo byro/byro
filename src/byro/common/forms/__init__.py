@@ -1,4 +1,4 @@
-from .configuration import ConfigurationForm
+from .configuration import ConfigurationForm, InitialForm
 from .registration import RegistrationConfigForm
 
-__all__ = ['ConfigurationForm', 'RegistrationConfigForm']
+__all__ = ['ConfigurationForm', 'InitialForm', 'RegistrationConfigForm']

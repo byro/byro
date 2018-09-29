@@ -84,7 +84,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'byro.common.middleware.PermissionMiddleware'
+    'byro.common.middleware.PermissionMiddleware',
+    'byro.common.middleware.SettingsMiddleware',
 ]
 
 with suppress(ImportError):

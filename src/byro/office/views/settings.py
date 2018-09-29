@@ -5,8 +5,26 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView
 
-from byro.common.forms import ConfigurationForm, RegistrationConfigForm
+from byro.common.forms import ConfigurationForm, RegistrationConfigForm, InitialForm
 from byro.common.models.configuration import Configuration, ByroConfiguration
+
+
+class InitialSettings(FormView):
+    form_class = InitialForm
+    template_name = 'office/settings/initial.html'
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs['instance'] = Configuration.get_solo()
+        return form_kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _('You\'re nearly ready to go – configure how you want to add new members, and you\'re done.'))
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('office:settings.registration')
 
 
 class ConfigurationView(FormView):
