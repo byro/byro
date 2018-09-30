@@ -19,16 +19,15 @@ def test_log_entry_formatting(mail_template, user):
         )
         == 'action.type(Test Mail)'
     )
-    assert (
-        format_log_entry(
-            LogEntry(
-                content_object=user,
-                user=user,
-                data={'source': 'value'},
-                action_type='action.type',
-            )
+    assert format_log_entry(
+        LogEntry(
+            content_object=user,
+            user=user,
+            data={'source': 'value'},
+            action_type='action.type',
         )
-        == 'action.type(<a href="/settings/users/1/">regular_user</a>)'
+    ) == 'action.type(<a href="/settings/users/{u.id}/">{u.username}</a>)'.format(
+        u=user
     )
 
 
