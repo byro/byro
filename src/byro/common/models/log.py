@@ -64,8 +64,18 @@ class LogEntry(models.Model):
 
 
 class LogTargetMixin:
+    LOG_TARGET_BASE = None
+
     def log(self, context, action, user=None, **kwargs):
         if hasattr(context, 'request'):
             context = context.request
 
-        LogEntry.objects.create(content_object=self, user=user or getattr(context, 'user', None), action_type=action, data=dict(kwargs))
+        user = user or getattr(context, 'user', None)
+
+        if isinstance(context, str) and not 'source' in kwargs:
+            kwargs['source'] = context
+
+        if self.LOG_TARGET_BASE and action.startswith('.'):
+            action = self.LOG_TARGET_BASE + action
+
+        LogEntry.objects.create(content_object=self, user=user, action_type=action, data=dict(kwargs))

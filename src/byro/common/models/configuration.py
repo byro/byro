@@ -17,6 +17,7 @@ class ByroConfiguration(SingletonModel):
 
 
 class Configuration(LogTargetMixin, ByroConfiguration):
+    LOG_TARGET_BASE = 'byro.settings'
 
     name = models.CharField(
         null=True, blank=True,

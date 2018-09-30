@@ -59,6 +59,7 @@ def get_member_data(obj):
 
 
 class Member(Auditable, models.Model, LogTargetMixin):
+    LOG_TARGET_BASE = 'byro.members'
 
     number = models.CharField(
         max_length=100,

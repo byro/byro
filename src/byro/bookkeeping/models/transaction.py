@@ -36,6 +36,8 @@ class TransactionQuerySet(models.QuerySet):
 class Transaction(models.Model, LogTargetMixin):
     objects = TransactionQuerySet.as_manager()
 
+    LOG_TARGET_BASE = 'byro.bookkeeping.transaction'
+
     memo = models.CharField(max_length=1000, null=True)
     booking_datetime = models.DateTimeField(null=True)
     value_datetime = models.DateTimeField()
