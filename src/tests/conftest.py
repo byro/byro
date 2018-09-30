@@ -99,8 +99,8 @@ def inactive_member():
 
 @pytest.fixture
 def partial_transaction():
-    t = Transaction.objects.create(value_datetime=now())
-    t.debit(account=SpecialAccounts.bank, amount=10, memo="Fee ID 3")
+    t = Transaction.objects.create(value_datetime=now(), user_or_context='test')
+    t.debit(account=SpecialAccounts.bank, amount=10, memo="Fee ID 3", user_or_context='test')
     yield t
     t.bookings.all().delete()
     t.delete()

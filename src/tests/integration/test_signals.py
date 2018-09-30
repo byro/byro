@@ -34,7 +34,7 @@ def test_match_single_fee(member, partial_transaction):
             return False
         if not sender.is_balanced:
             member = Member.objects.first()
-            sender.credit(account=SpecialAccounts.fees_receivable, amount=10, member=member)
+            sender.credit(account=SpecialAccounts.fees_receivable, amount=10, member=member, user_or_context='test')
             return True
         return False
 
@@ -73,7 +73,7 @@ def test_match_multiple_fees(member, partial_transaction):
             return False
         if not sender.is_balanced:
             member = Member.objects.first()
-            sender.credit(account=SpecialAccounts.donations, amount=5, member=member)
+            sender.credit(account=SpecialAccounts.donations, amount=5, member=member, user_or_context='test')
             return True
         return False
 
@@ -83,7 +83,7 @@ def test_match_multiple_fees(member, partial_transaction):
             return False
         if not sender.is_balanced:
             member = Member.objects.first()
-            sender.credit(account=SpecialAccounts.fees_receivable, amount=5, member=member)
+            sender.credit(account=SpecialAccounts.fees_receivable, amount=5, member=member, user_or_context='test')
             return True
         return False
 

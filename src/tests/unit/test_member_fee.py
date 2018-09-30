@@ -161,25 +161,25 @@ def test_liabilities_limit(member):
         assert member.balance == -900.0
         assert member.statute_barred_debt() == 160.0
 
-        t = Transaction.objects.create(value_datetime=test_date)
-        t.debit(account=SpecialAccounts.bank, amount=12)
-        t.credit(account=SpecialAccounts.fees_receivable, amount=12, member=member)
+        t = Transaction.objects.create(value_datetime=test_date, user_or_context='test')
+        t.debit(account=SpecialAccounts.bank, amount=12, user_or_context='test')
+        t.credit(account=SpecialAccounts.fees_receivable, amount=12, member=member, user_or_context='test')
         t.save()
 
         assert member.balance == -888.0
         assert member.statute_barred_debt() == 148.0
 
-        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=7, day=1))
-        t.debit(account=SpecialAccounts.bank, amount=13)
-        t.credit(account=SpecialAccounts.fees_receivable, amount=13, member=member)
+        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=7, day=1), user_or_context='test')
+        t.debit(account=SpecialAccounts.bank, amount=13, user_or_context='test')
+        t.credit(account=SpecialAccounts.fees_receivable, amount=13, member=member, user_or_context='test')
         t.save()
 
         assert member.balance == -875.0
         assert member.statute_barred_debt() == 135.0
 
-        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=12, day=31))
-        t.debit(account=SpecialAccounts.bank, amount=136)
-        t.credit(account=SpecialAccounts.fees_receivable, amount=136, member=member)
+        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=12, day=31), user_or_context='test')
+        t.debit(account=SpecialAccounts.bank, amount=136, user_or_context='test')
+        t.credit(account=SpecialAccounts.fees_receivable, amount=136, member=member, user_or_context='test')
         t.save()
 
         assert member.balance == -739.0
