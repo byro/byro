@@ -1,0 +1,12 @@
+{% extends "office/member/base.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ block.super }} :: {% trans "Log entries" %}{% endblock %}
+
+{% block member_content %}
+
+{% include "common/log.html" %}
+{% include "office/pagination.html" %}
+
+{% endblock %}

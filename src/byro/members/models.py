@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
-from byro.common.models import LogTargetMixin
+from byro.common.models import LogEntry, LogTargetMixin
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 from byro.common.models.configuration import Configuration
@@ -272,6 +272,11 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def get_absolute_url(self):
         return reverse('office:members.data', kwargs={'pk': self.pk})
 
+    def log_entries(self):
+        own_entries = [e.pk for e in super().log_entries()]
+        ms_entries = [e.pk for m in self.memberships.all() for e in m.log_entries()]
+        return LogEntry.objects.filter(pk__in=own_entries+ms_entries)
+
 
 class FeeIntervals:
     MONTHLY = 1
@@ -302,6 +307,8 @@ class MembershipType(Auditable, models.Model):
 
 
 class Membership(Auditable, models.Model, LogTargetMixin):
+    LOG_TARGET_BASE = 'byro.members.membership'
+
     member = models.ForeignKey(
         to='members.Member',
         on_delete=models.CASCADE,

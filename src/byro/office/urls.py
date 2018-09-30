@@ -23,6 +23,7 @@ urlpatterns = [
         url('finance$', members.MemberFinanceView.as_view(), name='members.finance'),
         url('leave$', members.MemberLeaveView.as_view(), name='members.leave'),
         url('record-disclosure$', members.MemberRecordDisclosureView.as_view(), name='members.record-disclosure'),
+        url('log$', members.MemberLogView.as_view(), name='members.log'),
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
 
