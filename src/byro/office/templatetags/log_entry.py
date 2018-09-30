@@ -48,11 +48,11 @@ def format_log_entry(entry):
 def format_log_source(entry):
     user = ""
     if entry.user:
-        user = mark_safe( '<span class="fa fa-user"></span> {}'.format( escape(entry.user) ) )
+        user = mark_safe('<span class="fa fa-user"></span> {}'.format(escape(entry.user)))
 
     source = entry.data.get('source', "")
     if source.startswith('internal: '):
-        source = mark_safe( '<span class="fa fa-gears"></span> {}'.format( escape(source[10:]) ) )
+        source = mark_safe('<span class="fa fa-gears"></span> {}'.format(escape(source[10:])))
 
     if entry.user:
         if entry.data.get('source', None) == str(entry.user):
