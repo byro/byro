@@ -97,7 +97,7 @@ def log_call(action, log_on='retval'):
 
             retval = f(*args, **kwargs)
 
-            log_kwargs = {k: repr(v) for k, v in kwargs.items()}
+            log_kwargs = {k: repr(v) for k, v in kwargs.items() if v}
             log_args = list(args)
             log_args = log_args[1:]   # Warning: we assume that args[0] is 'self'. Only works correctly with calls to bound methods
             if log_args:

@@ -46,10 +46,18 @@ def format_log_entry(entry):
 
 @register.filter(name='format_log_source')
 def format_log_source(entry):
+    user = ""
+    if entry.user:
+        user = mark_safe( '<span class="fa fa-user"></span> {}'.format( escape(entry.user) ) )
+
+    source = entry.data.get('source', "")
+    if source.startswith('internal: '):
+        source = mark_safe( '<span class="fa fa-gears"></span> {}'.format( escape(source[10:]) ) )
+
     if entry.user:
         if entry.data.get('source', None) == str(entry.user):
-            return entry.user
+            return user
         else:
-            return "{} (via {})".format(entry.data['source'], entry.user)
+            return mark_safe('{} (via {})'.format(source, user))
     else:
-        return entry.data['source']
+        return source
