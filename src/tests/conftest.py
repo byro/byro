@@ -80,7 +80,7 @@ def membership(member):
 
 @pytest.fixture
 def inactive_member():
-    member = Member.objects.create(email='joe@ex-hacker.space')
+    member = Member.objects.create(email='joe@ex-hacker.space', name='Inactive Joe')
     today = now()
     begin = today.replace(day=1) - relativedelta(months=3)
     end = today.replace(day=1) - relativedelta(months=1, days=-1)
