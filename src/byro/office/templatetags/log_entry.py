@@ -10,8 +10,8 @@ FORMATTER_REGISTRY = {}
 
 
 def default_formatter(entry):
-    data = dict(entry.data)
-    data.pop('source')
+    data = dict(entry.data or {})
+    data.pop('source', None)
 
     co = entry.content_object
     related_object = ""
