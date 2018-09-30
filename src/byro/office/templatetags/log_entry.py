@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
-from byro.common.models import Configuration
 from byro.common.signals import log_formatters
 
 FORMATTER_REGISTRY = {}

@@ -1,0 +1,21 @@
+{% load i18n %}
+{% load log_entry %}
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th class="table-column-small">{% trans "Date / Time" %}</th>
+            <th class="table-column-small">{% trans "Source" %}</th>
+            <th class="table-column-large">{% trans "Operation" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in log_entries %}
+            <tr>
+                <td>{{entry.datetime | date:"Y-m-d H:i:s e" }}</td>
+                <td>{{entry | format_log_source}}</td>
+                <td>{{entry | format_log_entry}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

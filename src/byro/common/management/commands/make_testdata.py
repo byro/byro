@@ -11,7 +11,8 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration
 from byro.members.models import FeeIntervals, Member, Membership, MembershipType
 
-SOURCE_TEST_DATA='Import of test data'
+SOURCE_TEST_DATA = 'Import of test data'
+
 
 def make_date(delta, end=False):
     date = (now() - delta).date()
@@ -59,19 +60,20 @@ class Command(BaseCommand):
                 text += ", " + _("EUR {amount} donation").format(amount=donates)
 
             t = Transaction.objects.create(
-                value_datetime=liability.transaction.value_datetime
+                value_datetime=liability.transaction.value_datetime,
+                user_or_context=SOURCE_TEST_DATA,
             )
             t.debit(
                 memo=text,
-                account=SpecialAccounts.bank, amount=amount
+                account=SpecialAccounts.bank, amount=amount,
+                user_or_context=SOURCE_TEST_DATA,
             )
             if donates:
-                t.credit(account=SpecialAccounts.donations, member=member, amount=donates)
-            t.credit(account=SpecialAccounts.fees_receivable, member=member, amount=pure_amount)
+                t.credit(account=SpecialAccounts.donations, member=member, amount=donates, user_or_context=SOURCE_TEST_DATA)
+            t.credit(account=SpecialAccounts.fees_receivable, member=member, amount=pure_amount, user_or_context=SOURCE_TEST_DATA)
             if pays_for:
-                t.credit(account=SpecialAccounts.fees_receivable, member=pays_for, amount=pure_amount)
+                t.credit(account=SpecialAccounts.fees_receivable, member=pays_for, amount=pure_amount, user_or_context=SOURCE_TEST_DATA)
             t.save()
-            t.log(SOURCE_TEST_DATA, '.created')
 
     def create_membership_types(self):
         MembershipType.objects.create(name='Standard membership', amount=120)
@@ -218,54 +220,59 @@ class Command(BaseCommand):
 
         t = Transaction.objects.create(
             value_datetime=(now()-relativedelta(days=23)).date(),
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.debit(
             memo=_("Belated member fee payment for Olga"),
-            account=bank_account, amount=20
+            account=bank_account, amount=20,
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.save()
-        t.log(SOURCE_TEST_DATA, '.created')
 
         t = Transaction.objects.create(
             value_datetime=(now()-relativedelta(days=17)).date(),
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.debit(
             memo=_("George lives to give, donation"),
-            account=bank_account, amount=42.23
+            account=bank_account, amount=42.23,
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.save()
-        t.log(SOURCE_TEST_DATA, '.created')
 
         for i in range(1, 4):
             t = Transaction.objects.create(
                 value_datetime=(now()-relativedelta(months=i)).date(),
+                user_or_context=SOURCE_TEST_DATA,
             )
             t.credit(
                 memo=_("Bank fees"),
-                account=bank_account, amount=9.95
+                account=bank_account, amount=9.95,
+                user_or_context=SOURCE_TEST_DATA,
             )
             t.save()
-            t.log(SOURCE_TEST_DATA, '.created')
 
         t = Transaction.objects.create(
             value_datetime=(now()-relativedelta(days=21)).date(),
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.credit(
             memo=_("ACME Inc. thanks you for your patronage, sale of one halo kite"),
-            account=bank_account, amount=123
+            account=bank_account, amount=123,
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.save()
-        t.log(SOURCE_TEST_DATA, '.created')
 
         t = Transaction.objects.create(
             value_datetime=(now()-relativedelta(days=20)).date(),
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.credit(
             memo=_("ACME Inc. thanks you for your patronage, sale of one emergency medkit"),
-            account=bank_account, amount=666
+            account=bank_account, amount=666,
+            user_or_context=SOURCE_TEST_DATA,
         )
         t.save()
-        t.log(SOURCE_TEST_DATA, '.created')
 
     @transaction.atomic()
     def handle(self, *args, **options):

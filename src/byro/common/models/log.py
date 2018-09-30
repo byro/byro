@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -72,10 +74,42 @@ class LogTargetMixin:
 
         user = user or getattr(context, 'user', None)
 
-        if isinstance(context, str) and not 'source' in kwargs:
+        if isinstance(context, str) and 'source' not in kwargs:
             kwargs['source'] = context
 
         if self.LOG_TARGET_BASE and action.startswith('.'):
             action = self.LOG_TARGET_BASE + action
 
         LogEntry.objects.create(content_object=self, user=user, action_type=action, data=dict(kwargs))
+
+    def log_entries(self):
+        return LogEntry.objects.filter(content_object=self)
+
+
+def log_call(action, log_on='retval'):
+    def outer_decorator(f):
+        @wraps(f)
+        def decorator(*args, **kwargs):
+            if 'user_or_context' not in kwargs:
+                raise TypeError("You need to provide a 'user_or_context' named parameter which indicates the responsible user (a User model object), request (a View instance or HttpRequest object), or generic context (a str).")
+            user_or_context = kwargs.pop('user_or_context')
+            user = kwargs.pop('user', None)
+
+            retval = f(*args, **kwargs)
+
+            log_kwargs = {k: repr(v) for k, v in kwargs.items()}
+            log_args = list(args)
+            log_args = log_args[1:]   # Warning: we assume that args[0] is 'self'. Only works correctly with calls to bound methods
+            if log_args:
+                log_kwargs['_args'] = [repr(v) for v in log_args]
+
+            if log_on == 'retval':
+                retval.log(user_or_context, action, user=user, **log_kwargs)
+            else:
+                args[0].log(user_or_context, action, user=user, **log_kwargs)
+
+            return retval
+
+        return decorator
+
+    return outer_decorator

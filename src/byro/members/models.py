@@ -243,13 +243,18 @@ class Member(Auditable, models.Model, LogTargetMixin):
         # Step 4
         for wrong_due in wrong_dues_in_db:
             booking = dues_in_db[wrong_due]
-            booking.transaction.reverse(memo=_('Due amount canceled because of change in membership amount'))
+            booking.transaction.reverse(memo=_('Due amount canceled because of change in membership amount'), user_or_context='internal: update_liabilites, membership amount changed',)
 
         # Step 5:
         for (date, amount) in missing_dues:
-            t = Transaction.objects.create(value_datetime=date, booking_datetime=_now, memo=_("Membership due"))
-            t.credit(account=src_account, amount=amount, member=self)
-            t.debit(account=dst_account, amount=amount, member=self)
+            t = Transaction.objects.create(
+                value_datetime=date,
+                booking_datetime=_now,
+                memo=_("Membership due"),
+                user_or_context='internal: update_liabilites, add missing liabilities',
+            )
+            t.credit(account=src_account, amount=amount, member=self, user_or_context='internal: update_liabilites, add missing liabilities')
+            t.debit(account=dst_account, amount=amount, member=self, user_or_context='internal: update_liabilites, add missing liabilities',)
             t.save()
 
         # Step 6:
@@ -259,7 +264,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
             transaction__reversed_by__isnull=True,
         ).exclude(date_range_q).prefetch_related('transaction')
         for stray_liability in stray_liabilities_qs.all():
-            stray_liability.transaction.reverse(memo=_("Due amount outside of membership canceled"))
+            stray_liability.transaction.reverse(memo=_("Due amount outside of membership canceled"), user_or_context='internal: update_liabilites, reverse stray liabilities',)
 
     def __str__(self):
         return 'Member {self.number} ({self.name})'.format(self=self)

@@ -6,7 +6,7 @@ from django.db import models, transaction
 from django.db.models import Prefetch
 from django.urls import reverse
 
-from byro.common.models import LogTargetMixin
+from byro.common.models import LogTargetMixin, log_call
 
 
 class TransactionQuerySet(models.QuerySet):
@@ -33,8 +33,23 @@ class TransactionQuerySet(models.QuerySet):
         return self.with_balances().exclude(balances_debit=models.F('balances_credit'))
 
 
+class TransactionManager(models.Manager):
+    def get_queryset(self):
+        return TransactionQuerySet(self.model, using=self._db)
+
+    def with_balances(self):
+        return self.get_queryset().with_balances()
+
+    def unbalanced_transactions(self):
+        return self.get_queryset().unbalanced_transactions()
+
+    @log_call('.created')
+    def create(self, *args, **kwargs):
+        return super().create(*args, **kwargs)
+
+
 class Transaction(models.Model, LogTargetMixin):
-    objects = TransactionQuerySet.as_manager()
+    objects = TransactionManager()
 
     LOG_TARGET_BASE = 'byro.bookkeeping.transaction'
 
@@ -58,25 +73,37 @@ class Transaction(models.Model, LogTargetMixin):
 
     data = JSONField(null=True)
 
+    @log_call('.debit.created', log_on='self')
     def debit(self, account, *args, **kwargs):
         return Booking.objects.create(transaction=self, debit_account=account, *args, **kwargs)
 
+    @log_call('.credit.created', log_on='self')
     def credit(self, account, *args, **kwargs):
         return Booking.objects.create(transaction=self, credit_account=account, *args, **kwargs)
 
+    @transaction.atomic
     def reverse(self, value_datetime=None, *args, **kwargs):
+        if 'user_or_context' not in kwargs:
+            raise TypeError("You need to provide a 'user_or_context' named parameter which indicates the responsible user (a User model object), request (a View instance or HttpRequest object), or generic context (a str).")
+        user_or_context = kwargs.pop('user_or_context')
+        user = kwargs.pop('user', None)
+
         t = Transaction.objects.create(
             value_datetime=value_datetime or self.value_datetime,
             reverses=self,
+            user_or_context=user_or_context,
+            user=user,
             *args,
             **kwargs,
         )
         for b in self.bookings.all():
             if b.credit_account:
-                t.debit(account=b.credit_account, amount=b.amount, member=b.member)
+                t.debit(account=b.credit_account, amount=b.amount, member=b.member, user_or_context=user_or_context, user=user)
             elif b.debit_account:
-                t.credit(account=b.debit_account, amount=b.amount, member=b.member)
+                t.credit(account=b.debit_account, amount=b.amount, member=b.member, user_or_context=user_or_context, user=user)
         t.save()
+        self.log(user_or_context, '.reversed', user=user)
+
         return t
 
     @property
@@ -153,9 +180,9 @@ class Transaction(models.Model, LogTargetMixin):
         return len(response_counter)
 
     def __str__(self):
-        return "<Transaction(memo={!r}{}{})>".format(
+        return "<Transaction(memo={!r}, value_datetime={!r}{})>".format(
             self.find_memo(),
-            ", booking_datetime={!r}".format(self.booking_datetime) if self.booking_datetime else "",
+            self.value_datetime.isoformat(),
             ", reverses={}".format(self.reverses) if self.reverses else "",
         )
 

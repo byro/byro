@@ -61,4 +61,8 @@
     <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
 {% endif %}
 </form>
+
+<h4>{% trans "Related log entries" %}</h4>
+{% include "common/log.html" with log_entries=transaction.log_entries %}
+
 {% endblock %}
