@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models import Prefetch
+from django.urls import reverse
 
 from byro.common.models import LogTargetMixin
 
@@ -148,6 +149,16 @@ class Transaction(models.Model, LogTargetMixin):
 
         response_counter += Counter()   # Remove zero and negative elements
         return len(response_counter)
+
+    def __str__(self):
+        return "<Transaction(memo={!r}{}{})>".format(
+            self.find_memo(),
+            ", booking_datetime={!r}".format(self.booking_datetime) if self.booking_datetime else "",
+            ", reverses={}".format(self.reverses) if self.reverses else "",
+        )
+
+    def get_absolute_url(self):
+        return reverse('office:finance.transactions.detail', kwargs={'pk': self.pk})
 
 
 class BookingsQuerySet(models.QuerySet):

@@ -11,6 +11,7 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration
 from byro.members.models import FeeIntervals, Member, Membership, MembershipType
 
+SOURCE_TEST_DATA='Import of test data'
 
 def make_date(delta, end=False):
     date = (now() - delta).date()
@@ -35,6 +36,7 @@ class Command(BaseCommand):
         config.mail_from = 'verein@dervereindervere.in'
         config.backoffice_mail = 'vorstanz@dervereindervere.in'
         config.save()
+        config.log(None, 'byro.settings.changed', source=SOURCE_TEST_DATA)
 
     def make_paid(self, member, vaguely=False, overly=False, donates=0, pays_for=None):
         member.update_liabilites()
@@ -69,6 +71,7 @@ class Command(BaseCommand):
             if pays_for:
                 t.credit(account=SpecialAccounts.fees_receivable, member=pays_for, amount=pure_amount)
             t.save()
+            t.log(None, 'byro.bookkeeping.transaction.created', source=SOURCE_TEST_DATA)
 
     def create_membership_types(self):
         MembershipType.objects.create(name='Standard membership', amount=120)
@@ -88,6 +91,8 @@ class Command(BaseCommand):
             amount=10,
         )
         self.make_paid(has_left)
+        has_left.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         does_not_pay = Member.objects.create(
             number='2',
             name='Yohnny Yolo',
@@ -101,6 +106,8 @@ class Command(BaseCommand):
             amount=10,
         )
         does_not_pay.update_liabilites()
+        does_not_pay.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         pays_occasionally = Member.objects.create(
             number='3',
             name='Olga Occasional',
@@ -114,6 +121,8 @@ class Command(BaseCommand):
             amount=10,
         )
         self.make_paid(pays_occasionally, vaguely=True)
+        pays_occasionally.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         pays_regularly = Member.objects.create(
             number='4',
             name='Dennis Diligent',
@@ -127,6 +136,8 @@ class Command(BaseCommand):
             amount=10,
         )
         self.make_paid(pays_regularly)
+        pays_regularly.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         pays_too_much = Member.objects.create(
             number='5',
             name='Omar Overachiever',
@@ -140,6 +151,8 @@ class Command(BaseCommand):
             amount=10,
         )
         self.make_paid(pays_too_much, overly=True)
+        pays_too_much.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         will_join = Member.objects.create(
             number='6',
             name='Francine Futuremember',
@@ -152,6 +165,8 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
+        will_join.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         giver = Member.objects.create(
             number='7',
             name='George Giver',
@@ -165,6 +180,8 @@ class Command(BaseCommand):
             amount=10,
         )
         self.make_paid(giver, donates=5)
+        giver.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         is_payed_for = Member.objects.create(
             number='8',
             name='Peter Partner',
@@ -178,6 +195,8 @@ class Command(BaseCommand):
             amount=10,
         )
         is_payed_for.update_liabilites()
+        is_payed_for.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
+
         pays_other = Member.objects.create(
             number='9',
             name='Aaron Alsopayer',
@@ -191,6 +210,7 @@ class Command(BaseCommand):
             amount=10,
         )
         self.make_paid(pays_other, pays_for=is_payed_for)
+        pays_other.log(None, 'byro.members.created', source=SOURCE_TEST_DATA)
 
     def create_bank_chaff(self):
         "Create some dummy traffic, and a couple of unmatched transactions on the bank account"
@@ -204,6 +224,7 @@ class Command(BaseCommand):
             account=bank_account, amount=20
         )
         t.save()
+        t.log(None, 'byro.bookkeeping.transaction.created', source=SOURCE_TEST_DATA)
 
         t = Transaction.objects.create(
             value_datetime=(now()-relativedelta(days=17)).date(),
@@ -213,6 +234,7 @@ class Command(BaseCommand):
             account=bank_account, amount=42.23
         )
         t.save()
+        t.log(None, 'byro.bookkeeping.transaction.created', source=SOURCE_TEST_DATA)
 
         for i in range(1, 4):
             t = Transaction.objects.create(
@@ -223,6 +245,7 @@ class Command(BaseCommand):
                 account=bank_account, amount=9.95
             )
             t.save()
+            t.log(None, 'byro.bookkeeping.transaction.created', source=SOURCE_TEST_DATA)
 
         t = Transaction.objects.create(
             value_datetime=(now()-relativedelta(days=21)).date(),
@@ -232,6 +255,7 @@ class Command(BaseCommand):
             account=bank_account, amount=123
         )
         t.save()
+        t.log(None, 'byro.bookkeeping.transaction.created', source=SOURCE_TEST_DATA)
 
         t = Transaction.objects.create(
             value_datetime=(now()-relativedelta(days=20)).date(),
@@ -241,6 +265,7 @@ class Command(BaseCommand):
             account=bank_account, amount=666
         )
         t.save()
+        t.log(None, 'byro.bookkeeping.transaction.created', source=SOURCE_TEST_DATA)
 
     @transaction.atomic()
     def handle(self, *args, **options):

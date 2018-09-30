@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
+from byro.common.models import Configuration
 from byro.common.signals import log_formatters
 
 FORMATTER_REGISTRY = {}
@@ -23,9 +24,9 @@ def default_formatter(entry):
             url = reverse('office:settings.users.detail', kwargs={'pk': co.pk})
 
         if url:
-            related_object = mark_safe('(<a href="{}">{}</a>)'.format(escape(url), escape(str(co))))
+            related_object = mark_safe(' (<a href="{}">{}</a>)'.format(escape(url), escape(str(co))))
         else:
-            related_object = mark_safe('({})'.format(escape(co)))
+            related_object = mark_safe(' ({})'.format(escape(co)))
 
     extra_data = ""
     if data:

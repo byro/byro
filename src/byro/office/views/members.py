@@ -83,7 +83,7 @@ class MemberCreateView(FormView):
         self.form = form
         form.save()
         messages.success(self.request, _('The member was added, please edit additional details if applicable.'))
-        form.instance.log(self, 'byro.members.add')
+        form.instance.log(self, 'byro.members.created')
 
         responses = new_member.send_robust(sender=form.instance)
         for module, response in responses:

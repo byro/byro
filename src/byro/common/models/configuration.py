@@ -1,8 +1,11 @@
 from django.conf.global_settings import LANGUAGES
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
+
+from byro.common.models.log import LogTargetMixin
 
 
 class ByroConfiguration(SingletonModel):
@@ -13,7 +16,7 @@ class ByroConfiguration(SingletonModel):
         abstract = True
 
 
-class Configuration(ByroConfiguration):
+class Configuration(LogTargetMixin, ByroConfiguration):
 
     name = models.CharField(
         null=True, blank=True,
@@ -94,3 +97,9 @@ class Configuration(ByroConfiguration):
     )
 
     form_title = _('General settings')
+
+    def __str__(self):
+        return "Settings"
+
+    def get_absolute_url(self):
+        return reverse('office:settings.base')

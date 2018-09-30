@@ -56,12 +56,16 @@ class TransactionDetailView(ListView):
                 member=form.cleaned_data['member'],
                 importer="_manual_entry",
             )
+            log_args = {}
             if form.cleaned_data['debit_value']:
                 t.debit(amount=form.cleaned_data['debit_value'], **arguments)
+                log_args['debit'] = dict(amount=form.cleaned_data['debit_value'], **arguments)
             if form.cleaned_data['credit_value']:
                 t.credit(amount=form.cleaned_data['credit_value'], **arguments)
+                log_args['credit'] = dict(amount=form.cleaned_data['credit_value'], **arguments)
             t.save()
             messages.success(self.request, _('The transaction was updated.'))
+            t.log(self, 'byro.bookkeeping.transaction.update', **log_args)
 
             t = self.get_object()
 
