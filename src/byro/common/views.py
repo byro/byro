@@ -38,7 +38,7 @@ class LoginView(TemplateView):
 
 
 def logout_view(request: HttpRequest) -> HttpResponseRedirect:
-    if(request.user):
+    if request.user:
         LogEntry.objects.create(content_object=request.user, user=request.user, action_type="byro.common.logout")
     logout(request)
     return redirect('/')

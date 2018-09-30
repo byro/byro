@@ -2,6 +2,8 @@ import pytest
 from django.shortcuts import reverse
 from django.utils.timezone import now
 
+from byro.common.models import LogEntry
+
 
 @pytest.mark.parametrize('url', (
     'settings.base',
@@ -33,16 +35,41 @@ def test_office_access_urls(client, user, url, logged_in):
 
 @pytest.mark.django_db
 def test_office_login_client(client, user):
+    log_count = LogEntry.objects.count()
     user.set_password('thepassword')
     user.save()
     response = client.post(reverse('common:login'), {'username': user.username, 'password': 'thepassword'}, follow=True)
     assert response.status_code == 200
+    assert LogEntry.objects.count() == log_count + 1
 
 
 @pytest.mark.django_db
-def test_office_logout(logged_in_client):
+def test_office_login_client_incorrect_password(client, user):
+    log_count = LogEntry.objects.count()
+    user.set_password('thepassword')
+    user.save()
+    response = client.post(reverse('common:login'), {'username': user.username, 'password': 'thepasswordddddd'}, follow=True)
+    assert response.status_code == 200
+    assert LogEntry.objects.count() == log_count
+
+
+@pytest.mark.django_db
+def test_office_login_client_inactive_user(client, user):
+    log_count = LogEntry.objects.count()
+    user.set_password('thepassword')
+    user.is_active = False
+    user.save()
+    response = client.post(reverse('common:login'), {'username': user.username, 'password': 'thepasswordddddd'}, follow=True)
+    assert response.status_code == 200
+    assert LogEntry.objects.count() == log_count
+
+
+@pytest.mark.django_db
+def test_office_logout(logged_in_client, configuration):
+    log_count = LogEntry.objects.count()
     response = logged_in_client.post(reverse('common:logout'), follow=True)
     assert response.status_code == 200
+    assert LogEntry.objects.count() == log_count + 1
 
 
 @pytest.mark.django_db
