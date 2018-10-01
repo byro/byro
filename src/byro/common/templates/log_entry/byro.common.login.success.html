@@ -1,0 +1,7 @@
+{% extends "common/log_entry/base.html" %}
+{% load i18n %}
+
+{% block log_entry_content %}
+    <h5><span class="le-icon"></span>{% trans "User logged in" %}</h5>
+    {% include "log_entry/snippet_user.html" with user=log_entry.content_object %}
+{% endblock %}

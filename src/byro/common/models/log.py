@@ -1,3 +1,5 @@
+import datetime
+import decimal
 from functools import wraps
 
 from django.contrib.auth import get_user_model
@@ -65,6 +67,29 @@ class LogEntry(models.Model):
         return super().save(*args, **kwargs)
 
 
+def flatten_objects(inobj):
+    if isinstance(inobj, dict):
+        return {k: flatten_objects(v) for k, v in inobj.items()}
+    elif isinstance(inobj, (tuple, list)):
+        return [flatten_objects(v) for v in inobj]
+    elif isinstance(inobj, datetime.datetime):
+        return inobj.strftime('%Y-%m-%d %H:%M:%S %Z')
+    elif isinstance(inobj, datetime.date):
+        return inobj.strftime('%Y-%m-%d')
+    elif isinstance(inobj, (int, float, decimal.Decimal)):
+        return "{:.2f}".format(inobj)
+    else:
+        try:
+            content_type = ContentType.objects.get_for_model(type(inobj))
+            return {
+                'object': content_type.name,
+                'ref': (content_type.app_label, content_type.model, inobj.pk),
+                'value': str(inobj)
+            }
+        except Exception:
+            return str(inobj)
+
+
 class LogTargetMixin:
     LOG_TARGET_BASE = None
 
@@ -79,6 +104,8 @@ class LogTargetMixin:
 
         if self.LOG_TARGET_BASE and action.startswith('.'):
             action = self.LOG_TARGET_BASE + action
+
+        kwargs = flatten_objects(kwargs)
 
         LogEntry.objects.create(content_object=self, user=user, action_type=action, data=dict(kwargs))
 
@@ -97,11 +124,11 @@ def log_call(action, log_on='retval'):
 
             retval = f(*args, **kwargs)
 
-            log_kwargs = {k: repr(v) for k, v in kwargs.items() if v}
+            log_kwargs = {k: v for k, v in kwargs.items() if v}
             log_args = list(args)
             log_args = log_args[1:]   # Warning: we assume that args[0] is 'self'. Only works correctly with calls to bound methods
             if log_args:
-                log_kwargs['_args'] = [repr(v) for v in log_args]
+                log_kwargs['_args'] = [v for v in log_args]
 
             if log_on == 'retval':
                 retval.log(user_or_context, action, user=user, **log_kwargs)

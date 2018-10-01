@@ -198,7 +198,7 @@ class MemberFinanceView(MemberView):
             Q(credit_account__in=account_list),
             member=self.get_member(),
             transaction__value_datetime__lte=now(),
-        ).order_by('-transaction__value_datetime')
+        ).order_by('-transaction__value_datetime', '-booking_datetime', '-transaction__booking_datetime')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

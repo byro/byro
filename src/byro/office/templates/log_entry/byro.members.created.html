@@ -1,0 +1,7 @@
+{% extends "common/log_entry/base.html" %}
+{% load i18n %}
+
+{% block log_entry_content %}
+    <h5><span class="le-icon"><i class="fa fa-user-plus"></i></span>{% trans "Member created" %}</h5>
+    {% include "log_entry/snippet_member.html" with member=log_entry.content_object %}
+{% endblock %}

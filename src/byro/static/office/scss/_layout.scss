@@ -108,3 +108,25 @@ footer {
     font-size: 11px;
     text-align: center;
 }
+
+.log_entry {
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    padding-left: 3em;
+    .le-icon {
+        margin-left: -2em;
+        display: inline-block;
+        min-width: 2em;
+        text-align: center;
+        margin-right: 0.2em;
+    }
+    h5 {
+        margin-bottom: 0.1rem;
+        display: inline-block;
+        min-width: 25%;
+    }
+    dl.row, dd {
+        margin-bottom: 0;
+    }
+}

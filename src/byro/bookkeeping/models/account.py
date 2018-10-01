@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.decorators import classproperty
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -114,3 +115,6 @@ class Account(Auditable, models.Model, LogTargetMixin):
 
     def get_absolute_url(self):
         return reverse('office:finance.accounts.detail', kwargs={'pk': self.pk})
+
+    def get_object_icon(self):
+        return mark_safe('<i class="fa fa-bank"></i> ')

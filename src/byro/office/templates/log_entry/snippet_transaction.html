@@ -1,0 +1,6 @@
+{% if transaction %}
+    <a href="{{transaction.get_absolute_url}}">
+        Transaction {{transaction.pk}}
+    </a>
+    {% include "common/log_data.html" with data=log_entry.data %}
+{% endif %}

@@ -1,5 +1,9 @@
+from contextlib import suppress
+
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import register
+from django.template.loader import TemplateDoesNotExist, get_template
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -10,6 +14,10 @@ FORMATTER_REGISTRY = {}
 
 
 def default_formatter(entry):
+    with suppress(TemplateDoesNotExist):
+        tmpl = get_template("log_entry/{}.html".format(entry.action_type))
+        return tmpl.render({'log_entry': entry})
+
     data = dict(entry.data or {})
     data.pop('source', None)
 
@@ -61,3 +69,32 @@ def format_log_source(entry):
             return mark_safe('{} (via {})'.format(source, user))
     else:
         return source
+
+
+@register.filter(name='format_log_object')
+def format_log_object(obj):
+    with suppress(Exception):
+        if 'object' in obj and 'ref' in obj and 'value' in obj:
+            content_object = ContentType.objects.get(app_label=obj['ref'][0], model=obj['ref'][1]).get_object_for_this_type(pk=obj['ref'][2])
+
+            if obj['value'] == str(content_object):
+                url = content_object.get_absolute_url()
+                str_val = mark_safe(escape(str(obj['value'])))
+
+                if hasattr(content_object, 'get_object_icon'):
+                    icon = content_object.get_object_icon()
+                else:
+                    icon = ""
+
+                if url:
+                    return mark_safe('{}<a href="{}">{}</a>'.format(icon, escape(url), str_val))
+
+            else:
+                return "{} object: {!r}".format(obj['object'], obj['value'])
+
+    return obj
+
+
+@register.filter(name='items_sorted')
+def items_sorted(data):
+    return sorted(data)

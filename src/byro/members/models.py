@@ -7,6 +7,7 @@ from django.db import models, transaction
 from django.db.models.fields.related import OneToOneRel
 from django.urls import reverse
 from django.utils.decorators import classproperty
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -271,6 +272,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
     def get_absolute_url(self):
         return reverse('office:members.data', kwargs={'pk': self.pk})
+
+    def get_object_icon(self):
+        return mark_safe('<i class="fa fa-user"></i> ')
 
     def log_entries(self):
         own_entries = [e.pk for e in super().log_entries()]

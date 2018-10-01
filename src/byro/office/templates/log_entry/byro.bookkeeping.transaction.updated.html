@@ -1,0 +1,7 @@
+{% extends "common/log_entry/base.html" %}
+{% load i18n %}
+
+{% block log_entry_content %}
+    <h5><span class="le-icon"><i class="fa fa-money"></i><i class="fa fa-pencil"></i></span>{% trans "Transaction updated" %}</h5>
+    {% include "log_entry/snippet_transaction.html" with transaction=log_entry.content_object %}
+{% endblock %}

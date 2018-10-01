@@ -1,0 +1,6 @@
+{% if user %}
+    <i class="fa fa-user"></i> <a href="{% url 'office:settings.users.detail' pk=user.pk %}">
+        {{user.first_name}} {{user.last_name}} ({{user}})
+    </a>
+    {% include "common/log_data.html" with data=log_entry.data %}
+{% endif %}

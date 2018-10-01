@@ -1,0 +1,6 @@
+{% if member %}
+    <a href="{{member.get_absolute_url}}">
+        {{member.name}} ({{member.number}})
+    </a>
+    {% include "common/log_data.html" with data=log_entry.data %}
+{% endif %}

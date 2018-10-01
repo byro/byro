@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models import Prefetch
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from byro.common.models import LogTargetMixin, log_call
 
@@ -102,7 +103,7 @@ class Transaction(models.Model, LogTargetMixin):
             elif b.debit_account:
                 t.credit(account=b.debit_account, amount=b.amount, member=b.member, user_or_context=user_or_context, user=user)
         t.save()
-        self.log(user_or_context, '.reversed', user=user)
+        self.log(user_or_context, '.reversed', user=user, reversed_by=t)
 
         return t
 
@@ -180,7 +181,8 @@ class Transaction(models.Model, LogTargetMixin):
         return len(response_counter)
 
     def __str__(self):
-        return "<Transaction(memo={!r}, value_datetime={!r}{})>".format(
+        return "Transaction(pk={}, memo={!r}, value_datetime={!r}{})".format(
+            self.pk,
             self.find_memo(),
             self.value_datetime.isoformat(),
             ", reverses={}".format(self.reverses) if self.reverses else "",
@@ -188,6 +190,9 @@ class Transaction(models.Model, LogTargetMixin):
 
     def get_absolute_url(self):
         return reverse('office:finance.transactions.detail', kwargs={'pk': self.pk})
+
+    def get_object_icon(self):
+        return mark_safe('<i class="fa fa-money"></i> ')
 
 
 class BookingsQuerySet(models.QuerySet):
