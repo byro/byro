@@ -1,4 +1,5 @@
 import pytest
+from django.db import transaction
 
 from byro.common.models import LogEntry
 
@@ -32,6 +33,31 @@ def test_log_immutable(member):
 
     with pytest.raises(Exception):
         a.delete()
+
+
+@pytest.mark.django_db
+def test_log_immutable_2(member):
+    LogEntry.objects.create(content_object=member, action_type="test.test_log_immutable_2", data={'source': 'test'})
+
+    a = LogEntry.objects.get(action_type="test.test_log_immutable_2")
+
+    def monkey_patched_save(*args, **kwargs):
+        return super(LogEntry, a).save(*args, **kwargs)
+
+    def monkey_patched_delete(*args, **kwargs):
+        return super(LogEntry, a).delete(*args, **kwargs)
+
+    a.save = monkey_patched_save
+    a.delete = monkey_patched_delete
+
+    with pytest.raises(Exception):
+        a.action_type = "Fnord"
+        with transaction.atomic():
+            a.save()
+
+    with pytest.raises(Exception):
+        with transaction.atomic():
+            a.delete()
 
 
 @pytest.mark.django_db

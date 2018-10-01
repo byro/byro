@@ -7,6 +7,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models.signals import pre_delete, pre_save
+from django.dispatch import receiver
 
 
 class ContentObjectManager(models.Manager):
@@ -66,6 +68,18 @@ class LogEntry(models.Model):
             raise ValueError("Need to provide at least user or data['source']")
 
         return super().save(*args, **kwargs)
+
+
+@receiver(pre_save, sender=LogEntry)
+def log_entry_pre_save(sender, instance, *args, **kwargs):
+    if instance.pk:
+        raise TypeError("Logs cannot be modified.")
+
+
+@receiver(pre_delete, sender=LogEntry)
+def log_entry_pre_delete(sender, instance, *args, **kwargs):
+    if instance.pk:
+        raise TypeError("Logs cannot be deleted.")
 
 
 def flatten_objects(inobj, key_was=None):
