@@ -242,12 +242,12 @@ class Member(Auditable, models.Model, LogTargetMixin):
         missing_dues = dues - dues_in_db_as_set
 
         # Step 4
-        for wrong_due in wrong_dues_in_db:
+        for wrong_due in sorted(wrong_dues_in_db):
             booking = dues_in_db[wrong_due]
             booking.transaction.reverse(memo=_('Due amount canceled because of change in membership amount'), user_or_context='internal: update_liabilites, membership amount changed',)
 
         # Step 5:
-        for (date, amount) in missing_dues:
+        for (date, amount) in sorted(missing_dues):
             t = Transaction.objects.create(
                 value_datetime=date,
                 booking_datetime=_now,
