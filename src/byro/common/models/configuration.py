@@ -8,7 +8,7 @@ from solo.models import SingletonModel
 from byro.common.models.log import LogTargetMixin
 
 
-class ByroConfiguration(SingletonModel):
+class ByroConfiguration(LogTargetMixin, SingletonModel):
     """ Use this class to build a configuration set that will automatically
     show up on the office settings interface. """
 
@@ -16,7 +16,7 @@ class ByroConfiguration(SingletonModel):
         abstract = True
 
 
-class Configuration(LogTargetMixin, ByroConfiguration):
+class Configuration(ByroConfiguration):
     LOG_TARGET_BASE = 'byro.settings'
 
     name = models.CharField(

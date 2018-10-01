@@ -9,6 +9,7 @@ from byro.common.forms import ConfigurationForm, RegistrationConfigForm, Initial
 from byro.common.models.configuration import Configuration, ByroConfiguration
 
 from byro.common.models import LogEntry
+from django.db import transaction
 
 class InitialSettings(FormView):
     form_class = InitialForm
@@ -19,9 +20,10 @@ class InitialSettings(FormView):
         form_kwargs['instance'] = Configuration.get_solo()
         return form_kwargs
 
+    @transaction.atomic
     def form_valid(self, form):
         form.save()
-        LogEntry.objects.create(content_object=Configuration.get_solo(), user=self.request.user, action_type="byro.settings.initial")
+        form.instance.log(self, ".initial", **form.cleaned_data)
         messages.success(self.request, _('You\'re nearly ready to go – configure how you want to add new members, and you\'re done.'))
         return super().form_valid(form)
 
@@ -46,15 +48,26 @@ class ConfigurationView(FormView):
             for model in config_models
         ]
 
+    @transaction.atomic
     def form_valid(self, form):
-        for form in self.get_form():
-            form.save()
-        LogEntry.objects.create(content_object=Configuration.get_solo(), user=self.request.user, action_type="byro.settings.changed")
+        for f in form:
+            f.save()
+            if f.changed_data:
+                f.instance.log(self, "byro.settings.changed", changes={
+                    k: (self._original_values[f][k], f.cleaned_data[k]) for k in f.changed_data
+                })
+        
         messages.success(self.request, _('The config was saved successfully.'))
-        return super().form_valid(form)
+        return super().form_valid(f)
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
+        self._original_values = {
+            f: {
+                k: getattr(f.instance, k)
+                for k in f.fields
+            } for f in form
+        }
         if all(f.is_valid() for f in form):
             return self.form_valid(form)
         else:

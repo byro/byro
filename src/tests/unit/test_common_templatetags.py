@@ -21,6 +21,7 @@ def test_templatetag_url_replace(GET, key, value, expected):
     result = url_replace(request(GET), key, value)
     assert all(e in result for e in expected)
 
+
 @pytest.mark.django_db
 def test_log_entry_formatting(mail_template, user):
     assert (

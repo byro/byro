@@ -1,7 +1,7 @@
 {% load log_entry %}
 <dl class="row">
-    {% for k,v in log_entry.data.items|items_sorted %}
-        {% if k != 'source' %}
+    {% for k,v in data.items|items_sorted %}
+        {% if k != 'source' and k != 'changes' %}
         <dt class="col-sm-3">{{k}}</dt><dd class="col-sm-9">{{v | format_log_object }}</dd>
         {% endif %}
     {% endfor %}

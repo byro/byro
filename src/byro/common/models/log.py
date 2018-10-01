@@ -25,12 +25,13 @@ class LogEntry(models.Model):
     :param content_object: The object that was modified (or added)
     :param datetime: Timestamp of the logged action
     :param user: The user that performed the action
-    :param action_type: dot-namespaced type of the action, such as "byro.office.members.add"
+    :param action_type: dot-namespaced type of the action, such as "byro.office.members.added"
     :param data: arbitrary additional data about the action.
       Well-known keys:
         * source: Actor/initiator of the change (a user or an automatic process). This must always be present. Will be generated from user attribute if set.
         * old: Value before the change
         * new: Value after the change
+        * changes: dictionary of changes  key: (old_value, new_value)
     """
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField(db_index=True)
@@ -67,16 +68,16 @@ class LogEntry(models.Model):
         return super().save(*args, **kwargs)
 
 
-def flatten_objects(inobj):
+def flatten_objects(inobj, key_was=None):
     if isinstance(inobj, dict):
-        return {k: flatten_objects(v) for k, v in inobj.items()}
+        return {k: flatten_objects(v, key_was=k) for k, v in inobj.items()}
     elif isinstance(inobj, (tuple, list)):
         return [flatten_objects(v) for v in inobj]
     elif isinstance(inobj, datetime.datetime):
         return inobj.strftime('%Y-%m-%d %H:%M:%S %Z')
     elif isinstance(inobj, datetime.date):
         return inobj.strftime('%Y-%m-%d')
-    elif isinstance(inobj, (int, float, decimal.Decimal)):
+    elif isinstance(inobj, decimal.Decimal) or (key_was == 'amount' and isinstance(inobj, (int, float))):
         return "{:.2f}".format(inobj)
     else:
         try:

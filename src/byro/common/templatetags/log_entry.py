@@ -75,22 +75,22 @@ def format_log_source(entry):
 def format_log_object(obj):
     with suppress(Exception):
         if 'object' in obj and 'ref' in obj and 'value' in obj:
-            content_object = ContentType.objects.get(app_label=obj['ref'][0], model=obj['ref'][1]).get_object_for_this_type(pk=obj['ref'][2])
+            with suppress(Exception):
+                content_object = ContentType.objects.get(app_label=obj['ref'][0], model=obj['ref'][1]).get_object_for_this_type(pk=obj['ref'][2])
 
-            if obj['value'] == str(content_object):
-                url = content_object.get_absolute_url()
-                str_val = mark_safe(escape(str(obj['value'])))
+                if obj['value'] == str(content_object):
+                    url = content_object.get_absolute_url()
+                    str_val = mark_safe(escape(str(obj['value'])))
 
-                if hasattr(content_object, 'get_object_icon'):
-                    icon = content_object.get_object_icon()
-                else:
-                    icon = ""
+                    if hasattr(content_object, 'get_object_icon'):
+                        icon = content_object.get_object_icon()
+                    else:
+                        icon = ""
 
-                if url:
-                    return mark_safe('{}<a href="{}">{}</a>'.format(icon, escape(url), str_val))
+                    if url:
+                        return mark_safe('{}<a href="{}">{}</a>'.format(icon, escape(url), str_val))
 
-            else:
-                return "{} object: {!r}".format(obj['object'], obj['value'])
+            return mark_safe("<i>{} object</i>: {!r}".format(escape(str(obj['object'])), escape(str(obj['value']))))
 
     return obj
 
