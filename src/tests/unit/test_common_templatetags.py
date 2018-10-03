@@ -33,7 +33,7 @@ def test_log_entry_formatting(mail_template, user):
                 action_type='action.type',
             )
         )
-        == 'action.type (Test Mail)'
+        == 'action.type (<a href="/mails/templates/6">Test Mail</a>)'
     )
     assert format_log_entry(
         LogEntry(

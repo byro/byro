@@ -1,6 +1,8 @@
 from copy import deepcopy
 
 from django.db import models
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import override, ugettext_lazy as _
 from i18nfield.fields import I18nCharField, I18nTextField
@@ -62,6 +64,12 @@ class MailTemplate(Auditable, models.Model):
                 if skip_queue:
                     mail.send()
         return mail
+
+    def get_absolute_url(self):
+        return reverse('office:mails.templates.view', kwargs={'pk': self.pk})
+
+    def get_object_icon(self):
+        return mark_safe('<i class="fa fa-envelope-o"></i> ')
 
 
 class EMail(Auditable, models.Model):
