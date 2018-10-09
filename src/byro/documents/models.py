@@ -1,17 +1,27 @@
-from django.db import models
+from hashlib import sha512
+
+from django.db import models, transaction
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from byro.common.models.auditable import Auditable
+from byro.common.models import LogTargetMixin, log_call
 from byro.common.models.choices import Choices
 
 
 class DocumentDirection(Choices):
     INCOMING = 'incoming'
     OUTGOING = 'outgoing'
+    OTHER = 'other'
 
 
-class Document(Auditable, models.Model):
-    document = models.FileField(upload_to='documents/')
+class Document(models.Model, LogTargetMixin):
+    LOG_TARGET_BASE = 'byro.documents.document'
+
+    class Meta:
+        ordering = ('-date', 'title', '-id')
+
+    document = models.FileField(upload_to='documents/%Y/%m/', max_length=1000)
+    date = models.DateField(null=True, default=now)
     title = models.CharField(max_length=300, null=True)
     category = models.CharField(max_length=300, null=True)
     direction = models.CharField(
@@ -25,6 +35,7 @@ class Document(Auditable, models.Model):
         on_delete=models.SET_NULL,
         null=True, blank=True,
     )
+    content_hash = models.CharField(max_length=300, null=True)
 
     template = _('''
 Hi, {name},
@@ -34,6 +45,25 @@ Please find attached a document we wanted to send you/that you requested.
 Thank you,
 {association}
 ''').strip()
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        if not getattr(self, 'pk', None):
+            first_time = True
+        else:
+            first_time = False
+
+        retval = super().save(*args, **kwargs)
+
+        if first_time:
+            h = sha512()
+            with self.document.open(mode='rb') as f:
+                for chunk in f.chunks():
+                    h.update(chunk)
+            self.content_hash = 'sha512:{}'.format(h.hexdigest())
+            super().save(*args, **kwargs)
+
+        return retval
 
     def send(self, immediately=False, text=None, subject=None, email=None):
         from byro.common.models import Configuration
