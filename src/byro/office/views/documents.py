@@ -21,6 +21,10 @@ class DocumentUploadForm(forms.ModelForm):
         categories = get_document_category_names()
 
         self.fields['category'] = forms.ChoiceField(choices=sorted(categories.items()), initial=initial_category)
+        if 'class' in self.fields['date'].widget.attrs:
+            self.fields['date'].widget.attrs['class'] += ' datepicker'
+        else:
+            self.fields['date'].widget.attrs['class'] = 'datepicker'
 
 
 class DocumentUploadView(FormView):
