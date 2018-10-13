@@ -70,7 +70,7 @@ Thank you,
                 for chunk in f.chunks():
                     h.update(chunk)
             self.content_hash = 'sha512:{}'.format(h.hexdigest())
-            super().save(*args, **kwargs)
+            super().save(update_fields=['content_hash'])
             self.log('internal: automatic checkpoint', '.stored', **self._get_log_properties())
 
         return retval
