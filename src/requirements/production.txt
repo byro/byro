@@ -13,3 +13,4 @@ django-db-constraints==0.3.*
 jinja2==2.10.*
 psycopg2-binary==2.7.*
 python-dateutil
+django-select2==6.3.1

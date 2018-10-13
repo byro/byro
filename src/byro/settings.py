@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'djangoformsetjs',
     'solo.apps.SoloAppConfig',
+    'django_select2',
 
     'byro.common.apps.CommonConfig',
     'byro.bookkeeping.apps.BookkeepingConfig',
@@ -267,6 +268,11 @@ else:
     EMAIL_USE_TLS = True  # Only one of these
     EMAIL_USE_SSL = False  # Only one of these
 
+## SELECT2 SETTINGS
+
+SELECT2_JS = ''
+SELECT2_CSS = ''
+SELECT2_I18N_PATH = '/static/vendored/select2/js/i18n'
 
 try:
     from .local_settings import *

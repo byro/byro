@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView
+from django_select2.forms import Select2Widget
 
 from byro.bookkeeping.models import (
     Account, Booking, DocumentTransactionLink, Transaction,
@@ -15,8 +16,8 @@ from .documents import DocumentUploadForm
 
 class NewBookingForm(forms.Form):
     memo = forms.CharField(label=_('Memo'), max_length=1000, required=False)
-    member = Booking._meta.get_field('member').formfield()
-    account = Booking._meta.get_field('debit_account').formfield()
+    member = Booking._meta.get_field('member').formfield(widget=Select2Widget)
+    account = Booking._meta.get_field('debit_account').formfield(widget=Select2Widget)
     debit_value = forms.DecimalField(min_value=0, max_digits=8, decimal_places=2, required=False)
     credit_value = forms.DecimalField(min_value=0, max_digits=8, decimal_places=2, required=False)
 
