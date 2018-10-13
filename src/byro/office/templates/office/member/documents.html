@@ -14,6 +14,7 @@
         </div>
     </div>
 
+    {% if member.documents.count %}
     <div class="card mt-3">
         <div class="card-header">
             <h4 class="card-title">{% trans "Related documents" %}</h4>
@@ -23,5 +24,6 @@
         </div>
         <div class="card-footer">{% include "office/pagination.html" %}</div>
     </div>
+    {% endif %}
 
 {% endblock %}

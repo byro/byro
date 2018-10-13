@@ -237,7 +237,7 @@ class MemberDocumentsView(MemberView, FormView):
 
         form.instance.member = member
         form.save()
-        member.log(self, '.documents.created', document=form.instance, content_hash=form.instance.content_hash)
+        member.log(self, '.document.created', document=form.instance, content_hash=form.instance.content_hash)
 
         return super().form_valid(form)
 

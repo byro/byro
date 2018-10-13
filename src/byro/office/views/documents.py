@@ -14,11 +14,13 @@ class DocumentUploadForm(forms.ModelForm):
         exclude = ('content_hash', 'member')
 
     def __init__(self, *args, **kwargs):
+        initial_category = kwargs.pop('initial_category', 'byro.documents.misc')
+
         super().__init__(*args, **kwargs)
 
         categories = get_document_category_names()
 
-        self.fields['category'] = forms.ChoiceField(choices=sorted(categories.items()), initial='byro.documents.misc')
+        self.fields['category'] = forms.ChoiceField(choices=sorted(categories.items()), initial=initial_category)
 
 
 class DocumentUploadView(FormView):

@@ -53,7 +53,7 @@ Thank you,
         return {
             f.name: getattr(self, f.name)
             for f in self._meta.get_fields()
-            if f.name not in ('id', 'mails')
+            if f.name not in ('id', 'mails') and hasattr(self, f.name)
         }
 
     @transaction.atomic

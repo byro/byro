@@ -15,6 +15,7 @@
     <thead>
         <tr>
             <th></th>
+            <th></th>
             <th>{% trans "Date" %}</th>
             <th>{% trans "Purpose" %}<br><i>{% trans "Originator/Recipient" %}</i></th>
             <th>{% trans "Member" %}</th>
@@ -28,13 +29,20 @@
             {% with transaction=booking.transaction %}
             {% with related_bookings=transaction.cached_bookings %}
                 <tr class="transaction-{% if not booking.transaction_balances_debit == booking.transaction_balances_credit %}unbalanced-{% endif %}{% cycle 'row-odd' 'row-even' as account_row %}">
-                    {% if booking.transaction_balances_debit == booking.transaction_balances_credit %}
-                        <td></td>
-                    {% else %}
-                        <td>
-                            <a href="{% url "office:finance.transactions.detail" pk=transaction.pk %}?in_account={{account.pk}}"><span class="fa fa-pencil"></span></a>
-                        </td>
-                    {% endif %}
+                    <td>
+                        <a href="{% url "office:finance.transactions.detail" pk=transaction.pk %}?in_account={{account.pk}}">
+                            {% if booking.transaction_balances_debit == booking.transaction_balances_credit %}
+                                <span class="fa fa-eye"></span>
+                            {% else %}
+                                <span class="fa fa-pencil"></span>
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td>
+                        {% if transaction.documents.count %}
+                            <span class="fa fa-paperclip"></span>
+                        {% endif %}
+                    </td>
                     <td style="white-space: nowrap;">{{ transaction.value_datetime.date }}</td>
                     <td>
                         <a data-toggle="collapse" data-target=".collapse-{{transaction.id}}" aria-controls="collapse-{{transaction.id}}">
@@ -66,6 +74,7 @@
                 </tr>
                 {% for related_booking in related_bookings %}
                 <tr class="collapse in related-{{ account_row }}-{% cycle 'related-odd' 'related-even' as related_row %} collapse-{{transaction.id}} {% if forloop.first %}related-first{% endif %} {% if forloop.last %}related-last{% endif %}">
+                    <td class="related-empty"></td>
                     <td class="related-empty"></td>
                     <td class="related-empty"></td>
                     <td>

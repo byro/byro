@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from byro.common.models import LogTargetMixin, log_call
+from byro.documents.models import Document
 
 
 class TransactionQuerySet(models.QuerySet):
@@ -73,6 +74,8 @@ class Transaction(models.Model, LogTargetMixin):
     )
 
     data = JSONField(null=True)
+
+    documents = models.ManyToManyField(Document, through='DocumentTransactionLink')
 
     @log_call('.debit.created', log_on='self')
     def debit(self, account, *args, **kwargs):
@@ -193,6 +196,11 @@ class Transaction(models.Model, LogTargetMixin):
 
     def get_object_icon(self):
         return mark_safe('<i class="fa fa-money"></i> ')
+
+
+class DocumentTransactionLink(models.Model):
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
 
 
 class BookingsQuerySet(models.QuerySet):

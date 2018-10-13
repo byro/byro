@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-13 14:52+0000\n"
-"PO-Revision-Date: 2018-10-13 17:00+0200\n"
+"POT-Creation-Date: 2018-10-13 17:13+0000\n"
+"PO-Revision-Date: 2018-10-13 19:14+0200\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -18,6 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
+
+#: byro/bookkeeping/apps.py:10
+msgid "Receipt"
+msgstr "Beleg"
+
+#: byro/bookkeeping/apps.py:11
+msgid "Invoice"
+msgstr "Rechnung"
 
 #: byro/bookkeeping/models/account.py:27
 msgid "Asset account"
@@ -471,7 +479,7 @@ msgid "Contact type"
 msgstr "Kontakt-Typ"
 
 #: byro/members/models.py:97
-#: byro/office/templates/office/account/detail.html:20
+#: byro/office/templates/office/account/detail.html:21
 #: byro/office/templates/office/transaction/detail.html:18
 msgid "Member"
 msgstr "Mitglied"
@@ -563,6 +571,11 @@ msgstr "Haben"
 msgid "Debit"
 msgstr "Soll"
 
+#: byro/office/templates/log_entry/byro.bookkeeping.transaction.document.created.html:5
+#: byro/office/templates/log_entry/byro.members.document.created.html:5
+msgid "Document uploaded"
+msgstr "Dokument hochgeladen"
+
 #: byro/office/templates/log_entry/byro.bookkeeping.transaction.reversed.html:5
 msgid "Transaction reversed"
 msgstr "Transaktion storniert"
@@ -586,10 +599,6 @@ msgstr "Dokument gespeichert"
 #: byro/office/templates/log_entry/byro.members.created.html:5
 msgid "Member created"
 msgstr "Mitglied angelegt"
-
-#: byro/office/templates/log_entry/byro.members.documents.created.html:5
-msgid "Document uploaded"
-msgstr "Dokument hochgeladen"
 
 #: byro/office/templates/log_entry/byro.members.membership.ended.html:5
 msgid "Membership ended"
@@ -637,14 +646,14 @@ msgstr "Speichern"
 msgid "Default "
 msgstr "Standard "
 
-#: byro/office/templates/office/account/detail.html:18
+#: byro/office/templates/office/account/detail.html:19
 #: byro/office/templates/office/documents/snippet_documents_table.html:7
 #: byro/office/templates/office/member/finance_table.html:6
 #: byro/office/templates/office/transaction/detail.html:16
 msgid "Date"
 msgstr "Datum"
 
-#: byro/office/templates/office/account/detail.html:19
+#: byro/office/templates/office/account/detail.html:20
 #: byro/office/templates/office/member/finance_table.html:8
 #: byro/office/templates/office/realtransaction/list.html:29
 #: byro/office/templates/office/realtransaction/match.html:16
@@ -652,12 +661,12 @@ msgstr "Datum"
 msgid "Purpose"
 msgstr "Zweck"
 
-#: byro/office/templates/office/account/detail.html:19
+#: byro/office/templates/office/account/detail.html:20
 #: byro/office/templates/office/transaction/detail.html:17
 msgid "Originator/Recipient"
 msgstr "Urheber/Empfänger"
 
-#: byro/office/templates/office/account/detail.html:21
+#: byro/office/templates/office/account/detail.html:22
 #: byro/office/templates/office/transaction/detail.html:19
 msgid "Account"
 msgstr "Konto"
@@ -975,10 +984,12 @@ msgid "Joined on %(start)s."
 msgstr "Beigetreten am %(start)s."
 
 #: byro/office/templates/office/member/documents.html:10
+#: byro/office/templates/office/transaction/detail.html:87
 msgid "Upload document"
 msgstr "Dokument hochladen"
 
-#: byro/office/templates/office/member/documents.html:19
+#: byro/office/templates/office/member/documents.html:20
+#: byro/office/templates/office/transaction/detail.html:68
 msgid "Related documents"
 msgstr "Zugehörige Dokumente"
 
@@ -1117,7 +1128,7 @@ msgstr "Entfernen"
 msgid "Edit transaction"
 msgstr "Buchungssatz bearbeiten"
 
-#: byro/office/templates/office/transaction/detail.html:65
+#: byro/office/templates/office/transaction/detail.html:78
 msgid "Related log entries"
 msgstr "Zugehörige Logbuch-Einträge"
 
@@ -1218,12 +1229,12 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
 
-#: byro/office/views/documents.py:35 byro/office/views/upload.py:32
+#: byro/office/views/documents.py:36 byro/office/views/upload.py:32
 #: byro/office/views/upload.py:49
 msgid "The upload was processed successfully."
 msgstr "Der Import wurde erfolgreich verarbeitet."
 
-#: byro/office/views/documents.py:37 byro/office/views/upload.py:34
+#: byro/office/views/documents.py:38 byro/office/views/upload.py:34
 msgid "The upload was added successfully, but could not be processed: "
 msgstr ""
 "Der Import wurde erfolgreich hochgeladen, konnte aber nicht verarbeitet "
@@ -1290,11 +1301,11 @@ msgstr ""
 msgid "The config was saved successfully."
 msgstr "Die Einstellungen wurden gespeichert."
 
-#: byro/office/views/transactions.py:12
+#: byro/office/views/transactions.py:17
 msgid "Memo"
 msgstr "Betreff"
 
-#: byro/office/views/transactions.py:65
+#: byro/office/views/transactions.py:112
 msgid "The transaction was updated."
 msgstr "The Transaktion wurde aktualisiert."
 

@@ -62,7 +62,33 @@
 {% endif %}
 </form>
 
-<h4>{% trans "Related log entries" %}</h4>
-{% include "common/log.html" with log_entries=transaction.log_entries %}
+    {% if transaction.documents.count %}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4 class="card-title">{% trans "Related documents" %}</h4>
+        </div>
+        <div class="card-body">
+            {% include "office/documents/snippet_documents_table.html" with documents=transaction.documents.all %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4 class="card-title">{% trans "Related log entries" %}</h4>
+        </div>
+        <div class="card-body">
+            {% include "common/log.html" with log_entries=transaction.log_entries %}
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4 class="card-title">{% trans "Upload document" %}</h4>
+        </div>
+        <div class="card-body">
+            {% include "office/documents/snippet_upload_document.html" with form=upload_form %}
+        </div>
+    </div>
 
 {% endblock %}
