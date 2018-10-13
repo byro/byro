@@ -1,0 +1,8 @@
+{% extends "common/log_entry/base.html" %}
+{% load i18n %}
+
+{% block log_entry_content %}
+    <h5><span class="le-icon"><i class="fa fa-file-o"></i><i class="fa fa-times"></i></span>{% trans "Document deleted" %}</h5>
+    <h6 style="display: inline-block;">{% trans "Showing values before deletion" %}</h6>
+    {% include "common/log_data.html" with data=log_entry.data %}
+{% endblock %}

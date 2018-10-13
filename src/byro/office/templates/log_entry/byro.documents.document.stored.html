@@ -1,0 +1,7 @@
+{% extends "common/log_entry/base.html" %}
+{% load i18n %}
+
+{% block log_entry_content %}
+    <h5><span class="le-icon"><i class="fa fa-file-o"></i></span>{% trans "Document stored" %}</h5>
+    {% include "common/log_data.html" with data=log_entry.data %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% load i18n %}
+{% load office_tags %}
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th class="table-column-small">{% trans "Date" %}</th>
+            <th class="table-column-small">{% trans "Direction" %}</th>
+            <th class="table-column-medium">{% trans "Category" %}</th>
+            <th>{% trans "Title" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for document in documents %}
+            <tr>
+                <td style="white-space: nowrap;">{{ document.date }}</td>
+                <td>{{ document.direction }}</td>
+                <td>{{ document.category | translate_document_category }}</td>
+                <td>{{ document.title }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

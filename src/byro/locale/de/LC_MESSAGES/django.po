@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-01 15:41+0000\n"
-"PO-Revision-Date: 2018-10-01 17:44+0200\n"
+"POT-Creation-Date: 2018-10-13 14:52+0000\n"
+"PO-Revision-Date: 2018-10-13 17:00+0200\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2\n"
 
 #: byro/bookkeeping/models/account.py:27
 msgid "Asset account"
@@ -196,10 +196,6 @@ msgstr "Quelle"
 msgid "Operation"
 msgstr "Vorgang"
 
-#: byro/common/templates/common/log_data_changes.html:5
-msgid "Key"
-msgstr "Schlüssel/Einstellung"
-
 #: byro/common/templates/common/log_data_changes.html:6
 msgid "Old value"
 msgstr "Vorheriger Wert"
@@ -220,7 +216,15 @@ msgstr "Zu den Eingaben wurde kein Nutzer gefunden."
 msgid "User account is deactivated."
 msgstr "Account ist deaktiviert."
 
-#: byro/documents/models.py:29
+#: byro/documents/apps.py:10
+msgid "Miscellaneous document"
+msgstr "Sonstiges Dokument"
+
+#: byro/documents/apps.py:11 byro/office/templates/office/base.html:74
+msgid "Registration form"
+msgstr "Beitrittsformular"
+
+#: byro/documents/models.py:43
 #, python-brace-format
 msgid ""
 "\n"
@@ -239,7 +243,7 @@ msgstr ""
 "Danke\n"
 "{association}\n"
 
-#: byro/documents/models.py:45
+#: byro/documents/models.py:85
 #, python-brace-format
 msgid "[{association}] Your document"
 msgstr "[{association}] Dein Dokument"
@@ -389,7 +393,7 @@ msgstr ""
 "Danke,\n"
 "Das Helferlein"
 
-#: byro/mails/models.py:16 byro/mails/models.py:92
+#: byro/mails/models.py:18 byro/mails/models.py:100
 #: byro/office/templates/office/mails/outbox.html:25
 #: byro/office/templates/office/mails/sent.html:13
 #: byro/office/templates/office/mails/templates.html:22
@@ -397,15 +401,15 @@ msgstr ""
 msgid "Subject"
 msgstr "Betreff"
 
-#: byro/mails/models.py:19 byro/mails/models.py:98
+#: byro/mails/models.py:21 byro/mails/models.py:106
 msgid "Text"
 msgstr "Text"
 
-#: byro/mails/models.py:24 byro/mails/models.py:76
+#: byro/mails/models.py:26 byro/mails/models.py:84
 msgid "Reply-To"
 msgstr "Reply-To"
 
-#: byro/mails/models.py:25
+#: byro/mails/models.py:27
 msgid ""
 "Change the Reply-To address if you do not want to use the default orga "
 "address"
@@ -413,11 +417,11 @@ msgstr ""
 "Ändere das Reply-To-Feld, wenn du Antworten nicht an die allgemeine Adresse "
 "geschickt haben möchtest"
 
-#: byro/mails/models.py:30 byro/mails/models.py:87
+#: byro/mails/models.py:32 byro/mails/models.py:95
 msgid "BCC"
 msgstr "BCC"
 
-#: byro/mails/models.py:31
+#: byro/mails/models.py:33
 msgid ""
 "Enter comma separated addresses. Will receive a blind copy of every mail "
 "sent from this template. This may be a LOT!"
@@ -426,20 +430,20 @@ msgstr ""
 "jeder Mail, die durch dieses Template verschickt wird. Das können viele "
 "werden."
 
-#: byro/mails/models.py:70 byro/office/templates/office/mails/outbox.html:26
+#: byro/mails/models.py:78 byro/office/templates/office/mails/outbox.html:26
 #: byro/office/templates/office/mails/sent.html:14
 msgid "To"
 msgstr "To"
 
-#: byro/mails/models.py:71 byro/mails/models.py:82 byro/mails/models.py:88
+#: byro/mails/models.py:79 byro/mails/models.py:90 byro/mails/models.py:96
 msgid "One email address or several addresses separated by commas."
 msgstr "Eine Adresse oder mehrere durch Kommas getrennte."
 
-#: byro/mails/models.py:81
+#: byro/mails/models.py:89
 msgid "CC"
 msgstr "CC"
 
-#: byro/mails/models.py:99
+#: byro/mails/models.py:107
 msgid "Sent at"
 msgstr "Verschickt"
 
@@ -567,9 +571,25 @@ msgstr "Transaktion storniert"
 msgid "Transaction updated"
 msgstr "Transaktion bearbeitet"
 
+#: byro/office/templates/log_entry/byro.documents.document.deleted.html:5
+msgid "Document deleted"
+msgstr "Dokument gelöscht"
+
+#: byro/office/templates/log_entry/byro.documents.document.deleted.html:6
+msgid "Showing values before deletion"
+msgstr "Werte vor dem Löschen werden angezeigt"
+
+#: byro/office/templates/log_entry/byro.documents.document.stored.html:5
+msgid "Document stored"
+msgstr "Dokument gespeichert"
+
 #: byro/office/templates/log_entry/byro.members.created.html:5
 msgid "Member created"
 msgstr "Mitglied angelegt"
+
+#: byro/office/templates/log_entry/byro.members.documents.created.html:5
+msgid "Document uploaded"
+msgstr "Dokument hochgeladen"
 
 #: byro/office/templates/log_entry/byro.members.membership.ended.html:5
 msgid "Membership ended"
@@ -598,6 +618,7 @@ msgstr "Konto hinzufügen …"
 
 #: byro/office/templates/office/account/add.html:12
 #: byro/office/templates/office/account/detail.html:11
+#: byro/office/templates/office/documents/add.html:14
 #: byro/office/templates/office/member/add.html:13
 #: byro/office/templates/office/member/data.html:21
 #: byro/office/templates/office/member/leave.html:19
@@ -614,9 +635,10 @@ msgstr "Speichern"
 
 #: byro/office/templates/office/account/base.html:4
 msgid "Default "
-msgstr "Standard"
+msgstr "Standard "
 
 #: byro/office/templates/office/account/detail.html:18
+#: byro/office/templates/office/documents/snippet_documents_table.html:7
 #: byro/office/templates/office/member/finance_table.html:6
 #: byro/office/templates/office/transaction/detail.html:16
 msgid "Date"
@@ -693,10 +715,6 @@ msgstr "Einstellungen"
 msgid "General"
 msgstr "Allgemeine Einstellungen"
 
-#: byro/office/templates/office/base.html:74
-msgid "Registration form"
-msgstr "Beitrittsformular"
-
 #: byro/office/templates/office/base.html:77
 #: byro/office/templates/office/user/list.html:5
 msgid "Users"
@@ -715,7 +733,7 @@ msgid "Members"
 msgstr "Mitglieder"
 
 #: byro/office/templates/office/base.html:116
-#: byro/office/templates/office/member/base.html:37
+#: byro/office/templates/office/member/base.html:45
 #: byro/office/templates/office/member/finance.html:4
 msgid "Finance"
 msgstr "Finanzen"
@@ -771,6 +789,27 @@ msgstr[1] "%(n)s Mitglieder"
 #: byro/office/templates/office/dashboard.html:43
 msgid "(all time)"
 msgstr "(insgesamt)"
+
+#: byro/office/templates/office/documents/add.html:7
+msgid "Upload Document …"
+msgstr "Dokument hochladen …"
+
+#: byro/office/templates/office/documents/snippet_documents_table.html:8
+msgid "Direction"
+msgstr "Richtung"
+
+#: byro/office/templates/office/documents/snippet_documents_table.html:9
+#: byro/office/templates/office/member/finance_table.html:9
+msgid "Category"
+msgstr "Kategorie"
+
+#: byro/office/templates/office/documents/snippet_documents_table.html:10
+msgid "Title"
+msgstr "Titel"
+
+#: byro/office/templates/office/documents/snippet_upload_document.html:35
+msgid "Upload"
+msgstr "Hochladen"
 
 #: byro/office/templates/office/mails/base.html:11
 #: byro/office/templates/office/mails/outbox.html:7
@@ -852,7 +891,7 @@ msgstr "Neue Mail-Vorlage hinzufügen"
 
 #: byro/office/templates/office/member/add.html:5
 msgid "Add Member …"
-msgstr "Mitglied hinzufügen"
+msgstr "Mitglied hinzufügen …"
 
 #: byro/office/templates/office/member/add.html:17
 msgid ""
@@ -871,15 +910,20 @@ msgid "Data"
 msgstr "Daten"
 
 #: byro/office/templates/office/member/base.html:29
+#: byro/office/templates/office/member/documents.html:5
+msgid "Documents"
+msgstr "Dokumente"
+
+#: byro/office/templates/office/member/base.html:37
 #: byro/office/templates/office/member/log.html:5
 msgid "Log entries"
 msgstr "Log-Einträge"
 
-#: byro/office/templates/office/member/base.html:45
+#: byro/office/templates/office/member/base.html:53
 msgid "Leave"
 msgstr "Austritt"
 
-#: byro/office/templates/office/member/base.html:53
+#: byro/office/templates/office/member/base.html:61
 msgid "Record Disclosure"
 msgstr "Datenbrief"
 
@@ -930,15 +974,19 @@ msgstr "bis diese Person Mitglied wird."
 msgid "Joined on %(start)s."
 msgstr "Beigetreten am %(start)s."
 
+#: byro/office/templates/office/member/documents.html:10
+msgid "Upload document"
+msgstr "Dokument hochladen"
+
+#: byro/office/templates/office/member/documents.html:19
+msgid "Related documents"
+msgstr "Zugehörige Dokumente"
+
 #: byro/office/templates/office/member/finance_table.html:7
 #: byro/office/templates/office/realtransaction/list.html:28
 #: byro/office/templates/office/realtransaction/match.html:15
 msgid "Amount"
 msgstr "Betrag"
-
-#: byro/office/templates/office/member/finance_table.html:9
-msgid "Category"
-msgstr "Kategorie"
 
 #: byro/office/templates/office/member/list.html:5
 msgid "Member List"
@@ -1075,7 +1123,7 @@ msgstr "Zugehörige Logbuch-Einträge"
 
 #: byro/office/templates/office/upload/add.html:7
 msgid "Upload Transaction …"
-msgstr "Transaktionsdatei hochladen ..."
+msgstr "Transaktionsdatei hochladen …"
 
 #: byro/office/templates/office/upload/list.html:5
 msgid "Transaction Imports"
@@ -1129,6 +1177,10 @@ msgstr "Backend-Benutzer"
 msgid "Frontend user"
 msgstr "Frontend-Benutzer"
 
+#: byro/office/templatetags/office_tags.py:9
+msgid "Unknown document type"
+msgstr "Unbekannter Dokumententyp"
+
 #: byro/office/views/accounts.py:16
 msgid "Charge"
 msgstr "Einahmenminderung"
@@ -1155,16 +1207,27 @@ msgstr "Ausgabe"
 msgid "Rebate"
 msgstr "Ausgabenminderung"
 
-#: byro/office/views/accounts.py:37 byro/office/views/members.py:85
+#: byro/office/views/accounts.py:37 byro/office/views/members.py:87
 msgid "The member was added, please edit additional details if applicable."
 msgstr ""
 "Das Mitglied wurde gespeichert, bitte füge zusätzliche Informationen hinzu, "
 "wenn nötig."
 
 #: byro/office/views/accounts.py:82 byro/office/views/mails.py:22
-#: byro/office/views/members.py:186
+#: byro/office/views/members.py:188
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
+
+#: byro/office/views/documents.py:35 byro/office/views/upload.py:32
+#: byro/office/views/upload.py:49
+msgid "The upload was processed successfully."
+msgstr "Der Import wurde erfolgreich verarbeitet."
+
+#: byro/office/views/documents.py:37 byro/office/views/upload.py:34
+msgid "The upload was added successfully, but could not be processed: "
+msgstr ""
+"Der Import wurde erfolgreich hochgeladen, konnte aber nicht verarbeitet "
+"werden: "
 
 #: byro/office/views/mails.py:21
 msgid ""
@@ -1196,13 +1259,13 @@ msgstr "Die Mail wurde verschickt."
 msgid "No mail has been sent."
 msgstr "Keine Mail wurde verschickt."
 
-#: byro/office/views/members.py:91 byro/office/views/members.py:244
+#: byro/office/views/members.py:93 byro/office/views/members.py:279
 msgid "Some post processing steps could not be completed: "
 msgstr ""
 "Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht durchgeführt "
 "werden: "
 
-#: byro/office/views/members.py:237
+#: byro/office/views/members.py:272
 msgid ""
 "The membership has been terminated. Please check the outbox for the "
 "notifications."
@@ -1210,7 +1273,7 @@ msgstr ""
 "Die Mitgliedschaft wurde beendet. Bitte sieh dir die Benachrichtigungsmails "
 "im Postausgang an."
 
-#: byro/office/views/members.py:303
+#: byro/office/views/members.py:338
 msgid "The email was generated and can be sent in the outbox."
 msgstr ""
 "Die E-Mail wurde erstellt und kann jetzt im Postausgang versendet werden."
@@ -1234,16 +1297,6 @@ msgstr "Betreff"
 #: byro/office/views/transactions.py:65
 msgid "The transaction was updated."
 msgstr "The Transaktion wurde aktualisiert."
-
-#: byro/office/views/upload.py:32 byro/office/views/upload.py:49
-msgid "The upload was processed successfully."
-msgstr "Der Import wurde erfolgreich verarbeitet."
-
-#: byro/office/views/upload.py:34
-msgid "The upload was added successfully, but could not be processed: "
-msgstr ""
-"Der Import wurde erfolgreich hochgeladen, konnte aber nicht verarbeitet "
-"werden: "
 
 #: byro/office/views/upload.py:51
 msgid "The upload could not be processed: "
@@ -1332,6 +1385,9 @@ msgstr "Englisch"
 #: byro/settings.py:165
 msgid "German"
 msgstr "Deutsch"
+
+#~ msgid "Key"
+#~ msgstr "Schlüssel/Einstellung"
 
 #~ msgid "User "
 #~ msgstr "Benutzer"

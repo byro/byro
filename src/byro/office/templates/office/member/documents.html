@@ -5,13 +5,23 @@
 {% block title %}{{ block.super }} :: {% trans "Documents" %}{% endblock %}
 
 {% block member_content %}
-	{% include "office/documents/snippet_upload_document.html" %}
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">{% trans "Upload document" %}</h4>
+        </div>
+        <div class="card-body">
+            {% include "office/documents/snippet_upload_document.html" %}
+        </div>
+    </div>
 
-<ul>
-	{% for document in member.documents.all %}
-	<li>{{ document }}</li>
-	{% endfor %}
-</ul>
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4 class="card-title">{% trans "Related documents" %}</h4>
+        </div>
+        <div class="card-body">
+            {% include "office/documents/snippet_documents_table.html" with documents=member.documents.all %}
+        </div>
+        <div class="card-footer">{% include "office/pagination.html" %}</div>
+    </div>
 
-{% include "office/pagination.html" %}
 {% endblock %}

@@ -24,6 +24,7 @@ from byro.office.signals import member_view
 
 from .documents import DocumentUploadForm
 
+
 class MemberView(DetailView):
     context_object_name = 'member'
     model = Member
@@ -213,9 +214,9 @@ class MemberDocumentsView(MemberView, FormView):
     paginate_by = 50
     form_class = DocumentUploadForm
 
-    @property
-    def object(self):
-        return self.get_object()
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -225,6 +226,20 @@ class MemberDocumentsView(MemberView, FormView):
     def get_form(self):
         form = super().get_form()
         return form
+
+    def get_success_url(self):
+        return reverse('office:members.documents', kwargs={'pk': self.get_member().pk})
+
+    @transaction.atomic
+    def form_valid(self, form):
+        self.form = form
+        member = self.get_member()
+
+        form.instance.member = member
+        form.save()
+        member.log(self, '.documents.created', document=form.instance, content_hash=form.instance.content_hash)
+
+        return super().form_valid(form)
 
 
 class MemberLeaveView(MemberView, FormView):

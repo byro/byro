@@ -1,11 +1,10 @@
 from django import forms
-from django.db import transaction
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import FormView
 
-from byro.documents.models import Document
+from byro.documents.models import Document, get_document_category_names
 
 
 class DocumentUploadForm(forms.ModelForm):
@@ -13,6 +12,13 @@ class DocumentUploadForm(forms.ModelForm):
     class Meta:
         model = Document
         exclude = ('content_hash', 'member')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        categories = get_document_category_names()
+
+        self.fields['category'] = forms.ChoiceField(choices=sorted(categories.items()), initial='byro.documents.misc')
 
 
 class DocumentUploadView(FormView):

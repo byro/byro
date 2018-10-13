@@ -9,6 +9,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from byro.common.signals import log_formatters
+from byro.documents.models import get_document_category_names
 
 FORMATTER_REGISTRY = {}
 
@@ -91,6 +92,11 @@ def format_log_object(obj):
                         return mark_safe('{}<a href="{}">{}</a>'.format(icon, escape(url), str_val))
 
             return mark_safe("<i>{} object</i>: {!r}".format(escape(str(obj['object'])), escape(str(obj['value']))))
+
+        if '.' in obj:
+            cats = get_document_category_names()
+            if obj in cats:
+                return "{} ({})".format(cats[obj], obj)
 
     return obj
 

@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from byro.common.models import LogTargetMixin, log_call
+from byro.common.models import LogTargetMixin
 from byro.common.models.choices import Choices
 
 
