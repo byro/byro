@@ -1,6 +1,8 @@
 from hashlib import sha512
 
 from django.db import models, transaction
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,20 +50,20 @@ Thank you,
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-        if not getattr(self, 'pk', None):
-            first_time = True
-        else:
-            first_time = False
 
         retval = super().save(*args, **kwargs)
 
-        if first_time:
+        # Only store the hash the first *time* that a file is added
+        # Unfortunately we cannot do that on the first *save*, because
+        # the API allows adding file content after the fact
+        if self.document and not self.content_hash:
             h = sha512()
             with self.document.open(mode='rb') as f:
                 for chunk in f.chunks():
                     h.update(chunk)
             self.content_hash = 'sha512:{}'.format(h.hexdigest())
             super().save(*args, **kwargs)
+            self.log('internal: automatic checkpoint', '.stored', **{f.name: getattr(self, f.name) for f in self._meta.get_fields()})
 
         return retval
 
@@ -82,3 +84,8 @@ Thank you,
 
     def get_display(self):
         return '{} Document: {}'.format(self.get_direction_display().capitalize(), self.category, self.title)
+
+
+@receiver(pre_delete, sender=Document, dispatch_uid='documents_models__log_deletion')
+def log_deletion(sender, instance, using, **kwargs):
+    instance.log('internal: automatic checkpoint', '.deleted', **{f.name: getattr(instance, f.name) for f in instance._meta.get_fields()})
