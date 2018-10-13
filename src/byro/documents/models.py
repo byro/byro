@@ -1,5 +1,6 @@
 from hashlib import sha512
 
+from django.apps import apps
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
@@ -48,6 +49,13 @@ Thank you,
 {association}
 ''').strip()
 
+    def _get_log_properties(self):
+        return {
+            f.name: getattr(self, f.name)
+            for f in self._meta.get_fields()
+            if f.name not in ('id', 'mails')
+        }
+
     @transaction.atomic
     def save(self, *args, **kwargs):
 
@@ -63,7 +71,7 @@ Thank you,
                     h.update(chunk)
             self.content_hash = 'sha512:{}'.format(h.hexdigest())
             super().save(*args, **kwargs)
-            self.log('internal: automatic checkpoint', '.stored', **{f.name: getattr(self, f.name) for f in self._meta.get_fields()})
+            self.log('internal: automatic checkpoint', '.stored', **self._get_log_properties())
 
         return retval
 
@@ -88,4 +96,14 @@ Thank you,
 
 @receiver(pre_delete, sender=Document, dispatch_uid='documents_models__log_deletion')
 def log_deletion(sender, instance, using, **kwargs):
-    instance.log('internal: automatic checkpoint', '.deleted', **{f.name: getattr(instance, f.name) for f in instance._meta.get_fields()})
+    instance.log('internal: automatic checkpoint', '.deleted', **instance._get_log_properties())
+
+
+def get_document_category_names():
+    categories = {}
+
+    for app in apps.get_app_configs():
+        if hasattr(app, 'ByroPluginMeta'):
+            categories.update(getattr(app.ByroPluginMeta, 'document_categories', {}))
+
+    return categories
