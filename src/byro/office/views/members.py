@@ -22,6 +22,7 @@ from byro.members.signals import (
 )
 from byro.office.signals import member_view
 
+from .documents import DocumentUploadForm
 
 class MemberView(DetailView):
     context_object_name = 'member'
@@ -205,6 +206,25 @@ class MemberFinanceView(MemberView):
         context['member'] = self.get_member()
         context['bookings'] = self.get_bookings()
         return context
+
+
+class MemberDocumentsView(MemberView, FormView):
+    template_name = 'office/member/documents.html'
+    paginate_by = 50
+    form_class = DocumentUploadForm
+
+    @property
+    def object(self):
+        return self.get_object()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['member'] = self.get_member()
+        return context
+
+    def get_form(self):
+        form = super().get_form()
+        return form
 
 
 class MemberLeaveView(MemberView, FormView):

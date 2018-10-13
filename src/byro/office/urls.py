@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 
 from .views import (
-    accounts, dashboard, mails, members, settings, transactions, upload, users,
+    accounts, dashboard, documents, mails, members, settings, transactions, upload, users,
 )
 
 app_name = 'office'
@@ -24,6 +24,7 @@ urlpatterns = [
         url('leave$', members.MemberLeaveView.as_view(), name='members.leave'),
         url('record-disclosure$', members.MemberRecordDisclosureView.as_view(), name='members.record-disclosure'),
         url('log$', members.MemberLogView.as_view(), name='members.log'),
+        url('documents$', members.MemberDocumentsView.as_view(), name='members.documents'),
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),
 
@@ -33,6 +34,8 @@ urlpatterns = [
     url(r'^upload/process/(?P<pk>\d+)', upload.UploadProcessView.as_view(), name='finance.uploads.process'),
     url(r'^upload/match/(?P<pk>\d+)', upload.UploadMatchView.as_view(), name='finance.uploads.match'),
     url('^upload/add', upload.CsvUploadView.as_view(), name='finance.uploads.add'),
+
+    url('^documents/add', documents.DocumentUploadView.as_view(), name='documents.add'),
 
     url('^accounts/$', accounts.AccountListView.as_view(), name='finance.accounts.list'),
     url('^accounts/add$', accounts.AccountCreateView.as_view(), name='finance.accounts.add'),

@@ -1,0 +1,16 @@
+{% extends "office/base_headline.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+{% load formset_tags %}
+
+{% block headline %}{% trans "Upload Document …" %}{% endblock %}
+
+{% block content %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
+    </form>
+{% endblock %}

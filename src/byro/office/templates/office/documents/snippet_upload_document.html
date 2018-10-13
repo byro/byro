@@ -1,0 +1,39 @@
+{% load i18n %}
+{% load bootstrap4 %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="container">
+    {% if form.non_field_errors %}
+        <div class=row">
+            <div class="col">
+                {{ form.non_field_errors }}
+            </div>
+        </div>
+    {% endif %}
+      <div class="row">
+        <div class="col">
+          {% bootstrap_field form.date show_label=False %}
+        </div>
+        <div class="col">
+          {% bootstrap_field form.direction show_label=False %}
+        </div>
+        <div class="col-9">
+          {% bootstrap_field form.category show_label=False %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+            {% bootstrap_field form.title show_label=False %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-auto">
+            {% bootstrap_field form.document show_label=False %}
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-success" type="submit">{% trans "Upload" %}</button>
+        </div>
+      </div>
+    </div>
+</form>

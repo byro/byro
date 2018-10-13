@@ -23,6 +23,14 @@
   </li>
   <li class="nav-item">
     <a
+      class="nav-link {% if "members.documents" in url_name %}active{% endif %}"
+      href="{% url "office:members.documents" pk=member.pk %}"
+    >
+        {% trans "Documents" %}
+    </a>
+  </li>
+  <li class="nav-item">
+    <a
       class="nav-link {% if "members.log" in url_name %}active{% endif %}"
       href="{% url "office:members.log" pk=member.pk %}"
     >

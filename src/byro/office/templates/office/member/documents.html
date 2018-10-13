@@ -1,0 +1,17 @@
+{% extends "office/member/base.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{{ block.super }} :: {% trans "Documents" %}{% endblock %}
+
+{% block member_content %}
+	{% include "office/documents/snippet_upload_document.html" %}
+
+<ul>
+	{% for document in member.documents.all %}
+	<li>{{ document }}</li>
+	{% endfor %}
+</ul>
+
+{% include "office/pagination.html" %}
+{% endblock %}
