@@ -1,0 +1,48 @@
+{% extends "office/base_headline.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block headline %}{% trans "Document details" %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th class="table-column-small">{% trans "Date" %}</th>
+                    <th class="table-column-small">{% trans "Direction" %}</th>
+                    <th class="table-column-medium">{% trans "Category" %}</th>
+                    <th>{% trans "Title / Information" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="white-space: nowrap;">{{ document.date }}</td>
+                    <td>{{ document.direction }}</td>
+                    <td>{{ document.category | translate_document_category }}</td>
+                    <td>{% if document.title %}{{ document.title }}<br/>{% endif %}
+                        {% if document.content_hash_ok %}
+                            <i class="fa fa-check" title="{% trans 'Integrity verified' %}"></i>
+                        {% else %}
+                            <span class="text-warning"><i class="fa fa-times"></i>{% trans "File corrupted or modified" %}</span>
+                        {% endif %}
+                        {{ document.document.size }} {% trans "bytes" %},
+                        {{ document.mime_type_guessed }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-body">
+        {% if document.mime_type_guessed == 'application/pdf' or 'image/' in document.mime_type_guessed %}
+            {# We should sandbox the iframe, but Chrome doesn't allow PDF rendiering then #}
+            <iframe src="{{document.document.url}}" width="100%" style="height: 100vh"></iframe>
+        {% else %}
+            Link: <a href="{{document.document.url}}">{{document.document}}</a>
+        {% endif %}
+        
+    </div>
+</div>
+
+{% endblock %}

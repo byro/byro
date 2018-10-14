@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic import DetailView, FormView
 
 from byro.documents.models import Document, get_document_category_names
 
@@ -45,3 +45,9 @@ class DocumentUploadView(FormView):
 
     def get_success_url(self):
         return self.request.path
+
+
+class DocumentDetailView(DetailView):
+    template_name = 'office/documents/detail.html'
+    model = Document
+    context_object_name = 'document'

@@ -5,7 +5,9 @@ from django.apps import apps
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -108,6 +110,12 @@ Thank you,
 
     def get_display(self):
         return '{} Document: {}'.format(self.get_direction_display().capitalize(), self.category, self.title)
+
+    def get_absolute_url(self):
+        return reverse('office:documents.detail', kwargs={'pk': self.pk})
+
+    def get_object_icon(self):
+        return mark_safe('<i class="fa fa-file-o"></i> ')
 
 
 @receiver(pre_delete, sender=Document, dispatch_uid='documents_models__log_deletion')

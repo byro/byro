@@ -16,14 +16,14 @@
                 <td style="white-space: nowrap;">{{ document.date }}</td>
                 <td>{{ document.direction }}</td>
                 <td>{{ document.category | translate_document_category }}</td>
-                <td>{% if document.title %}{{ document.title }}<br/>{% endif %}
+                <td><a href="{{ document.get_absolute_url }}" class="btn btn-light" style="width: 100%; text-align: left;">{% if document.title %}{{ document.title }}<br/>{% endif %}
                     {% if document.content_hash_ok %}
                         <i class="fa fa-check" title="{% trans 'Integrity verified' %}"></i>
                     {% else %}
                         <span class="text-warning"><i class="fa fa-times"></i>{% trans "File corrupted or modified" %}</span>
                     {% endif %}
                     {{ document.document.size }} {% trans "bytes" %},
-                    {{ document.mime_type_guessed }}
+                    {{ document.mime_type_guessed }}</a>
                 </td>
             </tr>
         {% endfor %}

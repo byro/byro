@@ -37,6 +37,7 @@ urlpatterns = [
     url('^upload/add', upload.CsvUploadView.as_view(), name='finance.uploads.add'),
 
     url('^documents/add', documents.DocumentUploadView.as_view(), name='documents.add'),
+    url(r'^documents/(?P<pk>\d+)', documents.DocumentDetailView.as_view(), name='documents.detail'),
 
     url('^accounts/$', accounts.AccountListView.as_view(), name='finance.accounts.list'),
     url('^accounts/add$', accounts.AccountCreateView.as_view(), name='finance.accounts.add'),
