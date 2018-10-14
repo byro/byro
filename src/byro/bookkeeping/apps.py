@@ -9,4 +9,5 @@ class BookkeepingConfig(AppConfig):
         document_categories = {
             'byro.bookkeeping.receipt': _('Receipt'),
             'byro.bookkeeping.invoice': _('Invoice'),
+            'byro.bookkeeping.account.statement': _('Statement'),
         }

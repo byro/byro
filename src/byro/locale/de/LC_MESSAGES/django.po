@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-13 17:13+0000\n"
-"PO-Revision-Date: 2018-10-13 19:14+0200\n"
+"POT-Creation-Date: 2018-10-14 12:16+0000\n"
+"PO-Revision-Date: 2018-10-14 14:17+0200\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -26,6 +26,10 @@ msgstr "Beleg"
 #: byro/bookkeeping/apps.py:11
 msgid "Invoice"
 msgstr "Rechnung"
+
+#: byro/bookkeeping/apps.py:12
+msgid "Statement"
+msgstr "Kontoauszug"
 
 #: byro/bookkeeping/models/account.py:27
 msgid "Asset account"
@@ -228,11 +232,11 @@ msgstr "Account ist deaktiviert."
 msgid "Miscellaneous document"
 msgstr "Sonstiges Dokument"
 
-#: byro/documents/apps.py:11 byro/office/templates/office/base.html:74
+#: byro/documents/apps.py:11 byro/office/templates/office/base.html:88
 msgid "Registration form"
 msgstr "Beitrittsformular"
 
-#: byro/documents/models.py:43
+#: byro/documents/models.py:45
 #, python-brace-format
 msgid ""
 "\n"
@@ -251,7 +255,7 @@ msgstr ""
 "Danke\n"
 "{association}\n"
 
-#: byro/documents/models.py:85
+#: byro/documents/models.py:101
 #, python-brace-format
 msgid "[{association}] Your document"
 msgstr "[{association}] Dein Dokument"
@@ -480,7 +484,7 @@ msgstr "Kontakt-Typ"
 
 #: byro/members/models.py:97
 #: byro/office/templates/office/account/detail.html:21
-#: byro/office/templates/office/transaction/detail.html:18
+#: byro/office/templates/office/transaction/detail.html:19
 msgid "Member"
 msgstr "Mitglied"
 
@@ -635,7 +639,7 @@ msgstr "Konto hinzufügen …"
 #: byro/office/templates/office/settings/form.html:16
 #: byro/office/templates/office/settings/initial.html:14
 #: byro/office/templates/office/settings/registration_form.html:143
-#: byro/office/templates/office/transaction/detail.html:61
+#: byro/office/templates/office/transaction/detail.html:62
 #: byro/office/templates/office/upload/add.html:14
 #: byro/office/templates/office/user/add.html:12
 #: byro/office/templates/office/user/detail.html:14
@@ -649,7 +653,7 @@ msgstr "Standard "
 #: byro/office/templates/office/account/detail.html:19
 #: byro/office/templates/office/documents/snippet_documents_table.html:7
 #: byro/office/templates/office/member/finance_table.html:6
-#: byro/office/templates/office/transaction/detail.html:16
+#: byro/office/templates/office/transaction/detail.html:17
 msgid "Date"
 msgstr "Datum"
 
@@ -657,22 +661,22 @@ msgstr "Datum"
 #: byro/office/templates/office/member/finance_table.html:8
 #: byro/office/templates/office/realtransaction/list.html:29
 #: byro/office/templates/office/realtransaction/match.html:16
-#: byro/office/templates/office/transaction/detail.html:17
+#: byro/office/templates/office/transaction/detail.html:18
 msgid "Purpose"
 msgstr "Zweck"
 
 #: byro/office/templates/office/account/detail.html:20
-#: byro/office/templates/office/transaction/detail.html:17
+#: byro/office/templates/office/transaction/detail.html:18
 msgid "Originator/Recipient"
 msgstr "Urheber/Empfänger"
 
 #: byro/office/templates/office/account/detail.html:22
-#: byro/office/templates/office/transaction/detail.html:19
+#: byro/office/templates/office/transaction/detail.html:20
 msgid "Account"
 msgstr "Konto"
 
 #: byro/office/templates/office/account/list.html:5
-#: byro/office/templates/office/base.html:124
+#: byro/office/templates/office/base.html:138
 msgid "Accounts"
 msgstr "Konten"
 
@@ -690,12 +694,12 @@ msgid "Type"
 msgstr "Art"
 
 #: byro/office/templates/office/account/list.html:21
-#: byro/office/templates/office/transaction/detail.html:20
+#: byro/office/templates/office/transaction/detail.html:21
 msgid "Incoming"
 msgstr "Eingehend"
 
 #: byro/office/templates/office/account/list.html:22
-#: byro/office/templates/office/transaction/detail.html:21
+#: byro/office/templates/office/transaction/detail.html:22
 msgid "Outgoing"
 msgstr "Ausgehend"
 
@@ -708,60 +712,60 @@ msgstr "Kontostand"
 msgid "Default"
 msgstr "Standard"
 
-#: byro/office/templates/office/base.html:54
+#: byro/office/templates/office/base.html:68
 #: byro/office/templates/office/dashboard.html:4
 #: byro/office/templates/office/member/base.html:13
 #: byro/office/templates/office/member/dashboard.html:4
 msgid "Dashboard"
 msgstr "Überblick"
 
-#: byro/office/templates/office/base.html:60
+#: byro/office/templates/office/base.html:74
 #: byro/office/templates/office/settings/base.html:4
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: byro/office/templates/office/base.html:68
+#: byro/office/templates/office/base.html:82
 msgid "General"
 msgstr "Allgemeine Einstellungen"
 
-#: byro/office/templates/office/base.html:77
+#: byro/office/templates/office/base.html:91
 #: byro/office/templates/office/user/list.html:5
 msgid "Users"
 msgstr "Benutzer"
 
-#: byro/office/templates/office/base.html:83
+#: byro/office/templates/office/base.html:97
 msgid "Plugins"
 msgstr "Plugins"
 
-#: byro/office/templates/office/base.html:101
+#: byro/office/templates/office/base.html:115
 msgid "Log"
 msgstr "Logbuch"
 
-#: byro/office/templates/office/base.html:106
+#: byro/office/templates/office/base.html:120
 msgid "Members"
 msgstr "Mitglieder"
 
-#: byro/office/templates/office/base.html:116
+#: byro/office/templates/office/base.html:130
 #: byro/office/templates/office/member/base.html:45
 #: byro/office/templates/office/member/finance.html:4
 msgid "Finance"
 msgstr "Finanzen"
 
-#: byro/office/templates/office/base.html:127
+#: byro/office/templates/office/base.html:141
 msgid "Transaction Upload"
 msgstr "Transaktions-Import"
 
-#: byro/office/templates/office/base.html:149
+#: byro/office/templates/office/base.html:163
 #: byro/office/templates/office/mails/base.html:4
 msgid "Mails"
 msgstr "E-Mails"
 
-#: byro/office/templates/office/base.html:185
+#: byro/office/templates/office/base.html:199
 #, python-format
 msgid "powered by <a %(a_attr)s>byro</a>"
 msgstr "powered by <a %(a_attr)s>byro</a>"
 
-#: byro/office/templates/office/base.html:190
+#: byro/office/templates/office/base.html:204
 msgid "running in development mode"
 msgstr "Entwicklungsmodus"
 
@@ -813,8 +817,20 @@ msgid "Category"
 msgstr "Kategorie"
 
 #: byro/office/templates/office/documents/snippet_documents_table.html:10
-msgid "Title"
-msgstr "Titel"
+msgid "Title / Information"
+msgstr "Titel/Informationen"
+
+#: byro/office/templates/office/documents/snippet_documents_table.html:21
+msgid "Integrity verified"
+msgstr "Integrität überprüft"
+
+#: byro/office/templates/office/documents/snippet_documents_table.html:23
+msgid "File corrupted or modified"
+msgstr "Datei beschädigt oder modifiziert"
+
+#: byro/office/templates/office/documents/snippet_documents_table.html:25
+msgid "bytes"
+msgstr "Bytes"
 
 #: byro/office/templates/office/documents/snippet_upload_document.html:35
 msgid "Upload"
@@ -984,12 +1000,12 @@ msgid "Joined on %(start)s."
 msgstr "Beigetreten am %(start)s."
 
 #: byro/office/templates/office/member/documents.html:10
-#: byro/office/templates/office/transaction/detail.html:87
+#: byro/office/templates/office/transaction/detail.html:88
 msgid "Upload document"
 msgstr "Dokument hochladen"
 
 #: byro/office/templates/office/member/documents.html:20
-#: byro/office/templates/office/transaction/detail.html:68
+#: byro/office/templates/office/transaction/detail.html:69
 msgid "Related documents"
 msgstr "Zugehörige Dokumente"
 
@@ -1128,7 +1144,7 @@ msgstr "Entfernen"
 msgid "Edit transaction"
 msgstr "Buchungssatz bearbeiten"
 
-#: byro/office/templates/office/transaction/detail.html:78
+#: byro/office/templates/office/transaction/detail.html:79
 msgid "Related log entries"
 msgstr "Zugehörige Logbuch-Einträge"
 
@@ -1229,12 +1245,12 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
 
-#: byro/office/views/documents.py:36 byro/office/views/upload.py:32
+#: byro/office/views/documents.py:40 byro/office/views/upload.py:32
 #: byro/office/views/upload.py:49
 msgid "The upload was processed successfully."
 msgstr "Der Import wurde erfolgreich verarbeitet."
 
-#: byro/office/views/documents.py:38 byro/office/views/upload.py:34
+#: byro/office/views/documents.py:42 byro/office/views/upload.py:34
 msgid "The upload was added successfully, but could not be processed: "
 msgstr ""
 "Der Import wurde erfolgreich hochgeladen, konnte aber nicht verarbeitet "
@@ -1301,11 +1317,11 @@ msgstr ""
 msgid "The config was saved successfully."
 msgstr "Die Einstellungen wurden gespeichert."
 
-#: byro/office/views/transactions.py:17
+#: byro/office/views/transactions.py:18
 msgid "Memo"
 msgstr "Betreff"
 
-#: byro/office/views/transactions.py:112
+#: byro/office/views/transactions.py:113
 msgid "The transaction was updated."
 msgstr "The Transaktion wurde aktualisiert."
 
@@ -1389,13 +1405,16 @@ msgstr ""
 "Mandatsgrund: {mandate_reason}\n"
 "\n"
 
-#: byro/settings.py:164
+#: byro/settings.py:165
 msgid "English"
 msgstr "Englisch"
 
-#: byro/settings.py:165
+#: byro/settings.py:166
 msgid "German"
 msgstr "Deutsch"
+
+#~ msgid "Title"
+#~ msgstr "Titel"
 
 #~ msgid "Key"
 #~ msgstr "Schlüssel/Einstellung"
