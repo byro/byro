@@ -7,7 +7,7 @@
             <th class="table-column-small">{% trans "Date" %}</th>
             <th class="table-column-small">{% trans "Direction" %}</th>
             <th class="table-column-medium">{% trans "Category" %}</th>
-            <th>{% trans "Title" %}</th>
+            <th>{% trans "Title / Information" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -16,7 +16,15 @@
                 <td style="white-space: nowrap;">{{ document.date }}</td>
                 <td>{{ document.direction }}</td>
                 <td>{{ document.category | translate_document_category }}</td>
-                <td>{{ document.title }}</td>
+                <td>{% if document.title %}{{ document.title }}<br/>{% endif %}
+                    {% if document.content_hash_ok %}
+                        <i class="fa fa-check" title="{% trans 'Integrity verified' %}"></i>
+                    {% else %}
+                        <span class="text-warning"><i class="fa fa-times"></i>{% trans "File corrupted or modified" %}</span>
+                    {% endif %}
+                    {{ document.document.size }} {% trans "bytes" %},
+                    {{ document.mime_type_guessed }}
+                </td>
             </tr>
         {% endfor %}
     </tbody>

@@ -73,7 +73,7 @@ def format_log_source(entry):
 
 
 @register.filter(name='format_log_object')
-def format_log_object(obj):
+def format_log_object(obj, key=None):
     with suppress(Exception):
         if 'object' in obj and 'ref' in obj and 'value' in obj:
             with suppress(Exception):
@@ -93,10 +93,17 @@ def format_log_object(obj):
 
             return mark_safe("<i>{} object</i>: {!r}".format(escape(str(obj['object'])), escape(str(obj['value']))))
 
-        if '.' in obj:
+        if key == 'category' and '.' in obj:
             cats = get_document_category_names()
             if obj in cats:
                 return "{} ({})".format(cats[obj], obj)
+
+        if key == 'content_hash':
+            parts = str(obj).split(':', 1)
+            if len(parts) == 2:
+                return mark_safe('{}: <tt title="{}">{} &hellip; {}</tt>'.format(
+                    escape(parts[0]), escape(parts[1]), escape(parts[1][:(6*2)]), escape(parts[1][-(6*2):])
+                ))
 
     return obj
 

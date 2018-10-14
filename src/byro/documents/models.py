@@ -1,9 +1,11 @@
 from hashlib import sha512
 
+import magic
 from django.apps import apps
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -55,6 +57,20 @@ Thank you,
             for f in self._meta.get_fields()
             if f.name not in ('id', 'mails') and hasattr(self, f.name)
         }
+
+    @cached_property
+    def content_hash_ok(self):
+        h = sha512()
+        with self.document.open(mode='rb') as f:
+            for chunk in f.chunks():
+                h.update(chunk)
+        return self.content_hash == 'sha512:{}'.format(h.hexdigest())
+
+    @cached_property
+    def mime_type_guessed(self):
+        with self.document.open(mode='rb') as f:
+            chunk = next(f.chunks())
+            return magic.from_buffer(chunk, mime=True)
 
     @transaction.atomic
     def save(self, *args, **kwargs):
