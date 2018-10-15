@@ -8,7 +8,7 @@ If you want to install byro on a server for actual usage, go to the :ref:`admini
 
 * git
 * Python 3.x
-* A recent version of pip
+* A recent version of pip (Ubuntu package: ``python3-pip``)
 * gettext (Debian package: ``gettext``)
 * A PostgreSQL server
 
@@ -41,7 +41,7 @@ Your local python environment
 
 Please execute ``python -V`` or ``python3 -V`` to make sure you have Python 3.x
 installed. Also make sure you have pip for Python 3 installed, you can execute ``pip3 -V`` to check.
-Then use Python's internal tools to create a virtual environment and activate it for your current
+Then use Python's internal tools (Ubuntu package: ``python3-venv``) to create a virtual environment and activate it for your current
 session::
 
     python3 -m venv env  # or virtualenv -p /usr/bin/python3 env, or ...
