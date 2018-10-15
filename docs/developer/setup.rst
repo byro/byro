@@ -8,7 +8,7 @@ If you want to install byro on a server for actual usage, go to the :ref:`admini
 
 * git
 * Python 3.x
-* A recent version of pip
+* A recent version of pip (Ubuntu package: ``python3-pip``)
 * gettext (Debian package: ``gettext``)
 * A PostgreSQL server
 
