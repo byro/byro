@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
-
+from django.utils.timezone import now
 
 class ContentObjectManager(models.Manager):
     "An object manager that can handle filter(content_object=...)"
@@ -19,6 +19,12 @@ class ContentObjectManager(models.Manager):
             kwargs['content_type'] = ContentType.objects.get_for_model(type(content_object))
             kwargs['object_id'] = content_object.pk
         return super().filter(*args, **kwargs)
+
+class LogEntryManager(ContentObjectManager):
+    "Manager that is linking the log chain on .create()"
+    def create(self, *args, **kwargs):
+        #prev_entry = LogEntry.objects.filter()
+        return super().create(*args, **kwargs)
 
 
 class LogEntry(models.Model):
@@ -34,45 +40,68 @@ class LogEntry(models.Model):
         * old: Value before the change
         * new: Value after the change
         * changes: dictionary of changes  key: (old_value, new_value)
+    :param auth_hash: Authentication hash for the log chain. See docs/administrator/log-chain.rst
+    :param auth_prev: `auth_hash` of the previous entry.
+    :param auth_data: Authentication data for the log chain:
+        * hash_ver: hash/algorithm version
+        * nonce: A random nonce
+        * data_mac: Message Authentication Code for the LogEntry.data attribute.
     """
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField(db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    datetime = models.DateTimeField(default=now, db_index=True)
     user = models.ForeignKey(get_user_model(), null=True, on_delete=models.SET_NULL)
 
     action_type = models.CharField(max_length=255)
     data = JSONField(null=True)
 
-    objects = ContentObjectManager()
+    auth_hash = models.CharField(max_length=140, null=False, unique=True)
+    auth_prev = models.ForeignKey('self', on_delete=models.PROTECT, related_name='auth_next', to_field='auth_hash', null=False, blank=False)
+    auth_data = JSONField(null=False)
+
+    objects = LogEntryManager()
 
     # FIXME Add pre-save signal, and, possibly, database-level protection against modification
 
     class Meta:
         ordering = ('-datetime', '-id')
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=['action_type']),
+        ]
 
     def delete(self, using=None, keep_parents=False):
         raise TypeError("Logs cannot be deleted.")
 
     def save(self, *args, **kwargs):
-        if getattr(self, 'pk', None):
-            raise TypeError("Logs cannot be modified.")
+        if kwargs.get('update_fields', None) == ['auth_hash'] and self.auth_hash.startswith('random:'):
+            self._OVERRIDE_SAVE = ['auth_hash']
+        elif kwargs.get('update_fields', None) == ['auth_prev'] and self.auth_prev == 'undefined:0':
+            self._OVERRIDE_SAVE = ['auth_prev']
+        else:
+            if getattr(self, 'pk', None):
+                raise TypeError("Logs cannot be modified.")
 
-        if not self.data:
-            self.data = {}
+            if not self.data:
+                self.data = {}
 
-        if self.user:
-            self.data.setdefault('source', str(self.user))
+            if self.user:
+                self.data.setdefault('source', str(self.user))
 
-        if not self.data.get('source'):
-            raise ValueError("Need to provide at least user or data['source']")
+            if not self.data.get('source'):
+                raise ValueError("Need to provide at least user or data['source']")
 
         return super().save(*args, **kwargs)
 
 
 @receiver(pre_save, sender=LogEntry)
 def log_entry_pre_save(sender, instance, *args, **kwargs):
-    if instance.pk:
+    if getattr(instance, '_OVERRIDE_SAVE', None) == ['auth_hash'] and instance.auth_hash.startswith('random:'):
+        delattr(instance, '_OVERRIDE_SAVE')
+    elif getattr(instance, '_OVERRIDE_SAVE', None) == ['auth_prev'] and instance.auth_prev == 'undefined:0':
+        delattr(instance, '_OVERRIDE_SAVE')
+    elif instance.pk:
         raise TypeError("Logs cannot be modified.")
 
 
