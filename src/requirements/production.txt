@@ -15,3 +15,5 @@ psycopg2-binary==2.7.*
 python-dateutil
 django-select2==6.3.1
 python-magic==0.4.15
+canonicaljson==1.1.4
+pynacl==1.2.1
