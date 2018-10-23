@@ -201,10 +201,13 @@
                     {% endblocktrans %}
                 {% endwith %}
                 {% if development_warning %}
-                    <span class="text-warning">&middot; {% trans "running in development mode" %}</span>
+                    &middot; <span class="text-warning">{% trans "running in development mode" %}</span>
                     {% if byro_version %}
                         <span>&middot; <a href="https://github.com/byro/byro/tree/{{ byro_version }}/">{{ byro_version }}</a></span>
                     {% endif %}
+                {% endif %}
+                {% if log_end %}
+                    <span style="font-size: 75%"><br>{{log_end.auth_hash}}</span>
                 {% endif %}
             </footer>
         </div>
