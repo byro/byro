@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.http import is_safe_url
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 
@@ -42,3 +43,13 @@ def logout_view(request: HttpRequest) -> HttpResponseRedirect:
         LogEntry.objects.create(content_object=request.user, user=request.user, action_type="byro.common.logout")
     logout(request)
     return redirect('/')
+
+
+class LogInfoView(TemplateView):
+    template_name = 'common/log/info.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['log_head'] = LogEntry.objects.get_chain_end()
+        context['now'] = now()
+        return context

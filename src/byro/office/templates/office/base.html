@@ -63,7 +63,11 @@
     </nav>
     <div id="page-wrapper">
         <nav class="nav flex-column sidebar">
-            {% if not request.user.is_anonymous %}
+            {% if request.user.is_anonymous %}
+            <a class="nav-link {% if url_name == "login" %}active{% endif %}" href="{% url 'common:login' %}">
+                <span class="fa fa-sign-in"></span> {% trans "Log in" %}
+            </a>
+            {% else %}
             <a class="nav-link {% if url_name == "dashboard" %}active{% endif %}" href="/">
                 <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
             </a>
@@ -206,8 +210,8 @@
                         <span>&middot; <a href="https://github.com/byro/byro/tree/{{ byro_version }}/">{{ byro_version }}</a></span>
                     {% endif %}
                 {% endif %}
-                {% if log_end %}
-                    <span style="font-size: 75%"><br>{{log_end.auth_hash}}</span>
+                {% if log_end %}<br>
+                    <a class="log-link" href="{% url 'common:log.info' %}">{{log_end.auth_hash}}</a>
                 {% endif %}
             </footer>
         </div>
