@@ -21,9 +21,9 @@ class SpecialAccounts:
         else:
             # Old mechanism: Return an account that is named as the special one would.
             #  But also tag it.
-            account = Account.objects.filter(account_category=category, name=name).first()
+            account = Account.objects.filter(account_category=category, name=str(name)).first()
             if not account:
-                account = Account.objects.create(account_category=category, name=name)
+                account = Account.objects.create(account_category=category, name=str(name))
                 with suppress(django.db.utils.ProgrammingError):
                     with transaction.atomic():
                         account.log(None, 'byro.bookkeeping.account.created', source="Automatic creation of special account")
