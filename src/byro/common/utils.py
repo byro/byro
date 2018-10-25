@@ -1,3 +1,4 @@
+import sys
 from contextlib import suppress
 
 from django.apps import apps
@@ -17,8 +18,15 @@ def get_version():
     # FIXME: In a release this should return the version
 
     with suppress(Exception):
+        retval = getattr(sys.modules[__name__], '_byro_git_version', None)
+        if retval:
+            return retval
+
         import subprocess
-        return subprocess.check_output(['git', 'describe', '--always', '--dirty', '--abbrev=40']).decode().strip()
+        retval = subprocess.check_output(['git', 'describe', '--always', '--dirty', '--abbrev=40']).decode().strip()
+        sys.modules[__name__]._byro_git_version = retval
+
+        return retval
 
     return None
 
