@@ -1,5 +1,4 @@
 import collections
-from contextlib import suppress
 
 from django.conf import settings
 from django.http import Http404
@@ -7,6 +6,7 @@ from django.urls import resolve
 
 from byro.bookkeeping.models import Transaction
 from byro.common.models import Configuration, LogEntry
+from byro.common.utils import get_version
 from byro.mails.models import EMail
 from byro.office.signals import nav_event
 
@@ -26,9 +26,8 @@ def byro_information(request):
 
     if settings.DEBUG:
         ctx['development_warning'] = True
-        with suppress(Exception):
-            import subprocess
-            ctx['byro_version'] = subprocess.check_output(['git', 'describe', '--always']).decode()
+
+    ctx['byro_version'] = get_version()
 
     return ctx
 

@@ -206,9 +206,9 @@
                 {% endwith %}
                 {% if development_warning %}
                     &middot; <span class="text-warning">{% trans "running in development mode" %}</span>
-                    {% if byro_version %}
-                        <span>&middot; <a href="https://github.com/byro/byro/tree/{{ byro_version }}/">{{ byro_version }}</a></span>
-                    {% endif %}
+                {% endif %}
+                {% if byro_version %}
+                    <span>&middot; <a href="https://github.com/byro/byro/tree/{{ byro_version | slice:':40' }}/">{{ byro_version }}</a></span>
                 {% endif %}
                 {% if log_end %}<br>
                     <a class="log-link" href="{% url 'common:log.info' %}">{{log_end.auth_hash}}</a>

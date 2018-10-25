@@ -16,6 +16,8 @@ from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils.timezone import now
 
+from byro.common.utils import get_installed_software
+
 
 class ContentObjectManager(models.Manager):
     "An object manager that can handle filter(content_object=...)"
@@ -125,6 +127,7 @@ class LogEntry(models.Model):
             'data_mac': 'blake2b:{}'.format(hdd_mac.decode('us-ascii')),
             'orig_content_type': '{}.{}'.format(self.content_type.app_label, self.content_type.model) if self.content_type else None,
             'orig_user_id': self.user_id if self.user_id else None,
+            'software_version': ", ".join(get_installed_software()),
         }
 
         authenticated_dict = self.get_authenticated_dict()
