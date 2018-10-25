@@ -9,6 +9,7 @@ from byro.common.forms import ConfigurationForm, RegistrationConfigForm, Initial
 from byro.common.models.configuration import Configuration, ByroConfiguration
 
 from byro.common.models import LogEntry
+from byro.bookkeeping.models import Account
 from django.db import transaction
 
 class InitialSettings(FormView):
@@ -23,7 +24,16 @@ class InitialSettings(FormView):
     @transaction.atomic
     def form_valid(self, form):
         form.save()
-        form.instance.log(self, ".initial", **form.cleaned_data)
+        other_data = {
+            'accounts': [
+                {
+                    'account': acc,
+                    'name': acc.name,
+                    'balances': acc.balances(),
+                } for acc in Account.objects.all()
+            ]
+        }
+        form.instance.log(self, ".initial", initial_data=form.cleaned_data, other_data=other_data)
         messages.success(self.request, _('You\'re nearly ready to go – configure how you want to add new members, and you\'re done.'))
         return super().form_valid(form)
 

@@ -98,6 +98,17 @@ body {
     flex-grow: 1;
     display: flex;
     padding: 20px 40px;
+
+    a.log-link {
+        font-size: 75%;
+        text-decoration: none;
+        cursor: help;
+        color: inherit;
+    }
+    a.log-link:hover {
+        text-decoration: underline;
+        color: $brand-primary;
+    }
 }
 .nav-pills {
     border-bottom: $gray-light solid 1px;

@@ -3,5 +3,30 @@
 
 {% block log_entry_content %}
     <h5><span class="le-icon"><i class="fa fa-gears"></i></span>{% trans "Initial settings" %}</h5>
+    {% if log_entry.data.initial_data %}
+        {% include "common/log_data.html" with data=log_entry.data.initial_data %}
+        <h6 class="mt-3">{% trans "Initial State: Accounts" %}</h6>
+        <table>
+            <thead>
+                <tr>
+                    <th>{% trans "Account" %}</th>
+                    <th>{% trans "Debit" %}</th>
+                    <th>{% trans "Credit" %}</th>
+                    <th>{% trans "Net" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in log_entry.data.other_data.accounts %}
+                    <tr>
+                        <td>{{account.account|format_log_object}}</td>
+                        <td>{{ account.balances.debit }}</td>
+                        <td>{{ account.balances.credit }}</td>
+                        <td>{{ account.balances.net }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
     {% include "common/log_data.html" with data=log_entry.data %}
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,34 @@
+{% extends "office/base_headline.html" %}
+{% load i18n %}
+{% load qrcode_inline %}
+
+{% block headline %}{% trans "Eternal log" %}{% endblock %}
+
+{% block content %}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4>{% trans "What is going on here?" %}</h4>
+        </div>
+        <div class="card-body">
+            {% blocktrans trimmed %}
+                <p>All changes in byro are recorded in an internal audit log file. Each entry is represented by its <a href="https://en.wikipedia.org/wiki/Cryptographic_hash">hash value</a> and is linked to the previous entry in a <a href="https://en.wikipedia.org/wiki/Hash_chain">hash chain</a>. Proof of the hash value at some point in time carries within it proof of all hash values, and with them all log entries, before it.</p>
+                <p>This page serves as a publicly visible notary of the current hash value. It can be printed, downloaded, or saved in the web archive.</p>
+            {% endblocktrans %}
+        </div>
+    </div>
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4>
+                {% with now|date:"Y-m-d H:i:s e" as now_datetime %}
+                    {% blocktrans trimmed %}Most recent log entry as of {{ now_datetime }}{% endblocktrans %}
+                {% endwith %}
+            </h4>
+        </div>
+        <div class="card-body" style="word-wrap: break-word; word-break: break-all;">
+            <div class="row">
+                <div class="col"><tt>{{log_head.auth_hash}}</tt></div>
+                <div class="col-2 text-center" style="min-width: 140px;"><img src="{{log_head.auth_hash | qrcode_inline }}"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

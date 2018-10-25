@@ -29,6 +29,7 @@ class PermissionMiddleware:
     UNAUTHENTICATED_URLS = (
         'login',
         'logout',
+        'log.info',
     )
 
     def __init__(self, get_response):

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-14 12:16+0000\n"
-"PO-Revision-Date: 2018-10-14 14:17+0200\n"
+"POT-Creation-Date: 2018-10-24 12:54+0000\n"
+"PO-Revision-Date: 2018-10-24 15:01+0200\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -208,6 +208,41 @@ msgstr "Quelle"
 msgid "Operation"
 msgstr "Vorgang"
 
+#: byro/common/templates/common/log/info.html:5
+msgid "Eternal log"
+msgstr "Ewiges Logfile"
+
+#: byro/common/templates/common/log/info.html:10
+msgid "What is going on here?"
+msgstr "Was ist das hier?"
+
+#: byro/common/templates/common/log/info.html:13
+msgid ""
+"<p>All changes in byro are recorded in an internal audit log file. Each "
+"entry is represented by its <a href=\"https://en.wikipedia.org/wiki/"
+"Cryptographic_hash\">hash value</a> and is linked to the previous entry in a "
+"<a href=\"https://en.wikipedia.org/wiki/Hash_chain\">hash chain</a>. Proof "
+"of the hash value at some point in time carries within it proof of all hash "
+"values, and with them all log entries, before it.</p> <p>This page serves as "
+"a publicly visible notary of the current hash value. It can be printed, "
+"downloaded, or saved in the web archive.</p>"
+msgstr ""
+"<p> alle Änderungen in byro werden in einem internen Audit-Log "
+"aufgezeichnet. Jeder Eintrag wird durch seinen <a href = \"https://de."
+"wikipedia.org/wiki/Kryptographische_Hashfunktion\">Hashwert</a> "
+"repräsentiert und ist mit dem vorherigen Eintrag zu einer <a href=\"https://"
+"de.wikipedia.org/wiki/Ewige_Logdatei\">Ewigen Logdatei</a> verknüpft. Der "
+"Nachweis des Hash-Wertes zu einem bestimmten Zeitpunkt trägt in sich den "
+"Nachweis aller Hash-Werte, und damit alle Log-Einträge, vor ihm.</p> "
+"<p>Diese Seite dient als öffentlich sichtbarer Nachweis des aktuellen Hash-"
+"Wertes. Sie kann gedruckt, heruntergeladen oder im <i>web archive</i> "
+"gespeichert werden. </p>"
+
+#: byro/common/templates/common/log/info.html:23
+#, python-format
+msgid "Most recent log entry as of %(now_datetime)s"
+msgstr "Jüngster Log-Eintrag zum Zeitpunkt %(now_datetime)s"
+
 #: byro/common/templates/common/log_data_changes.html:6
 msgid "Old value"
 msgstr "Vorheriger Wert"
@@ -220,11 +255,11 @@ msgstr "Neuer Wert"
 msgid "User logged in"
 msgstr "Benutzer angemeldet"
 
-#: byro/common/views.py:23
+#: byro/common/views.py:24
 msgid "No user account matches the entered credentials."
 msgstr "Zu den Eingaben wurde kein Nutzer gefunden."
 
-#: byro/common/views.py:27
+#: byro/common/views.py:28
 msgid "User account is deactivated."
 msgstr "Account ist deaktiviert."
 
@@ -232,11 +267,11 @@ msgstr "Account ist deaktiviert."
 msgid "Miscellaneous document"
 msgstr "Sonstiges Dokument"
 
-#: byro/documents/apps.py:11 byro/office/templates/office/base.html:88
+#: byro/documents/apps.py:11 byro/office/templates/office/base.html:92
 msgid "Registration form"
 msgstr "Beitrittsformular"
 
-#: byro/documents/models.py:45
+#: byro/documents/models.py:47
 #, python-brace-format
 msgid ""
 "\n"
@@ -255,7 +290,7 @@ msgstr ""
 "Danke\n"
 "{association}\n"
 
-#: byro/documents/models.py:101
+#: byro/documents/models.py:103
 #, python-brace-format
 msgid "[{association}] Your document"
 msgstr "[{association}] Dein Dokument"
@@ -651,6 +686,7 @@ msgid "Default "
 msgstr "Standard "
 
 #: byro/office/templates/office/account/detail.html:19
+#: byro/office/templates/office/documents/detail.html:13
 #: byro/office/templates/office/documents/snippet_documents_table.html:7
 #: byro/office/templates/office/member/finance_table.html:6
 #: byro/office/templates/office/transaction/detail.html:17
@@ -676,7 +712,7 @@ msgid "Account"
 msgstr "Konto"
 
 #: byro/office/templates/office/account/list.html:5
-#: byro/office/templates/office/base.html:138
+#: byro/office/templates/office/base.html:142
 msgid "Accounts"
 msgstr "Konten"
 
@@ -713,59 +749,63 @@ msgid "Default"
 msgstr "Standard"
 
 #: byro/office/templates/office/base.html:68
+msgid "Log in"
+msgstr "Anmelden"
+
+#: byro/office/templates/office/base.html:72
 #: byro/office/templates/office/dashboard.html:4
 #: byro/office/templates/office/member/base.html:13
 #: byro/office/templates/office/member/dashboard.html:4
 msgid "Dashboard"
 msgstr "Überblick"
 
-#: byro/office/templates/office/base.html:74
+#: byro/office/templates/office/base.html:78
 #: byro/office/templates/office/settings/base.html:4
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: byro/office/templates/office/base.html:82
+#: byro/office/templates/office/base.html:86
 msgid "General"
 msgstr "Allgemeine Einstellungen"
 
-#: byro/office/templates/office/base.html:91
+#: byro/office/templates/office/base.html:95
 #: byro/office/templates/office/user/list.html:5
 msgid "Users"
 msgstr "Benutzer"
 
-#: byro/office/templates/office/base.html:97
+#: byro/office/templates/office/base.html:101
 msgid "Plugins"
 msgstr "Plugins"
 
-#: byro/office/templates/office/base.html:115
+#: byro/office/templates/office/base.html:119
 msgid "Log"
 msgstr "Logbuch"
 
-#: byro/office/templates/office/base.html:120
+#: byro/office/templates/office/base.html:124
 msgid "Members"
 msgstr "Mitglieder"
 
-#: byro/office/templates/office/base.html:130
+#: byro/office/templates/office/base.html:134
 #: byro/office/templates/office/member/base.html:45
 #: byro/office/templates/office/member/finance.html:4
 msgid "Finance"
 msgstr "Finanzen"
 
-#: byro/office/templates/office/base.html:141
+#: byro/office/templates/office/base.html:145
 msgid "Transaction Upload"
 msgstr "Transaktions-Import"
 
-#: byro/office/templates/office/base.html:163
+#: byro/office/templates/office/base.html:167
 #: byro/office/templates/office/mails/base.html:4
 msgid "Mails"
 msgstr "E-Mails"
 
-#: byro/office/templates/office/base.html:199
+#: byro/office/templates/office/base.html:203
 #, python-format
 msgid "powered by <a %(a_attr)s>byro</a>"
 msgstr "powered by <a %(a_attr)s>byro</a>"
 
-#: byro/office/templates/office/base.html:204
+#: byro/office/templates/office/base.html:208
 msgid "running in development mode"
 msgstr "Entwicklungsmodus"
 
@@ -807,27 +847,37 @@ msgstr "(insgesamt)"
 msgid "Upload Document …"
 msgstr "Dokument hochladen …"
 
+#: byro/office/templates/office/documents/detail.html:5
+msgid "Document details"
+msgstr "Dokumentendetails"
+
+#: byro/office/templates/office/documents/detail.html:14
 #: byro/office/templates/office/documents/snippet_documents_table.html:8
 msgid "Direction"
 msgstr "Richtung"
 
+#: byro/office/templates/office/documents/detail.html:15
 #: byro/office/templates/office/documents/snippet_documents_table.html:9
 #: byro/office/templates/office/member/finance_table.html:9
 msgid "Category"
 msgstr "Kategorie"
 
+#: byro/office/templates/office/documents/detail.html:16
 #: byro/office/templates/office/documents/snippet_documents_table.html:10
 msgid "Title / Information"
 msgstr "Titel/Informationen"
 
+#: byro/office/templates/office/documents/detail.html:26
 #: byro/office/templates/office/documents/snippet_documents_table.html:21
 msgid "Integrity verified"
 msgstr "Integrität überprüft"
 
+#: byro/office/templates/office/documents/detail.html:28
 #: byro/office/templates/office/documents/snippet_documents_table.html:23
 msgid "File corrupted or modified"
 msgstr "Datei beschädigt oder modifiziert"
 
+#: byro/office/templates/office/documents/detail.html:30
 #: byro/office/templates/office/documents/snippet_documents_table.html:25
 msgid "bytes"
 msgstr "Bytes"
