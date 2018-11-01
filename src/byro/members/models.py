@@ -126,20 +126,6 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def balance(self) -> Decimal:
         return self._calc_balance()
 
-    def waive_debts_before_date(self, date):
-        cutoff_date = date - timedelta(days=1)
-        amount = self._calc_balance(cutoff_date, cutoff_date)
-        if amount >= 0:
-            return
-        amount = abs(amount)
-        src_account = SpecialAccounts.fees_receivable
-        dst_account = SpecialAccounts.fees
-        t = Transaction.objects.create(value_datetime=date, memo=_("Membership debts waived"), booking_datetime=now())
-        t.credit(account=src_account, amount=amount, member=self)
-        t.debit(account=dst_account, amount=amount, member=self)
-        t.save()
-        return amount
-
     def statute_barred_debt(self, future_limit=relativedelta()) -> Decimal:
         limit = relativedelta(months=Configuration.get_solo().liability_interval) - future_limit
         last_unenforceable_date = now().replace(month=12, day=31) - limit - relativedelta(years=1)
