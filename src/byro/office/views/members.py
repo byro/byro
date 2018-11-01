@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import messages
@@ -242,63 +244,163 @@ class MemberDocumentsView(MemberView, FormView):
         return super().form_valid(form)
 
 
-class MemberLeaveView(MemberView, FormView):
-    template_name = 'office/member/leave.html'
-    form_class = forms.modelform_factory(Membership,
-                                         fields=['start', 'end', 'interval', 'amount'])
+class MemberAccountAdjustmentForm(forms.Form):
+    form_title = _('Adjust member account balance')
+
+    date = forms.DateField(initial=lambda: now().date())
+    adjustment_reason = forms.ChoiceField(choices=[
+        ('initial' ,_("Initial balance")),
+        ('waiver', _("Fees waived")),
+    ])
+    adjustment_memo = forms.CharField(required=False)
+    adjustment_type = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=[
+            ('relative', _('Relative (Add or subtract amount to/from balance)')),
+            ('absolute', _('Absolute (Balance should be)')),
+        ],
+        initial='relative',
+    )
+    amount = forms.DecimalField(initial=Decimal('0.00'), decimal_places=2)
+
+    date.widget.attrs.update({'class': 'datepicker'})
+
+class MultipleFormsMixin:
+    def get_operations(self):
+        raise NotImplementedError
+
+    def mangle_button(self, name, prefix):
+        return 'submit_{}_{}'.format(prefix, name)
 
     def get_forms(self):
-        obj = self.get_object()
-        return [
-            self.form_class(instance=m, prefix=m.id,
-                            data=self.request.POST if self.request.method == 'POST' else None)
-            for m in obj.memberships.all().order_by('-start')
-        ]
+        """Instantiate forms, return a list of tuples like get_operations(), but with Form objects and expanded prefix values."""
+        retval = []
+
+        for prefix, title, form_class, buttons, callback in self.get_operations():
+            retval.append(
+                (
+                    prefix,
+                    title,
+                    form_class(prefix=prefix, data=self.request.POST if self.request.method == 'POST' else None),
+                    buttons,
+                    callback
+                )
+            )
+
+        return retval
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['forms'] = self.get_forms()
         return context
 
-    @transaction.atomic
     def post(self, *args, **kwargs):
-        for form in self.get_forms():
-            if form.is_valid() and form.has_changed() and form.instance.end:
-                if not getattr(form.instance, 'member', False):
-                    form.instance.member = self.get_object()
+        retval = None
 
-                form.save()
-                form.instance.log(self, '.ended')
-                messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
+        for prefix, title, form, buttons, callback in self.get_forms():
+            active_buttons = [name for name in buttons if self.mangle_button(name, prefix) in self.request.POST]
+            if active_buttons:
+                if form.is_valid():
+                    retval = callback(form, active_buttons)
 
-                form.instance.member.update_liabilites()
+        if retval:
+            return retval
 
-                responses = leave_member.send_robust(sender=form.instance)
-                for module, response in responses:
-                    if isinstance(response, Exception):
-                        messages.warning(self.request, _('Some post processing steps could not be completed: ') + str(response))
+        return redirect(self.request.get_full_path())
 
-                config = Configuration.get_solo()
-                if config.leave_member_template:
-                    context = {
-                        'name': config.name,
-                        'contact': config.mail_from,
-                        'number': form.instance.member.number,
-                        'member_name': form.instance.member.name,
-                        'end': form.instance.end,
-                    }
-                    responses = [r[1] for r in leave_member_mail_information.send_robust(sender=form.instance) if r]
-                    context['additional_information'] = '\n'.join(responses).strip()
-                    config.leave_member_template.to_mail(email=form.instance.member.email, context=context)
-                if config.leave_office_template:
-                    context = {
-                        'member_name': form.instance.member.name,
-                        'end': form.instance.end,
-                    }
-                    responses = [r[1] for r in leave_member_office_mail_information.send_robust(sender=form.instance) if r]
-                    context['additional_information'] = '\n'.join(responses).strip()
-                    config.leave_office_template.to_mail(email=config.backoffice_mail, context=context)
-        return redirect(reverse('office:members.leave', kwargs=self.kwargs))
+
+class MemberOperationsView(MultipleFormsMixin, MemberView):
+    template_name = 'office/member/operations.html'
+    membership_form_class = forms.modelform_factory(Membership,
+                                         fields=['start', 'end', 'interval', 'amount'])
+
+    def get_operations(self):
+        """Return a list of tuples. Each one:
+            + internal name/prefix of the form
+            + Title of the form
+            + A callable returning a Form instance
+            + (Ordered)Dict of submit buttons {button_name: button_text}
+            + Callback function for successful submit of the form
+        """
+        member = self.get_object()
+        now_ = now()
+
+        retval = []
+
+        # Add Leave forms for all current memberships
+        def _create_ms_leave_form(*args, **kwargs):
+            f = self.membership_form_class(instance=ms, *args, **kwargs)
+            f.fields['start'].disabled = True
+            f.fields['interval'].disabled = True
+            f.fields['amount'].disabled = True
+            f.fields['end'].required = True
+            f.fields['end'].widget.attrs['class'] = 'datepicker'
+            return f
+
+        for ms in member.memberships.all().order_by('-start'):
+            if ms.start <= now_.date() and (not ms.end or ms.end > now_.date()):
+                retval.append(
+                    ('ms_{}_leave'.format(ms.pk),
+                        _('End membership'),
+                        _create_ms_leave_form,
+                        {'end': _('End membership')},
+                        lambda *args, **kwargs: self.end_membership(ms, *args, **kwargs),
+                    )
+                )
+
+        # Add account adjustment form
+        retval.append(
+            ('member_account_adjustment',
+                _('Adjust member account balance'),
+                MemberAccountAdjustmentForm,
+                {'adjust': _('Adjust balance')},
+                self.adjust_balance,
+            )
+        )
+
+        return retval
+
+    @transaction.atomic
+    def adjust_balance(self, form, active_buttons):
+        print(active_buttons)
+
+    @transaction.atomic
+    def end_membership(self, ms, form, active_buttons):
+        if form.instance.end:
+            if not getattr(form.instance, 'member', False):
+                form.instance.member = self.get_object()
+
+            form.save()
+            form.instance.log(self, '.ended')
+            messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
+
+            form.instance.member.update_liabilites()
+
+            responses = leave_member.send_robust(sender=form.instance)
+            for module, response in responses:
+                if isinstance(response, Exception):
+                    messages.warning(self.request, _('Some post processing steps could not be completed: ') + str(response))
+
+            config = Configuration.get_solo()
+            if config.leave_member_template:
+                context = {
+                    'name': config.name,
+                    'contact': config.mail_from,
+                    'number': form.instance.member.number,
+                    'member_name': form.instance.member.name,
+                    'end': form.instance.end,
+                }
+                responses = [r[1] for r in leave_member_mail_information.send_robust(sender=form.instance) if r]
+                context['additional_information'] = '\n'.join(responses).strip()
+                config.leave_member_template.to_mail(email=form.instance.member.email, context=context)
+            if config.leave_office_template:
+                context = {
+                    'member_name': form.instance.member.name,
+                    'end': form.instance.end,
+                }
+                responses = [r[1] for r in leave_member_office_mail_information.send_robust(sender=form.instance) if r]
+                context['additional_information'] = '\n'.join(responses).strip()
+                config.leave_office_template.to_mail(email=config.backoffice_mail, context=context)
 
 
 class MemberListTypeaheadView(View):

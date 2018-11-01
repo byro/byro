@@ -47,10 +47,10 @@
   </li>
   <li class="nav-item">
     <a
-      class="nav-link {% if "members.leave" in url_name %}active{% endif %}"
-      href="{% url "office:members.leave" pk=member.pk %}"
+      class="nav-link {% if "members.operations" in url_name %}active{% endif %}"
+      href="{% url "office:members.operations" pk=member.pk %}"
     >
-        {% trans "Leave" %}
+        {% trans "Operations" %}
     </a>
   </li>
   <li class="nav-item">

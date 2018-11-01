@@ -1,0 +1,24 @@
+{% extends "office/member/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block member_content %}
+
+{% for prefix, title, form, buttons, callback in forms %}
+    <form method='post'>
+        {% csrf_token %}
+        <div class="card member-form-card">
+            <div class="card-header">{{ title }}</div>
+            <div class="card-body">
+                {% bootstrap_form form layout='horizontal' %}
+            </div>
+            <div class="card-footer">
+                {% for name, value in buttons.items %}
+                <button class="btn btn-success" type="submit" name="submit_{{prefix}}_{{name}}">{{value}}</button>
+                {% endfor %}
+            </div>
+        </div>
+    </form>
+{% endfor %}
+
+{% endblock %}

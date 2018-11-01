@@ -4,7 +4,7 @@ from .accounts import (
 from .dashboard import DashboardView
 from .members import (
     MemberCreateView, MemberDashboardView, MemberDataView,
-    MemberFinanceView, MemberLeaveView, MemberListView,
+    MemberFinanceView, MemberListView, MemberOperationsView,
 )
 from .settings import ConfigurationView, RegistrationConfigView
 from .transactions import TransactionDetailView
@@ -21,7 +21,7 @@ __all__ = [
     'MemberDashboardView',
     'MemberDataView',
     'MemberFinanceView',
-    'MemberLeaveView',
+    'MemberOperationsView',
     'MemberListView',
     'UserListView',
     'UserCreateView',

@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^members/view/(?P<pk>\d+)/', include([
         url('data$', members.MemberDataView.as_view(), name='members.data'),
         url('finance$', members.MemberFinanceView.as_view(), name='members.finance'),
-        url('leave$', members.MemberLeaveView.as_view(), name='members.leave'),
+        url('operations$', members.MemberOperationsView.as_view(), name='members.operations'),
         url('record-disclosure$', members.MemberRecordDisclosureView.as_view(), name='members.record-disclosure'),
         url('log$', members.MemberLogView.as_view(), name='members.log'),
         url('documents$', members.MemberDocumentsView.as_view(), name='members.documents'),
