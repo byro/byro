@@ -46,3 +46,11 @@ class SpecialAccounts:
     @classproperty
     def bank(cls):
         return cls.special_account('bank', AccountCategory.ASSET, _('Bank'))
+
+    @classproperty
+    def opening_balance(cls):
+        return cls.special_account('opening_balance', AccountCategory.ASSET, _('Opening balance'))
+
+    @classproperty
+    def lost_income(cls):
+        return cls.special_account('lost_income', AccountCategory.EXPENSE, _('Lost income'))

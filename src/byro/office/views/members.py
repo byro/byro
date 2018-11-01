@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, View
 
-from byro.bookkeeping.models import Booking
+from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
@@ -249,7 +249,7 @@ class MemberAccountAdjustmentForm(forms.Form):
 
     date = forms.DateField(initial=lambda: now().date())
     adjustment_reason = forms.ChoiceField(choices=[
-        ('initial' ,_("Initial balance")),
+        ('initial', _("Initial balance")),
         ('waiver', _("Fees waived")),
     ])
     adjustment_memo = forms.CharField(required=False)
@@ -264,6 +264,7 @@ class MemberAccountAdjustmentForm(forms.Form):
     amount = forms.DecimalField(initial=Decimal('0.00'), decimal_places=2)
 
     date.widget.attrs.update({'class': 'datepicker'})
+
 
 class MultipleFormsMixin:
     def get_operations(self):
@@ -301,7 +302,7 @@ class MultipleFormsMixin:
             active_buttons = [name for name in buttons if self.mangle_button(name, prefix) in self.request.POST]
             if active_buttons:
                 if form.is_valid():
-                    retval = callback(form, active_buttons)
+                    retval = callback(form, active_buttons) or retval
 
         if retval:
             return retval
@@ -311,8 +312,7 @@ class MultipleFormsMixin:
 
 class MemberOperationsView(MultipleFormsMixin, MemberView):
     template_name = 'office/member/operations.html'
-    membership_form_class = forms.modelform_factory(Membership,
-                                         fields=['start', 'end', 'interval', 'amount'])
+    membership_form_class = forms.modelform_factory(Membership, fields=['start', 'end', 'interval', 'amount'])
 
     def get_operations(self):
         """Return a list of tuples. Each one:
@@ -340,7 +340,8 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
         for ms in member.memberships.all().order_by('-start'):
             if ms.start <= now_.date() and (not ms.end or ms.end > now_.date()):
                 retval.append(
-                    ('ms_{}_leave'.format(ms.pk),
+                    (
+                        'ms_{}_leave'.format(ms.pk),
                         _('End membership'),
                         _create_ms_leave_form,
                         {'end': _('End membership')},
@@ -350,7 +351,8 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
         # Add account adjustment form
         retval.append(
-            ('member_account_adjustment',
+            (
+                'member_account_adjustment',
                 _('Adjust member account balance'),
                 MemberAccountAdjustmentForm,
                 {'adjust': _('Adjust balance')},
@@ -362,7 +364,59 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
     @transaction.atomic
     def adjust_balance(self, form, active_buttons):
-        print(active_buttons)
+        memo = form.cleaned_data['adjustment_memo']
+        if not memo:
+            memo = dict(form.fields['adjustment_reason'].choices).get(form.cleaned_data['adjustment_reason'], None)
+        if not memo:
+            memo = _('Account adjustment')
+
+        member = self.get_member()
+        now_ = now()
+
+        if form.cleaned_data['adjustment_type'] == 'relative':
+            amount = form.cleaned_data['amount']
+        else:
+            old_balance = member._calc_balance(form.cleaned_data['date'], form.cleaned_data['date'])
+            amount = old_balance - form.cleaned_data['amount']
+
+        amount_, from_, to_ = None, None, None
+
+        if amount != 0:
+            if form.cleaned_data['adjustment_reason'] == 'initial':
+                amount_, from_, to_ = amount, SpecialAccounts.opening_balance, SpecialAccounts.fees_receivable
+            elif form.cleaned_data['adjustment_reason'] == 'waiver':
+                if amount < 0:
+                    amount_, from_, to_ = -amount, SpecialAccounts.fees_receivable, SpecialAccounts.lost_income
+                else:
+                    messages.error(self.request, _("Fee waiving needs to decrease debts. Use a negative value in relative mode, or a value higher than the current one in absolute mode."))
+                    return
+
+            if amount_ < 0:
+                amount_ = -amount_
+                from_, to_ = to_, from_
+
+            from_member = member if from_ == SpecialAccounts.fees_receivable else None
+            to_member = member if to_ == SpecialAccounts.fees_receivable else None
+
+            t = Transaction.objects.create(
+                value_datetime=form.cleaned_data['date'],
+                booking_datetime=now_,
+                user_or_context=self,
+                memo=memo,
+            )
+            t.debit(account=to_, member=to_member, amount=amount_, user_or_context=self)
+            t.credit(account=from_, member=from_member, amount=amount_, user_or_context=self)
+
+            balance = member.balance
+
+            if form.cleaned_data['adjustment_reason'] == 'initial':
+                member.log(self, '.finance.initial_balance', balance=balance)
+            elif form.cleaned_data['adjustment_reason'] == 'waiver':
+                member.log(self, '.finance.fees_waived', amount=amount)
+            else:
+                member.log(self, '.finance.account_adjusted', balance=balance, amount=amount)
+
+            messages.success(self.request, _('Membership account adjusted by {amount}, current balance is {balance}').format(amount=amount, balance=balance))
 
     @transaction.atomic
     def end_membership(self, ms, form, active_buttons):
