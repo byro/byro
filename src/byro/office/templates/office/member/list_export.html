@@ -1,0 +1,18 @@
+{% extends "office/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+
+{% block title %}{% trans "Export member list" %}{% endblock %}
+
+{% block content %}
+<p>{% blocktrans trimmed %}
+    Select the export format and fields to be exported, then press 'Export'.
+{% endblocktrans %}</p>
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form layout='horizontal' %}
+    <button class="btn btn-success" type="submit">{% trans "Export" %}</button>
+</form>
+
+{% endblock %}

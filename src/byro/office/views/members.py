@@ -1,19 +1,27 @@
+import csv
+from collections import OrderedDict
 from decimal import Decimal
+from itertools import chain
 
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
-from django.http import JsonResponse
+from django.db.models.fields.related import OneToOneRel
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, View
+from django.views.generic.list import (
+    MultipleObjectMixin, MultipleObjectTemplateResponseMixin,
+)
 
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
+from byro.common.forms.registration import SPECIAL_NAMES, RegistrationConfigForm
 from byro.common.models import Configuration
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
@@ -73,6 +81,124 @@ class MemberListView(ListView):
         for member in Member.objects.all():
             member.update_liabilites()
         return redirect(request.path)
+
+
+class MemberListExportForm(forms.Form):
+    field_list = forms.MultipleChoiceField(choices=[], widget=forms.CheckboxSelectMultiple)
+    export_format = forms.ChoiceField(choices=[
+        ('csv', _("CSV (Comma Separated Values)")),
+        ('csv_de', _("CSV (Semicolon Separated Values, German Windows versions)")),  # FIXME German decimal point
+        # ('xlsx', _("XLSX (Excel)")),
+    ])
+
+    @staticmethod
+    def get_possible_fields():
+        reg_form = Configuration.get_solo().registration_form or []
+        form_config = {entry['name']: entry for entry in reg_form}
+
+        retval = OrderedDict()
+
+        retval['_internal_id'] = _('Internal database ID'), lambda m: m.pk, False
+        retval['_internal_active'] = _('Member active?'), lambda m: m.is_active, False
+        retval['_internal_balance'] = _('Account balance'), lambda m: m.balance, False
+
+        profile_map = {
+            profile.related_model: profile.name
+            for profile in Member._meta.related_objects
+            if isinstance(profile, OneToOneRel) and profile.name.startswith('profile_')
+        }
+
+        def get_getter(model_, field_):
+            if model_ is Member:
+                return lambda m: getattr(m, field_.name) or ""
+            elif model is Membership:
+                return lambda m: (getattr(m.memberships.last(), field_.name) or "") if m.memberships.count() else ""
+            elif model_ in profile_map:
+                return lambda m: getattr(getattr(m, profile_map[model_]), field_.name) or ""
+            else:
+                return lambda m: ""
+
+        for model, field in RegistrationConfigForm.get_form_fields():
+            f_id = "{}__{}".format(SPECIAL_NAMES.get(model, model.__name__), field.name)
+            f_name = field.verbose_name or field.name
+
+            retval[f_id] = (
+                f_name if model in SPECIAL_NAMES else "{} ({})".format(f_name, model.__name__),
+                get_getter(model, field),
+                f_id in form_config and not form_config[f_id].get('position', 0) < 0
+            )
+
+        return retval
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        possible_fields = self.get_possible_fields()
+        self.fields['field_list'].choices = [
+            (field_id, name)
+            for (field_id, (name, x, default_selected))
+            in possible_fields.items()
+        ]
+        self.fields['field_list'].initial = [
+            field_id
+            for field_id, (x, x, default_selected)
+            in possible_fields.items() if default_selected
+        ]
+
+
+class csv_excel_de(csv.excel):
+    delimiter = ';'
+
+
+class MemberListExportView(FormView, MultipleObjectMixin, MultipleObjectTemplateResponseMixin):
+    template_name = 'office/member/list_export.html'
+    context_object_name = 'members'
+    model = Member
+    form_class = MemberListExportForm
+
+    def get(self, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        return super().get(*args, **kwargs)
+
+    def form_valid(self, form):
+        possible_fields = MemberListExportForm.get_possible_fields()
+        selected_fields = form.cleaned_data['field_list']
+        header = OrderedDict([(f_id, f_name) for f_id, (f_name, x, x) in possible_fields.items() if f_id in selected_fields])
+        data = self.get_data([(f_id, getter) for f_id, (x, getter, x) in possible_fields.items() if f_id in selected_fields])
+
+        if form.cleaned_data['export_format'].startswith('csv'):
+            return self.export_csv(header, data, csv_format=form.cleaned_data['export_format'])
+
+        return HttpResponse('Hallo', content_type='text/plain')
+
+    def export_csv(self, header, data, csv_format='default'):
+        class Echo:
+            "Dummy class"
+            def write(self, value):
+                return value
+
+        pseudo_buffer = Echo()
+        writer = csv.DictWriter(
+            pseudo_buffer,
+            header.keys(),
+            dialect={
+                'csv_de': csv_excel_de,
+            }.get(csv_format, 'excel'),
+        )
+        response = StreamingHttpResponse(
+            (writer.writerow(row) for row in chain([header], data)),
+            content_type='text/csv; charset=utf-8',
+            charset='utf-8-sig',
+        )
+        response['Content-Disposition'] = 'attachment; filename="members_{}.csv"'.format(now().date())
+        return response
+
+    def get_data(self, field_mapping):
+        for m in Member.objects.all():
+            print("foo")
+            yield {
+                f_id: f_getter(m)
+                for (f_id, f_getter) in field_mapping
+            }
 
 
 class MemberCreateView(FormView):

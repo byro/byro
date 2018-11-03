@@ -16,9 +16,10 @@ urlpatterns = [
     url(r'^settings/users/(?P<pk>\d+)/$', users.UserDetailView.as_view(), name='settings.users.detail'),
     url('^settings$', settings.ConfigurationView.as_view(), name='settings.base'),
     url('^$', dashboard.DashboardView.as_view(), name='dashboard'),
-    url(r'^members/typeahead', members.MemberListTypeaheadView.as_view(), name='members.typeahead'),
-    url(r'^members/list', members.MemberListView.as_view(), name='members.list'),
-    url(r'^members/add', members.MemberCreateView.as_view(), name='members.add'),
+    url(r'^members/typeahead$', members.MemberListTypeaheadView.as_view(), name='members.typeahead'),
+    url(r'^members/list$', members.MemberListView.as_view(), name='members.list'),
+    url(r'^members/list/export$', members.MemberListExportView.as_view(), name='members.list.export'),
+    url(r'^members/add$', members.MemberCreateView.as_view(), name='members.add'),
     url(r'^members/view/(?P<pk>\d+)/', include([
         url('data$', members.MemberDataView.as_view(), name='members.data'),
         url('finance$', members.MemberFinanceView.as_view(), name='members.finance'),

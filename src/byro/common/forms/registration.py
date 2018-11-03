@@ -102,7 +102,8 @@ class RegistrationConfigForm(forms.Form):
             self.fields_extra[key] = (verbose_name, (self[name] for name in form_fields.keys()))
             self.fields.update(form_fields)
 
-    def get_form_fields(self):
+    @staticmethod
+    def get_form_fields():
         for model in [Member, Membership] + Member.profile_classes:
             for field in model._meta.fields:
                 if field.name in ('id', 'member') or (model is Member and field.name == 'membership_type'):

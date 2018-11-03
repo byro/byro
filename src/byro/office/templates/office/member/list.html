@@ -5,14 +5,22 @@
 {% block title %}{% trans "Member List" %}{% endblock %}
 
 {% block content %}
-<p>
-<a href="{% url "office:members.add" %}" class="btn btn-success">
-    <span class="fa fa-plus"></span> {% trans "Add new member" %}
-</a>
 <form method="post" class="form form-inline">
     {% csrf_token %}
-    <button type="submit" class="btn btn-success">{% trans "Rebuild" %}</button>
+    <div class="btn-group" role="group" aria-label="{% trans 'Member list operations' %}">
+        <a href="{% url "office:members.add" %}" class="btn btn-success">
+            <span class="fa fa-plus"></span> {% trans "Add new member …" %}
+        </a>
+        <a href="{% url "office:members.list.export" %}" class="btn btn-success">
+            <span class="fa fa-download"></span> {% trans "Export member list …" %}
+        </a>
+        <button type="submit" class="btn btn-success">
+            <span class="fa fa-refresh"></span> {% trans "Refresh account balance" %}
+        </button>
+
+    </div>
 </form>
+<p>
 <div class="form-group">
     <form method="get" class="form form-inline">
         <select name="filter" class="form-control">

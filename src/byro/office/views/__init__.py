@@ -3,8 +3,8 @@ from .accounts import (
 )
 from .dashboard import DashboardView
 from .members import (
-    MemberCreateView, MemberDashboardView, MemberDataView,
-    MemberFinanceView, MemberListView, MemberOperationsView,
+    MemberCreateView, MemberDashboardView, MemberDataView, MemberFinanceView,
+    MemberListExportView, MemberListView, MemberOperationsView,
 )
 from .settings import ConfigurationView, RegistrationConfigView
 from .transactions import TransactionDetailView
@@ -23,6 +23,7 @@ __all__ = [
     'MemberFinanceView',
     'MemberOperationsView',
     'MemberListView',
+    'MemberListExportView',
     'UserListView',
     'UserCreateView',
     'UserDetailView',
