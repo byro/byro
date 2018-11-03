@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
-from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
@@ -53,15 +53,8 @@ class MemberView(DetailView):
         return ctx
 
 
-class MemberListView(ListView):
-    template_name = 'office/member/list.html'
-    context_object_name = 'members'
-    model = Member
-    paginate_by = 50
-
-    def get_queryset(self):
-        search = self.request.GET.get('q')
-        _filter = self.request.GET.get('filter', 'active')
+class MemberListMixin:
+    def get_members_queryset(self, search=None, _filter='active'):
         qs = Member.objects.all()
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(number=search))
@@ -77,6 +70,18 @@ class MemberListView(ListView):
             qs = qs.filter(active_q)
         return qs.order_by('-id').distinct()
 
+
+class MemberListView(MemberListMixin, ListView):
+    template_name = 'office/member/list.html'
+    context_object_name = 'members'
+    model = Member
+    paginate_by = 50
+
+    def get_queryset(self):
+        search = self.request.GET.get('q')
+        _filter = self.request.GET.get('filter', 'active')
+        return self.get_members_queryset(search, _filter)
+
     def post(self, request, *args, **kwargs):
         for member in Member.objects.all():
             member.update_liabilites()
@@ -85,6 +90,11 @@ class MemberListView(ListView):
 
 class MemberListExportForm(forms.Form):
     field_list = forms.MultipleChoiceField(choices=[], widget=forms.CheckboxSelectMultiple)
+    member_filter = forms.ChoiceField(choices=[
+        ('active', _('Active members')),
+        ('inactive', _('Only inactive members')),
+        ('all', _('All members')),
+    ])
     export_format = forms.ChoiceField(choices=[
         ('csv', _("CSV (Comma Separated Values)")),
         ('csv_de', _("CSV (Semicolon Separated Values, German Windows versions)")),  # FIXME German decimal point
@@ -149,7 +159,7 @@ class csv_excel_de(csv.excel):
     delimiter = ';'
 
 
-class MemberListExportView(FormView, MultipleObjectMixin, MultipleObjectTemplateResponseMixin):
+class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, MultipleObjectTemplateResponseMixin):
     template_name = 'office/member/list_export.html'
     context_object_name = 'members'
     model = Member
@@ -163,12 +173,12 @@ class MemberListExportView(FormView, MultipleObjectMixin, MultipleObjectTemplate
         possible_fields = MemberListExportForm.get_possible_fields()
         selected_fields = form.cleaned_data['field_list']
         header = OrderedDict([(f_id, f_name) for f_id, (f_name, x, x) in possible_fields.items() if f_id in selected_fields])
-        data = self.get_data([(f_id, getter) for f_id, (x, getter, x) in possible_fields.items() if f_id in selected_fields])
+        data = self.get_data(form, [(f_id, getter) for f_id, (x, getter, x) in possible_fields.items() if f_id in selected_fields])
 
         if form.cleaned_data['export_format'].startswith('csv'):
             return self.export_csv(header, data, csv_format=form.cleaned_data['export_format'])
 
-        return HttpResponse('Hallo', content_type='text/plain')
+        return redirect(self.request.get_full_path())
 
     def export_csv(self, header, data, csv_format='default'):
         class Echo:
@@ -192,9 +202,9 @@ class MemberListExportView(FormView, MultipleObjectMixin, MultipleObjectTemplate
         response['Content-Disposition'] = 'attachment; filename="members_{}.csv"'.format(now().date())
         return response
 
-    def get_data(self, field_mapping):
-        for m in Member.objects.all():
-            print("foo")
+    def get_data(self, form, field_mapping):
+        qs = self.get_members_queryset(_filter=form.cleaned_data['member_filter'])
+        for m in qs.all():
             yield {
                 f_id: f_getter(m)
                 for (f_id, f_getter) in field_mapping
