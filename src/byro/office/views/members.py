@@ -181,7 +181,7 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
             object_id=0,
             user=self.request.user,
             action_type="byro.members.export",
-            data = {
+            data={
                 'filter': form.cleaned_data['member_filter'],
                 'format': form.cleaned_data['export_format'],
                 'fields': OrderedDict([(f_id, str(f_name)) for (f_id, f_name) in header.items()]),
@@ -194,12 +194,18 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
         return redirect(self.request.get_full_path())
 
     def export_csv(self, header, data, csv_format='default'):
-        class Echo:
-            "Dummy class"
+        class EchoBOM:
+            """Dummy, based on the Django docs.
+            This one adds one feature: It outputs a Unicode BOM (Byte-Order Mark) as the first
+            character."""
             def write(self, value):
-                return value
+                if not hasattr(self, 'have_bom'):
+                    self.have_bom = True
+                    return "\ufeff" + value
+                else:
+                    return value
 
-        pseudo_buffer = Echo()
+        pseudo_buffer = EchoBOM()
         writer = csv.DictWriter(
             pseudo_buffer,
             header.keys(),
@@ -210,7 +216,7 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
         response = StreamingHttpResponse(
             (writer.writerow(row) for row in chain([header], data)),
             content_type='text/csv; charset=utf-8',
-            charset='utf-8-sig',
+            charset='utf-8',
         )
         response['Content-Disposition'] = 'attachment; filename="members_{}.csv"'.format(now().date())
         return response
