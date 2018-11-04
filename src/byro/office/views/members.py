@@ -181,7 +181,7 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
             object_id=0,
             user=self.request.user,
             action_type="byro.members.export",
-            data = {
+            data={
                 'filter': form.cleaned_data['member_filter'],
                 'format': form.cleaned_data['export_format'],
                 'fields': OrderedDict([(f_id, str(f_name)) for (f_id, f_name) in header.items()]),
@@ -513,11 +513,11 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
     @transaction.atomic
     def adjust_balance(self, form, active_buttons):
-        memo = form.cleaned_data['adjustment_memo']
-        if not memo:
-            memo = dict(form.fields['adjustment_reason'].choices).get(form.cleaned_data['adjustment_reason'], None)
-        if not memo:
-            memo = _('Account adjustment')
+        memo = (
+            form.cleaned_data['adjustment_memo']
+            or dict(form.fields['adjustment_reason'].choices).get(form.cleaned_data['adjustment_reason'], None)
+            or _('Account adjustment')
+        )
 
         member = self.get_member()
         now_ = now()
