@@ -22,7 +22,7 @@ from django.views.generic.list import (
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.forms.registration import SPECIAL_NAMES, RegistrationConfigForm
-from byro.common.models import Configuration
+from byro.common.models import Configuration, LogEntry
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
@@ -169,11 +169,24 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
         self.object_list = self.get_queryset()
         return super().get(*args, **kwargs)
 
+    @transaction.atomic
     def form_valid(self, form):
         possible_fields = MemberListExportForm.get_possible_fields()
         selected_fields = form.cleaned_data['field_list']
         header = OrderedDict([(f_id, f_name) for f_id, (f_name, x, x) in possible_fields.items() if f_id in selected_fields])
         data = self.get_data(form, [(f_id, getter) for f_id, (x, getter, x) in possible_fields.items() if f_id in selected_fields])
+
+        LogEntry.objects.create(
+            content_type=None,
+            object_id=0,
+            user=self.request.user,
+            action_type="byro.members.export",
+            data = {
+                'filter': form.cleaned_data['member_filter'],
+                'format': form.cleaned_data['export_format'],
+                'fields': OrderedDict([(f_id, str(f_name)) for (f_id, f_name) in header.items()]),
+            }
+        )
 
         if form.cleaned_data['export_format'].startswith('csv'):
             return self.export_csv(header, data, csv_format=form.cleaned_data['export_format'])
