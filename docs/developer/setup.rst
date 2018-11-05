@@ -30,7 +30,7 @@ Database setup
 Having the database server installed, we still need a database and a database user::
 
   sudo -u postgres -i
-  postgres $ createuser <yourusername>
+  postgres $ createuser --pwprompt <yourusername>
   postgres $ createdb byro -O <yourusername>
 
 Substitute your system username for ``<yourusername>``.
