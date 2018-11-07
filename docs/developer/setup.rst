@@ -10,6 +10,7 @@ If you want to install byro on a server for actual usage, go to the :ref:`admini
 * Python 3.x
 * A recent version of pip (Ubuntu package: ``python3-pip``)
 * gettext (Debian package: ``gettext``)
+* libjpeg or any other library supported in pillow_ (for qrcode_)
 * A PostgreSQL server
 
 Some Python dependencies might also need a compiler during installation, the Debian package
@@ -30,7 +31,7 @@ Database setup
 Having the database server installed, we still need a database and a database user::
 
   sudo -u postgres -i
-  postgres $ createuser <yourusername>
+  postgres $ createuser --pwprompt <yourusername>
   postgres $ createdb byro -O <yourusername>
 
 Substitute your system username for ``<yourusername>``.
@@ -146,3 +147,6 @@ To contribute to byro, please read the :doc:`contributing documentation </develo
 Head over to the :doc:`documentation patching section </developer/documentation>` if you want to improve the documentation.
 
 If you want to work on plugins, please go to the :doc:`plugin guides </developer/plugins/index>`.
+
+.. _qrcode: https://pypi.org/project/qrcode/
+.. _pillow: https://pillow.readthedocs.io/en/latest/installation.html#external-libraries
