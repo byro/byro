@@ -101,57 +101,16 @@ class MemberListExportForm(forms.Form):
         # ('xlsx', _("XLSX (Excel)")),
     ])
 
-    @staticmethod
-    def get_possible_fields():
-        reg_form = Configuration.get_solo().registration_form or []
-        form_config = {entry['name']: entry for entry in reg_form}
-
-        retval = OrderedDict()
-
-        retval['_internal_id'] = _('Internal database ID'), lambda m: m.pk, False
-        retval['_internal_active'] = _('Member active?'), lambda m: m.is_active, False
-        retval['_internal_balance'] = _('Account balance'), lambda m: m.balance, False
-
-        profile_map = {
-            profile.related_model: profile.name
-            for profile in Member._meta.related_objects
-            if isinstance(profile, OneToOneRel) and profile.name.startswith('profile_')
-        }
-
-        def get_getter(model_, field_):
-            if model_ is Member:
-                return lambda m: getattr(m, field_.name) or ""
-            elif model is Membership:
-                return lambda m: (getattr(m.memberships.last(), field_.name) or "") if m.memberships.count() else ""
-            elif model_ in profile_map:
-                return lambda m: getattr(getattr(m, profile_map[model_]), field_.name) or ""
-            else:
-                return lambda m: ""
-
-        for model, field in RegistrationConfigForm.get_form_fields():
-            f_id = "{}__{}".format(SPECIAL_NAMES.get(model, model.__name__), field.name)
-            f_name = field.verbose_name or field.name
-
-            retval[f_id] = (
-                f_name if model in SPECIAL_NAMES else "{} ({})".format(f_name, model.__name__),
-                get_getter(model, field),
-                f_id in form_config and not form_config[f_id].get('position', 0) < 0
-            )
-
-        return retval
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        possible_fields = self.get_possible_fields()
+        fields = Member.get_fields()
         self.fields['field_list'].choices = [
-            (field_id, name)
-            for (field_id, (name, x, default_selected))
-            in possible_fields.items()
+            (f.field_id, f.name)
+            for f in fields.values()
         ]
         self.fields['field_list'].initial = [
-            field_id
-            for field_id, (x, x, default_selected)
-            in possible_fields.items() if default_selected
+            f.field_id
+            for f in fields.values() if f.registration_form.get('position', -1) > -1
         ]
 
 
@@ -171,10 +130,10 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
 
     @transaction.atomic
     def form_valid(self, form):
-        possible_fields = MemberListExportForm.get_possible_fields()
+        fields = Member.get_fields()
         selected_fields = form.cleaned_data['field_list']
-        header = OrderedDict([(f_id, f_name) for f_id, (f_name, x, x) in possible_fields.items() if f_id in selected_fields])
-        data = self.get_data(form, [(f_id, getter) for f_id, (x, getter, x) in possible_fields.items() if f_id in selected_fields])
+        header = OrderedDict([(f.field_id, f.name) for f in fields.values() if f.field_id in selected_fields])
+        data = self.get_data(form, [(f.field_id, f.getter) for f in fields.values() if f.field_id in selected_fields])
 
         LogEntry.objects.create(
             content_type=None,

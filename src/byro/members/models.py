@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from decimal import Decimal
 from functools import reduce
 
@@ -12,10 +13,62 @@ from django.utils.translation import ugettext_lazy as _
 
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
-from byro.common.models import LogEntry, LogTargetMixin
+from byro.common.models import Configuration, LogEntry, LogTargetMixin
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 from byro.common.models.configuration import Configuration
+
+
+class Field:
+    field_id = str
+    name = str
+    description = str
+
+    computed = bool
+    read_only = bool
+    registration_form = dict
+
+    getter = lambda m: None
+    setter = lambda m, v: None
+
+    def __init__(self, field_id, name, description, path, registration_form = None, **kwargs):
+        self.field_id = field_id
+        self.name = name
+        self.description = description
+        self.path = path
+        self.registration_form = registration_form or {}
+        for k,v in kwargs.items():
+            setattr(self, k, v)
+
+    @staticmethod
+    def _follow_path(start, path):
+        """Follow a python.dot.path until its penultimate item, then return the current object and the name of the last descriptor.
+        Allows 'func()' syntax to call a method along the way without arguments.
+
+        Examples:
+            _follow_path(m, 'pk')  ->  m, 'pk'
+            _follow_path(m, 'profile_foo.bar')  ->  m.profile_foo, 'bar'
+            _follow_path(m, 'memberships.last().start')  ->  m.memberships.last(), 'start'
+        """
+        target = start
+        path = path.split(".")
+        for p in path[:-1]:
+            target = getattr(target, p.rsplit("(")[0], None)
+            if p.endswith("()") and target is not None:
+                target = target()
+        return target, path[-1]
+
+    def getter(self, member):
+        target, prop = self._follow_path(member, self.path)
+        return getattr(target, prop, None)
+
+    def setter(self, member, value):
+        if self.read_only:
+            raise NotImplementedError("Writing to {} is not supported".format(self.path))
+        target, prop = self._follow_path(member, self.path)
+        if target is None:
+            raise AttributeError("Encountered 'None' while following {}".format(self.path))
+        setattr(target, prop, value)
 
 
 class MemberTypes:
@@ -111,6 +164,44 @@ class Member(Auditable, models.Model, LogTargetMixin):
             for related in self._meta.related_objects
             if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
         ]
+
+    @classmethod
+    def get_fields(cls):
+        result = []
+
+        result.append(Field('_internal_id', _('Internal database ID'), "", 'pk', computed=True, read_only=True))
+        result.append(Field('_internal_active', _('Member active?'), "", 'is_active', computed=True, read_only=True))
+        result.append(Field('_internal_balance', _('Account balance'), "", 'balance', computed=True, read_only=True))
+
+        reg_form = Configuration.get_solo().registration_form or []
+        form_config = {entry['name']: entry for entry in reg_form}
+
+        profile_map = {
+            profile.related_model: profile.name
+            for profile in cls._meta.related_objects
+            if isinstance(profile, OneToOneRel) and profile.name.startswith('profile_')
+        }
+
+        for model in [cls, Membership] + cls.profile_classes:
+            for field in model._meta.fields:
+                if field.name in ('id', 'member') or (model is Member and field.name == 'membership_type'):
+                    continue
+
+                f_id = "{}__{}".format(SPECIAL_NAMES.get(model, model.__name__), field.name)
+                f_name = field.verbose_name or field.name
+
+                if issubclass(model, cls):
+                    f_path = field.name
+                elif model is Membership:
+                    f_path = "memberships.last().{}".format(field.name)
+                    f_name = "{} ({})".format(f_name, _("Current membership"))
+                else:
+                    f_path = "{}.{}".format(profile_map[model], field.name)
+                    f_name = "{} ({})".format(f_name, model.__name__)
+
+                result.append(Field(f_id, f_name, "", f_path, registration_form=form_config.get(f_id, None), computed=False, read_only=False))
+
+        return OrderedDict([(f.field_id, f) for f in result])
 
     def _calc_balance(self, liability_cutoff=None, asset_cutoff=None) -> Decimal:
         _now = now()
@@ -325,3 +416,18 @@ class Membership(Auditable, models.Model, LogTargetMixin):
 
     def get_absolute_url(self):
         return reverse('office:members.data', kwargs={'pk': self.member.pk})
+
+SPECIAL_NAMES = {
+    Member: 'member',
+    Membership: 'membership',
+}
+
+SPECIAL_ORDER = [
+    'member__number',
+    'member__name',
+    'member__address',
+    'member__email',
+    'membership__start',
+    'membership__interval',
+    'membership__amount',
+]

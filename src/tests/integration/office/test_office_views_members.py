@@ -1,7 +1,7 @@
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.utils.timezone import now
 from django.urls import reverse
+from django.utils.timezone import now
 
 pytestmark = pytest.mark.usefixtures('configuration')
 
