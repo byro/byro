@@ -97,7 +97,7 @@ class MemberListExportForm(forms.Form):
     ])
     export_format = forms.ChoiceField(choices=[
         ('csv', _("CSV (Comma Separated Values)")),
-        ('csv_de', _("CSV (Semicolon Separated Values, German Windows versions)")),  # FIXME German decimal point
+        ('csv_de', _("CSV (Semicolon Separated Values, German Windows versions)")),
         # ('xlsx', _("XLSX (Excel)")),
     ])
 
@@ -116,6 +116,13 @@ class MemberListExportForm(forms.Form):
 
 class csv_excel_de(csv.excel):
     delimiter = ';'
+
+
+def filter_excel_de(data):
+    if isinstance(data, (float, Decimal)):
+        return "{:18,.2f}".format(data).replace(",", "_").replace(".", ",").replace("_", ".").strip()
+    else:
+        return data
 
 
 class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, MultipleObjectTemplateResponseMixin):
@@ -164,6 +171,9 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
                 else:
                     return value
 
+        def row_converter_de(row_):
+            return {k:filter_excel_de(v) for (k,v) in row_.items()}
+
         pseudo_buffer = EchoBOM()
         writer = csv.DictWriter(
             pseudo_buffer,
@@ -172,8 +182,11 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
                 'csv_de': csv_excel_de,
             }.get(csv_format, 'excel'),
         )
+        converter = {
+            'csv_de': row_converter_de,
+        }.get(csv_format, lambda x: x)
         response = StreamingHttpResponse(
-            (writer.writerow(row) for row in chain([header], data)),
+            (writer.writerow(converter(row)) for row in chain([header], data)),
             content_type='text/csv; charset=utf-8',
             charset='utf-8',
         )
