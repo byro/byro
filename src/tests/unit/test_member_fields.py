@@ -9,6 +9,7 @@ def test_internal_follow_path():
         class B:
             c = 3
         d = 1
+
         def e(self):
             class F:
                 g = 4
@@ -39,8 +40,8 @@ def test_member_field_reading(member, membership, inactive_member):
 
     assert f['member__name'].getter(member) == member.name
 
-    assert f['_internal_active'].getter(member) == True
-    assert f['_internal_active'].getter(inactive_member) == False
+    assert f['_internal_active'].getter(member) is True
+    assert f['_internal_active'].getter(inactive_member) is False
 
 
 @pytest.mark.django_db

@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from byro.office.views.members import filter_excel_de
 
+
 def test_windows_de_comma():
     assert filter_excel_de(0.01) == "0,01"
     assert filter_excel_de(0.1) == "0,10"

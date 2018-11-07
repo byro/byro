@@ -8,7 +8,6 @@ from django import forms
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
-from django.db.models.fields.related import OneToOneRel
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -21,7 +20,6 @@ from django.views.generic.list import (
 
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
-from byro.common.forms.registration import SPECIAL_NAMES, RegistrationConfigForm
 from byro.common.models import Configuration, LogEntry
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
@@ -172,7 +170,7 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
                     return value
 
         def row_converter_de(row_):
-            return {k:filter_excel_de(v) for (k,v) in row_.items()}
+            return {k: filter_excel_de(v) for (k, v) in row_.items()}
 
         pseudo_buffer = EchoBOM()
         writer = csv.DictWriter(

@@ -16,7 +16,6 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry, LogTargetMixin
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
-from byro.common.models.configuration import Configuration
 
 
 class Field:
@@ -28,16 +27,13 @@ class Field:
     read_only = bool
     registration_form = dict
 
-    getter = lambda m: None
-    setter = lambda m, v: None
-
-    def __init__(self, field_id, name, description, path, registration_form = None, **kwargs):
+    def __init__(self, field_id, name, description, path, registration_form=None, **kwargs):
         self.field_id = field_id
         self.name = name
         self.description = description
         self.path = path
         self.registration_form = registration_form or {}
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
     @staticmethod
@@ -416,6 +412,7 @@ class Membership(Auditable, models.Model, LogTargetMixin):
 
     def get_absolute_url(self):
         return reverse('office:members.data', kwargs={'pk': self.member.pk})
+
 
 SPECIAL_NAMES = {
     Member: 'member',
