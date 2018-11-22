@@ -34,7 +34,7 @@ class AccountCreateView(FormView):
 
     def form_valid(self, form):
         form.save()
-        messages.success(self.request, _('The member was added, please edit additional details if applicable.'))
+        messages.success(self.request, _('The account was added, please edit additional details if applicable.'))
         self.form = form
         return super().form_valid(form)
 
