@@ -44,7 +44,7 @@ class UserCreateView(FormView):
     def form_valid(self, form):
         form.save()
         self.form = form
-        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.create")
+        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.created")
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -58,7 +58,7 @@ class UserDetailView(UpdateView):
     form_class = UserForm
 
     def form_valid(self, form):
-        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.update")
+        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.updated")
         return super().form_valid(form)
 
     def get_object(self):
