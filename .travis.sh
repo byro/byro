@@ -23,5 +23,5 @@ if [ "$1" == "docs" ]; then
     make html
     make linkcheck
     npm install -g write-good
-    write-good **/*.rst
+    write-good **/*.rst --no-passive --no-adverb
 fi
