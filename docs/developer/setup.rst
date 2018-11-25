@@ -31,7 +31,7 @@ Database setup
 Having the database server installed, we still need a database and a database user::
 
   sudo -u postgres -i
-  postgres $ createuser --pwprompt <yourusername>
+  postgres $ createuser <yourusername>
   postgres $ createdb byro -O <yourusername>
 
 Substitute your system username for ``<yourusername>``.
@@ -75,6 +75,11 @@ file ``byro/local_settings.py`` with contents like these::
             'HOST': 'localhost',
         }
     }
+
+(The default -- and recommended -- installation uses PostgreSQL "Peer Authentication", in which the
+Unix user is mapped to the Postgres database user. This works only for local connections, and only
+on Linux, most BSDs, OS X, and Solaris, but provides the highest level of security and the least
+amount of configuration. In this mode the keys ``USER``, ``PASSWORD``, and ``HOST`` MUST NOT be set.)
 
 Then, create the local database::
 

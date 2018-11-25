@@ -131,12 +131,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'byro',
-        'HOST': 'localhost',
     }
 }
 
 if os.getenv('TRAVIS'):
     DATABASES['default']['USER'] = 'postgres'
+    DATABASES['default']['HOST'] = 'localhost'
     DATABASES['default']['PASSWORD'] = ''
 
 
