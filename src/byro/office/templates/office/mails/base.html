@@ -22,6 +22,12 @@
           href="{% url "office:mails.templates.list" %}"
         >{% trans "Templates" %}</a>
     </li>
+    <li class="nav-item">
+        <a
+          class="nav-link {% if "mails.compose" in url_name %}active{% endif %}"
+          href="{% url "office:mails.compose" %}"
+        >{% trans "Compose" %}</a>
+    </li>
 </ul>
 
     {% block mail_content %}

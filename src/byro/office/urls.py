@@ -49,6 +49,7 @@ urlpatterns = [
     url('^mails/(?P<pk>[0-9]+)/copy$', mails.MailCopy.as_view(), name='mails.mail.copy'),
     url('^mails/(?P<pk>[0-9]+)/delete$', mails.OutboxPurge.as_view(), name='mails.mail.delete'),
     url('^mails/(?P<pk>[0-9]+)/send$', mails.OutboxSend.as_view(), name='mails.mail.send'),
+    url('^mails/compose$', mails.Compose.as_view(), name='mails.compose'),
     url('^mails/sent$', mails.SentMail.as_view(), name='mails.sent'),
     url('^mails/outbox$', mails.OutboxList.as_view(), name='mails.outbox.list'),
     url('^mails/outbox/send$', mails.OutboxSend.as_view(), name='mails.outbox.send'),

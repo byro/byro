@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, ListView, UpdateView, View
@@ -130,6 +131,22 @@ class TemplateCreate(CreateView):
     context_object_name = 'template'
     success_url = '/mails/templates'
     form_class = MAIL_TEMPLATE_FORM_CLASS
+
+
+MAIL_SUBJECT_FORM_CLASS = forms.modelform_factory(
+    EMail,
+    form=RestrictedLanguagesI18nModelForm,
+    fields=['to', 'reply_to', 'cc', 'bcc', 'subject', 'text'],
+)
+
+
+class Compose(SuccessMessageMixin, CreateView):
+    model = MailTemplate
+    template_name = 'office/mails/compose.html'
+    context_object_name = 'template'
+    success_url = '/mails/outbox'
+    form_class = MAIL_SUBJECT_FORM_CLASS
+    success_message = "The email was created successfully. Go to our outbox and send it."
 
 
 class TemplateDelete(View):  # TODO
