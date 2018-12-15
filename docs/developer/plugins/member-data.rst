@@ -91,7 +91,7 @@ add a general newsletter view to the sidebar::
        }
 
 
-Configuring you plugin
+Configuring your plugin
 ----------------------
 
 If you'd like to provide custom configuration options (for example, the
