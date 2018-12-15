@@ -25,6 +25,7 @@
     <form method="get" class="form form-inline">
         <select name="filter" class="form-control">
             <option value="">{% trans "Active members" %}</option>
+            <option value="negbalance"{% if "negbalance" == request.GET.filter %}selected{% endif %}>{% trans "Members with negative balance" %}</option>
             <option value="inactive"{% if "inactive" == request.GET.filter %}selected{% endif %}>{% trans "Only inactive members" %}</option>
             <option value="all" {% if "all" == request.GET.filter %}selected{% endif %}>{% trans "All members" %}</option>
         </select>
