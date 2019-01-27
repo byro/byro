@@ -5,8 +5,6 @@
 {% block title %}{% trans "Member List" %}{% endblock %}
 
 {% block content %}
-<form method="post" class="form form-inline">
-    {% csrf_token %}
     <div class="btn-group" role="group" aria-label="{% trans 'Member list operations' %}">
         <a href="{% url "office:members.add" %}" class="btn btn-success">
             <span class="fa fa-plus"></span> {% trans "Add new member …" %}
@@ -14,12 +12,10 @@
         <a href="{% url "office:members.list.export" %}" class="btn btn-success">
             <span class="fa fa-download"></span> {% trans "Export member list …" %}
         </a>
-        <button type="submit" class="btn btn-success">
-            <span class="fa fa-refresh"></span> {% trans "Refresh account balance" %}
-        </button>
-
+        <a href="{% url "office:members.list.import" %}" class="btn btn-success">
+            <span class="fa fa-upload"></span> {% trans "Import members …" %}
+        </a>
     </div>
-</form>
 <p>
 <div class="form-group">
     <form method="get" class="form form-inline">
@@ -33,31 +29,39 @@
     </form>
 </div>
 </p>
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th>{% trans "Number" %}</th>
-            <th>{% trans "Name" %}</th>
-            <th>{% trans "Balance" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for member in members %}
+    <form method="post" class="form form-inline">
+        {% csrf_token %}
+
+        <table class="table table-sm">
+            <thead>
             <tr>
-                <td><a href="{% url "office:members.dashboard" pk=member.pk %}">
-                    {{ member.number }}
-                </a></td>
-                <td><a href="{% url "office:members.dashboard" pk=member.pk %}">
-                    {{ member.name }}
-                </a></td>
-                <td>
-                    <span{% if member.balance < 0 %} class="text-danger"{% endif %}>
-                        {{ member.balance }}
-                    </span>
-                </td>
+                <th>{% trans "Number" %}</th>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "Balance" %}
+                    <button type="submit" class="btn-success btn-small">
+                        <span class="fa fa-refresh"></span> {% trans "Refresh" %}
+                    </button>
+                </th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+            {% for member in members %}
+                <tr>
+                    <td><a href="{% url "office:members.dashboard" pk=member.pk %}">
+                        {{ member.number }}
+                    </a></td>
+                    <td><a href="{% url "office:members.dashboard" pk=member.pk %}">
+                        {{ member.name }}
+                    </a></td>
+                    <td>
+                        <span{% if member.balance < 0 %} class="text-danger"{% endif %}>
+                            {{ member.balance }}
+                        </span>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </form>
 {% include "office/pagination.html" %}
 {% endblock %}

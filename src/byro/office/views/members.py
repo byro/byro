@@ -1,13 +1,20 @@
 import csv
+import hashlib
 from collections import OrderedDict
 from decimal import Decimal
+from functools import partial
 from itertools import chain
 
+import dateparser
+import unicodecsv
+from chardet import UniversalDetector
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
+from django.dispatch import receiver
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -28,8 +35,7 @@ from byro.members.signals import (
     leave_member_office_mail_information, new_member,
     new_member_mail_information, new_member_office_mail_information,
 )
-from byro.office.signals import member_view
-
+from byro.office.signals import member_view, member_list_importers
 from .documents import DocumentUploadForm
 
 
@@ -198,6 +204,120 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
                 f_id: f_getter(m)
                 for (f_id, f_getter) in field_mapping
             }
+
+
+def get_member_list_importers():
+    return [r[1] for r in member_list_importers.send_robust(sender=None)]
+
+
+class MemberListImportForm(forms.Form):
+    importer = forms.ChoiceField(choices=lambda: tuple((i['id'], i['label']) for i in get_member_list_importers()))
+    upload_file = forms.FileField()
+
+
+class MemberListImportView(FormView):
+    template_name = 'office/member/list_import.html'
+    context_object_name = 'members'
+    model = Member
+    form_class = MemberListImportForm
+
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
+
+    def form_invalid(self, form):
+        print(form.errors.as_json())
+        return super().form_invalid(form)
+
+    @transaction.atomic
+    def form_valid(self, form):
+        importers = {i['id']: i for i in get_member_list_importers()}
+
+        importer = importers[form.cleaned_data['importer']]
+        sha256sum = hashlib.sha256()
+        for chunk in form.cleaned_data['upload_file'].chunks():
+            sha256sum.update(chunk)
+
+        LogEntry.objects.create(
+            content_type=None,
+            object_id=0,
+            user=self.request.user,
+            action_type="byro.members.import",
+            data={
+                'importer': form.cleaned_data['importer'],
+                'sha256': sha256sum.hexdigest(),
+            }
+        )
+
+        return importer['form_valid'](self, form)
+
+
+@transaction.atomic
+def default_csv_form_valid(view, form, dialect='excel'):
+    detector = UniversalDetector()
+    for chunk in form.cleaned_data['upload_file'].chunks():
+        detector.feed(chunk)
+        if detector.done: break
+    detector.close()
+
+    mapping = None
+    fields = Member.get_fields()
+
+    with form.cleaned_data['upload_file'].open() as fp:
+        instream = unicodecsv.DictReader(fp, dialect=dialect, encoding=detector.result['encoding'])
+
+        for indict in instream:
+            if mapping is None:
+                mapping = {}
+                for k in indict.keys():
+                    for field in fields.values():
+                        if str(field.name).strip() == k.strip():
+                            mapping[k.strip()] = field
+                            break
+                    else:
+                        messages.error(view.request, _("Couldn't map input column '{}' to field").format(k.strip()))
+                        return redirect(view.request.get_full_path())
+
+            member = Member.objects.create()
+            membership_parms = {}
+            for k, v in indict.items():
+                field = mapping[k.strip()]
+                #  FIXME We're special casing the Membership here, but really Field.setter should handle that
+                #  (In the case of 'member.memberships.last()' for the getter it should create a new Membership
+                #  if no Membership exists.)
+                if field.field_id.startswith("membership__"):
+                    if v:
+                        membership_parms[field.field_id.split('__', 1)[1]] = v
+                else:
+                    field.setter(member, v)
+            member.log(view, '.created')
+            member.save()
+            if membership_parms:
+                for k in 'start', 'end':
+                    #  FIXME Also, we should find a way to handle dates in a generic way
+                    if membership_parms.get(k, None):
+                        membership_parms[k] = dateparser.parse(membership_parms[k],
+                                                               languages=[settings.LANGUAGE_CODE, 'en'])
+                Membership.objects.create(member=member, **membership_parms)
+
+    return redirect(reverse('office:members.list'))
+
+
+@receiver(member_list_importers)
+def default_csv_importer(sender, **kwargs):
+    return {
+        'id': 'byro.office.members.import.default_csv',
+        'label': _('Generic CSV import (Comma Separated Values)'),
+        'form_valid': default_csv_form_valid,
+    }
+
+
+@receiver(member_list_importers)
+def default_csv_importer_german(sender, **kwargs):
+    return {
+        'id': 'byro.office.members.import.default_csv_german',
+        'label': _('Generic CSV import (Semicolon Separated Values, German Windows versions)'),
+        'form_valid': partial(default_csv_form_valid, dialect=csv_excel_de),
+    }
 
 
 class MemberCreateView(FormView):

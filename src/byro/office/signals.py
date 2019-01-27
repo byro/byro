@@ -28,3 +28,20 @@ side bar, please set ``section`` in your return dict to either ``finance`` or
 
 May return an iterable of multiple dictionaries as described above.
 """
+
+member_list_importers = django.dispatch.Signal()
+"""
+This signal allows you to add additional member list importers.
+Receives None as argument, must return a dict:
+
+    {
+        "id": "dot.scoped.importer.id",
+        "label": _("My super importer"),
+        "form_valid": form_valid_callback,
+    }
+
+where `form_valid_callback` should accept two arguments: view (the View object
+handling the request), and form (the form object that was submitted, the file
+to import is in the `upload_file` form field) and should return a Response
+object.
+"""

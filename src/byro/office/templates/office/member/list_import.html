@@ -1,0 +1,15 @@
+{% extends "office/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+
+{% block title %}{% trans "Import members" %}{% endblock %}
+
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        <button class="btn btn-success" type="submit">{% trans "Import" %}</button>
+    </form>
+
+{% endblock %}
