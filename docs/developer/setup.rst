@@ -11,6 +11,7 @@ If you want to install byro on a server for actual usage, go to the :ref:`admini
 * A recent version of pip (Ubuntu package: ``python3-pip``)
 * gettext (Debian package: ``gettext``)
 * libjpeg or any other library supported in pillow_ (for qrcode_)
+* libmagic
 * A PostgreSQL server
 
 Some Python dependencies might also need a compiler during installation, the Debian package
@@ -62,6 +63,8 @@ The first thing you need are all the main application's dependencies::
 
     (env)$ cd src/
     (env)$ pip3 install -r requirements/production.txt -r requirements/development.txt
+
+.. note:: (Windows only) If you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
 
 Next, if you have custom database settings or other settings you need, make a new
 file ``byro/local_settings.py`` with contents like these::
