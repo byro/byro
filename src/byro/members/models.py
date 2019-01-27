@@ -292,17 +292,20 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 date += relativedelta(months=membership.interval)
 
         # Step 2
-        date_range_q = reduce(
-            lambda a, b: a | b, [
-                models.Q(transaction__value_datetime__gte=start) & models.Q(transaction__value_datetime__lte=end)
-                for start, end in membership_ranges
-            ]
-        )
+        if membership_ranges:
+            date_range_q = reduce(
+                lambda a, b: a | b, [
+                    models.Q(transaction__value_datetime__gte=start) & models.Q(transaction__value_datetime__lte=end)
+                    for start, end in membership_ranges
+                ]
+            )
         dues_qs = Booking.objects.filter(
             member=self,
             credit_account=src_account,
             transaction__reversed_by__isnull=True,
-        ).filter(date_range_q)
+        )
+        if membership_ranges:
+            dues_qs = dues_qs.filter(date_range_q)
         dues_in_db = {  # Must be a dictionary instead of set, to retrieve b later on
             (b.transaction.value_datetime.date(), b.amount): b
             for b in dues_qs.all()
@@ -335,7 +338,10 @@ class Member(Auditable, models.Model, LogTargetMixin):
             member=self,
             credit_account=src_account,
             transaction__reversed_by__isnull=True,
-        ).exclude(date_range_q).prefetch_related('transaction')
+        )
+        if membership_ranges:
+            stray_liabilities_qs = stray_liabilities_qs.exclude(date_range_q)
+        stray_liabilities_qs = stray_liabilities_qs.prefetch_related('transaction')
         for stray_liability in stray_liabilities_qs.all():
             stray_liability.transaction.reverse(memo=_("Due amount outside of membership canceled"), user_or_context='internal: update_liabilites, reverse stray liabilities',)
 
