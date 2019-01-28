@@ -35,3 +35,8 @@
         background: $brand-danger;
     }
 }
+
+.page-item.page-link-inactive .page-link:hover {
+    background-color: inherit;
+    cursor: inherit;
+}
