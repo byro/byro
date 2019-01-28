@@ -24,6 +24,7 @@ __all__ = [
     'MemberOperationsView',
     'MemberListView',
     'MemberListExportView',
+    'MemberListImportView',
     'UserListView',
     'UserCreateView',
     'UserDetailView',

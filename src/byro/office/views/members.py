@@ -256,7 +256,8 @@ def default_csv_form_valid(view, form, dialect='excel'):
     detector = UniversalDetector()
     for chunk in form.cleaned_data['upload_file'].chunks():
         detector.feed(chunk)
-        if detector.done: break
+        if detector.done:
+            break
     detector.close()
 
     mapping = None
