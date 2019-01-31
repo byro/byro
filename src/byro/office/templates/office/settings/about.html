@@ -1,0 +1,62 @@
+{% extends "office/settings/base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block headline %}{% trans "About byro" %}{% endblock %}
+
+{% block settings_content %}
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-3" style="max-width: 12em">
+                    <img src="{% static "office/img/byro.svg" %}" style="height: 90%; width: 90%; max-width: 10em"
+                         alt="byro">
+                </div>
+                <div class="col-lg-9">
+                    {% if byro_version %}{% blocktrans trimmed %}
+                        version {{ byro_version }}
+                    {% endblocktrans %}{% endif %}
+                    {% blocktrans trimmed %}
+                        <p>byro is free software released under the FIXME license.</p>
+                        <p>Originally written by Tobias Kunze (<a href="https://github.com/rixx"><i
+                                class="fa fa-github"></i>
+                            rixx</a>), with contributions by Henryk Plötz (<a href="https://github.com/henryk"><i
+                                class="fa fa-github"></i> henryk</a>), luto (<a href="https://github.com/luto"><i
+                                class="fa fa-github"></i> luto</a>), Andreas Madsack (<a
+                                href="https://github.com/mfa"><i
+                                class="fa fa-github"></i> mfa</a>), and <a
+                                href="https://github.com/byro/byro/graphs/contributors">several others</a>.</p>
+                        <p>The byro logo was graciously provided by Markus Kempken (<a
+                                href="http://enigmation.de">enigmation.de</a>).</p>
+                    {% endblocktrans %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        {% if plugins %}
+            <div class="card-header">{% trans "Installed plugins" %}</div>
+            <div class="card-body">
+                <div class="plugin-list">
+                    <dl>
+                        {% for plugin in plugins %}
+                            <dt>{{ plugin.meta.name }} {{ plugin.meta.version }}</dt>
+                            <dd>{{ plugin.meta.description }}</dd>
+                        {% endfor %}
+                    </dl>
+                </div>
+            </div>
+        {% endif %}
+        <div class="card-{% if plugins %}footer{% else %}body{% endif %}">
+            <a class="btn btn-outline-primary" href="https://github.com/search?l=Python&q=byro-%2A&type=Repositories">
+                {% if plugins %}
+                    {% trans "Find more plugins online …" %}
+                {% else %}
+                    {% trans "Find plugins online …" %}
+                {% endif %}
+            </a>
+        </div>
+    </div>
+{% endblock %}

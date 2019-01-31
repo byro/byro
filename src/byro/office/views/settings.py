@@ -1,16 +1,16 @@
 from django import forms
 from django.apps import apps
 from django.contrib import messages
+from django.db import transaction
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView, ListView
 
+from byro.bookkeeping.models import Account
 from byro.common.forms import ConfigurationForm, RegistrationConfigForm, InitialForm
+from byro.common.models import LogEntry
 from byro.common.models.configuration import Configuration, ByroConfiguration
 
-from byro.common.models import LogEntry
-from byro.bookkeeping.models import Account
-from django.db import transaction
 
 class InitialSettings(FormView):
     form_class = InitialForm
@@ -101,18 +101,19 @@ class RegistrationConfigView(FormView):
         return reverse('office:settings.registration')
 
 
-class PluginsView(TemplateView):
-    template_name = 'office/settings/plugins.html'
+class AboutByroView(TemplateView):
+    template_name = 'office/settings/about.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['plugins'] = []
         for app in apps.get_app_configs():
-            if hasattr(app, 'ByroPluginMeta'):
+            if hasattr(app, 'ByroPluginMeta') and hasattr(app.ByroPluginMeta, 'name'):
                 context['plugins'].append({
                     'meta': app.ByroPluginMeta,
                 })
         return context
+
 
 class LogView(ListView):
     template_name = 'office/settings/log.html'

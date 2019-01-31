@@ -94,12 +94,6 @@
                     <a class="nav-link nav-link-second-level {% if "settings.users" in url_name %}active{% endif %}" href="{% url 'office:settings.users.list' %}">
                         {% trans "Users" %}
                     </a>
-                    <a
-                      class="nav-link nav-link-second-level {% if "settings.plugins" in url_name %}active{% endif %}"
-                      href="{% url "office:settings.plugins" %}"
-                    >
-                        {% trans "Plugins" %}
-                    </a>
                     {% for nav_element in nav_event %}
                         {% if nav_element.section == 'settings' %}
                             <a class="nav-link nav-link-second-level {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
@@ -117,6 +111,12 @@
                       href="{% url "office:settings.log" %}"
                     >
                         {% trans "Log" %}
+                    </a>
+                    <a
+                            class="nav-link nav-link-second-level {% if "settings.about" in url_name %}active{% endif %}"
+                            href="{% url "office:settings.about" %}"
+                    >
+                        {% trans "About" %}
                     </a>
                 </div>
             </li>
