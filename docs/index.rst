@@ -1,10 +1,12 @@
-byro
-----
+|byro|
+------
 
 byro is a membership administration tool. byro is best suited to small and
 medium sized clubs/NGOs/associations of all kinds, with a focus on the DACH
 region.  byro is heavily plugin based to help fit it to different requirements
 in different situations and countries.
+
+.. image:: img/screenshots/office_dashboard.png
 
 We are planning to have a large amount of documentation, but at the moment we are still working on
 it (and on byro itself), so it's incomplete and work-in-progress.
@@ -43,3 +45,5 @@ Please note that byro is a tool for tracking member data and payments, and
 the administrative acts around it. byro is not a bookkeeping tool (yet?).
 
 .. _open issues: https://github.com/byro/byro/issues/new
+.. |byro| image:: img/logo/byro_128.png
+   :alt: byro
