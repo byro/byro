@@ -29,13 +29,14 @@ class Command(BaseCommand):
 
     def create_configs(self):
         config = Configuration.get_solo()
-        config.name = 'Der Verein DER VEREIN'
+        config.name = 'Der Verein e.V.'
         config.address = 'Erich-Weinert-Straße 53\n39104 Magdeburg'
         config.url = 'https://dervereindervere.in'
         config.language = 'de'
         config.currency = 'EUR'
         config.mail_from = 'verein@dervereindervere.in'
         config.backoffice_mail = 'vorstanz@dervereindervere.in'
+        config.registration_form = '[{"name": "member__number", "position": 1}, {"name": "member__name", "position": 2}, {"name": "member__address", "position": 3}, {"name": "member__email", "position": 4}, {"name": "membership__start", "position": 5, "default_date": "beginning_month"}, {"name": "membership__interval", "default": "1", "position": 6}, {"name": "membership__amount", "default": "23", "position": 7}]'
         config.save()
         config.log(SOURCE_TEST_DATA, '.changed')
 

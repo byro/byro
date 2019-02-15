@@ -11,7 +11,7 @@ from byro.common.models.configuration import Configuration
 @pytest.fixture
 def configuration():
     config = Configuration.get_solo()
-    config.name = 'Association Name'
+    config.name = 'Der Verein e.V.'
     config.backoffice_mail = 'associationname@example.com'
     config.mail_from = 'associationname@example.com'
     config.save()

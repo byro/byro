@@ -3,23 +3,25 @@
 # This file is distributed under the same license as the byro package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: byro \n"
+"Project-Id-Version: byro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-13 19:25+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2019-01-31 18:51+0100\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
+"Language-Team: \n"
+"Language: de\n"
+"X-Generator: Poedit 2.2.1\n"
 
 #: ../../developer/plugins/guides.rst:2
 msgid "Plugin Guides"
-msgstr ""
+msgstr "Plugin-Anleitungen"
 
 #: ../../developer/plugins/guides.rst:4
 msgid ""
@@ -27,4 +29,6 @@ msgid ""
 "to write an importer plugin, an exporter plugin, or a transaction plugin "
 "here."
 msgstr ""
-
+"Sobald wir ein oder zwei Core-Plugins beendet haben, werden wir hier "
+"zeigen, wie man ein Importer-Plugin, ein Exporter-Plugin oder ein "
+"Transaktions-Plugin schreibt."
