@@ -102,7 +102,7 @@
 
             var default_date = elem.find('select[name$=__default_date]');
 
-            if(default_date) {
+            if (default_date.length) {
                 var other = elem.find('input[name$=__default]');
                 var update_func = function() {
                     console.log( $(default_date).val() );
