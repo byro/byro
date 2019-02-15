@@ -58,7 +58,7 @@ def logged_in_client(live_server, client, user):
 @pytest.fixture
 def chrome_options(chrome_options):
     chrome_options.add_argument('headless')
-    chrome_options.add_argument('window-size=1392x783')
+    chrome_options.add_argument('window-size=1488x837')
     return chrome_options
 
 
