@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django import forms
 from django.db.models.fields.related import OneToOneRel
 from django.utils.timezone import now
@@ -49,8 +51,12 @@ class CreateMemberForm(forms.Form):
                 form_field.initial = today
             elif field['default_date'] == DefaultDates.BEGINNING_MONTH:
                 form_field.initial = today.replace(day=1)
+            elif field['default_date'] == DefaultDates.BEGINNING_MONTH_NEXT:
+                form_field.initial = (today.replace(day=28) + timedelta(days=7)).replace(day=1)
             elif field['default_date'] == DefaultDates.BEGINNING_YEAR:
                 form_field.initial = today.replace(day=1, month=1)
+            elif field['default_date'] == DefaultDates.BEGINNING_YEAR_NEXT:
+                form_field.initial = (today.replace(day=31, month=12) + timedelta(days=7)).replace(day=1, month=1)
             elif field['default_date'] == DefaultDates.FIXED_DATE:
                 form_field.initial = field.get('default', None)
         elif 'default_boolean' in field:

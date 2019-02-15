@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-28 14:28+0000\n"
-"PO-Revision-Date: 2019-01-28 15:38+0100\n"
+"POT-Creation-Date: 2019-02-15 12:24+0000\n"
+"PO-Revision-Date: 2019-02-15 13:27+0100\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -75,40 +75,48 @@ msgstr "Eröffnungsbestand"
 msgid "Lost income"
 msgstr "Verlust"
 
-#: byro/common/forms/registration.py:23
+#: byro/common/forms/registration.py:25
 msgid "Current day"
 msgstr "Aktueller Tag"
 
-#: byro/common/forms/registration.py:24
+#: byro/common/forms/registration.py:26
 msgid "Beginning of current month"
 msgstr "Anfang des aktuellen Monats"
 
-#: byro/common/forms/registration.py:25
+#: byro/common/forms/registration.py:27
+msgid "Beginning of next month"
+msgstr "Anfang nächsten Monats"
+
+#: byro/common/forms/registration.py:28
 msgid "Beginning of current year"
 msgstr "Anfang des aktuellen Jahres"
 
-#: byro/common/forms/registration.py:26 byro/common/forms/registration.py:134
+#: byro/common/forms/registration.py:29
+msgid "Beginning of next year"
+msgstr "Anfang nächsten Jahres"
+
+#: byro/common/forms/registration.py:30 byro/common/forms/registration.py:138
 msgid "Other/fixed date"
 msgstr "Anderes/Festes Datum"
 
-#: byro/common/forms/registration.py:35
+#: byro/common/forms/registration.py:39
 msgid "False"
 msgstr "Falsch"
 
-#: byro/common/forms/registration.py:36
+#: byro/common/forms/registration.py:40
 msgid "True"
 msgstr "Wahr"
 
-#: byro/common/forms/registration.py:74
+#: byro/common/forms/registration.py:78
 msgid "Position in form"
 msgstr "Position im Formular"
 
-#: byro/common/forms/registration.py:76
+#: byro/common/forms/registration.py:80
 msgid "Default date"
 msgstr "Standarddatum"
 
-#: byro/common/forms/registration.py:80 byro/common/forms/registration.py:118
-#: byro/common/forms/registration.py:124 byro/common/forms/registration.py:128
+#: byro/common/forms/registration.py:84 byro/common/forms/registration.py:122
+#: byro/common/forms/registration.py:128 byro/common/forms/registration.py:132
 msgid "Default value"
 msgstr "Standardwert"
 
@@ -802,13 +810,13 @@ msgstr "Allgemeine Einstellungen"
 msgid "Users"
 msgstr "Benutzer"
 
-#: byro/office/templates/office/base.html:101
-msgid "Plugins"
-msgstr "Plugins"
-
-#: byro/office/templates/office/base.html:119
+#: byro/office/templates/office/base.html:113
 msgid "Log"
 msgstr "Logbuch"
+
+#: byro/office/templates/office/base.html:119
+msgid "About"
+msgstr "Über"
 
 #: byro/office/templates/office/base.html:124
 msgid "Members"
@@ -1242,6 +1250,41 @@ msgstr "Zuordnungen"
 msgid "Add a new VT"
 msgstr "Weitere Buchung"
 
+#: byro/office/templates/office/settings/about.html:5
+msgid "About byro"
+msgstr "Über byro"
+
+#: byro/office/templates/office/settings/about.html:17
+#, python-format
+msgid "version %(byro_version)s"
+msgstr "version %(byro_version)s"
+
+#: byro/office/templates/office/settings/about.html:20
+msgid ""
+"<p>byro is free software released under the FIXME license.</p> <p>Originally "
+"written by Tobias Kunze (<a href=\"https://github.com/rixx\"><i class=\"fa "
+"fa-github\"></i> rixx</a>), with contributions by Henryk Plötz (<a href="
+"\"https://github.com/henryk\"><i class=\"fa fa-github\"></i> henryk</a>), "
+"luto (<a href=\"https://github.com/luto\"><i class=\"fa fa-github\"></i> "
+"luto</a>), Andreas Madsack (<a href=\"https://github.com/mfa\"><i class=\"fa "
+"fa-github\"></i> mfa</a>), and <a href=\"https://github.com/byro/byro/graphs/"
+"contributors\">several others</a>.</p> <p>The byro logo was graciously "
+"provided by Markus Kempken (<a href=\"http://enigmation.de\">enigmation.de</"
+"a>).</p>"
+msgstr ""
+
+#: byro/office/templates/office/settings/about.html:40
+msgid "Installed plugins"
+msgstr "Installierte Plugins"
+
+#: byro/office/templates/office/settings/about.html:55
+msgid "Find more plugins online …"
+msgstr "Weitere Plugins online suchen …"
+
+#: byro/office/templates/office/settings/about.html:57
+msgid "Find plugins online …"
+msgstr "Plugins online suchen …"
+
 #: byro/office/templates/office/settings/log.html:5
 msgid "Audit Log"
 msgstr "Logbuch"
@@ -1610,6 +1653,9 @@ msgstr "Englisch"
 #: byro/settings.py:171
 msgid "German"
 msgstr "Deutsch"
+
+#~ msgid "Plugins"
+#~ msgstr "Plugins"
 
 #~ msgid "Rebuild"
 #~ msgstr "Neu berechnen"

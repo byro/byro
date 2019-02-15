@@ -13,7 +13,9 @@ from byro.members.models import Member, Membership
 class DefaultDates:
     TODAY = 'today'
     BEGINNING_MONTH = 'beginning_month'
+    BEGINNING_MONTH_NEXT = 'beginning_month_next'
     BEGINNING_YEAR = 'beginning_year'
+    BEGINNING_YEAR_NEXT = 'beginning_year_next'
     FIXED_DATE = 'fixed_date'
 
     @classproperty
@@ -22,7 +24,9 @@ class DefaultDates:
             (None, '------------'),
             (cls.TODAY, _('Current day')),
             (cls.BEGINNING_MONTH, _('Beginning of current month')),
+            (cls.BEGINNING_MONTH_NEXT, _('Beginning of next month')),
             (cls.BEGINNING_YEAR, _('Beginning of current year')),
+            (cls.BEGINNING_YEAR_NEXT, _('Beginning of next year')),
             (cls.FIXED_DATE, _('Other/fixed date')),
         )
 
