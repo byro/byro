@@ -43,8 +43,12 @@ byro provides a rich API for plugins. See our `developer documentation`_ if you 
 plugin. If you want your plugin to be officially recognized or listed here, please open an issue
 or a pull request.
 
+Inofficial plugins are encouraged to add the `byro-plugin` tag if they are on
+GitHub. You can see all byro plugins on GitHub `here`_.
+
 .. |byro| image:: docs/img/logo/byro_128.png
    :alt: byro
 .. _developer documentation: http://byro.readthedocs.io/en/latest/
 .. _installation documentation: https://byro.readthedocs.io/en/latest/developer/setup/
 .. _byro: https://byro.cloud
+.. _here: https://github.com/topics/byro-plugin
