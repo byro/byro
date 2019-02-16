@@ -54,6 +54,9 @@ Inofficial Plugins
 Inofficial plugins are encouraged to add the `byro-plugin` tag if they are on
 GitHub. You can see all byro plugins on GitHub `here`_.
 
+- `byro-shackspace`_ is an example for how a group can extend or modify byro to
+  fit their purpose, e.g. add custom mechanisms and save additional data.
+
 .. |byro| image:: docs/img/logo/byro_128.png
    :alt: byro
 .. _developer documentation: http://byro.readthedocs.io/en/latest/
@@ -62,3 +65,4 @@ GitHub. You can see all byro plugins on GitHub `here`_.
 .. _here: https://github.com/topics/byro-plugin
 .. _byro-mailman: https://github.com/byro/byro-mailman
 .. _byro-gemeinnuetzigkeit: https://github.com/byro/byro-gemeinnuetzigkeit
+.. _byro-shackspace: https://github.com/byro/byro-shackspace
