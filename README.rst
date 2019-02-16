@@ -17,7 +17,7 @@
    :target: http://byro.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation
 
-byro is a membership administration tool for small and medium sized
+byro_ is a membership administration tool for small and medium sized
 clubs/NGOs/associations of all kinds, with a focus on the DACH region. While it
 is still a work in progress, it is already usable and in active use.
 
@@ -43,8 +43,8 @@ byro provides a rich API for plugins. See our `developer documentation`_ if you 
 plugin. If you want your plugin to be officially recognized or listed here, please open an issue
 or a pull request.
 
-.. _developer documentation: http://byro.readthedocs.io/en/latest/
-.. _installation documentation: https://byro.readthedocs.io/en/latest/developer/setup/
-
 .. |byro| image:: docs/img/logo/byro_128.png
    :alt: byro
+.. _developer documentation: http://byro.readthedocs.io/en/latest/
+.. _installation documentation: https://byro.readthedocs.io/en/latest/developer/setup/
+.. _byro: https://byro.cloud
