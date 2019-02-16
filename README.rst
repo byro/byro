@@ -43,6 +43,14 @@ byro provides a rich API for plugins. See our `developer documentation`_ if you 
 plugin. If you want your plugin to be officially recognized or listed here, please open an issue
 or a pull request.
 
+- `byro-mailman`_ provides integration with the mailman mailing list tool,
+  including automatic subscriptions, member lists, and removals.
+- `byro-gemeinnuetzigkeit`_ provides tools for German non-profits, most notably
+  receipts for membership fees and donations.
+
+Inofficial Plugins
+------------------
+
 Inofficial plugins are encouraged to add the `byro-plugin` tag if they are on
 GitHub. You can see all byro plugins on GitHub `here`_.
 
@@ -52,3 +60,5 @@ GitHub. You can see all byro plugins on GitHub `here`_.
 .. _installation documentation: https://byro.readthedocs.io/en/latest/developer/setup/
 .. _byro: https://byro.cloud
 .. _here: https://github.com/topics/byro-plugin
+.. _byro-mailman: https://github.com/byro/byro-mailman
+.. _byro-gemeinnuetzigkeit: https://github.com/byro/byro-gemeinnuetzigkeit
