@@ -8,7 +8,7 @@ from byro.members.models import Member
 from byro.members.signals import (
     new_member_mail_information, new_member_office_mail_information,
 )
-from byro.office.signals import nav_event
+from byro.office.signals import nav_event, member_dashboard_tile
 
 
 @receiver(unauthenticated_urls)
@@ -59,3 +59,15 @@ def new_member_office_mail_info_memberpage(sender, signal, **kwargs):
         return _('Their personal member page is at {link}').format(
             link=sender.profile_memberpage.get_url(),
         )
+
+
+@receiver(member_dashboard_tile)
+def member_dashboard_page_link(sender, signal, member=None, **kwargs):
+    if not member:
+        return
+    url = member.profile_memberpage.get_url()
+    if url:
+        return {
+            'url': url,
+            'title': _('Public profile'),
+        }
