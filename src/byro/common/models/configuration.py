@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
 
+from byro.common.models.choices import Choices
 from byro.common.models.log import LogTargetMixin
 
 
@@ -14,6 +15,12 @@ class ByroConfiguration(LogTargetMixin, SingletonModel):
 
     class Meta:
         abstract = True
+
+
+class MemberViewLevel(Choices):
+    NO = 'no'
+    NAME_ONLY = 'name-only'
+    NAME_AND_CONTACT = 'name-contact'
 
 
 class Configuration(ByroConfiguration):
@@ -55,6 +62,19 @@ class Configuration(ByroConfiguration):
     # Registration form configuration, contains settings for the fields to include when adding a new member
     registration_form = JSONField(
         null=True, blank=True,
+    )
+    public_base_url = models.URLField(  # Do we want this here or in the settings.py next to SITE_URL?
+        max_length=512,
+        null=True,
+        blank=True,
+        verbose_name=_("External base URL of byro installation"),
+        help_text=_("This field is used to generate the absolute URL for public pages. Leave it empty if it is the same as this page\'s base URL."),
+    )
+    can_see_other_members = models.CharField(
+        max_length=MemberViewLevel.max_length,
+        verbose_name=_('Members can see other members'),
+        choices=MemberViewLevel.choices,
+        default=MemberViewLevel.NO,
     )
     mail_from = models.EmailField(
         null=True, blank=True,
