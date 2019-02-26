@@ -251,20 +251,34 @@ class MemberListImportView(FormView):
         return importer['form_valid'](self, form)
 
 
-@transaction.atomic
-def default_csv_form_valid(view, form, dialect='excel'):
+def get_encoding(form):
     detector = UniversalDetector()
     for chunk in form.cleaned_data['upload_file'].chunks():
         detector.feed(chunk)
         if detector.done:
             break
     detector.close()
+    return detector.result['encoding']
 
+
+def create_membership(membership_parms, member):
+    if membership_parms:
+        for k in 'start', 'end':
+            #  FIXME Also, we should find a way to handle dates in a generic way
+            if membership_parms.get(k, None):
+                membership_parms[k] = dateparser.parse(membership_parms[k],
+                                                       languages=[settings.LANGUAGE_CODE, 'en'])
+        Membership.objects.create(member=member, **membership_parms)
+
+
+@transaction.atomic
+def default_csv_form_valid(view, form, dialect='excel'):
     mapping = None
     fields = Member.get_fields()
+    encoding = get_encoding(form)
 
     with form.cleaned_data['upload_file'].open() as fp:
-        instream = unicodecsv.DictReader(fp, dialect=dialect, encoding=detector.result['encoding'])
+        instream = unicodecsv.DictReader(fp, dialect=dialect, encoding=encoding)
 
         for indict in instream:
             if mapping is None:
@@ -292,13 +306,7 @@ def default_csv_form_valid(view, form, dialect='excel'):
                     field.setter(member, v)
             member.log(view, '.created')
             member.save()
-            if membership_parms:
-                for k in 'start', 'end':
-                    #  FIXME Also, we should find a way to handle dates in a generic way
-                    if membership_parms.get(k, None):
-                        membership_parms[k] = dateparser.parse(membership_parms[k],
-                                                               languages=[settings.LANGUAGE_CODE, 'en'])
-                Membership.objects.create(member=member, **membership_parms)
+            create_membership(membership_parms, member)
 
     return redirect(reverse('office:members.list'))
 
