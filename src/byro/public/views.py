@@ -18,7 +18,7 @@ from byro.office.signals import member_dashboard_tile
 
 
 class MemberConsentForm(forms.Form):
-    visible_consent = forms.BooleanField(label=_('Consent: Visible to other members'), required=False)
+    is_visible_to_members = forms.BooleanField(label=_('Consent: Visible to other members'), required=False)
 
 
 class MemberBaseView(DetailView):
@@ -88,7 +88,7 @@ class MemberUpdateView(MemberBaseView, FormMixin):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
-            self.object.profile_memberpage.visible_consent = form.cleaned_data['visible_consent']
+            self.object.profile_memberpage.is_visible_to_members = form.cleaned_data['is_visible_to_members']
             self.object.profile_memberpage.save()
         return HttpResponseRedirect(self.get_success_url())
 
@@ -103,7 +103,7 @@ class MemberListView(ListView):
         config = Configuration.get_solo()
         context['config'] = config
         context['member_view_level'] = MemberViewLevel
-        context['member_undisclosed'] = Member.objects.exclude(profile_memberpage__visible_consent=True).count()
+        context['member_undisclosed'] = Member.objects.exclude(profile_memberpage__is_visible_to_members=True).count()
         return context
 
     def get_queryset(self):
@@ -122,4 +122,4 @@ class MemberListView(ListView):
         if not member.is_active:
             raise Http404("Page does not exist")
 
-        return Member.objects.filter(profile_memberpage__visible_consent=True).order_by('name')
+        return Member.objects.filter(profile_memberpage__is_visible_to_members=True).order_by('name')
