@@ -41,9 +41,11 @@
 
 <body>
     <nav class="navbar navbar-static-top bg-primary">
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand d-flex align-items-center" href="/">
             <img src="{% static "office/img/byro.svg" %}" width="40" height="40" class="d-inline-block align-top">
+            <span class="ml-2">
             {{ config.name }}
+            </span>
         </a>
         {% if not request.user.is_anonymous %}
         <ul class="navbar-nav">
