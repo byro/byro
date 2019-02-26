@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'byro.mails.apps.MailsConfig',
     'byro.members.apps.MemberConfig',
     'byro.office.apps.OfficeConfig',
+    'byro.public.apps.PublicConfig',
     'byro.plugins.profile.ProfilePluginConfig',
     'byro.plugins.sepa.SepaPluginConfig',
 
