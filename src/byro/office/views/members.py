@@ -1,6 +1,6 @@
+import collections
 import csv
 import hashlib
-import collections
 from decimal import Decimal
 from functools import partial
 from itertools import chain
@@ -35,7 +35,10 @@ from byro.members.signals import (
     leave_member_office_mail_information, new_member,
     new_member_mail_information, new_member_office_mail_information,
 )
-from byro.office.signals import member_view, member_list_importers, member_dashboard_tile
+from byro.office.signals import (
+    member_dashboard_tile, member_list_importers, member_view,
+)
+
 from .documents import DocumentUploadForm
 
 
@@ -395,7 +398,7 @@ class MemberDashboardView(MemberView):
         context['statute_barred_debt']['in1year'] = obj.statute_barred_debt(relativedelta(years=1)) - context['statute_barred_debt']['now']
 
         context['tiles'] = []
-        for receiver, response in member_dashboard_tile.send(self.request, member=obj):
+        for __, response in member_dashboard_tile.send(self.request, member=obj):
             if not response:
                 continue
             if isinstance(response, collections.Mapping):
