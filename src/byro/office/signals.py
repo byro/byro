@@ -54,8 +54,10 @@ Receives None as argument, must return either None or a dict:
         "title": _("Dash!"),
         "lines": [_('Line 1'), _('Line 2')]
         "url": "/member/123/foo/",
+        "public": False,  # False is the default
     }
 
 All of the parts of this dict are optional. You cannot include HTML in the
-response, all strings will be escaped at render time.
+response, all strings will be escaped at render time. If "public" is set to
+True, the dasboard tile will also be shown on the member's personal page.
 """

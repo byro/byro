@@ -1,3 +1,4 @@
+import collections
 from datetime import timedelta
 
 from django import forms
@@ -13,6 +14,7 @@ from byro.bookkeeping.models import Booking
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration, MemberViewLevel
 from byro.members.models import Member
+from byro.office.signals import member_dashboard_tile
 
 
 class MemberConsentForm(forms.Form):
@@ -64,6 +66,12 @@ class MemberView(MemberBaseView):
             'years': round(delta.days / 365, 1),
             'first': first,
         }
+        context['tiles'] = []
+        for __, response in member_dashboard_tile.send(self.request, member=obj):
+            if not response:
+                continue
+            if isinstance(response, collections.Mapping) and response.get('public', False):
+                context['tiles'].append(response)
         return context
 
 
