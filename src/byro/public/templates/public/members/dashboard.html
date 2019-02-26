@@ -93,6 +93,14 @@
         </span>
     </div>
     {% endif %}
+    {% for tile in tiles %}
+        {% if tile.url %}<a href="{{ tile.url }}"{% else %}<div{% endif %} class="dashboard-block">
+          <h1>{{ tile.title }}</h1>
+          <span class="dashboard-description">
+            {{ tile.lines|join:'<br>' }}
+          </span>
+        {% if tile.url %}</a>{% else %}</div>{% endif %}
+    {% endfor %}
 </div>
 {% endwith %}
 <h4 class="mt-4">{% trans "Membership history" %}</h4>
