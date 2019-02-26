@@ -12,7 +12,7 @@ from byro.bookkeeping.models import (
     Account, AccountCategory, RealTransactionSource, Transaction,
 )
 from byro.bookkeeping.special_accounts import SpecialAccounts
-from byro.common.models.configuration import Configuration
+from byro.common.models.configuration import Configuration, MemberViewLevel
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
 from byro.plugins.sepa.models import MemberSepa
@@ -24,6 +24,7 @@ def configuration():
     config.name = 'Association Name'
     config.backoffice_mail = 'associationname@example.com'
     config.mail_from = 'associationname@example.com'
+    config.can_see_other_members = MemberViewLevel.NAME_AND_CONTACT
     config.save()
     return config
 
