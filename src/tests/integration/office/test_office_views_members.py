@@ -45,6 +45,25 @@ def test_all_members_list(member, membership, inactive_member, logged_in_client)
 
 
 @pytest.mark.django_db
+def test_member_view(member, membership, logged_in_client):
+    response = logged_in_client.get(reverse('office:members.dashboard', kwargs={'pk': member.pk}))
+    content = response.content.decode()
+    assert response.status_code == 200, content
+    assert member.name in content
+
+
+@pytest.mark.django_db
+def test_member_view_different_public_address(member, membership, logged_in_client, configuration):
+    configuration.public_base_url = 'https://complicated.long.url.example.org'
+    configuration.save()
+    response = logged_in_client.get(reverse('office:members.dashboard', kwargs={'pk': member.pk}))
+    content = response.content.decode()
+    assert response.status_code == 200, content
+    assert member.name in content
+    assert configuration.public_base_url in content
+
+
+@pytest.mark.django_db
 def test_members_export_list_csv(member, membership, inactive_member, logged_in_client):
     response = logged_in_client.post(
         reverse('office:members.list.export'), {
