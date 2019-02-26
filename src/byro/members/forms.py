@@ -36,6 +36,22 @@ class CreateMemberForm(forms.Form):
         if 'member__number' in self.fields:
             self.fields['member__number'].initial = get_next_member_number()
 
+    def get_date_initial(self, field):
+        today = now().date()
+        default = field['default_date']
+        if default == DefaultDates.TODAY:
+            return today
+        elif default == DefaultDates.BEGINNING_MONTH:
+            return today.replace(day=1)
+        elif default == DefaultDates.BEGINNING_MONTH_NEXT:
+            return (today.replace(day=28) + timedelta(days=7)).replace(day=1)
+        elif default == DefaultDates.BEGINNING_YEAR:
+            return today.replace(day=1, month=1)
+        elif default == DefaultDates.BEGINNING_YEAR_NEXT:
+            return (today.replace(day=31, month=12) + timedelta(days=7)).replace(day=1, month=1)
+        elif default == DefaultDates.FIXED_DATE:
+            return field.get('default', None)
+
     def build_field(self, field, profiles):
         model_name = field['name'].split('__')[0]
         if model_name in MAPPING:
@@ -46,19 +62,7 @@ class CreateMemberForm(forms.Form):
         form_field.model = model
         self.fields[field['name']] = form_field
         if 'default_date' in field:
-            today = now().date()
-            if field['default_date'] == DefaultDates.TODAY:
-                form_field.initial = today
-            elif field['default_date'] == DefaultDates.BEGINNING_MONTH:
-                form_field.initial = today.replace(day=1)
-            elif field['default_date'] == DefaultDates.BEGINNING_MONTH_NEXT:
-                form_field.initial = (today.replace(day=28) + timedelta(days=7)).replace(day=1)
-            elif field['default_date'] == DefaultDates.BEGINNING_YEAR:
-                form_field.initial = today.replace(day=1, month=1)
-            elif field['default_date'] == DefaultDates.BEGINNING_YEAR_NEXT:
-                form_field.initial = (today.replace(day=31, month=12) + timedelta(days=7)).replace(day=1, month=1)
-            elif field['default_date'] == DefaultDates.FIXED_DATE:
-                form_field.initial = field.get('default', None)
+            form_field.initial = self.get_date_initial(field=field)
         elif 'default_boolean' in field:
             form_field.initial = field['default_boolean']
         elif 'default' in field:
