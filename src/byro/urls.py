@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'', include((raw_plugin_patterns, 'plugins'))),
     url(r'', include('byro.common.urls', namespace='common')),
     url(r'', include('byro.office.urls', namespace='office')),
+    url(r'', include('byro.public.urls', namespace='public')),
 ]
 
 if settings.DEBUG:
