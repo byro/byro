@@ -1,0 +1,14 @@
+{% extends "office/base.html" %}
+{% load i18n %}
+{% load compress %}
+{% load static %}
+
+{% block title %}{% blocktrans %}Member page{% endblocktrans %}{% endblock %}
+{% block headline %}{% blocktrans %}Personal member page{% endblocktrans %}{% endblock %}
+
+{% block stylesheets%}
+    {% compress css %}
+        <link rel="stylesheet" type="text/css" href="{% static "byro_memberpage/byro_memberpage.css" %}"/>
+    {% endcompress %}
+{% endblock %}
+
