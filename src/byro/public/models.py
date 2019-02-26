@@ -2,6 +2,7 @@ import string
 from urllib.parse import urljoin
 
 from annoying.fields import AutoOneToOneField
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -12,6 +13,10 @@ from byro.common.models.configuration import Configuration
 
 def generate_default_token():
     return get_random_string(allowed_chars=string.ascii_lowercase + string.digits, length=32)
+
+
+def get_default_consent():
+    return {"fields": dict()}
 
 
 class MemberpageProfile(models.Model):
@@ -31,6 +36,11 @@ class MemberpageProfile(models.Model):
     is_visible_to_members = models.BooleanField(
         default=False,
         verbose_name=_('Consent: Visible to other members'),
+    )
+    # publication_consent format: {"fields": {"profile_memberpage__secret_token": {"visibility": "share"}}}
+    publication_consent = JSONField(
+        default=get_default_consent,
+        null=True, blank=True,
     )
 
     def get_url(self):
