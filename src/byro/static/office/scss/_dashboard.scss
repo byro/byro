@@ -32,7 +32,11 @@
         background: $brand-warning;
     }
     &.block-danger {
-        background: $brand-danger;
+        border: $brand-danger 5px solid;
+        h1 {
+            color: $brand-danger;
+            opacity: 1;
+        }
     }
 }
 
