@@ -4,7 +4,8 @@ $brand-primary: #005da5 !default;
 $brand-success: $brand-primary !default;
 $brand-lighter: fade-out($brand-primary, 0.5) !default;
 $brand-lightest: fade-out($brand-primary, 0.8) !default;
-$brand-info: #0582ca !default;
+//$brand-info: #0582ca !default;
+$brand-info: $brand-primary;
 $brand-warning: #ffa14f !default;
 $brand-danger: #c60009 !default;
 
