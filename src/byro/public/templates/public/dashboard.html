@@ -1,0 +1,114 @@
+{% extends "byro_memberpage/base.html" %}
+{% load i18n %}
+
+{% block content %}
+{% with is_active=member.is_active %}
+
+<div class="card mt-4 mb-4" style="max-width: 50rem;">
+    <div class="card-header member-name-container">
+        <div class="member-name">
+            <h4 class="card-title">{{member.name}}</h4>
+            <h5 class="card-subtitle mb-2 text-muted">
+                {% if is_active %}
+                    {% blocktrans with start=current_membership.start.isoformat trimmed %}
+                        Current membership active since {{ start }}.
+                    {% endblocktrans %}
+                {% else %}
+                    <span class="text-danger">{% blocktrans %}No current active membership{% endblocktrans %}</span>
+                {% endif %}
+            </h5>
+        </div>
+        {% if member.number %}
+            <div class="member-number">#
+                {{member.number}}
+            </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <p class="card-text">{{member.email}}</p>
+        <address class="card-text" style="white-space: pre">{{member.address}}</address>
+    </div>
+    {% if config.can_see_other_members != member_view_level.NO and is_active %}
+    <div class="card-footer text-right">
+        <form method="POST" action="{% url 'plugins:byro_memberpage:unprotected:memberpage.update' secret_token=member.profile_memberpage.secret_token %}">
+            {% csrf_token %}
+            {% if member.profile_memberpage.visible_consent %}
+                <p>{% trans "Your basic information is visible to other members" %} <button type="submit" name="disable_consent" class="btn btn-secondary"><i class="fa fa-eye-slash"></i> {% trans 'Revoke consent' %}</button></p>
+            {% else %}
+                <p>{% trans "You are currently not visible to other members" %} <input type="hidden" name="visible_consent" value="1"><button type="submit" name="enable_consent" class="btn btn-success"><i class="fa fa-eye"></i> {% trans 'I hereby consent that other members may see my information in the member list' %}</button></p>
+            {% endif %}
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<div class="dashboard-list">
+    <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
+        <h1>
+            {{ member.balance }} €
+        </h1>
+        <span class="dashboard-description">
+            {% trans "current balance" %}
+        </span>
+    </div>
+    {% if member.donation_balance %}
+        <div class="dashboard-block">
+            <h1>
+                {{ member.donation_balance }} €
+            </h1>
+            <span class="dashboard-description">
+                {% trans "donations" %}
+            </span>
+        </div>
+    {% endif %}
+    <div class="dashboard-block">
+        <h1>
+            {% blocktrans with count=member_since.days trimmed %}
+            {{ count }} days
+            {% endblocktrans %}
+        </h1>
+        <span class="dashboard-description">
+            {% if member_since.days > 0 %}
+                {% blocktrans with count=member_since.years trimmed %}
+                or {{ count }} years of membership
+                {% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed %}
+                until this person becomes a member.
+                {% endblocktrans %}
+            {% endif %}
+            <br>
+            {% blocktrans with start=member_since.first.isoformat trimmed %}
+                First joined on {{ start }}.
+            {% endblocktrans %}
+        </span>
+    </div>
+    {% if is_active %}
+    <div class="dashboard-block">
+      <h1>
+        {{ current_membership.amount }} €
+      </h1>
+      <span class="dashboard-description">
+        {% blocktrans %}membership fee{% endblocktrans %} <strong>{{ current_membership.get_interval_display }}</strong>
+        </span>
+    </div>
+    {% endif %}
+</div>
+{% endwith %}
+<h4 class="mt-4">{% trans "Membership history" %}</h4>
+{% for ms in memberships %}
+    <div class="card mt-4" style="max-width: 20rem;">
+        <div class="card-header">
+            <h5 class="card-title">{{ms.start.isoformat}} &mdash; {{ms.end.isoformat|default:"&hellip;"}}</h4>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ms.amount}} {{ms.get_interval_display}}</p>
+        </div>
+    </div>
+{% endfor %}
+
+<h4 class="mt-4">{% trans "Finance details" %}</h4>
+{% include "office/member/finance_table.html" %}
+{% include "office/pagination.html" %}
+
+{% endblock %}
