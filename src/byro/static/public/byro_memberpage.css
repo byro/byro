@@ -1,0 +1,11 @@
+.card .member-name-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.card-header .member-number {
+	font-size: 200%;
+	white-space: nowrap;
+}

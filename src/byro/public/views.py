@@ -27,7 +27,7 @@ class MemberBaseView(DetailView):
 
 
 class MemberView(MemberBaseView):
-    template_name = 'public/member_dashboard.html'
+    template_name = 'public/members/dashboard.html'
 
     def get_bookings(self, member):
         account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
@@ -72,7 +72,7 @@ class MemberUpdateView(MemberBaseView, FormMixin):
 
     def get_success_url(self):
         return reverse(
-            'plugins:byro_public:member.dashboard',
+            'public:memberpage:member.dashboard',
             kwargs={'secret_token': self.kwargs['secret_token']}
         )
 
@@ -86,7 +86,7 @@ class MemberUpdateView(MemberBaseView, FormMixin):
 
 
 class MemberListView(ListView):
-    template_name = 'public/memberlist.html'
+    template_name = 'public/members/memberlist.html'
     paginate_by = 50
     context_object_name = 'members'
 

@@ -36,7 +36,7 @@ class MemberpageProfile(models.Model):
     def get_url(self):
         config = Configuration.get_solo()
         relative_url = reverse(
-            'plugins:byro_memberpage:unprotected:memberpage.dashboard',
+            'public:memberpage:member.dashboard',
             kwargs={'secret_token': self.secret_token}
         )
         if config.public_base_url:

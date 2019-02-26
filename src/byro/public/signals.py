@@ -27,7 +27,7 @@ def memberpage_primary(sender, **kwargs):
             result = [
                 {
                     'label': _('Member page'),
-                    'url': reverse('public:memberpage.dashboard', kwargs=kwargs),
+                    'url': reverse('public:memberpage:member.dashboard', kwargs=kwargs),
                     'active': request.resolver_match.view_name == 'public:memberpage.dashboard',
                 }
             ]
@@ -36,8 +36,8 @@ def memberpage_primary(sender, **kwargs):
                 if member.is_active:
                     result.append({
                         'label': _('Member list'),
-                        'url': reverse('public:memberpage.list', kwargs=kwargs),
-                        'active': request.resolver_match.view_name == 'public:memberpage.list',
+                        'url': reverse('public:memberpage:member.list', kwargs=kwargs),
+                        'active': request.resolver_match.view_name == 'public:memberpage:member.list',
                     })
             return result
     return {}
