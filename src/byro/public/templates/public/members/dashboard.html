@@ -1,4 +1,4 @@
-{% extends "byro_memberpage/base.html" %}
+{% extends "public/members/base.html" %}
 {% load i18n %}
 
 {% block content %}
@@ -30,7 +30,7 @@
     </div>
     {% if config.can_see_other_members != member_view_level.NO and is_active %}
     <div class="card-footer text-right">
-        <form method="POST" action="{% url 'plugins:byro_memberpage:unprotected:memberpage.update' secret_token=member.profile_memberpage.secret_token %}">
+        <form method="POST" action="{% url 'public:memberpage:member.update' secret_token=member.profile_memberpage.secret_token %}">
             {% csrf_token %}
             {% if member.profile_memberpage.visible_consent %}
                 <p>{% trans "Your basic information is visible to other members" %} <button type="submit" name="disable_consent" class="btn btn-secondary"><i class="fa fa-eye-slash"></i> {% trans 'Revoke consent' %}</button></p>
