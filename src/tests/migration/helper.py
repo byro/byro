@@ -40,15 +40,15 @@ class TestMigrations(TestCase):
         try:
             # From django/test/testcases.py
             for db_name in self._databases_names(include_mirrors=False):
-                    try:
-                        call_command('loaddata', *fixtures, **{
-                            'verbosity': 0,
-                            'commit': False,
-                            'database': db_name,
-                        })
-                    except Exception:
-                        self._rollback_atomics(self.cls_atomics)
-                        raise
+                try:
+                    call_command('loaddata', *fixtures, **{
+                        'verbosity': 0,
+                        'commit': False,
+                        'database': db_name,
+                    })
+                except Exception:
+                    self._rollback_atomics(self.cls_atomics)
+                    raise
 
         finally:
             # Restore old _get_model() function
