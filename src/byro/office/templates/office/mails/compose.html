@@ -1,0 +1,21 @@
+{% extends "office/mails/base.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+{% load formset_tags %}
+
+{% block mail_content %}
+<form method='post'>
+    {% csrf_token %}
+    <div class="card member-form-card">
+        <div class="card-header">
+            {% trans "Send email" %}
+        </div>
+        <div class="card-body">
+            {% bootstrap_form form layout='horizontal' %}
+            <div class="card-body">
+                <button class="btn btn-info" type="submit">Save to Outbox</button>
+            </div>
+        </div>
+</form>
+{% endblock %}
