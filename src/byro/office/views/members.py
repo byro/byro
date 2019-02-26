@@ -1,6 +1,6 @@
 import csv
 import hashlib
-from collections import OrderedDict
+import collections
 from decimal import Decimal
 from functools import partial
 from itertools import chain
@@ -35,7 +35,7 @@ from byro.members.signals import (
     leave_member_office_mail_information, new_member,
     new_member_mail_information, new_member_office_mail_information,
 )
-from byro.office.signals import member_view, member_list_importers
+from byro.office.signals import member_view, member_list_importers, member_dashboard_tile
 from .documents import DocumentUploadForm
 
 
@@ -143,7 +143,7 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
     def form_valid(self, form):
         fields = Member.get_fields()
         selected_fields = form.cleaned_data['field_list']
-        header = OrderedDict([(f.field_id, f.name) for f in fields.values() if f.field_id in selected_fields])
+        header = collections.OrderedDict([(f.field_id, f.name) for f in fields.values() if f.field_id in selected_fields])
         data = self.get_data(form, [(f.field_id, f.getter) for f in fields.values() if f.field_id in selected_fields])
 
         LogEntry.objects.create(
@@ -154,7 +154,7 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
             data={
                 'filter': form.cleaned_data['member_filter'],
                 'format': form.cleaned_data['export_format'],
-                'fields': OrderedDict([(f_id, str(f_name)) for (f_id, f_name) in header.items()]),
+                'fields': collections.OrderedDict([(f_id, str(f_name)) for (f_id, f_name) in header.items()]),
             }
         )
 
@@ -385,6 +385,14 @@ class MemberDashboardView(MemberView):
             'now': obj.statute_barred_debt(),
         }
         context['statute_barred_debt']['in1year'] = obj.statute_barred_debt(relativedelta(years=1)) - context['statute_barred_debt']['now']
+
+        context['tiles'] = []
+        for receiver, response in member_dashboard_tile.send(self.request, member=obj):
+            if not response:
+                continue
+            if isinstance(response, collections.Mapping):
+                context['tiles'].append(response)
+
         return context
 
 

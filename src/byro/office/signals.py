@@ -45,3 +45,17 @@ handling the request), and form (the form object that was submitted, the file
 to import is in the `upload_file` form field) and should return a Response
 object.
 """
+member_dashboard_tile = django.dispatch.Signal()
+"""
+This signal allows you to add tiles to the member's dashboard.
+Receives None as argument, must return either None or a dict:
+
+    {
+        "title": _("Dash!"),
+        "lines": [_('Line 1'), _('Line 2')]
+        "url": "/member/123/foo/",
+    }
+
+All of the parts of this dict are optional. You cannot include HTML in the
+response, all strings will be escaped at render time.
+"""
