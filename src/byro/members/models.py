@@ -248,7 +248,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
         key_value_data = [d for d in data if len(d) == 2 and not isinstance(d, str)]
         text_data = [d for d in data if isinstance(d, str)]
         key_length = min(max(len(d[0]) for d in key_value_data), 20)
-        key_value_text = '\n'.join((key + ':').ljust(key_length) + ' ' + value for key, value in key_value_data)
+        key_value_text = []
+        for key, value in key_value_data:
+            key = (key + ':').ljust(key_length) + ' '
+            value = value.strip()
+            if value in [None, 'None', '']:
+                value = '-'
+            if isinstance(value, str) and '\n' in value:
+                value = '\n'.join([' ' * (key_length + 1) + line for line in value.split('\n')]).strip()
+            key_value_text.append(key + value)
+        key_value_text = '\n'.join(key_value_text)
         if text_data:
             key_value_text += '\n' + '\n'.join(text_data)
         context = {
