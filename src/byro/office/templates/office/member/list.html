@@ -5,15 +5,18 @@
 {% block title %}{% trans "Member List" %}{% endblock %}
 
 {% block content %}
-    <div class="btn-group" role="group" aria-label="{% trans 'Member list operations' %}">
+    <div id="member-actions" class="btn-group" role="group" aria-label="{% trans 'Member list operations' %}">
         <a href="{% url "office:members.add" %}" class="btn btn-success">
-            <span class="fa fa-plus"></span> {% trans "Add new member …" %}
+            <span class="fa fa-plus"></span> {% trans "Add new member" %}
+        </a>
+        <a href="{% url "office:members.disclosure" %}" class="btn btn-success">
+            <span class="fa fa-envelope"></span> {% trans "Send disclosure mail" %}
         </a>
         <a href="{% url "office:members.list.export" %}" class="btn btn-success">
-            <span class="fa fa-download"></span> {% trans "Export member list …" %}
+            <span class="fa fa-download"></span> {% trans "Export member list" %}
         </a>
         <a href="{% url "office:members.list.import" %}" class="btn btn-success">
-            <span class="fa fa-upload"></span> {% trans "Import members …" %}
+            <span class="fa fa-upload"></span> {% trans "Import members" %}
         </a>
     </div>
 <p>

@@ -20,9 +20,9 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import DetailView, FormView, ListView, View
+from django.views.generic import DetailView, FormView, ListView, View, TemplateView
 from django.views.generic.list import (
-    MultipleObjectMixin, MultipleObjectTemplateResponseMixin,
+    MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 )
 
 from byro.bookkeeping.models import Booking, Transaction
@@ -91,6 +91,22 @@ class MemberListView(MemberListMixin, ListView):
         for member in Member.objects.all():
             member.update_liabilites()
         return redirect(request.path)
+
+
+class MemberDisclosureView(MemberListMixin, TemplateView):
+    template_name = 'office/member/disclosure.html'
+    context_object_name = 'members'
+    model = Member
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['count'] = self.get_members_queryset().count()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        for member in self.get_members_queryset():
+            member.record_disclosure_email.save()
+        return redirect('/members/list')
 
 
 class MemberListExportForm(forms.Form):

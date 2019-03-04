@@ -1,0 +1,17 @@
+{% extends "office/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Data Disclosure Mail" %}{% endblock %}
+
+{% block content %}
+
+<h2>{% trans "Data Disclosure Mail" %}</h2>
+{% blocktrans trimmed with count=count %}
+    Do you want to send data disclosure mails to all {{ count }} active members? The mails will be generated and placed in the outbox for your review.
+{% endblocktrans %}
+<form method='post' class="w-100 d-flex">
+    {% csrf_token %}
+    <button class="btn btn-success ml-auto" type="submit">{% trans "Generate mails" %}</button>
+</form>
+{% endblock %}

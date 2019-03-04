@@ -40,3 +40,10 @@
     background-color: inherit;
     cursor: inherit;
 }
+#member-actions {
+    display: flex;
+    justify-content: flex-end;
+    .btn {
+        margin-left: 8px;
+    }
+}
