@@ -4,7 +4,7 @@
 {% block title %}{% trans "Member list" %}{% endblock %}
 {% block headline %}{% trans "Member list" %}{% endblock %}
 
-{% block content %}
+{% block public_content %}
 
 {% if config.can_see_other_members != member_view_level.NO %}
 {% if members %}
