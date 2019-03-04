@@ -34,6 +34,7 @@ from byro.members.signals import (
     leave_member, leave_member_mail_information,
     leave_member_office_mail_information, new_member,
     new_member_mail_information, new_member_office_mail_information,
+    update_member,
 )
 from byro.office.signals import member_view, member_list_importers
 from .documents import DocumentUploadForm
@@ -425,7 +426,8 @@ class MemberDataView(MemberView):
     @transaction.atomic
     def post(self, *args, **kwargs):
         any_changed = False
-        for form in self.get_forms():
+        form_list = self.get_forms()
+        for form in form_list:
             if form.is_valid() and form.has_changed():
                 if not getattr(form.instance, 'member', False):
                     form.instance.member = self.get_object()
@@ -434,6 +436,7 @@ class MemberDataView(MemberView):
         if any_changed:
             self.get_object().log(self, '.updated')
             messages.success(self.request, _('Your changes have been saved.'))
+            responses = update_member.send_robust(sender=self.request, form_list=form_list)
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
 
 

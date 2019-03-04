@@ -30,3 +30,9 @@ leave_member = django.dispatch.Signal()
 Receives the new member as signal. If an exception is raised, the error
 message will be displayed in the frontend as a warning.
 """
+update_member = django.dispatch.Signal()
+"""
+If a member is updated via the office form collection at members/view/{id}/data.
+The signal receives the request, and the form_list as parameters. The changes
+will already have been saved at this point.
+"""

@@ -11,7 +11,7 @@ Member management
 -----------------
 
 .. automodule:: byro.members.signals
-   :members: new_member, new_member_mail_information, new_member_office_mail_information, leave_member, leave_member_mail_information, leave_member_office_mail_information
+   :members: new_member, new_member_mail_information, new_member_office_mail_information, leave_member, leave_member_mail_information, leave_member_office_mail_information, update_member
 
 
 Payment
