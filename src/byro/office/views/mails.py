@@ -20,8 +20,13 @@ class MailDetail(UpdateView):
     def form_valid(self, form):
         if form.instance.sent:
             raise forms.ValidationError(_('This mail has been sent already, and cannot be modified. Copy it to a draft instead!'))
-        messages.success(self.request, _('Your changes have been saved.'))
-        return super().form_valid(form)
+        result = super().form_valid(form)
+        if form.data.get('action', 'save') == 'send':
+            form.instance.send()
+            messages.success(self.request, _('Your changes have been saved and the email was sent.'))
+        else:
+            messages.success(self.request, _('Your changes have been saved.'))
+        return result
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)

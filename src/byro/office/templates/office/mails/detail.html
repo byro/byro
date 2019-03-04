@@ -25,10 +25,10 @@
             {% bootstrap_form form layout='horizontal' %}
             <div class="card-body">
                 {% if not form.instance.sent %}
-                    <button class="btn btn-info" type="submit">Save</button>
-                    <a href="{% url "office:mails.mail.send" pk=form.instance.pk %}" class="btn btn-success">
-                        {% trans "Send" %}
-                    </a>
+                    <button class="btn btn-info" type="submit" name="action" value="save">Save</button>
+                    <button class="btn btn-success" type="submit" name="action" value="send">
+                        {% trans "Save and send" %}
+                    </button>
                     <a href="{% url "office:mails.mail.delete" pk=form.instance.pk %}" class="btn btn-danger">
                         {% trans "Discard" %}
                     </a>
