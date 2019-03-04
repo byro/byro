@@ -151,7 +151,15 @@ class Compose(SuccessMessageMixin, CreateView):
     context_object_name = 'template'
     success_url = '/mails/outbox'
     form_class = MAIL_SUBJECT_FORM_CLASS
-    success_message = "The email was created successfully. Go to our outbox and send it."
+
+    def form_valid(self, form):
+        result = super().form_valid(form)
+        if form.data.get('action', 'save') == 'send':
+            form.instance.send()
+            messages.success(self.request, _('Your changes have been saved and the email was sent.'))
+        else:
+            messages.success(self.request, _("The email was created successfully. Go to our outbox to send it."))
+        return result
 
 
 class TemplateDelete(View):  # TODO

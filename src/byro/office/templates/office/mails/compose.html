@@ -14,7 +14,10 @@
         <div class="card-body">
             {% bootstrap_form form layout='horizontal' %}
             <div class="card-body">
-                <button class="btn btn-info" type="submit">Save to Outbox</button>
+                <button class="btn btn-info" type="submit" name="action" value="save">{% trans "Save to outbox" %}</button>
+                <button class="btn btn-success" type="submit" name="action" value="send">
+                    {% trans "Save and send" %}
+                </button>
             </div>
         </div>
 </form>
