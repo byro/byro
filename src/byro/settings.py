@@ -139,6 +139,12 @@ if os.getenv('TRAVIS'):
     DATABASES['default']['HOST'] = 'localhost'
     DATABASES['default']['PASSWORD'] = ''
 
+# for docker-compose development
+if os.getenv('DEVELOPMENT'):
+    DATABASES['default']['USER'] = 'byro'
+    DATABASES['default']['HOST'] = 'db'
+    DATABASES['default']['PASSWORD'] = 'byro'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators

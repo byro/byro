@@ -4,13 +4,18 @@ web:
   environment:
       PYTHONUNBUFFERED: 0
       DJANGO_SETTINGS_MODULE: byro.settings
+      DEVELOPMENT: 1
   entrypoint:
-   - './manage.py'
+   - './src/manage.py'
   links:
    - db
   volumes:
-   - .:/opt/code
+   - ..:/opt/code/
   ports:
    - "127.0.0.1:8020:8020"
 db:
   image: postgres:10
+  environment:
+      POSTGRES_PASSWORD: byro
+      POSTGRES_DB: byro
+      POSTGRES_USER: byro
