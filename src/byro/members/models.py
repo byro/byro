@@ -283,9 +283,13 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
         # Step 1
         for membership in self.memberships.all():
-            booking_date = _now.replace(day=membership.start.day)
+            end = membership.end
+            if not end:
+                try:
+                    end = _now.replace(day=membership.start.day)
+                except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
+                    end = _now + relativedelta(day=1, months=1, days=-1)
             date = membership.start
-            end = membership.end or booking_date.date()
             membership_ranges.append((date, end))
             while date <= end:
                 dues.add((date, membership.amount))
