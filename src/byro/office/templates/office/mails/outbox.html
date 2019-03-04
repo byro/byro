@@ -2,12 +2,11 @@
 {% load i18n %}
 {% load bootstrap4 %}
 {% load static %}
-{% load formset_tags %}
 
 {% block title %}{% trans "Outbox" %} :: {{ block.super }}{% endblock %}
 
 {% block mail_content %}
-<script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
+{% if mails %}
 <div class="form-group row float-right">
     <form method="post" action="{% url "office:mails.outbox.send" %}" class="form form-inline">
         {% csrf_token %}
@@ -18,6 +17,7 @@
         <button type="submit" class="btn btn-danger">{% trans "Discard all" %}</button>
     </form>
 </div>
+{% endif %}
 
 <table class="table table-sm">
     <thead>

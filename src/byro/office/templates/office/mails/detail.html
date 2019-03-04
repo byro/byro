@@ -12,7 +12,7 @@
     <div class="card member-form-card">
         <div class="card-header">
             {% if mail.sent %}
-            {% blocktrans with when=mail.sent.isoformat trimmed %}
+            {% blocktrans with when=mail.sent trimmed %}
                 Mail, sent at {{ when }}
             {% endblocktrans %}
             {% else %}
