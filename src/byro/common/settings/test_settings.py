@@ -33,17 +33,3 @@ DEBUG_PROPAGATE_EXCEPTIONS = True
 with suppress(ValueError):
     INSTALLED_APPS.remove('debug_toolbar.apps.DebugToolbarConfig')  # noqa
     MIDDLEWARE.remove('debug_toolbar.middleware.DebugToolbarMiddleware')  # noqa
-
-
-# Don't run migrations
-class DisableMigrations(object):
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return None
-
-
-if not os.environ.get("TRAVIS", ""):
-    MIGRATION_MODULES = DisableMigrations()
