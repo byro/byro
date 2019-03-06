@@ -4,14 +4,14 @@ def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
 
     mode = 'development' if debug else 'production'
     lines = [
-        (f'This is byro v{__version__} calling, running in {mode} mode.', True),
+        ('This is byro v{__version__} calling, running in {mode} mode.'.format(__version__=__version__), True),
         ('', False),
-        (f'Settings:', True),
-        (f'Read from: {", ".join(config_files)}', False),
-        (f'Logging:   {LOG_DIR}', False),
+        ('Settings:', True),
+        ('Read from: ' + ", ".join(config_files), False),
+        ('Logging:   {LOG_DIR}'.format(LOG_DIR=LOG_DIR), False),
     ]
     if plugins:
-        lines += [(f'Plugins:   {",".join(plugins)}', False)]
+        lines += [('Plugins:   ' + ",".join(plugins), False)]
     else:
         lines += [('', False)]
     image = '''
@@ -27,7 +27,10 @@ def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
     image[-1] += ' ' * (img_width - len(image[-1]))
     image += [' ' * img_width for _ in range((len(lines) - len(image)))]
 
-    lines = [(f'{image[n]}  {lines[n][0]}', lines[n][1]) for n in range(len(lines))]
+    lines = [
+        (image[n] + ' ' +lines[n][0], lines[n][1])
+        for n in range(len(lines))
+    ]
 
     size = max(len(line[0]) for line in lines) + 4
     start_box(size)

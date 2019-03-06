@@ -20,16 +20,16 @@ def print_line(string, box=False, bold=False, color=None, size=None):
     text_length = len(string)
     alt_string = string
     if bold:
-        string = f'{BOLD}{string}{RESET}'
+        string = '{BOLD}{string}{RESET}'.format(BOLD=BOLD, string=string, RESET=RESET)
     if color:
-        string = f'{color}{string}{RESET}'
+        string = '{color}{string}{RESET}'.format(color=color, string=string, RESET=RESET)
     if box:
         if size:
             if text_length + 2 < size:
                 string += ' ' * (size - text_length - 2)
                 alt_string += ' ' * (size - text_length - 2)
-        string = f'┃ {string} ┃'
-        alt_string = f'| {string} |'
+        string = '┃ {string} ┃'.format(string=string)
+        alt_string = '| {string} |'.format(string=string)
     try:
         print(string)
     except (UnicodeDecodeError, UnicodeEncodeError):
