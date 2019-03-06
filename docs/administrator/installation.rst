@@ -1,7 +1,7 @@
 Installation
 ============
 
-This guide will help you to install pretalx on a Linux distribution, as long as
+This guide will help you to install byro on a Linux distribution, as long as
 the prerequisites are present.
 
 Step 0: Prerequisites
