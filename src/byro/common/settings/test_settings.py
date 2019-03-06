@@ -3,10 +3,11 @@ import os
 import tempfile
 from contextlib import suppress
 
+from byro.settings import *  # noqa
+
 tmpdir = tempfile.TemporaryDirectory()
 os.environ.setdefault('DATA_DIR', tmpdir.name)
 
-from byro.settings import *  # noqa
 
 BASE_DIR = tmpdir.name
 DATA_DIR = tmpdir.name
