@@ -43,4 +43,3 @@ def reduce_dict(data):
         }
         for section_name, section_content in data.items()
     }
-

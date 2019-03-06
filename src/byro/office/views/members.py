@@ -20,9 +20,11 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import DetailView, FormView, ListView, View, TemplateView
+from django.views.generic import (
+    DetailView, FormView, ListView, TemplateView, View,
+)
 from django.views.generic.list import (
-    MultipleObjectMixin, MultipleObjectTemplateResponseMixin
+    MultipleObjectMixin, MultipleObjectTemplateResponseMixin,
 )
 
 from byro.bookkeeping.models import Booking, Transaction
@@ -33,8 +35,8 @@ from byro.members.models import Member, Membership
 from byro.members.signals import (
     leave_member, leave_member_mail_information,
     leave_member_office_mail_information, new_member,
-    new_member_mail_information, new_member_office_mail_information,
-    update_member,
+    new_member_mail_information,
+    new_member_office_mail_information, update_member,
 )
 from byro.office.signals import (
     member_dashboard_tile, member_list_importers, member_view,
@@ -471,7 +473,7 @@ class MemberDataView(MemberView):
         if any_changed:
             self.get_object().log(self, '.updated')
             messages.success(self.request, _('Your changes have been saved.'))
-            responses = update_member.send_robust(sender=self.request, form_list=form_list)
+            update_member.send_robust(sender=self.request, form_list=form_list)
         return redirect(reverse('office:members.data', kwargs=self.kwargs))
 
 
