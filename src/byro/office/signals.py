@@ -4,13 +4,14 @@ member_view = django.dispatch.Signal()
 """
 This signal allows you to add a tab to the member detail view tab list.
 Receives the member as sender, and additionally the request
-Must return a dict:
+Must return a dict::
 
     {
         "label": _("Fancy Member View"),
         "url": "/member/123/foo/",
         "url_name": "plugins:myplugin:foo_view",
     }
+
 Please use byro.office.views.members.MemberView as base class for these views.
 """
 
@@ -32,7 +33,7 @@ May return an iterable of multiple dictionaries as described above.
 member_list_importers = django.dispatch.Signal()
 """
 This signal allows you to add additional member list importers.
-Receives None as argument, must return a dict:
+Receives None as argument, must return a dict::
 
     {
         "id": "dot.scoped.importer.id",
@@ -48,7 +49,7 @@ object.
 member_dashboard_tile = django.dispatch.Signal()
 """
 This signal allows you to add tiles to the member's dashboard.
-Receives None as argument, must return either None or a dict:
+Receives None as argument, must return either None or a dict::
 
     {
         "title": _("Dash!"),

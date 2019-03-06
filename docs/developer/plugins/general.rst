@@ -25,7 +25,10 @@ Display
 -------
 
 .. automodule:: byro.office.signals
-   :members: nav_event, unauthenticated_urls, member_view, log_formatters, member_dashboard_tile
+   :members: nav_event, member_view, member_dashboard_tile
+
+.. automodule:: byro.common.signals
+   :members: unauthenticated_urls, log_formatters
 
 
 Import

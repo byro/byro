@@ -106,4 +106,4 @@ texinfo_documents = [
 locale_dirs = ['locale']
 gettext_compact = False
 
-linkcheck_ignore = [r'http://localhost.*', ]
+linkcheck_ignore = [r'http://localhost.*', 'https://byro.yourdomain.com/']

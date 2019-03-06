@@ -92,7 +92,7 @@ add a general newsletter view to the sidebar::
 
 
 Configuring your plugin
-----------------------
+-----------------------
 
 If you'd like to provide custom configuration options (for example, the
 name or latest issue of your newsletter), you can add a special configuration

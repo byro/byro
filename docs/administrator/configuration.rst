@@ -12,7 +12,7 @@ is in this order:
        - The configuration file ``byro.cfg`` in the ``src`` directory, next to the ``byro.example.cfg`` file.
        - The configuration file ``~/.byro.cfg`` in the home of the executing user.
        - The configuration file ``/etc/byro/byro.cfg``
-5. Sensible defaults
+3. Sensible defaults
 
 This page explains the options by configuration file section and notes the corresponding environment
 variable next to it. A configuration file looks like this:
