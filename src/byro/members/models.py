@@ -292,19 +292,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
         # Step 1
         for membership in self.memberships.all():
-            end = membership.end
-            if not end:
-                try:
-                    end = _now.replace(day=membership.start.day)
-                except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
-                    end = _now + relativedelta(day=1, months=1, days=-1)
-            date = membership.start
-            membership_ranges.append((date, end))
-            while date <= end:
-                dues.add((date, membership.amount))
-                date += relativedelta(months=membership.interval)
+            membership_range, membership_dues = membership.get_dues(_now=_now)
+            membership_ranges.append(membership_range)
+            dues |= membership_dues
 
         # Step 2
+        dues_qs = Booking.objects.filter(
+            member=self,
+            credit_account=src_account,
+            transaction__reversed_by__isnull=True,
+        )
         if membership_ranges:
             date_range_q = reduce(
                 lambda a, b: a | b, [
@@ -312,12 +309,6 @@ class Member(Auditable, models.Model, LogTargetMixin):
                     for start, end in membership_ranges
                 ]
             )
-        dues_qs = Booking.objects.filter(
-            member=self,
-            credit_account=src_account,
-            transaction__reversed_by__isnull=True,
-        )
-        if membership_ranges:
             dues_qs = dues_qs.filter(date_range_q)
         dues_in_db = {  # Must be a dictionary instead of set, to retrieve b later on
             (b.transaction.value_datetime.date(), b.amount): b
@@ -431,6 +422,21 @@ class Membership(Auditable, models.Model, LogTargetMixin):
 
     def get_absolute_url(self):
         return reverse('office:members.data', kwargs={'pk': self.member.pk})
+
+    def get_dues(self, _now=None):
+        _now = _now or now()
+        dues = set()
+        end = self.end
+        if not end:
+            try:
+                end = _now.replace(day=self.start.day)
+            except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
+                end = _now + relativedelta(day=1, months=1, days=-1)
+        date = self.start
+        while date <= end:
+            dues.add((date, self.amount))
+            date += relativedelta(months=self.interval)
+        return (self.start, end), dues
 
 
 SPECIAL_NAMES = {
