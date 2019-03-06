@@ -13,7 +13,7 @@
             <button type="submit" name="disable_consent" class="btn btn-secondary"><i class="fa fa-eye-slash"></i> {% trans 'Revoke consent' %}</button>
             {% else %}
             <span>{% trans "You are currently not visible to other members." %}</span>
-            <input type="hidden" name="id_is_visible_to_members" value="1">
+            <input type="hidden" id="id_is_visible_to_members" name="is_visible_to_members" value="1">
             <button type="submit" name="enable_consent" class="btn btn-success btn-inline"><i class="fa fa-eye"></i> {% trans 'I hereby consent that other members may see my information in the member list' %}</button>
             {% endif %}
         </form>
