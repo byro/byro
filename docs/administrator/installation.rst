@@ -93,7 +93,9 @@ We also need to create a data directory::
 We compile static files and translation data and create the database structure::
 
     $ python -m byro migrate
-    $ python -m byro rebuild
+    $ python -m byro compilemessages
+    $ python -m byro collectstatic
+    $ python -m byro compress
 
 Now, create an administrator user by running::
 
@@ -106,8 +108,10 @@ If you just want to play around with byro, you can load test data::
 Step 6: Starting byro as a service
 ----------------------------------
 
-We recommend starting byro using systemd to make sure it starts up after a reboot. Create a file
-named ``/etc/systemd/system/byro-web.service`` with the following content::
+We recommend starting byro using systemd to make sure it starts up after a
+reboot. Create a file named ``/etc/systemd/system/byro-web.service`` with the
+following content (replacing the local paths with ones appropriate for your
+system, especially the local Python version's)::
 
     [Unit]
     Description=byro web service
@@ -177,9 +181,6 @@ The following snippet is an example on how to configure a nginx proxy for byro::
         }
     }
 
-.. note:: Remember to replace the ``python3.5`` in the ``/static/`` path in the config
-          above with your python version.
-
 We recommend reading about setting `strong encryption settings`_ for your web server.
 
 You've made it! You should now be able to reach byro at
@@ -217,6 +218,9 @@ If you want to upgrade byro to a specific release, you can substitute
 
     $ pip3 install -U byro gunicorn
     $ python -m byro migrate
+    $ python -m byro compilemessages
+    $ python -m byro collectstatic
+    $ python -m byro compress
     # systemctl restart byro-web
 
 
