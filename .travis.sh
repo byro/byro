@@ -16,8 +16,8 @@ if [ "$1" == "style" ]; then
 fi
 
 if [ "$1" == "docs" ]; then
-    pip install -r src/requirements/documentation.txt
     cd ../docs
+    pip install -r requirements.txt
     make html
     make linkcheck
     npm install -g write-good
