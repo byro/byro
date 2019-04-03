@@ -6,7 +6,7 @@ python:
 sudo: false
 install:
   - pip install -U pip setuptools wheel codecov coverage
-  - pip install -Ur src/requirements.txt -r src/requirements/development.txt
+  - pip install -Ue ".[dev]"
 script:
   - bash .travis.sh $JOB
 cache:

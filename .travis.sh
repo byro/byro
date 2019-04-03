@@ -6,7 +6,7 @@ echo "Running $1"
 if [ "$1" == "tests" ]; then
     psql -c 'create database byro;' -U postgres
     cd src
-    python manage.py check
+    python -m byro check
     pytest --cov=byro tests
     codecov
 fi
