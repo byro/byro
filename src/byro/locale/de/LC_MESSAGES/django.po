@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-06 21:14+0000\n"
+"POT-Creation-Date: 2019-04-03 21:17+0000\n"
 "PO-Revision-Date: 2019-03-06 22:18+0100\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
@@ -573,73 +573,73 @@ msgstr "Kontostand"
 msgid "Current membership"
 msgstr "Aktuelle Mitgliedschaft"
 
-#: byro/members/models.py:335
+#: byro/members/models.py:326
 msgid "Due amount canceled because of change in membership amount"
 msgstr "Ausstehender Betrag durch Änderung des Mitgliedsbeitrags storniert"
 
-#: byro/members/models.py:342
+#: byro/members/models.py:333
 msgid "Membership due"
 msgstr "Mitgliedsbeitrag fällig"
 
-#: byro/members/models.py:359
+#: byro/members/models.py:350
 msgid "Due amount outside of membership canceled"
 msgstr "Ausstehender Betrag außerhalb der Mitgliedschaft storniert"
 
-#: byro/members/models.py:385
+#: byro/members/models.py:376
 msgid "monthly"
 msgstr "monatlich"
 
-#: byro/members/models.py:386
+#: byro/members/models.py:377
 msgid "quarterly"
 msgstr "pro Quartal"
 
-#: byro/members/models.py:387
+#: byro/members/models.py:378
 msgid "biannually"
 msgstr "halbjährlich"
 
-#: byro/members/models.py:388
+#: byro/members/models.py:379
 msgid "annually"
 msgstr "jährlich"
 
-#: byro/members/models.py:395
+#: byro/members/models.py:386
 msgid "name"
 msgstr "Name"
 
-#: byro/members/models.py:399
+#: byro/members/models.py:390
 msgid "amount"
 msgstr "Betrag"
 
-#: byro/members/models.py:400
+#: byro/members/models.py:391
 msgid "Please enter the yearly fee for this membership type."
 msgstr "Bitte gib den Jahresbeitrag für diesen Beitragstyp ein."
 
-#: byro/members/models.py:413
+#: byro/members/models.py:404
 msgid "start"
 msgstr "Beginn"
 
-#: byro/members/models.py:416
+#: byro/members/models.py:407
 msgid "end"
 msgstr "Ende"
 
-#: byro/members/models.py:421
+#: byro/members/models.py:412
 #: byro/office/templates/office/member/dashboard.html:88
 #: byro/public/templates/public/members/dashboard.html:73
 msgid "membership fee"
 msgstr "Beitrag"
 
-#: byro/members/models.py:422
+#: byro/members/models.py:413
 msgid "The amount to be paid in the chosen interval"
 msgstr "Der Beitrag, der im angegebenen Intervall gezahlt werden soll"
 
-#: byro/members/models.py:426
+#: byro/members/models.py:417
 msgid "payment interval"
 msgstr "Intervall"
 
-#: byro/members/models.py:427
+#: byro/members/models.py:418
 msgid "How often does the member pay their fees?"
 msgstr "Wie oft soll das Mitglied zahlen?"
 
-#: byro/members/models.py:430
+#: byro/members/models.py:421
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
@@ -1191,17 +1191,17 @@ msgid "Import members"
 msgstr "Mitglieder importieren"
 
 #: byro/office/templates/office/member/list.html:26
-#: byro/office/views/members.py:118
+#: byro/office/views/members.py:120
 msgid "Active members"
 msgstr "Aktive Mitglieder"
 
 #: byro/office/templates/office/member/list.html:27
-#: byro/office/views/members.py:119
+#: byro/office/views/members.py:121
 msgid "Only inactive members"
 msgstr "Inaktive Mitglieder"
 
 #: byro/office/templates/office/member/list.html:28
-#: byro/office/views/members.py:120
+#: byro/office/views/members.py:122
 msgid "All members"
 msgstr "Alle Mitglieder"
 
@@ -1461,7 +1461,7 @@ msgstr ""
 "wenn nötig."
 
 #: byro/office/views/accounts.py:82 byro/office/views/mails.py:28
-#: byro/office/views/members.py:473
+#: byro/office/views/members.py:475
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
 
@@ -1514,74 +1514,74 @@ msgstr "Keine Mail wurde verschickt."
 msgid "The email was created successfully. Go to our outbox to send it."
 msgstr "Die Mail wurde gespeichert. Im Postausgang kannst du sie verschicken."
 
-#: byro/office/views/members.py:123
+#: byro/office/views/members.py:125
 msgid "CSV (Comma Separated Values)"
 msgstr "CSV (Komma-Separierte Werte)"
 
-#: byro/office/views/members.py:124
+#: byro/office/views/members.py:126
 msgid "CSV (Semicolon Separated Values, German Windows versions)"
 msgstr "CSV (Semikolon-Separierte Werte, deutsche Windows-Versionen)"
 
-#: byro/office/views/members.py:312
+#: byro/office/views/members.py:314
 msgid "Couldn't map input column '{}' to field"
 msgstr "Konnte die Eingangsspalte '{}' keinem Datenbank-Feld zuordnen"
 
-#: byro/office/views/members.py:338
+#: byro/office/views/members.py:340
 msgid "Generic CSV import (Comma Separated Values)"
 msgstr "Generischer CSV-Import (Komma-Separierte Werte)"
 
-#: byro/office/views/members.py:347
+#: byro/office/views/members.py:349
 msgid ""
 "Generic CSV import (Semicolon Separated Values, German Windows versions)"
 msgstr ""
 "Generischer CSV-Import (Semikolon-Separierte Werte, deutsche Windows-"
 "Versionen)"
 
-#: byro/office/views/members.py:363
+#: byro/office/views/members.py:365
 msgid "The member was added, please edit additional details if applicable."
 msgstr ""
 "Das Mitglied wurde gespeichert, bitte füge zusätzliche Informationen hinzu, "
 "wenn nötig."
 
-#: byro/office/views/members.py:369 byro/office/views/members.py:720
+#: byro/office/views/members.py:371 byro/office/views/members.py:722
 msgid "Some post processing steps could not be completed: "
 msgstr ""
 "Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht durchgeführt "
 "werden: "
 
-#: byro/office/views/members.py:532 byro/office/views/members.py:640
+#: byro/office/views/members.py:534 byro/office/views/members.py:642
 msgid "Adjust member account balance"
 msgstr "Mitgliedskontostand korrigieren"
 
-#: byro/office/views/members.py:536
+#: byro/office/views/members.py:538
 msgid "Initial balance"
 msgstr "Anfangssaldo"
 
-#: byro/office/views/members.py:537
+#: byro/office/views/members.py:539
 msgid "Fees waived"
 msgstr "Mitgliedsbeiträge erlassen"
 
-#: byro/office/views/members.py:543
+#: byro/office/views/members.py:545
 msgid "Relative (Add or subtract amount to/from balance)"
 msgstr "Relativ (Betrag abziehen oder aufaddieren)"
 
-#: byro/office/views/members.py:544
+#: byro/office/views/members.py:546
 msgid "Absolute (Balance should be)"
 msgstr "Absolut (Sollbetrag eingeben)"
 
-#: byro/office/views/members.py:629 byro/office/views/members.py:631
+#: byro/office/views/members.py:631 byro/office/views/members.py:633
 msgid "End membership"
 msgstr "Mitgliedschaft beenden"
 
-#: byro/office/views/members.py:642
+#: byro/office/views/members.py:644
 msgid "Adjust balance"
 msgstr "Saldo korrigieren"
 
-#: byro/office/views/members.py:654
+#: byro/office/views/members.py:656
 msgid "Account adjustment"
 msgstr "Kontenkorrektur"
 
-#: byro/office/views/members.py:675
+#: byro/office/views/members.py:677
 msgid ""
 "Fee waiving needs to decrease debts. Use a negative value in relative mode, "
 "or a value higher than the current one in absolute mode."
@@ -1590,13 +1590,13 @@ msgstr ""
 "im relativen Modus oder einen Wert, der höher ist als der aktuelle, im "
 "absoluten Modus."
 
-#: byro/office/views/members.py:703
+#: byro/office/views/members.py:705
 #, python-brace-format
 msgid "Membership account adjusted by {amount}, current balance is {balance}"
 msgstr ""
 "Mitgliedskonto korrigiert um {amount}, Aktueller Kontostand ist {balance}"
 
-#: byro/office/views/members.py:713
+#: byro/office/views/members.py:715
 msgid ""
 "The membership has been terminated. Please check the outbox for the "
 "notifications."
@@ -1604,7 +1604,7 @@ msgstr ""
 "Die Mitgliedschaft wurde beendet. Bitte sieh dir die Benachrichtigungsmails "
 "im Postausgang an."
 
-#: byro/office/views/members.py:778
+#: byro/office/views/members.py:780
 msgid "The email was generated and can be sent in the outbox."
 msgstr ""
 "Die E-Mail wurde erstellt und kann jetzt im Postausgang versendet werden."
@@ -1826,11 +1826,11 @@ msgid ""
 "shared."
 msgstr "Weitere %(count)s Mitglieder haben ihre Stammdaten nicht freigegeben."
 
-#: byro/settings.py:177
+#: byro/settings.py:211
 msgid "English"
 msgstr "Englisch"
 
-#: byro/settings.py:178
+#: byro/settings.py:211
 msgid "German"
 msgstr "Deutsch"
 
