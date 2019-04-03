@@ -95,7 +95,7 @@ setup(
             'isort',
             'ipython',
             'pylama',
-            'pytest',
+            'pytest==3.9.3',
             'pytest-cov',
             'pytest-django',
             'pytest-sugar',
