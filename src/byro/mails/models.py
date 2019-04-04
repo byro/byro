@@ -110,6 +110,7 @@ class EMail(Auditable, models.Model):
         to='documents.Document',
         related_name='mails',
     )
+    balance = models.ForeignKey(to='members.MemberBalance', on_delete=models.CASCADE, null=True, blank=True, related_name='reminder_mails')
 
     @property
     def attachment_ids(self):
