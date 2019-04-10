@@ -4,28 +4,18 @@ MAINTAINER byro team
 EXPOSE 8020
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get install -y zsh gettext
+RUN apt-get update && apt-get install -y zsh gettext libjpeg-dev libmagic-dev
 
-# user
 RUN useradd uid1000 -d /home/uid1000
 RUN mkdir -p /home/uid1000 && chown uid1000: /home/uid1000
-VOLUME /home/uid1000
-RUN chown -R uid1000: /opt
+RUN mkdir -p /byro && chown uid1000: /byro
 
-ADD requirements.txt /opt/code/requirements.txt
-ADD requirements/production.txt /opt/code/requirements/production.txt
-ADD requirements/development.txt /opt/code/requirements/development.txt
-WORKDIR /opt/code
-RUN pip install -Ur requirements.txt
-RUN pip install -Ur requirements/development.txt
-ADD install_local_plugins.sh /opt/code/install_local_plugins.sh
-ADD . /opt/code
+ADD . /byro
+ADD byro.docker.cfg /byro/byro.cfg
+RUN cd /byro && pip3 install -e .
+RUN cd /byro && /bin/zsh install_local_plugins.sh
 
-RUN /bin/zsh install_local_plugins.sh
+CMD ["/bin/bash"]
 
-WORKDIR /opt/code
-
-# used for production. on dev set by docker-compose
-# will be fixed later
-#ENTRYPOINT ["./start.sh"]
-#CMD ["web"]
+WORKDIR /byro
+ENTRYPOINT ["python3","manage.py","runserver"]
