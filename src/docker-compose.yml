@@ -6,11 +6,11 @@ web:
       DJANGO_SETTINGS_MODULE: byro.settings
       DEVELOPMENT: 1
   entrypoint:
-   - './src/manage.py'
+   - '/byro/manage.py'
   links:
    - db
-  volumes:
-   - ..:/opt/code/
+     #  volumes:
+     #   - ..:/opt/code/
   ports:
    - "127.0.0.1:8020:8020"
 db:
