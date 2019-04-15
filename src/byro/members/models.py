@@ -212,18 +212,21 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def balance(self) -> Decimal:
         return self._calc_balance()
 
-    def create_balance(self, start, end, commit=True):
+    def create_balance(self, start, end, commit=True, create_if_zero=True):
         if self.balances.exists():
             if self.balances.filter(
                 models.Q(models.Q(start__lt=start) & models.Q(end__gt=start))  # start overlaps
                 | models.Q(models.Q(start__lt=end) & models.Q(end__gt=end))  # end overlaps
             ).exists():
                 raise Exception('Cannot create overlapping balance: {} from {} to {}'.format(self, start, end))
+        amount = self._calc_balance(liability_cutoff=start, asset_cutoff=start),
+        if not amount and not create_if_zero:
+            return
         balance = MemberBalance(
             member=self,
             start=start,
             end=end,
-            amount=self._calc_balance(liability_cutoff=start, asset_cutoff=start),
+            amount=amount,
         )
         if commit is True:
             balance.save()
