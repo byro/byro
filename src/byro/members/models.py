@@ -212,6 +212,23 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def balance(self) -> Decimal:
         return self._calc_balance()
 
+    def create_balance(self, start, end, commit=True):
+        if self.balances.exists():
+            if self.balances.filter(
+                models.Q(models.Q(start__lt=start) & models.Q(end__gt=start))  # start overlaps
+                | models.Q(models.Q(start__lt=end) & models.Q(end__gt=end))  # end overlaps
+            ).exists():
+                raise Exception('Cannot create overlapping balance: {} from {} to {}'.format(self, start, end))
+        balance = MemberBalance(
+            member=self,
+            start=start,
+            end=end,
+            amount=self._calc_balance(liability_cutoff=start, asset_cutoff=start),
+        )
+        if commit is True:
+            balance.save()
+        return balance
+
     def statute_barred_debt(self, future_limit=relativedelta()) -> Decimal:
         limit = relativedelta(months=Configuration.get_solo().liability_interval) - future_limit
         last_unenforceable_date = now().replace(month=12, day=31) - limit - relativedelta(years=1)
@@ -456,10 +473,20 @@ SPECIAL_ORDER = [
 
 
 class MemberBalance(models.Model):
+    """
+    Member balance entries are similar in nature to invoices, describing the
+    amount owed over a certain period in time.
+
+    As they MUST NOT overlap per member, they should be created via the
+    ``Member.create_balance(start, end)`` method interface.
+    """
     member = models.ForeignKey(
         to='members.Member',
         related_name='balances',
         on_delete=models.PROTECT,
     )
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    reference = models.CharField(null=True, blank=True, verbose_name=_('Reference'), help_text=_('For example an invoice number or a payment reference'), unique=True, max_length=50)
+    amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name=_('Amount'))
+    start = models.DateTimeField(verbose_name=_('Start'))
+    end = models.DateTimeField(verbose_name=_('End'))
+    state = models.CharField(choices=[('paid', _('paid')), ('partial', _('partially paid')), ('unpaid', _('unpaid'))], default='unpaid', max_length=7)
