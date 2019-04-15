@@ -199,11 +199,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
         return OrderedDict([(f.field_id, f) for f in result])
 
-    def _calc_balance(self, liability_cutoff=None, asset_cutoff=None) -> Decimal:
+    def _calc_balance(self, liability_cutoff=None, asset_cutoff=None, liability_start=None, asset_start=None) -> Decimal:
         _now = now()
         fees_receivable_account = SpecialAccounts.fees_receivable
-        debits = Booking.objects.filter(debit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=liability_cutoff or _now)
-        credits = Booking.objects.filter(credit_account=fees_receivable_account, member=self, transaction__value_datetime__lte=asset_cutoff or _now)
+        qs = Booking.objects.filter(member=self)
+        debits = qs.filter(debit_account=fees_receivable_account, transaction__value_datetime__lte=liability_cutoff or _now)
+        if liability_start:
+            debits = debits.filter(transaction__value_datetime__gte=liability_start)
+        credits = qs.filter(credit_account=fees_receivable_account, transaction__value_datetime__lte=asset_cutoff or _now)
+        if asset_start:
+            credits = credits.filter(transaction__value_datetime__gte=asset_start)
         liability = debits.aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
         asset = credits.aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
         return asset - liability
@@ -219,7 +224,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 | models.Q(models.Q(start__lt=end) & models.Q(end__gt=end))  # end overlaps
             ).exists():
                 raise Exception('Cannot create overlapping balance: {} from {} to {}'.format(self, start, end))
-        amount = self._calc_balance(liability_cutoff=start, asset_cutoff=start),
+        amount = self._calc_balance(liability_cutoff=end, asset_cutoff=end, liability_start=start, asset_start=start),
         if not amount and not create_if_zero:
             return
         balance = MemberBalance(
