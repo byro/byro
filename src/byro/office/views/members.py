@@ -109,8 +109,11 @@ class MemberDisclosureView(MemberListMixin, TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        for member in self.get_members_queryset():
+        members = self.get_members_queryset()
+        for member in members:
             member.record_disclosure_email.save()
+        messages.success(request, _('Generated {count} data disclosure emails and placed them in the outbox.').format(count=len(members)))
+        return redirect('/members/list')
         return redirect('/members/list')
 
 
