@@ -1,6 +1,7 @@
 import collections
 import csv
 import hashlib
+from datetime import datetime, time
 from decimal import Decimal
 from functools import partial
 from itertools import chain
@@ -117,8 +118,8 @@ class MemberDisclosureView(MemberListMixin, TemplateView):
 
 
 class MemberBalanceForm(forms.Form):
-    start = forms.DateTimeField(label=_('Start of balance timeframe'))
-    end = forms.DateTimeField(label=_('End of balance timeframe'))
+    start = forms.DateField(label=_('Start of balance timeframe'))
+    end = forms.DateField(label=_('End of balance timeframe'))
     create_if_zero = forms.BooleanField(label=_('Create balances even if there was no payment due in the time chosen?'), required=False, initial=False)
     balance_cutoff = forms.DecimalField(required=False, label=_('Balance cutoff'), help_text=_('Only members with a deficit greater than this will receive an email.'), min_value=0)
     subject = forms.CharField(label=_('Subject'))
@@ -135,7 +136,20 @@ know if you think this email is incorrect.'''), widget=forms.Textarea)
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
+        self.fields['start'].widget.attrs['class'] = ' datepicker'
+        self.fields['end'].widget.attrs['class'] = ' datepicker'
         # TODO: set start/end
+
+    def clean(self):
+        cleaned_data = super().clean()
+        end = cleaned_data.get('end')
+        start = cleaned_data.get('start')
+        if end >= datetime.now().date():
+            raise forms.ValidationError(_('End must be in the past!'))
+        if end < start:
+            raise forms.ValidationError(_('Start must be before end!'))
+        return cleaned_data
+
 
 
 class MemberBalanceView(MemberListMixin, FormView):
@@ -147,15 +161,15 @@ class MemberBalanceView(MemberListMixin, FormView):
     def form_valid(self, form):
         members = Member.objects.filter(Q(memberships__start__lte=now().date()) & (Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date()))).order_by('-id').distinct()
         mails = errors = balance_count = 0
-        start = form.cleaned_data.get('start')
-        end = form.cleaned_data.get('end')
+        start = datetime.combine(form.cleaned_data.get('start'), time(0, 0))
+        end = datetime.combine(form.cleaned_data.get('end'), time(23, 59))
         create_if_zero = form.cleaned_data.get('create_if_zero')
         balance_cutoff = form.cleaned_data.get('balance_cutoff')
         text = form.cleaned_data.get('text')
         subject = form.cleaned_data.get('subject')
         for member in members:
             try:
-                balance = member.create_balance(start=start, end=end)
+                balance = member.create_balance(start=start, end=end, create_if_zero=create_if_zero)
                 balance_count += 1
                 if not balance_cutoff or balance.amount < -balance_cutoff:
                     mail = EMail.objects.create(
