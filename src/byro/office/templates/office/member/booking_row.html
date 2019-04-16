@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div class="tr transaction {% if not booking.transaction_balances_credit == booking.transaction_balances_debit %}unmatched{% endif %}">
+    <div class="date">{{ booking.transaction.value_datetime.date }}
+        {% if booking.transaction.booking_datetime.date and booking.transaction.booking_datetime.date != booking.transaction.value_datetime.date %}<br>
+        {% with booking.transaction.booking_datetime.date as date %}
+        ({% blocktrans %}Booked on {{date}}{% endblocktrans %})
+        {% endwith %}
+        {% endif %}
+    </div>
+    <div class="amount text-md-right{% if booking.debit_account %} text-danger{% endif %}">{% if booking.debit_account %}-{% endif %}{{ booking.amount }}</div>
+    <div class="purpose">{{ booking.transaction.find_memo|default:'-' }}</div>
+    <div class="category">{{ booking.debit_account|default:booking.credit_account }}</div>
+</div>

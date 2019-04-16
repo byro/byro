@@ -141,3 +141,58 @@ footer {
         margin-bottom: 0;
     }
 }
+#transaction-table {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    #header, .tr {
+        display: flex;
+        flex-direction: row;
+        border-top: 1px solid #dae0e4;
+        .amount {
+            width: 10%;
+        }
+        .date, .category {
+            width: 20%;
+        }
+        .purpose {
+            width: 50%;
+        }
+        > div {
+            padding: 0.3rem;
+            vertical-align: bottom;
+        }
+    }
+    #header {
+        border-bottom: 2px solid #dae0e4;
+        font-weight: bold;
+    }
+    .tr {
+
+    }
+    .balance {
+        border: 2px solid black;
+        margin-top: 3px;
+        min-height: 50px;
+        content: "  ";
+        position: relative;
+        &.negative {
+            border-color: #c60009;
+        }
+        &:before {
+            content: attr(data-amount);
+            position: absolute;
+            right: 0px;
+            margin-right: -120px;
+            margin-top: 15px;
+            text-decoration: underline double;
+        }
+        &.negative:before {
+            color: #c60009;
+        }
+        .empty {
+            text-align: center;
+            margin-top: 8px;
+        }
+    }
+}

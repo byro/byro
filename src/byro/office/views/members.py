@@ -558,12 +558,32 @@ class MemberFinanceView(MemberView):
 
     def get_bookings(self):
         account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
-        return Booking.objects.with_transaction_data().filter(
+        member = self.get_member()
+        bookings = Booking.objects.with_transaction_data().filter(
             Q(debit_account__in=account_list) |
             Q(credit_account__in=account_list),
-            member=self.get_member(),
+            member=member,
             transaction__value_datetime__lte=now(),
         ).order_by('-transaction__value_datetime', '-booking_datetime', '-transaction__booking_datetime')
+        if not member.balances.exists():
+           return bookings
+        result = []
+        balances = list(member.balances.order_by('-start'))
+        current_balance = balances.pop(0)
+        current_balance.bookings = []
+        for booking in bookings:
+           while current_balance and booking.transaction.value_datetime < current_balance.start:
+               result.append(current_balance)
+               current_balance = balances.pop(0) if balances else None
+               if current_balance:
+                   current_balance.bookings = []
+           if not current_balance:
+               result.append(booking)
+           elif booking.transaction.value_datetime > current_balance.end:
+               result.append(booking)
+           else:
+               current_balance.bookings.append(booking)
+        return result
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
