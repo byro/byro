@@ -175,7 +175,7 @@ class MemberBalanceView(MemberListMixin, FormView):
                     mail = EMail.objects.create(
                         to=member.email,
                         balance=balance,
-                        text=text,
+                        text=text.format(name=member.name, start=start, end=end, amount=amount),
                         subject=subject,
                     )
                     mail.members.add(member)
