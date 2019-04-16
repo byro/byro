@@ -9,6 +9,9 @@
         <a href="{% url "office:members.add" %}" class="btn btn-success">
             <span class="fa fa-plus"></span> {% trans "Add new member" %}
         </a>
+        <a href="{% url "office:members.balance" %}" class="btn btn-success">
+            <span class="fa fa-envelope"></span> {% trans "Balances/Reminders" %}
+        </a>
         <a href="{% url "office:members.disclosure" %}" class="btn btn-success">
             <span class="fa fa-envelope"></span> {% trans "Send disclosure mail" %}
         </a>

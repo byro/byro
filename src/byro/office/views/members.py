@@ -139,7 +139,7 @@ know if you think this email is incorrect.'''), widget=forms.Textarea)
 
 
 class MemberBalanceView(MemberListMixin, FormView):
-    template_name = 'office/members/balance.html'
+    template_name = 'office/member/balance.html'
     context_object_name = 'members'
     model = Member
     form_class = MemberBalanceForm
