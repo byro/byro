@@ -114,6 +114,64 @@ class MemberDisclosureView(MemberListMixin, TemplateView):
             member.record_disclosure_email.save()
         messages.success(request, _('Generated {count} data disclosure emails and placed them in the outbox.').format(count=len(members)))
         return redirect('/members/list')
+
+
+class MemberBalanceForm(forms.Form):
+    start = forms.DateTimeField(label=_('Start of balance timeframe'))
+    end = forms.DateTimeField(label=_('End of balance timeframe'))
+    create_if_zero = forms.BooleanField(label=_('Create balances even if there was no payment due in the time chosen?'), required=False, initial=False)
+    balance_cutoff = forms.DecimalField(required=False, label=_('Balance cutoff'), help_text=_('Only members with a deficit greater than this will receive an email.'), min_value=0)
+    subject = forms.CharField(label=_('Subject'))
+    text = forms.CharField(label=_('Text'), initial=_('''Hello {name},
+
+we wanted to let you know that within the time from {start}
+to {end} you incurred unpaid liabilities in the amount of
+
+   EUR {amount}
+
+Please settle this amount as soon as possible, or let us
+know if you think this email is incorrect.'''), widget=forms.Textarea)
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        # TODO: set start/end
+
+
+class MemberBalanceView(MemberListMixin, FormView):
+    template_name = 'office/members/balance.html'
+    context_object_name = 'members'
+    model = Member
+    form_class = MemberBalanceForm
+
+    def form_valid(self, form):
+        members = Member.objects.filter(Q(memberships__start__lte=now().date()) & (Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date()))).order_by('-id').distinct()
+        mails = errors = balance_count = 0
+        start = form.cleaned_data.get('start')
+        end = form.cleaned_data.get('end')
+        create_if_zero = form.cleaned_data.get('create_if_zero')
+        balance_cutoff = form.cleaned_data.get('balance_cutoff')
+        text = form.cleaned_data.get('text')
+        subject = form.cleaned_data.get('subject')
+        for member in members:
+            try:
+                balance = member.create_balance(start=start, end=end)
+                balance_count += 1
+                if not balance_cutoff or balance.amount < -balance_cutoff:
+                    mail = EMail.objects.create(
+                        to=member.email,
+                        balance=balance,
+                        text=text,
+                        subject=subject,
+                    )
+                    mail.members.add(member)
+                    mails += 1
+            except Exception:
+                errors += 1
+        message = str(_('{balance_count} balances were created and {mail_count} reminder emails were placed in the outbox.').format(balance_count=balance_count, mail_count=mails))
+        if errors:
+            message += ' ' + str(_('{errors} balances could not be created due to errors. Presumably, these members already have balances overlapping this timeframe.'.format(errors=errors)))
+        messages.success(self.request, message)
         return redirect('/members/list')
 
 

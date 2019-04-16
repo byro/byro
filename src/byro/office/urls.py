@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^members/list/export$', members.MemberListExportView.as_view(), name='members.list.export'),
     url(r'^members/list/import$', members.MemberListImportView.as_view(), name='members.list.import'),
     url(r'^members/list/disclosure$', members.MemberDisclosureView.as_view(), name='members.disclosure'),
+    url(r'^members/list/balance$', members.MemberBalanceView.as_view(), name='members.balance'),
     url(r'^members/add$', members.MemberCreateView.as_view(), name='members.add'),
     url(r'^members/view/(?P<pk>\d+)/', include([
         url('data$', members.MemberDataView.as_view(), name='members.data'),
