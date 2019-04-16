@@ -1,11 +1,19 @@
 from .accounts import (
-    AccountCreateView, AccountDeleteView, AccountDetailView, AccountListView,
+    AccountCreateView,
+    AccountDeleteView,
+    AccountDetailView,
+    AccountListView,
 )
 from .dashboard import DashboardView
 from .members import (
-    MemberCreateView, MemberDashboardView, MemberDataView,
-    MemberFinanceView, MemberListExportView,
-    MemberListImportView, MemberListView, MemberOperationsView,
+    MemberCreateView,
+    MemberDashboardView,
+    MemberDataView,
+    MemberFinanceView,
+    MemberListExportView,
+    MemberListImportView,
+    MemberListView,
+    MemberOperationsView,
 )
 from .settings import ConfigurationView, RegistrationConfigView
 from .transactions import TransactionDetailView

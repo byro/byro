@@ -4,7 +4,11 @@ import pytest
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import (
-    Account, AccountCategory, AccountTag, Booking, Transaction,
+    Account,
+    AccountCategory,
+    AccountTag,
+    Booking,
+    Transaction,
 )
 from byro.bookkeeping.special_accounts import SpecialAccounts
 

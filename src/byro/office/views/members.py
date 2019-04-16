@@ -21,11 +21,10 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import (
-    DetailView, FormView, ListView, TemplateView, View,
-)
+from django.views.generic import DetailView, FormView, ListView, TemplateView, View
 from django.views.generic.list import (
-    MultipleObjectMixin, MultipleObjectTemplateResponseMixin,
+    MultipleObjectMixin,
+    MultipleObjectTemplateResponseMixin,
 )
 
 from byro.bookkeeping.models import Booking, Transaction
@@ -34,13 +33,18 @@ from byro.common.models import Configuration, LogEntry
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
-    leave_member, leave_member_mail_information,
-    leave_member_office_mail_information, new_member,
+    leave_member,
+    leave_member_mail_information,
+    leave_member_office_mail_information,
+    new_member,
     new_member_mail_information,
-    new_member_office_mail_information, update_member,
+    new_member_office_mail_information,
+    update_member,
 )
 from byro.office.signals import (
-    member_dashboard_tile, member_list_importers, member_view,
+    member_dashboard_tile,
+    member_list_importers,
+    member_view,
 )
 
 from .documents import DocumentUploadForm

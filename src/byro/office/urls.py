@@ -1,8 +1,15 @@
 from django.conf.urls import include, url
 
 from .views import (
-    accounts, dashboard, documents, mails, members,
-    settings, transactions, upload, users,
+    accounts,
+    dashboard,
+    documents,
+    mails,
+    members,
+    settings,
+    transactions,
+    upload,
+    users,
 )
 
 app_name = 'office'

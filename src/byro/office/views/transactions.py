@@ -8,7 +8,10 @@ from django.views.generic import ListView
 from django_select2.forms import Select2Widget
 
 from byro.bookkeeping.models import (
-    Account, Booking, DocumentTransactionLink, Transaction,
+    Account,
+    Booking,
+    DocumentTransactionLink,
+    Transaction,
 )
 
 from .documents import DocumentUploadForm

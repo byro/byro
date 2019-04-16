@@ -9,7 +9,10 @@ from django.shortcuts import reverse
 from django.utils.timezone import now
 
 from byro.bookkeeping.models import (
-    Account, AccountCategory, RealTransactionSource, Transaction,
+    Account,
+    AccountCategory,
+    RealTransactionSource,
+    Transaction,
 )
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration, MemberViewLevel

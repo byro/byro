@@ -1,5 +1,6 @@
 import pytest
 from django.db.models import Q
+
 from helper import TestMigrations
 
 

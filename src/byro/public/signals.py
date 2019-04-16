@@ -6,7 +6,8 @@ from byro.common.models.configuration import Configuration, MemberViewLevel
 from byro.common.signals import unauthenticated_urls
 from byro.members.models import Member
 from byro.members.signals import (
-    new_member_mail_information, new_member_office_mail_information,
+    new_member_mail_information,
+    new_member_office_mail_information,
 )
 from byro.office.signals import member_dashboard_tile, nav_event
 
