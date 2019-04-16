@@ -46,17 +46,23 @@ def test_all_members_list(member, membership, inactive_member, logged_in_client)
 
 @pytest.mark.django_db
 def test_member_view(member, membership, logged_in_client):
-    response = logged_in_client.get(reverse('office:members.dashboard', kwargs={'pk': member.pk}))
+    response = logged_in_client.get(
+        reverse('office:members.dashboard', kwargs={'pk': member.pk})
+    )
     content = response.content.decode()
     assert response.status_code == 200, content
     assert member.name in content
 
 
 @pytest.mark.django_db
-def test_member_view_different_public_address(member, membership, logged_in_client, configuration):
+def test_member_view_different_public_address(
+    member, membership, logged_in_client, configuration
+):
     configuration.public_base_url = 'https://complicated.long.url.example.org'
     configuration.save()
-    response = logged_in_client.get(reverse('office:members.dashboard', kwargs={'pk': member.pk}))
+    response = logged_in_client.get(
+        reverse('office:members.dashboard', kwargs={'pk': member.pk})
+    )
     content = response.content.decode()
     assert response.status_code == 200, content
     assert member.name in content
@@ -66,28 +72,32 @@ def test_member_view_different_public_address(member, membership, logged_in_clie
 @pytest.mark.django_db
 def test_members_export_list_csv(member, membership, inactive_member, logged_in_client):
     response = logged_in_client.post(
-        reverse('office:members.list.export'), {
+        reverse('office:members.list.export'),
+        {
             'member_filter': 'all',
             'export_format': 'csv',
             'field_list': ['_internal_id', 'member__name'],
-        }
+        },
     )
     content = b"".join(response.streaming_content).decode()
     assert response.status_code == 200, content
-    assert content == "\ufeffInternal database ID,Name\r\n{},{}\r\n{},{}\r\n".format(inactive_member.pk, inactive_member.name, member.pk, member.name)
+    assert content == "\ufeffInternal database ID,Name\r\n{},{}\r\n{},{}\r\n".format(
+        inactive_member.pk, inactive_member.name, member.pk, member.name
+    )
 
 
 @pytest.mark.django_db
 def test_members_adjust_account_initial(member, logged_in_client):
     assert member.balance == 0
     response = logged_in_client.post(
-        reverse('office:members.operations', kwargs={'pk': member.pk}), {
+        reverse('office:members.operations', kwargs={'pk': member.pk}),
+        {
             'member_account_adjustment-date': str(now().date()),
             'member_account_adjustment-adjustment_reason': 'initial',
             'member_account_adjustment-adjustment_type': 'absolute',
             'member_account_adjustment-amount': '23',
             'submit_member_account_adjustment_adjust': 'adjust',
-        }
+        },
     )
     content = response.content.decode()
     assert response.status_code == 302, content
@@ -98,13 +108,14 @@ def test_members_adjust_account_initial(member, logged_in_client):
 def test_members_adjust_account_waiver(member, logged_in_client):
     assert member.balance == 0
     response = logged_in_client.post(
-        reverse('office:members.operations', kwargs={'pk': member.pk}), {
+        reverse('office:members.operations', kwargs={'pk': member.pk}),
+        {
             'member_account_adjustment-date': str(now().date()),
             'member_account_adjustment-adjustment_reason': 'waiver',
             'member_account_adjustment-adjustment_type': 'relative',
             'member_account_adjustment-amount': '-2',
             'submit_member_account_adjustment_adjust': 'adjust',
-        }
+        },
     )
     content = response.content.decode()
     assert response.status_code == 302, content
@@ -115,10 +126,13 @@ def test_members_adjust_account_waiver(member, logged_in_client):
 def test_members_end_membership(member, membership, logged_in_client):
     assert member.is_active
     response = logged_in_client.post(
-        reverse('office:members.operations', kwargs={'pk': member.pk}), {
-            'ms_{}_leave-end'.format(membership.pk): (now() + relativedelta(days=-1)).date(),
+        reverse('office:members.operations', kwargs={'pk': member.pk}),
+        {
+            'ms_{}_leave-end'.format(membership.pk): (
+                now() + relativedelta(days=-1)
+            ).date(),
             'submit_ms_{}_leave_end'.format(membership.pk): 'end',
-        }
+        },
     )
     content = response.content.decode()
     assert response.status_code == 302, content

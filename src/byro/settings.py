@@ -47,13 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'compressor',
     'bootstrap4',
     'djangoformsetjs',
     'solo.apps.SoloAppConfig',
     'django_select2',
-
     'byro.common.apps.CommonConfig',
     'byro.bookkeeping.apps.BookkeepingConfig',
     'byro.documents.apps.DocumentsConfig',
@@ -63,7 +61,6 @@ INSTALLED_APPS = [
     'byro.public.apps.PublicConfig',
     'byro.plugins.profile.ProfilePluginConfig',
     'byro.plugins.sepa.SepaPluginConfig',
-
     'annoying',
     'django_db_constraints',
 ]
@@ -76,9 +73,7 @@ for entry_point in iter_entry_points(group='byro.plugin', name=None):
 ## URL SETTINGS
 SITE_URL = config.get('site', 'url', fallback='http://localhost')
 INTERNAL_IPS = ['127.0.0.1', '::1', 'localhost']
-ALLOWED_HOSTS = [
-    SITE_URL
-]
+ALLOWED_HOSTS = [SITE_URL]
 if DEBUG:
     ALLOWED_HOSTS += INTERNAL_IPS
 ROOT_URLCONF = 'byro.urls'
@@ -110,7 +105,6 @@ else:
             os.chmod(SECRET_FILE, 0o600)
             os.chown(SECRET_FILE, os.getuid(), os.getgid())
             f.write(SECRET_KEY)
-
 
 
 ## DATABASE SETTINGS
@@ -219,17 +213,11 @@ LANGUAGE_CODE = config.get('locale', 'language_code')
 ## AUTHENTICATION SETTINGS
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
@@ -270,7 +258,7 @@ TEMPLATES = [
             ],
             'loaders': template_loaders,
         },
-    },
+    }
 ]
 
 STATICFILES_FINDERS = (
@@ -284,23 +272,24 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'byro', 'static')]
 ## EXTERNAL APP SETTINGS
 with suppress(ImportError):
     import django_extensions  # noqa
+
     INSTALLED_APPS.append('django_extensions')
 
 with suppress(ImportError):
     import django_securebox
+
     INSTALLED_APPS.append('django_securebox')
     MIDDLEWARE.insert(2, 'django_securebox.middleware.SecureBoxMiddleware')
 
 with suppress(ImportError):
     import debug_toolbar
+
     INSTALLED_APPS.append('debug_toolbar')
     MIDDLEWARE.insert(2, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 
 COMPRESS_ENABLED = COMPRESS_OFFLINE = not DEBUG
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
+COMPRESS_PRECOMPILERS = (('text/x-scss', 'django_libsass.SassCompiler'),)
 COMPRESS_CSS_FILTERS = (
     # CssAbsoluteFilter is incredibly slow, especially when dealing with our _flags.scss
     # However, we don't need it if we consequently use the static() function in Sass
@@ -313,7 +302,10 @@ SELECT2_I18N_PATH = '/static/vendored/select2/js/i18n'
 
 with suppress(ImportError):
     from .local_settings import *
-    print('You are using the deprecated local_settings.py – Please move to the byro.cfg format.')
+
+    print(
+        'You are using the deprecated local_settings.py – Please move to the byro.cfg format.'
+    )
 
 WSGI_APPLICATION = 'byro.wsgi.application'
 log_initial(

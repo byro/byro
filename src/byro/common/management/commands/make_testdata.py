@@ -36,19 +36,30 @@ class Command(BaseCommand):
         config.currency = 'EUR'
         config.mail_from = 'verein@dervereindervere.in'
         config.backoffice_mail = 'vorstanz@dervereindervere.in'
-        config.registration_form = [{"name": "member__number", "position": 1}, {"name": "member__name", "position": 2},
-                                    {"name": "member__address", "position": 3},
-                                    {"name": "member__email", "position": 4},
-                                    {"name": "membership__start", "position": 5, "default_date": "beginning_month"},
-                                    {"name": "membership__interval", "default": "1", "position": 6},
-                                    {"name": "membership__amount", "default": "23", "position": 7}]
+        config.registration_form = [
+            {"name": "member__number", "position": 1},
+            {"name": "member__name", "position": 2},
+            {"name": "member__address", "position": 3},
+            {"name": "member__email", "position": 4},
+            {
+                "name": "membership__start",
+                "position": 5,
+                "default_date": "beginning_month",
+            },
+            {"name": "membership__interval", "default": "1", "position": 6},
+            {"name": "membership__amount", "default": "23", "position": 7},
+        ]
         config.save()
         config.log(SOURCE_TEST_DATA, '.changed')
 
     def make_paid(self, member, vaguely=False, overly=False, donates=0, pays_for=None):
         member.update_liabilites()
-        for index, liability in enumerate(member.bookings.filter(debit_account=SpecialAccounts.fees_receivable,
-                                                                 transaction__value_datetime__lte=now()).all()):
+        for index, liability in enumerate(
+            member.bookings.filter(
+                debit_account=SpecialAccounts.fees_receivable,
+                transaction__value_datetime__lte=now(),
+            ).all()
+        ):
             if vaguely and index % 2 == 0:
                 continue
 
@@ -72,17 +83,30 @@ class Command(BaseCommand):
             )
             t.debit(
                 memo=text,
-                account=SpecialAccounts.bank, amount=amount,
+                account=SpecialAccounts.bank,
+                amount=amount,
                 user_or_context=SOURCE_TEST_DATA,
             )
             if donates:
-                t.credit(account=SpecialAccounts.donations, member=member, amount=donates,
-                         user_or_context=SOURCE_TEST_DATA)
-            t.credit(account=SpecialAccounts.fees_receivable, member=member, amount=pure_amount,
-                     user_or_context=SOURCE_TEST_DATA)
+                t.credit(
+                    account=SpecialAccounts.donations,
+                    member=member,
+                    amount=donates,
+                    user_or_context=SOURCE_TEST_DATA,
+                )
+            t.credit(
+                account=SpecialAccounts.fees_receivable,
+                member=member,
+                amount=pure_amount,
+                user_or_context=SOURCE_TEST_DATA,
+            )
             if pays_for:
-                t.credit(account=SpecialAccounts.fees_receivable, member=pays_for, amount=pure_amount,
-                         user_or_context=SOURCE_TEST_DATA)
+                t.credit(
+                    account=SpecialAccounts.fees_receivable,
+                    member=pays_for,
+                    amount=pure_amount,
+                    user_or_context=SOURCE_TEST_DATA,
+                )
             t.save()
 
     def create_membership_types(self):
@@ -234,7 +258,8 @@ class Command(BaseCommand):
         )
         t.debit(
             memo=_("Belated member fee payment for Olga"),
-            account=bank_account, amount=20,
+            account=bank_account,
+            amount=20,
             user_or_context=SOURCE_TEST_DATA,
         )
         t.save()
@@ -245,7 +270,8 @@ class Command(BaseCommand):
         )
         t.debit(
             memo=_("George lives to give, donation"),
-            account=bank_account, amount=42.23,
+            account=bank_account,
+            amount=42.23,
             user_or_context=SOURCE_TEST_DATA,
         )
         t.save()
@@ -257,7 +283,8 @@ class Command(BaseCommand):
             )
             t.credit(
                 memo=_("Bank fees"),
-                account=bank_account, amount=9.95,
+                account=bank_account,
+                amount=9.95,
                 user_or_context=SOURCE_TEST_DATA,
             )
             t.save()
@@ -268,7 +295,8 @@ class Command(BaseCommand):
         )
         t.credit(
             memo=_("ACME Inc. thanks you for your patronage, sale of one halo kite"),
-            account=bank_account, amount=123,
+            account=bank_account,
+            amount=123,
             user_or_context=SOURCE_TEST_DATA,
         )
         t.save()
@@ -278,8 +306,11 @@ class Command(BaseCommand):
             user_or_context=SOURCE_TEST_DATA,
         )
         t.credit(
-            memo=_("ACME Inc. thanks you for your patronage, sale of one emergency medkit"),
-            account=bank_account, amount=666,
+            memo=_(
+                "ACME Inc. thanks you for your patronage, sale of one emergency medkit"
+            ),
+            account=bank_account,
+            amount=666,
             user_or_context=SOURCE_TEST_DATA,
         )
         t.save()

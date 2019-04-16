@@ -41,7 +41,11 @@ def full_testdata(django_db_setup, django_db_blocker):
 @pytest.fixture
 def login_user():
     def do_login(client, user):
-        client.post(reverse('common:login'), {'username': user.username, 'password': 'test_password'})
+        client.post(
+            reverse('common:login'),
+            {'username': user.username, 'password': 'test_password'},
+        )
+
     return do_login
 
 
@@ -66,13 +70,24 @@ def member():
     yield member
 
     [profile.delete() for profile in member.profiles]
-    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
+    [
+        (t.bookings.all().delete(), t.delete())
+        for t in Transaction.objects.filter(bookings__member=member).all()
+    ]
     member.delete()
 
 
 @pytest.fixture
 def member_with_sepa_profile(member):
-    MemberSepa.objects.create(member=member, iban='DE89370400440532013000', bic='COBADEFFXXX', issue_date=now().date(), fullname=member.name, address='Somewhere', mandate_reference='\'tis a reference')
+    MemberSepa.objects.create(
+        member=member,
+        iban='DE89370400440532013000',
+        bic='COBADEFFXXX',
+        issue_date=now().date(),
+        fullname=member.name,
+        address='Somewhere',
+        mandate_reference='\'tis a reference',
+    )
     return member
 
 
@@ -99,22 +114,23 @@ def inactive_member():
     begin = today.replace(day=1) - relativedelta(months=3)
     end = today.replace(day=1) - relativedelta(months=1, days=-1)
     Membership.objects.create(
-        member=member,
-        start=begin,
-        end=end,
-        amount=20,
-        interval=FeeIntervals.MONTHLY,
+        member=member, start=begin, end=end, amount=20, interval=FeeIntervals.MONTHLY
     )
     yield member
     [profile.delete() for profile in member.profiles]
-    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=member).all()]
+    [
+        (t.bookings.all().delete(), t.delete())
+        for t in Transaction.objects.filter(bookings__member=member).all()
+    ]
     member.delete()
 
 
 @pytest.fixture
 def partial_transaction():
     t = Transaction.objects.create(value_datetime=now(), user_or_context='test')
-    t.debit(account=SpecialAccounts.bank, amount=10, memo="Fee ID 3", user_or_context='test')
+    t.debit(
+        account=SpecialAccounts.bank, amount=10, memo="Fee ID 3", user_or_context='test'
+    )
     yield t
     t.bookings.all().delete()
     t.delete()
@@ -123,8 +139,7 @@ def partial_transaction():
 @pytest.fixture
 def mail_template():
     return MailTemplate.objects.create(
-        subject='Test Mail',
-        text='Hi!\nThis is just a test mail.\nThe robo clerk',
+        subject='Test Mail', text='Hi!\nThis is just a test mail.\nThe robo clerk'
     )
 
 
@@ -149,7 +164,9 @@ def sent_email():
 
 @pytest.fixture
 def real_transaction_source():
-    csv = open(os.path.join(os.path.dirname(__file__), 'fixtures/transactions.csv')).read()
+    csv = open(
+        os.path.join(os.path.dirname(__file__), 'fixtures/transactions.csv')
+    ).read()
     f = SimpleUploadedFile('testresource.csv', csv.encode())
     return RealTransactionSource.objects.create(source_file=f)
 
@@ -161,6 +178,7 @@ def account_helper(name, cat, **kwargs):
         account.debits.all().delete()
         account.credits.all().delete()
         account.delete()
+
     f.__name__ = name
     return pytest.fixture(f)
 

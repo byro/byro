@@ -21,13 +21,27 @@ class TestBookkeepingMigrationsFirst(TestWithShackdataBase):
 
         # For test comparison
         self.real_transaction_count = RealTransaction.objects.count()
-        self.virtual_transaction_w_src_count = VirtualTransaction.objects.filter(source_account__isnull=False).count()
-        self.virtual_transaction_w_dst_count = VirtualTransaction.objects.filter(destination_account__isnull=False).count()
-        self.virtual_transaction_member_fees_count = VirtualTransaction.objects.filter(
-            Q(source_account__isnull=True, destination_account__account_category='member_fees', real_transaction__isnull=True) |
-            Q(destination_account__isnull=True, source_account__account_category='member_fees', real_transaction__isnull=True)
+        self.virtual_transaction_w_src_count = VirtualTransaction.objects.filter(
+            source_account__isnull=False
         ).count()
-        self.orphan_virtual_transaction_count = VirtualTransaction.objects.filter(real_transaction=None).count()
+        self.virtual_transaction_w_dst_count = VirtualTransaction.objects.filter(
+            destination_account__isnull=False
+        ).count()
+        self.virtual_transaction_member_fees_count = VirtualTransaction.objects.filter(
+            Q(
+                source_account__isnull=True,
+                destination_account__account_category='member_fees',
+                real_transaction__isnull=True,
+            )
+            | Q(
+                destination_account__isnull=True,
+                source_account__account_category='member_fees',
+                real_transaction__isnull=True,
+            )
+        ).count()
+        self.orphan_virtual_transaction_count = VirtualTransaction.objects.filter(
+            real_transaction=None
+        ).count()
 
         self.reversed_transactions = {
             rt: rt.reverses
@@ -45,15 +59,20 @@ class TestBookkeepingMigrationsFirst(TestWithShackdataBase):
         from byro.bookkeeping.models import Transaction, Booking
 
         # All RealTransaction lead to one Transaction, as do VirtualTransaction with no RealTransaction
-        assert Transaction.objects.count() == self.real_transaction_count + self.orphan_virtual_transaction_count
+        assert (
+            Transaction.objects.count()
+            == self.real_transaction_count + self.orphan_virtual_transaction_count
+        )
 
         # All VirtualTransaction lead to one Booking per direction, as does each RealTransaction
         #  VirtualTransaction referencing 'member_fees' have an additional implicit direction
-        assert Booking.objects.count() == \
-            self.virtual_transaction_w_src_count + \
-            self.virtual_transaction_w_dst_count + \
-            self.real_transaction_count + \
-            self.virtual_transaction_member_fees_count
+        assert (
+            Booking.objects.count()
+            == self.virtual_transaction_w_src_count
+            + self.virtual_transaction_w_dst_count
+            + self.real_transaction_count
+            + self.virtual_transaction_member_fees_count
+        )
 
     def test_reverses_migrated(self):
         assert len(self.reversed_transactions) > 0
@@ -61,8 +80,12 @@ class TestBookkeepingMigrationsFirst(TestWithShackdataBase):
         from byro.bookkeeping.models import Transaction
 
         for rt, rt_reverses in self.reversed_transactions.items():
-            t = Transaction.objects.filter(Q(memo=rt.purpose) | Q(bookings__memo=rt.purpose)).first()
-            t_reverses = Transaction.objects.filter(Q(memo=rt_reverses.purpose) | Q(bookings__memo=rt_reverses.purpose)).first()
+            t = Transaction.objects.filter(
+                Q(memo=rt.purpose) | Q(bookings__memo=rt.purpose)
+            ).first()
+            t_reverses = Transaction.objects.filter(
+                Q(memo=rt_reverses.purpose) | Q(bookings__memo=rt_reverses.purpose)
+            ).first()
 
             assert t
             assert t_reverses
@@ -82,10 +105,15 @@ class TestBookkeepingMigrationsFinal(TestWithShackdataBase):
     def test_accounts_migrated_fully(self):
         from byro.bookkeeping.models import Account, AccountCategory
 
-        assert Account.objects.exclude(account_category__in=[
-            AccountCategory.ASSET,
-            AccountCategory.LIABILITY,
-            AccountCategory.INCOME,
-            AccountCategory.EXPENSE,
-            AccountCategory.EQUITY,
-        ]).count() == 0
+        assert (
+            Account.objects.exclude(
+                account_category__in=[
+                    AccountCategory.ASSET,
+                    AccountCategory.LIABILITY,
+                    AccountCategory.INCOME,
+                    AccountCategory.EXPENSE,
+                    AccountCategory.EQUITY,
+                ]
+            ).count()
+            == 0
+        )

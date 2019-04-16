@@ -7,7 +7,6 @@ from django.test import TestCase
 
 # from https://www.caktusgroup.com/blog/2016/02/02/writing-unit-tests-django-migrations/
 class TestMigrations(TestCase):
-
     @property
     def app(self):
         return apps.get_containing_app_config(type(self).__module__).name
@@ -29,7 +28,9 @@ class TestMigrations(TestCase):
             try:
                 return apps.get_model(model_identifier)
             except (LookupError, TypeError):
-                raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
+                raise base.DeserializationError(
+                    "Invalid model identifier: '%s'" % model_identifier
+                )
 
         # Save the old _get_model() function
         old_get_model = python._get_model
@@ -41,11 +42,11 @@ class TestMigrations(TestCase):
             # From django/test/testcases.py
             for db_name in self._databases_names(include_mirrors=False):
                 try:
-                    call_command('loaddata', *fixtures, **{
-                        'verbosity': 0,
-                        'commit': False,
-                        'database': db_name,
-                    })
+                    call_command(
+                        'loaddata',
+                        *fixtures,
+                        **{'verbosity': 0, 'commit': False, 'database': db_name}
+                    )
                 except Exception:
                     self._rollback_atomics(self.cls_atomics)
                     raise
@@ -55,8 +56,11 @@ class TestMigrations(TestCase):
             python._get_model = old_get_model
 
     def setUp(self):
-        assert self.migrate_from and self.migrate_to, \
-            "TestCase '{}' must define migrate_from and migrate_to properties".format(type(self).__name__)
+        assert (
+            self.migrate_from and self.migrate_to
+        ), "TestCase '{}' must define migrate_from and migrate_to properties".format(
+            type(self).__name__
+        )
         self.migrate_from = [(self.app, self.migrate_from)]
         self.migrate_to = [(self.app, self.migrate_to)]
         executor = MigrationExecutor(connection)

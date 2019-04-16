@@ -14,16 +14,24 @@ class MailDetail(UpdateView):
     queryset = EMail.objects.all()
     template_name = 'office/mails/detail.html'
     context_object_name = 'mail'
-    form_class = forms.modelform_factory(EMail, fields=['to', 'reply_to', 'cc', 'bcc', 'subject', 'text'])
+    form_class = forms.modelform_factory(
+        EMail, fields=['to', 'reply_to', 'cc', 'bcc', 'subject', 'text']
+    )
     success_url = '/mails/outbox'
 
     def form_valid(self, form):
         if form.instance.sent:
-            raise forms.ValidationError(_('This mail has been sent already, and cannot be modified. Copy it to a draft instead!'))
+            raise forms.ValidationError(
+                _(
+                    'This mail has been sent already, and cannot be modified. Copy it to a draft instead!'
+                )
+            )
         result = super().form_valid(form)
         if form.data.get('action', 'save') == 'send':
             form.instance.send()
-            messages.success(self.request, _('Your changes have been saved and the email was sent.'))
+            messages.success(
+                self.request, _('Your changes have been saved and the email was sent.')
+            )
         else:
             messages.success(self.request, _('Your changes have been saved.'))
         return result
@@ -37,7 +45,6 @@ class MailDetail(UpdateView):
 
 
 class MailCopy(View):
-
     def get_object(self):
         return EMail.objects.get(pk=self.kwargs['pk'])
 
@@ -48,7 +55,6 @@ class MailCopy(View):
 
 
 class OutboxQueryset:
-
     def get_queryset(self):
         qs = EMail.objects.filter(sent__isnull=True)
         if 'pk' in self.kwargs:
@@ -62,7 +68,6 @@ class OutboxList(OutboxQueryset, ListView):
 
 
 class OutboxPurge(OutboxQueryset, View):
-
     def dispatch(self, request, *args, **kwargs):
         qs = self.get_queryset()
         length = len(qs)
@@ -78,7 +83,6 @@ class OutboxPurge(OutboxQueryset, View):
 
 
 class OutboxSend(OutboxQueryset, View):
-
     def dispatch(self, request, *args, **kwargs):
         qs = self.get_queryset()
         length = len(qs)
@@ -110,6 +114,7 @@ class RestrictedLanguagesI18nModelForm(I18nModelForm):
     def __init__(self, *args, **kwargs):
         if 'locales' not in kwargs:
             from byro.common.models import Configuration
+
             config = Configuration.get_solo()
             kwargs['locales'] = [config.language or settings.LANGUAGE_CODE]
         return super().__init__(*args, **kwargs)
@@ -156,9 +161,14 @@ class Compose(SuccessMessageMixin, CreateView):
         result = super().form_valid(form)
         if form.data.get('action', 'save') == 'send':
             form.instance.send()
-            messages.success(self.request, _('Your changes have been saved and the email was sent.'))
+            messages.success(
+                self.request, _('Your changes have been saved and the email was sent.')
+            )
         else:
-            messages.success(self.request, _("The email was created successfully. Go to our outbox to send it."))
+            messages.success(
+                self.request,
+                _("The email was created successfully. Go to our outbox to send it."),
+            )
         return result
 
 

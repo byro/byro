@@ -21,8 +21,12 @@ class NewBookingForm(forms.Form):
     memo = forms.CharField(label=_('Memo'), max_length=1000, required=False)
     member = Booking._meta.get_field('member').formfield(widget=Select2Widget)
     account = Booking._meta.get_field('debit_account').formfield(widget=Select2Widget)
-    debit_value = forms.DecimalField(min_value=0, max_digits=8, decimal_places=2, required=False)
-    credit_value = forms.DecimalField(min_value=0, max_digits=8, decimal_places=2, required=False)
+    debit_value = forms.DecimalField(
+        min_value=0, max_digits=8, decimal_places=2, required=False
+    )
+    credit_value = forms.DecimalField(
+        min_value=0, max_digits=8, decimal_places=2, required=False
+    )
 
 
 class TransactionDetailView(ListView):
@@ -38,9 +42,13 @@ class TransactionDetailView(ListView):
         t = self.get_object()
         if t.balances_credit != t.balances_debit:
             if t.balances_credit > t.balances_debit:
-                form.fields['debit_value'].initial = t.balances_credit - t.balances_debit
+                form.fields['debit_value'].initial = (
+                    t.balances_credit - t.balances_debit
+                )
             else:
-                form.fields['credit_value'].initial = t.balances_debit - t.balances_credit
+                form.fields['credit_value'].initial = (
+                    t.balances_debit - t.balances_credit
+                )
         return form
 
     def get_upload_form(self, input_data=None, input_files=None):
@@ -48,7 +56,7 @@ class TransactionDetailView(ListView):
             input_data,
             input_files,
             prefix='upload_form',
-            initial_category='byro.bookkeeping.receipt'
+            initial_category='byro.bookkeeping.receipt',
         )
         form.fields['title'].required = False
         return form
@@ -85,7 +93,10 @@ class TransactionDetailView(ListView):
                     if account.unbalanced_transactions.count():
                         return redirect(
                             "{}?filter=unbalanced".format(
-                                reverse('office:finance.accounts.detail', kwargs={'pk': account.pk})
+                                reverse(
+                                    'office:finance.accounts.detail',
+                                    kwargs={'pk': account.pk},
+                                )
                             )
                         )
                 return redirect('office:finance.accounts.list')
@@ -94,7 +105,7 @@ class TransactionDetailView(ListView):
             return redirect(
                 "{}?in_account={}".format(
                     reverse('office:finance.transactions.detail', kwargs={'pk': t.pk}),
-                    request.GET['in_account']
+                    request.GET['in_account'],
                 )
             )
         else:
@@ -119,4 +130,9 @@ class TransactionDetailView(ListView):
     def process_upload_form(self, form, t):
         form.save()
         DocumentTransactionLink.objects.create(transaction=t, document=form.instance)
-        t.log(self, '.document.created', document=form.instance, content_hash=form.instance.content_hash)
+        t.log(
+            self,
+            '.document.created',
+            document=form.instance,
+            content_hash=form.instance.content_hash,
+        )

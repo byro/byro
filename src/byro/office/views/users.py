@@ -24,8 +24,12 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
-            'username', 'last_name', 'email', 'is_superuser',
-            'is_staff', 'is_staff',
+            'username',
+            'last_name',
+            'email',
+            'is_superuser',
+            'is_staff',
+            'is_staff',
         ]
 
 
@@ -44,11 +48,17 @@ class UserCreateView(FormView):
     def form_valid(self, form):
         form.save()
         self.form = form
-        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.created")
+        LogEntry.objects.create(
+            content_object=form.instance,
+            user=self.request.user,
+            action_type="byro.common.user.created",
+        )
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:settings.users.detail', kwargs={'pk': self.form.instance.pk})
+        return reverse(
+            'office:settings.users.detail', kwargs={'pk': self.form.instance.pk}
+        )
 
 
 class UserDetailView(UpdateView):
@@ -58,7 +68,11 @@ class UserDetailView(UpdateView):
     form_class = UserForm
 
     def form_valid(self, form):
-        LogEntry.objects.create(content_object=form.instance, user=self.request.user, action_type="byro.common.user.updated")
+        LogEntry.objects.create(
+            content_object=form.instance,
+            user=self.request.user,
+            action_type="byro.common.user.updated",
+        )
         return super().form_valid(form)
 
     def get_object(self):

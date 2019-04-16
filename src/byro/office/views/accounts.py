@@ -34,12 +34,17 @@ class AccountCreateView(FormView):
 
     def form_valid(self, form):
         form.save()
-        messages.success(self.request, _('The account was added, please edit additional details if applicable.'))
+        messages.success(
+            self.request,
+            _('The account was added, please edit additional details if applicable.'),
+        )
         self.form = form
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:finance.accounts.detail', kwargs={'pk': self.form.instance.pk})
+        return reverse(
+            'office:finance.accounts.detail', kwargs={'pk': self.form.instance.pk}
+        )
 
 
 class AccountDetailView(ListView):
@@ -56,8 +61,12 @@ class AccountDetailView(ListView):
     def get_queryset(self):
         qs = self.get_object().bookings_with_transaction_data
         if self.request.GET.get('filter') == 'unbalanced':
-            qs = qs.exclude(transaction_balances_debit=models.F('transaction_balances_credit'))
-        qs = qs.filter(transaction__value_datetime__lte=now()).order_by('-transaction__value_datetime')
+            qs = qs.exclude(
+                transaction_balances_debit=models.F('transaction_balances_credit')
+            )
+        qs = qs.filter(transaction__value_datetime__lte=now()).order_by(
+            '-transaction__value_datetime'
+        )
         return qs
 
     def get_form(self, request=None):
@@ -70,8 +79,7 @@ class AccountDetailView(ListView):
         context['form'] = self.get_form()
         context['account'] = self.get_object()
         context['ACCOUNT_COLUMN_HEADERS'] = ACCOUNT_COLUMN_HEADERS.get(
-            self.get_object().account_category,
-            (_("Debit"), _("Credit"))
+            self.get_object().account_category, (_("Debit"), _("Credit"))
         )
         return context
 

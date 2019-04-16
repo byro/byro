@@ -62,7 +62,10 @@ class MemberView(DetailView):
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
-        responses = [r[1] for r in member_view.send_robust(self.get_object(), request=self.request)]
+        responses = [
+            r[1]
+            for r in member_view.send_robust(self.get_object(), request=self.request)
+        ]
         ctx['member_views'] = responses
         ctx['member'] = self.get_member()
         return ctx
@@ -75,7 +78,9 @@ class MemberListMixin:
             qs = qs.filter(Q(name__icontains=search) | Q(number=search))
         # Logic:
         #  + Active members have membership with start <= today and (end is null or end >= today)
-        active_q = Q(memberships__start__lte=now().date()) & (Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date()))
+        active_q = Q(memberships__start__lte=now().date()) & (
+            Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date())
+        )
         inactive_q = ~active_q
         if _filter == 'all':
             pass
@@ -117,17 +122,36 @@ class MemberDisclosureView(MemberListMixin, TemplateView):
         members = self.get_members_queryset()
         for member in members:
             member.record_disclosure_email.save()
-        messages.success(request, _('Generated {count} data disclosure emails and placed them in the outbox.').format(count=len(members)))
+        messages.success(
+            request,
+            _(
+                'Generated {count} data disclosure emails and placed them in the outbox.'
+            ).format(count=len(members)),
+        )
         return redirect('/members/list')
 
 
 class MemberBalanceForm(forms.Form):
     start = forms.DateField(label=_('Start of balance timeframe'))
     end = forms.DateField(label=_('End of balance timeframe'))
-    create_if_zero = forms.BooleanField(label=_('Create balances even if there was no payment due in the time chosen?'), required=False, initial=False)
-    balance_cutoff = forms.DecimalField(required=False, label=_('Balance cutoff'), help_text=_('Only members with a deficit greater than this will receive an email.'), min_value=0)
+    create_if_zero = forms.BooleanField(
+        label=_('Create balances even if there was no payment due in the time chosen?'),
+        required=False,
+        initial=False,
+    )
+    balance_cutoff = forms.DecimalField(
+        required=False,
+        label=_('Balance cutoff'),
+        help_text=_(
+            'Only members with a deficit greater than this will receive an email.'
+        ),
+        min_value=0,
+    )
     subject = forms.CharField(label=_('Subject'))
-    text = forms.CharField(label=_('Text'), initial=_('''Hello {name},
+    text = forms.CharField(
+        label=_('Text'),
+        initial=_(
+            '''Hello {name},
 
 we wanted to let you know that within the time from {start}
 to {end} you incurred unpaid liabilities in the amount of
@@ -135,7 +159,10 @@ to {end} you incurred unpaid liabilities in the amount of
    EUR {amount}
 
 Please settle this amount as soon as possible, or let us
-know if you think this email is incorrect.'''), widget=forms.Textarea)
+know if you think this email is incorrect.'''
+        ),
+        widget=forms.Textarea,
+    )
 
     def __init__(self, *args, **kwargs):
 
@@ -155,7 +182,6 @@ know if you think this email is incorrect.'''), widget=forms.Textarea)
         return cleaned_data
 
 
-
 class MemberBalanceView(MemberListMixin, FormView):
     template_name = 'office/member/balance.html'
     context_object_name = 'members'
@@ -163,7 +189,17 @@ class MemberBalanceView(MemberListMixin, FormView):
     form_class = MemberBalanceForm
 
     def form_valid(self, form):
-        members = Member.objects.filter(Q(memberships__start__lte=now().date()) & (Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date()))).order_by('-id').distinct()
+        members = (
+            Member.objects.filter(
+                Q(memberships__start__lte=now().date())
+                & (
+                    Q(memberships__end__isnull=True)
+                    | Q(memberships__end__gte=now().date())
+                )
+            )
+            .order_by('-id')
+            .distinct()
+        )
         mails = errors = balance_count = 0
         start = datetime.combine(form.cleaned_data.get('start'), time(0, 0))
         end = datetime.combine(form.cleaned_data.get('end'), time(23, 59))
@@ -173,49 +209,69 @@ class MemberBalanceView(MemberListMixin, FormView):
         subject = form.cleaned_data.get('subject')
         for member in members:
             try:
-                balance = member.create_balance(start=start, end=end, create_if_zero=create_if_zero)
+                balance = member.create_balance(
+                    start=start, end=end, create_if_zero=create_if_zero
+                )
                 balance_count += 1
                 if not balance_cutoff or balance.amount < -balance_cutoff:
                     mail = EMail.objects.create(
                         to=member.email,
                         balance=balance,
-                        text=text.format(name=member.name, start=start, end=end, amount=amount),
+                        text=text.format(
+                            name=member.name, start=start, end=end, amount=amount
+                        ),
                         subject=subject,
                     )
                     mail.members.add(member)
                     mails += 1
             except Exception:
                 errors += 1
-        message = str(_('{balance_count} balances were created and {mail_count} reminder emails were placed in the outbox.').format(balance_count=balance_count, mail_count=mails))
+        message = str(
+            _(
+                '{balance_count} balances were created and {mail_count} reminder emails were placed in the outbox.'
+            ).format(balance_count=balance_count, mail_count=mails)
+        )
         if errors:
-            message += ' ' + str(_('{errors} balances could not be created due to errors. Presumably, these members already have balances overlapping this timeframe.'.format(errors=errors)))
+            message += ' ' + str(
+                _(
+                    '{errors} balances could not be created due to errors. Presumably, these members already have balances overlapping this timeframe.'.format(
+                        errors=errors
+                    )
+                )
+            )
         messages.success(self.request, message)
         return redirect('/members/list')
 
 
 class MemberListExportForm(forms.Form):
-    field_list = forms.MultipleChoiceField(choices=[], widget=forms.CheckboxSelectMultiple)
-    member_filter = forms.ChoiceField(choices=[
-        ('active', _('Active members')),
-        ('inactive', _('Only inactive members')),
-        ('all', _('All members')),
-    ])
-    export_format = forms.ChoiceField(choices=[
-        ('csv', _("CSV (Comma Separated Values)")),
-        ('csv_de', _("CSV (Semicolon Separated Values, German Windows versions)")),
-        # ('xlsx', _("XLSX (Excel)")),
-    ])
+    field_list = forms.MultipleChoiceField(
+        choices=[], widget=forms.CheckboxSelectMultiple
+    )
+    member_filter = forms.ChoiceField(
+        choices=[
+            ('active', _('Active members')),
+            ('inactive', _('Only inactive members')),
+            ('all', _('All members')),
+        ]
+    )
+    export_format = forms.ChoiceField(
+        choices=[
+            ('csv', _("CSV (Comma Separated Values)")),
+            ('csv_de', _("CSV (Semicolon Separated Values, German Windows versions)")),
+            # ('xlsx', _("XLSX (Excel)")),
+        ]
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         fields = Member.get_fields()
         self.fields['field_list'].choices = [
-            (f.field_id, f.name)
-            for f in fields.values()
+            (f.field_id, f.name) for f in fields.values()
         ]
         self.fields['field_list'].initial = [
             f.field_id
-            for f in fields.values() if f.registration_form.get('position', -1) > -1
+            for f in fields.values()
+            if f.registration_form.get('position', -1) > -1
         ]
 
 
@@ -225,12 +281,20 @@ class csv_excel_de(csv.excel):
 
 def filter_excel_de(data):
     if isinstance(data, (float, Decimal)):
-        return "{:18,.2f}".format(data).replace(",", "_").replace(".", ",").replace("_", ".").strip()
+        return (
+            "{:18,.2f}".format(data)
+            .replace(",", "_")
+            .replace(".", ",")
+            .replace("_", ".")
+            .strip()
+        )
     else:
         return data
 
 
-class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, MultipleObjectTemplateResponseMixin):
+class MemberListExportView(
+    FormView, MemberListMixin, MultipleObjectMixin, MultipleObjectTemplateResponseMixin
+):
     template_name = 'office/member/list_export.html'
     context_object_name = 'members'
     model = Member
@@ -244,8 +308,21 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
     def form_valid(self, form):
         fields = Member.get_fields()
         selected_fields = form.cleaned_data['field_list']
-        header = collections.OrderedDict([(f.field_id, f.name) for f in fields.values() if f.field_id in selected_fields])
-        data = self.get_data(form, [(f.field_id, f.getter) for f in fields.values() if f.field_id in selected_fields])
+        header = collections.OrderedDict(
+            [
+                (f.field_id, f.name)
+                for f in fields.values()
+                if f.field_id in selected_fields
+            ]
+        )
+        data = self.get_data(
+            form,
+            [
+                (f.field_id, f.getter)
+                for f in fields.values()
+                if f.field_id in selected_fields
+            ],
+        )
 
         LogEntry.objects.create(
             content_type=None,
@@ -255,12 +332,16 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
             data={
                 'filter': form.cleaned_data['member_filter'],
                 'format': form.cleaned_data['export_format'],
-                'fields': collections.OrderedDict([(f_id, str(f_name)) for (f_id, f_name) in header.items()]),
-            }
+                'fields': collections.OrderedDict(
+                    [(f_id, str(f_name)) for (f_id, f_name) in header.items()]
+                ),
+            },
         )
 
         if form.cleaned_data['export_format'].startswith('csv'):
-            return self.export_csv(header, data, csv_format=form.cleaned_data['export_format'])
+            return self.export_csv(
+                header, data, csv_format=form.cleaned_data['export_format']
+            )
 
         return redirect(self.request.get_full_path())
 
@@ -269,6 +350,7 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
             """Dummy, based on the Django docs.
             This one adds one feature: It outputs a Unicode BOM (Byte-Order Mark) as the first
             character."""
+
             def write(self, value):
                 if not hasattr(self, 'have_bom'):
                     self.have_bom = True
@@ -283,28 +365,23 @@ class MemberListExportView(FormView, MemberListMixin, MultipleObjectMixin, Multi
         writer = csv.DictWriter(
             pseudo_buffer,
             header.keys(),
-            dialect={
-                'csv_de': csv_excel_de,
-            }.get(csv_format, 'excel'),
+            dialect={'csv_de': csv_excel_de}.get(csv_format, 'excel'),
         )
-        converter = {
-            'csv_de': row_converter_de,
-        }.get(csv_format, lambda x: x)
+        converter = {'csv_de': row_converter_de}.get(csv_format, lambda x: x)
         response = StreamingHttpResponse(
             (writer.writerow(converter(row)) for row in chain([header], data)),
             content_type='text/csv; charset=utf-8',
             charset='utf-8',
         )
-        response['Content-Disposition'] = 'attachment; filename="members_{}.csv"'.format(now().date())
+        response[
+            'Content-Disposition'
+        ] = 'attachment; filename="members_{}.csv"'.format(now().date())
         return response
 
     def get_data(self, form, field_mapping):
         qs = self.get_members_queryset(_filter=form.cleaned_data['member_filter'])
         for m in qs.all():
-            yield {
-                f_id: f_getter(m)
-                for (f_id, f_getter) in field_mapping
-            }
+            yield {f_id: f_getter(m) for (f_id, f_getter) in field_mapping}
 
 
 def get_member_list_importers():
@@ -312,7 +389,11 @@ def get_member_list_importers():
 
 
 class MemberListImportForm(forms.Form):
-    importer = forms.ChoiceField(choices=lambda: tuple((i['id'], i['label']) for i in get_member_list_importers()))
+    importer = forms.ChoiceField(
+        choices=lambda: tuple(
+            (i['id'], i['label']) for i in get_member_list_importers()
+        )
+    )
     upload_file = forms.FileField()
 
 
@@ -346,7 +427,7 @@ class MemberListImportView(FormView):
             data={
                 'importer': form.cleaned_data['importer'],
                 'sha256': sha256sum.hexdigest(),
-            }
+            },
         )
 
         return importer['form_valid'](self, form)
@@ -367,8 +448,9 @@ def create_membership(membership_parms, member):
         for k in 'start', 'end':
             #  FIXME Also, we should find a way to handle dates in a generic way
             if membership_parms.get(k, None):
-                membership_parms[k] = dateparser.parse(membership_parms[k],
-                                                       languages=[settings.LANGUAGE_CODE, 'en'])
+                membership_parms[k] = dateparser.parse(
+                    membership_parms[k], languages=[settings.LANGUAGE_CODE, 'en']
+                )
         Membership.objects.create(member=member, **membership_parms)
 
 
@@ -390,7 +472,12 @@ def default_csv_form_valid(view, form, dialect='excel'):
                             mapping[k.strip()] = field
                             break
                     else:
-                        messages.error(view.request, _("Couldn't map input column '{}' to field").format(k.strip()))
+                        messages.error(
+                            view.request,
+                            _("Couldn't map input column '{}' to field").format(
+                                k.strip()
+                            ),
+                        )
                         return redirect(view.request.get_full_path())
 
             member = Member.objects.create()
@@ -425,7 +512,9 @@ def default_csv_importer(sender, **kwargs):
 def default_csv_importer_german(sender, **kwargs):
     return {
         'id': 'byro.office.members.import.default_csv_german',
-        'label': _('Generic CSV import (Semicolon Separated Values, German Windows versions)'),
+        'label': _(
+            'Generic CSV import (Semicolon Separated Values, German Windows versions)'
+        ),
         'form_valid': partial(default_csv_form_valid, dialect=csv_excel_de),
     }
 
@@ -441,13 +530,20 @@ class MemberCreateView(FormView):
     def form_valid(self, form):
         self.form = form
         form.save()
-        messages.success(self.request, _('The member was added, please edit additional details if applicable.'))
+        messages.success(
+            self.request,
+            _('The member was added, please edit additional details if applicable.'),
+        )
         form.instance.log(self, '.created')
 
         responses = new_member.send_robust(sender=form.instance)
         for module, response in responses:
             if isinstance(response, Exception):
-                messages.warning(self.request, _('Some post processing steps could not be completed: ') + str(response))
+                messages.warning(
+                    self.request,
+                    _('Some post processing steps could not be completed: ')
+                    + str(response),
+                )
         config = Configuration.get_solo()
 
         if config.welcome_member_template and form.instance.email:
@@ -457,14 +553,28 @@ class MemberCreateView(FormView):
                 'number': form.instance.number,
                 'member_name': form.instance.name,
             }
-            responses = [r[1] for r in new_member_mail_information.send_robust(sender=form.instance) if r]
+            responses = [
+                r[1]
+                for r in new_member_mail_information.send_robust(sender=form.instance)
+                if r
+            ]
             context['additional_information'] = '\n'.join(responses).strip()
-            config.welcome_member_template.to_mail(email=form.instance.email, context=context)
+            config.welcome_member_template.to_mail(
+                email=form.instance.email, context=context
+            )
         if config.welcome_office_template:
             context = {'member_name': form.instance.name}
-            responses = [r[1] for r in new_member_office_mail_information.send_robust(sender=form.instance) if r]
+            responses = [
+                r[1]
+                for r in new_member_office_mail_information.send_robust(
+                    sender=form.instance
+                )
+                if r
+            ]
             context['additional_information'] = '\n'.join(responses).strip()
-            config.welcome_office_template.to_mail(email=config.backoffice_mail, context=context)
+            config.welcome_office_template.to_mail(
+                email=config.backoffice_mail, context=context
+            )
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -488,12 +598,13 @@ class MemberDashboardView(MemberView):
         }
         context['current_membership'] = {
             'amount': obj.memberships.last().amount,
-            'interval': obj.memberships.last().get_interval_display()
+            'interval': obj.memberships.last().get_interval_display(),
         }
-        context['statute_barred_debt'] = {
-            'now': obj.statute_barred_debt(),
-        }
-        context['statute_barred_debt']['in1year'] = obj.statute_barred_debt(relativedelta(years=1)) - context['statute_barred_debt']['now']
+        context['statute_barred_debt'] = {'now': obj.statute_barred_debt()}
+        context['statute_barred_debt']['in1year'] = (
+            obj.statute_barred_debt(relativedelta(years=1))
+            - context['statute_barred_debt']['now']
+        )
 
         context['tiles'] = []
         for __, response in member_dashboard_tile.send(self.request, member=obj):
@@ -508,31 +619,85 @@ class MemberDashboardView(MemberView):
 class MemberDataView(MemberView):
     template_name = 'office/member/data.html'
 
-    def _instantiate(self, form_class, member, profile_class=None, instance=None, prefix=None, empty=False):
+    def _instantiate(
+        self,
+        form_class,
+        member,
+        profile_class=None,
+        instance=None,
+        prefix=None,
+        empty=False,
+    ):
         params = {
-            'instance': (getattr(member, profile_class._meta.get_field('member').related_query_name()) if profile_class else instance) if not empty else None,
-            'prefix': prefix or (profile_class.__name__ if profile_class else instance.__class__.__name__ + '_' if instance else 'member_'),
+            'instance': (
+                getattr(
+                    member, profile_class._meta.get_field('member').related_query_name()
+                )
+                if profile_class
+                else instance
+            )
+            if not empty
+            else None,
+            'prefix': prefix
+            or (
+                profile_class.__name__
+                if profile_class
+                else instance.__class__.__name__ + '_'
+                if instance
+                else 'member_'
+            ),
             'data': self.request.POST if self.request.method == 'POST' else None,
         }
         return form_class(**params)
 
     def get_forms(self):
         obj = self.get_object()
-        membership_create_form = forms.modelform_factory(Membership, fields=['start', 'end', 'interval', 'amount'])
+        membership_create_form = forms.modelform_factory(
+            Membership, fields=['start', 'end', 'interval', 'amount']
+        )
         for key in membership_create_form.base_fields:
             setattr(membership_create_form.base_fields[key], 'required', False)
-        return [
-            self._instantiate(forms.modelform_factory(Member, exclude=['membership_type']), member=obj, instance=obj),
-        ] + [
-            self._instantiate(forms.modelform_factory(Membership, exclude=['member']), member=obj, instance=m, prefix=m.id)
-            for m in obj.memberships.all()
-        ] + [self._instantiate(membership_create_form, member=obj, profile_class=Membership, empty=True)] + [
-            self._instantiate(forms.modelform_factory(
-                profile_class,
-                fields=[f.name for f in profile_class._meta.fields if f.name not in ['id', 'member']],
-            ), member=obj, profile_class=profile_class)
-            for profile_class in obj.profile_classes
-        ]
+        return (
+            [
+                self._instantiate(
+                    forms.modelform_factory(Member, exclude=['membership_type']),
+                    member=obj,
+                    instance=obj,
+                )
+            ]
+            + [
+                self._instantiate(
+                    forms.modelform_factory(Membership, exclude=['member']),
+                    member=obj,
+                    instance=m,
+                    prefix=m.id,
+                )
+                for m in obj.memberships.all()
+            ]
+            + [
+                self._instantiate(
+                    membership_create_form,
+                    member=obj,
+                    profile_class=Membership,
+                    empty=True,
+                )
+            ]
+            + [
+                self._instantiate(
+                    forms.modelform_factory(
+                        profile_class,
+                        fields=[
+                            f.name
+                            for f in profile_class._meta.fields
+                            if f.name not in ['id', 'member']
+                        ],
+                    ),
+                    member=obj,
+                    profile_class=profile_class,
+                )
+                for profile_class in obj.profile_classes
+            ]
+        )
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -563,30 +728,40 @@ class MemberFinanceView(MemberView):
     def get_bookings(self):
         account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
         member = self.get_member()
-        bookings = Booking.objects.with_transaction_data().filter(
-            Q(debit_account__in=account_list) |
-            Q(credit_account__in=account_list),
-            member=member,
-            transaction__value_datetime__lte=now(),
-        ).order_by('-transaction__value_datetime', '-booking_datetime', '-transaction__booking_datetime')
+        bookings = (
+            Booking.objects.with_transaction_data()
+            .filter(
+                Q(debit_account__in=account_list) | Q(credit_account__in=account_list),
+                member=member,
+                transaction__value_datetime__lte=now(),
+            )
+            .order_by(
+                '-transaction__value_datetime',
+                '-booking_datetime',
+                '-transaction__booking_datetime',
+            )
+        )
         if not member.balances.exists():
-           return bookings
+            return bookings
         result = []
         balances = list(member.balances.order_by('-start'))
         current_balance = balances.pop(0)
         current_balance.bookings = []
         for booking in bookings:
-           while current_balance and booking.transaction.value_datetime < current_balance.start:
-               result.append(current_balance)
-               current_balance = balances.pop(0) if balances else None
-               if current_balance:
-                   current_balance.bookings = []
-           if not current_balance:
-               result.append(booking)
-           elif booking.transaction.value_datetime > current_balance.end:
-               result.append(booking)
-           else:
-               current_balance.bookings.append(booking)
+            while (
+                current_balance
+                and booking.transaction.value_datetime < current_balance.start
+            ):
+                result.append(current_balance)
+                current_balance = balances.pop(0) if balances else None
+                if current_balance:
+                    current_balance.bookings = []
+            if not current_balance:
+                result.append(booking)
+            elif booking.transaction.value_datetime > current_balance.end:
+                result.append(booking)
+            else:
+                current_balance.bookings.append(booking)
         return result
 
     def get_context_data(self, *args, **kwargs):
@@ -624,7 +799,12 @@ class MemberDocumentsView(MemberView, FormView):
 
         form.instance.member = member
         form.save()
-        member.log(self, '.document.created', document=form.instance, content_hash=form.instance.content_hash)
+        member.log(
+            self,
+            '.document.created',
+            document=form.instance,
+            content_hash=form.instance.content_hash,
+        )
 
         return super().form_valid(form)
 
@@ -633,10 +813,9 @@ class MemberAccountAdjustmentForm(forms.Form):
     form_title = _('Adjust member account balance')
 
     date = forms.DateField(initial=lambda: now().date())
-    adjustment_reason = forms.ChoiceField(choices=[
-        ('initial', _("Initial balance")),
-        ('waiver', _("Fees waived")),
-    ])
+    adjustment_reason = forms.ChoiceField(
+        choices=[('initial', _("Initial balance")), ('waiver', _("Fees waived"))]
+    )
     adjustment_memo = forms.CharField(required=False)
     adjustment_type = forms.ChoiceField(
         widget=forms.RadioSelect,
@@ -667,9 +846,14 @@ class MultipleFormsMixin:
                 (
                     prefix,
                     title,
-                    form_class(prefix=prefix, data=self.request.POST if self.request.method == 'POST' else None),
+                    form_class(
+                        prefix=prefix,
+                        data=self.request.POST
+                        if self.request.method == 'POST'
+                        else None,
+                    ),
                     buttons,
-                    callback
+                    callback,
                 )
             )
 
@@ -684,7 +868,11 @@ class MultipleFormsMixin:
         retval = None
 
         for prefix, title, form, buttons, callback in self.get_forms():
-            active_buttons = [name for name in buttons if self.mangle_button(name, prefix) in self.request.POST]
+            active_buttons = [
+                name
+                for name in buttons
+                if self.mangle_button(name, prefix) in self.request.POST
+            ]
             if active_buttons:
                 if form.is_valid():
                     retval = callback(form, active_buttons) or retval
@@ -697,7 +885,9 @@ class MultipleFormsMixin:
 
 class MemberOperationsView(MultipleFormsMixin, MemberView):
     template_name = 'office/member/operations.html'
-    membership_form_class = forms.modelform_factory(Membership, fields=['start', 'end', 'interval', 'amount'])
+    membership_form_class = forms.modelform_factory(
+        Membership, fields=['start', 'end', 'interval', 'amount']
+    )
 
     def get_operations(self):
         """Return a list of tuples. Each one:
@@ -730,7 +920,9 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                         _('End membership'),
                         _create_ms_leave_form,
                         {'end': _('End membership')},
-                        lambda *args, **kwargs: self.end_membership(ms, *args, **kwargs),
+                        lambda *args, **kwargs: self.end_membership(
+                            ms, *args, **kwargs
+                        ),
                     )
                 )
 
@@ -751,7 +943,9 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
     def adjust_balance(self, form, active_buttons):
         memo = (
             form.cleaned_data['adjustment_memo']
-            or dict(form.fields['adjustment_reason'].choices).get(form.cleaned_data['adjustment_reason'], None)
+            or dict(form.fields['adjustment_reason'].choices).get(
+                form.cleaned_data['adjustment_reason'], None
+            )
             or _('Account adjustment')
         )
 
@@ -761,19 +955,34 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
         if form.cleaned_data['adjustment_type'] == 'relative':
             amount = form.cleaned_data['amount']
         else:
-            old_balance = member._calc_balance(form.cleaned_data['date'], form.cleaned_data['date'])
+            old_balance = member._calc_balance(
+                form.cleaned_data['date'], form.cleaned_data['date']
+            )
             amount = old_balance - form.cleaned_data['amount']
 
         amount_, from_, to_ = None, None, None
 
         if amount != 0:
             if form.cleaned_data['adjustment_reason'] == 'initial':
-                amount_, from_, to_ = amount, SpecialAccounts.opening_balance, SpecialAccounts.fees_receivable
+                amount_, from_, to_ = (
+                    amount,
+                    SpecialAccounts.opening_balance,
+                    SpecialAccounts.fees_receivable,
+                )
             elif form.cleaned_data['adjustment_reason'] == 'waiver':
                 if amount < 0:
-                    amount_, from_, to_ = -amount, SpecialAccounts.fees_receivable, SpecialAccounts.lost_income
+                    amount_, from_, to_ = (
+                        -amount,
+                        SpecialAccounts.fees_receivable,
+                        SpecialAccounts.lost_income,
+                    )
                 else:
-                    messages.error(self.request, _("Fee waiving needs to decrease debts. Use a negative value in relative mode, or a value higher than the current one in absolute mode."))
+                    messages.error(
+                        self.request,
+                        _(
+                            "Fee waiving needs to decrease debts. Use a negative value in relative mode, or a value higher than the current one in absolute mode."
+                        ),
+                    )
                     return
 
             if amount_ < 0:
@@ -790,7 +999,9 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                 memo=memo,
             )
             t.debit(account=to_, member=to_member, amount=amount_, user_or_context=self)
-            t.credit(account=from_, member=from_member, amount=amount_, user_or_context=self)
+            t.credit(
+                account=from_, member=from_member, amount=amount_, user_or_context=self
+            )
 
             balance = member.balance
 
@@ -799,9 +1010,16 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
             elif form.cleaned_data['adjustment_reason'] == 'waiver':
                 member.log(self, '.finance.fees_waived', amount=amount)
             else:
-                member.log(self, '.finance.account_adjusted', balance=balance, amount=amount)
+                member.log(
+                    self, '.finance.account_adjusted', balance=balance, amount=amount
+                )
 
-            messages.success(self.request, _('Membership account adjusted by {amount}, current balance is {balance}').format(amount=amount, balance=balance))
+            messages.success(
+                self.request,
+                _(
+                    'Membership account adjusted by {amount}, current balance is {balance}'
+                ).format(amount=amount, balance=balance),
+            )
 
     @transaction.atomic
     def end_membership(self, ms, form, active_buttons):
@@ -811,14 +1029,23 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
             form.save()
             form.instance.log(self, '.ended')
-            messages.success(self.request, _('The membership has been terminated. Please check the outbox for the notifications.'))
+            messages.success(
+                self.request,
+                _(
+                    'The membership has been terminated. Please check the outbox for the notifications.'
+                ),
+            )
 
             form.instance.member.update_liabilites()
 
             responses = leave_member.send_robust(sender=form.instance)
             for module, response in responses:
                 if isinstance(response, Exception):
-                    messages.warning(self.request, _('Some post processing steps could not be completed: ') + str(response))
+                    messages.warning(
+                        self.request,
+                        _('Some post processing steps could not be completed: ')
+                        + str(response),
+                    )
 
             config = Configuration.get_solo()
             if config.leave_member_template:
@@ -829,21 +1056,36 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                     'member_name': form.instance.member.name,
                     'end': form.instance.end,
                 }
-                responses = [r[1] for r in leave_member_mail_information.send_robust(sender=form.instance) if r]
+                responses = [
+                    r[1]
+                    for r in leave_member_mail_information.send_robust(
+                        sender=form.instance
+                    )
+                    if r
+                ]
                 context['additional_information'] = '\n'.join(responses).strip()
-                config.leave_member_template.to_mail(email=form.instance.member.email, context=context)
+                config.leave_member_template.to_mail(
+                    email=form.instance.member.email, context=context
+                )
             if config.leave_office_template:
                 context = {
                     'member_name': form.instance.member.name,
                     'end': form.instance.end,
                 }
-                responses = [r[1] for r in leave_member_office_mail_information.send_robust(sender=form.instance) if r]
+                responses = [
+                    r[1]
+                    for r in leave_member_office_mail_information.send_robust(
+                        sender=form.instance
+                    )
+                    if r
+                ]
                 context['additional_information'] = '\n'.join(responses).strip()
-                config.leave_office_template.to_mail(email=config.backoffice_mail, context=context)
+                config.leave_office_template.to_mail(
+                    email=config.backoffice_mail, context=context
+                )
 
 
 class MemberListTypeaheadView(View):
-
     def dispatch(self, request, *args, **kwargs):
         search = request.GET.get('search')
         if not search or len(search) < 2:
@@ -852,17 +1094,19 @@ class MemberListTypeaheadView(View):
         queryset = Member.objects.filter(
             Q(name__icontains=search) | Q(profile_profile__nick__icontains=search)
         )
-        return JsonResponse({
-            'count': len(queryset),
-            'results': [
-                {
-                    'id': member.pk,
-                    'nick': member.profile_profile.nick,
-                    'name': member.name,
-                }
-                for member in queryset
-            ],
-        })
+        return JsonResponse(
+            {
+                'count': len(queryset),
+                'results': [
+                    {
+                        'id': member.pk,
+                        'nick': member.profile_profile.nick,
+                        'name': member.name,
+                    }
+                    for member in queryset
+                ],
+            }
+        )
 
 
 class MemberRecordDisclosureView(MemberView):
@@ -876,7 +1120,9 @@ class MemberRecordDisclosureView(MemberView):
     def post(self, request, *args, **kwargs):
         self.get_member().record_disclosure_email.save()
         self.get_member().log(self, '.disclosure_email_generated')
-        messages.success(request, _('The email was generated and can be sent in the outbox.'))
+        messages.success(
+            request, _('The email was generated and can be sent in the outbox.')
+        )
         return redirect(reverse('office:members.dashboard', kwargs=self.kwargs))
 
 

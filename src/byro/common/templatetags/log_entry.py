@@ -32,7 +32,9 @@ def default_formatter(entry):
             url = reverse('office:settings.users.detail', kwargs={'pk': co.pk})
 
         if url:
-            related_object = mark_safe(' (<a href="{}">{}</a>)'.format(escape(url), escape(str(co))))
+            related_object = mark_safe(
+                ' (<a href="{}">{}</a>)'.format(escape(url), escape(str(co)))
+            )
         else:
             related_object = mark_safe(' ({})'.format(escape(co)))
 
@@ -40,7 +42,9 @@ def default_formatter(entry):
     if data:
         extra_data = " {}".format(escape(str(data)))
 
-    return mark_safe("{}{}{}".format(escape(str(entry.action_type)), related_object, extra_data))
+    return mark_safe(
+        "{}{}{}".format(escape(str(entry.action_type)), related_object, extra_data)
+    )
 
 
 @register.filter(name='format_log_entry')
@@ -57,11 +61,15 @@ def format_log_entry(entry):
 def format_log_source(entry):
     user = ""
     if entry.user:
-        user = mark_safe('<span class="fa fa-user"></span> {}'.format(escape(entry.user)))
+        user = mark_safe(
+            '<span class="fa fa-user"></span> {}'.format(escape(entry.user))
+        )
 
     source = entry.data.get('source', "")
     if source.startswith('internal: '):
-        source = mark_safe('<span class="fa fa-gears"></span> {}'.format(escape(source[10:])))
+        source = mark_safe(
+            '<span class="fa fa-gears"></span> {}'.format(escape(source[10:]))
+        )
 
     if entry.user:
         if entry.data.get('source', None) == str(entry.user):
@@ -77,7 +85,9 @@ def format_log_object(obj, key=None):
     with suppress(Exception):
         if 'object' in obj and 'ref' in obj and 'value' in obj:
             with suppress(Exception):
-                content_object = ContentType.objects.get(app_label=obj['ref'][0], model=obj['ref'][1]).get_object_for_this_type(pk=obj['ref'][2])
+                content_object = ContentType.objects.get(
+                    app_label=obj['ref'][0], model=obj['ref'][1]
+                ).get_object_for_this_type(pk=obj['ref'][2])
 
                 if obj['value'] == str(content_object):
                     url = content_object.get_absolute_url()
@@ -89,9 +99,15 @@ def format_log_object(obj, key=None):
                         icon = ""
 
                     if url:
-                        return mark_safe('{}<a href="{}">{}</a>'.format(icon, escape(url), str_val))
+                        return mark_safe(
+                            '{}<a href="{}">{}</a>'.format(icon, escape(url), str_val)
+                        )
 
-            return mark_safe("<i>{} object</i>: {!r}".format(escape(str(obj['object'])), escape(str(obj['value']))))
+            return mark_safe(
+                "<i>{} object</i>: {!r}".format(
+                    escape(str(obj['object'])), escape(str(obj['value']))
+                )
+            )
 
         if key == 'category' and '.' in obj:
             cats = get_document_category_names()
@@ -101,9 +117,14 @@ def format_log_object(obj, key=None):
         if key == 'content_hash':
             parts = str(obj).split(':', 1)
             if len(parts) == 2:
-                return mark_safe('{}: <tt title="{}">{} &hellip; {}</tt>'.format(
-                    escape(parts[0]), escape(parts[1]), escape(parts[1][:(6*2)]), escape(parts[1][-(6*2):])
-                ))
+                return mark_safe(
+                    '{}: <tt title="{}">{} &hellip; {}</tt>'.format(
+                        escape(parts[0]),
+                        escape(parts[1]),
+                        escape(parts[1][: (6 * 2)]),
+                        escape(parts[1][-(6 * 2) :]),
+                    )
+                )
 
     return obj
 

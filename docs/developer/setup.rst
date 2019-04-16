@@ -116,7 +116,7 @@ Code checks and unit tests
 Before you check in your code into git, always run the static checkers and unit tests::
 
     (env)$ isort -c -rc .
-    (env)$ black -S --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py"
+    (env)$ black -S --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py" .
     (env)$ python manage.py check
     (env)$ py.test tests
 
@@ -131,7 +131,7 @@ for example::
     cd $GIT_DIR/../src
     source ../env/bin/activate
     isort -c -rc .
-    black -S --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py"
+    black -S --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py" .
 
 
 Working with translations

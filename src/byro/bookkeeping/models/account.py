@@ -42,16 +42,13 @@ class AccountTag(models.Model):
 
 class Account(Auditable, models.Model, LogTargetMixin):
     account_category = models.CharField(
-        choices=AccountCategory.choices,
-        max_length=AccountCategory.max_length,
+        choices=AccountCategory.choices, max_length=AccountCategory.max_length
     )
     name = models.CharField(max_length=300, null=True)  # e.g. 'Laser donations'
     tags = models.ManyToManyField(AccountTag, related_name='accounts')
 
     class Meta:
-        unique_together = (
-            ('account_category', 'name'),
-        )
+        unique_together = (('account_category', 'name'),)
 
     def __str__(self):
         if self.name:
@@ -61,13 +58,13 @@ class Account(Auditable, models.Model, LogTargetMixin):
     @property
     def bookings(self):
         from byro.bookkeeping.models import Booking
-        return Booking.objects.filter(
-            Q(debit_account=self) | Q(credit_account=self)
-        )
+
+        return Booking.objects.filter(Q(debit_account=self) | Q(credit_account=self))
 
     @property
     def bookings_with_transaction_data(self):
         from byro.bookkeeping.models import Booking
+
         return Booking.objects.with_transaction_data().filter(
             Q(debit_account=self) | Q(credit_account=self)
         )
@@ -75,6 +72,7 @@ class Account(Auditable, models.Model, LogTargetMixin):
     @property
     def transactions(self):
         from byro.bookkeeping.models import Transaction
+
         return Transaction.objects.filter(
             Q(bookings__debit_account=self) | Q(bookings__credit_account=self)
         )
@@ -82,6 +80,7 @@ class Account(Auditable, models.Model, LogTargetMixin):
     @property
     def unbalanced_transactions(self):
         from byro.bookkeeping.models import Transaction
+
         return Transaction.objects.unbalanced_transactions().filter(
             Q(bookings__debit_account=self) | Q(bookings__credit_account=self)
         )
@@ -104,7 +103,11 @@ class Account(Auditable, models.Model, LogTargetMixin):
         # ASSET, EXPENSE:  Debit increases balance, credit decreases it
         # INCOME, LIABILITY, EQUITY:  Debit decreases balance, credit increases it
 
-        if self.account_category in (AccountCategory.LIABILITY, AccountCategory.INCOME, AccountCategory.EQUITY):
+        if self.account_category in (
+            AccountCategory.LIABILITY,
+            AccountCategory.INCOME,
+            AccountCategory.EQUITY,
+        ):
             result['net'] = result['credit'] - result['debit']
         else:
             result['net'] = result['debit'] - result['credit']

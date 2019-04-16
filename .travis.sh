@@ -12,7 +12,7 @@ fi
 
 if [ "$1" == "style" ]; then
     isort --check-only --recursive --diff .
-    black -S --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py"
+    black -S --check --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py" .
 fi
 
 if [ "$1" == "docs" ]; then

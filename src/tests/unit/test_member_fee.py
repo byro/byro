@@ -22,13 +22,18 @@ def member_membership(new_member):
     today = timezone.now()
     begin_last_month = today.replace(day=1) - relativedelta(months=+1)
     end_this_month = today.replace(day=1) + relativedelta(months=+1, days=-1)
-    ms = Membership.objects.create(member=new_member,
-                                   start=begin_last_month,
-                                   end=end_this_month,
-                                   amount=20,
-                                   interval=FeeIntervals.MONTHLY)
+    ms = Membership.objects.create(
+        member=new_member,
+        start=begin_last_month,
+        end=end_this_month,
+        amount=20,
+        interval=FeeIntervals.MONTHLY,
+    )
     yield ms
-    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all()]
+    [
+        (t.bookings.all().delete(), t.delete())
+        for t in Transaction.objects.filter(bookings__member=ms.member).all()
+    ]
     ms.delete()
 
 
@@ -36,7 +41,9 @@ def member_membership(new_member):
 def test_liabilities_easy(member_membership):
     member_membership.member.update_liabilites()
     bookings = member_membership.member.bookings.all()
-    credits = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+    credits = member_membership.member.bookings.filter(
+        debit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(bookings) == 4
     assert sum([i.amount for i in bookings]) == 80
     assert sum([i.amount for i in credits]) == 40
@@ -50,7 +57,9 @@ def test_liabilities_future_transactions(member_membership):
     member_membership.save()
 
     member_membership.member.update_liabilites()
-    bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+    bookings = member_membership.member.bookings.filter(
+        debit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(bookings) == 3
     assert sum([i.amount for i in bookings]) == 60
 
@@ -59,11 +68,15 @@ def test_liabilities_future_transactions(member_membership):
     member_membership.save()
     member_membership.member.update_liabilites()
 
-    bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+    bookings = member_membership.member.bookings.filter(
+        debit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(bookings) == 3
     assert sum([i.amount for i in bookings]) == 60
 
-    correction_bookings = member_membership.member.bookings.filter(credit_account=SpecialAccounts.fees_receivable).all()
+    correction_bookings = member_membership.member.bookings.filter(
+        credit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(correction_bookings) == 1
     assert sum([i.amount for i in correction_bookings]) == 20
 
@@ -71,17 +84,23 @@ def test_liabilities_future_transactions(member_membership):
 @pytest.mark.django_db
 def test_liabilities_change(member_membership):
     member_membership.member.update_liabilites()
-    bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+    bookings = member_membership.member.bookings.filter(
+        debit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(bookings) == 2
     assert sum([i.amount for i in bookings]) == 40
 
-    member_membership.amount = 20+10
+    member_membership.amount = 20 + 10
     member_membership.save()
     member_membership.member.update_liabilites()
 
     # Old amount should be canceled, new amount set
-    debits = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
-    credits = member_membership.member.bookings.filter(credit_account=SpecialAccounts.fees_receivable).all()
+    debits = member_membership.member.bookings.filter(
+        debit_account=SpecialAccounts.fees_receivable
+    ).all()
+    credits = member_membership.member.bookings.filter(
+        credit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(debits) == 4
     assert len(credits) == 2
     assert sum([i.amount for i in credits]) == 40
@@ -93,20 +112,27 @@ def member_membership_second(new_member):
     today = timezone.now().date()
     begin_some_time_ago = today.replace(day=1) - relativedelta(months=4)
     end_two_months_ago = today.replace(day=1) + relativedelta(months=-2, days=-1)
-    ms = Membership.objects.create(member=new_member,
-                                   start=begin_some_time_ago,
-                                   end=end_two_months_ago,
-                                   amount=8,
-                                   interval=FeeIntervals.MONTHLY)
+    ms = Membership.objects.create(
+        member=new_member,
+        start=begin_some_time_ago,
+        end=end_two_months_ago,
+        amount=8,
+        interval=FeeIntervals.MONTHLY,
+    )
     yield ms
-    [(t.bookings.all().delete(), t.delete()) for t in Transaction.objects.filter(bookings__member=ms.member).all()]
+    [
+        (t.bookings.all().delete(), t.delete())
+        for t in Transaction.objects.filter(bookings__member=ms.member).all()
+    ]
     ms.delete()
 
 
 @pytest.mark.django_db
 def test_liabilities_complicated_example(member_membership, member_membership_second):
     member_membership.member.update_liabilites()
-    virtual_transactions = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+    virtual_transactions = member_membership.member.bookings.filter(
+        debit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(virtual_transactions) == 4
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20
 
@@ -116,7 +142,9 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
     member_membership.save()
 
     member_membership.member.update_liabilites()
-    virtual_transactions = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+    virtual_transactions = member_membership.member.bookings.filter(
+        debit_account=SpecialAccounts.fees_receivable
+    ).all()
     assert len(virtual_transactions) == 5
     assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20 + 20
 
@@ -126,11 +154,15 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
     for repeat in range(2):  # Ensure that update_liabilities() is idempotent
         member_membership.member.update_liabilites()
 
-        bookings = member_membership.member.bookings.filter(debit_account=SpecialAccounts.fees_receivable).all()
+        bookings = member_membership.member.bookings.filter(
+            debit_account=SpecialAccounts.fees_receivable
+        ).all()
         assert len(bookings) == 5
         assert sum([i.amount for i in bookings]) == 8 + 8 + 20 + 20 + 20
 
-        correction_bookings = member_membership.member.bookings.filter(credit_account=SpecialAccounts.fees_receivable).all()
+        correction_bookings = member_membership.member.bookings.filter(
+            credit_account=SpecialAccounts.fees_receivable
+        ).all()
         assert len(correction_bookings) == 1
         assert sum([i.amount for i in correction_bookings]) == 20
 
@@ -163,23 +195,44 @@ def test_liabilities_limit(member):
 
         t = Transaction.objects.create(value_datetime=test_date, user_or_context='test')
         t.debit(account=SpecialAccounts.bank, amount=12, user_or_context='test')
-        t.credit(account=SpecialAccounts.fees_receivable, amount=12, member=member, user_or_context='test')
+        t.credit(
+            account=SpecialAccounts.fees_receivable,
+            amount=12,
+            member=member,
+            user_or_context='test',
+        )
         t.save()
 
         assert member.balance == -888.0
         assert member.statute_barred_debt() == 148.0
 
-        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=7, day=1), user_or_context='test')
+        t = Transaction.objects.create(
+            value_datetime=test_date.replace(year=2007, month=7, day=1),
+            user_or_context='test',
+        )
         t.debit(account=SpecialAccounts.bank, amount=13, user_or_context='test')
-        t.credit(account=SpecialAccounts.fees_receivable, amount=13, member=member, user_or_context='test')
+        t.credit(
+            account=SpecialAccounts.fees_receivable,
+            amount=13,
+            member=member,
+            user_or_context='test',
+        )
         t.save()
 
         assert member.balance == -875.0
         assert member.statute_barred_debt() == 135.0
 
-        t = Transaction.objects.create(value_datetime=test_date.replace(year=2007, month=12, day=31), user_or_context='test')
+        t = Transaction.objects.create(
+            value_datetime=test_date.replace(year=2007, month=12, day=31),
+            user_or_context='test',
+        )
         t.debit(account=SpecialAccounts.bank, amount=136, user_or_context='test')
-        t.credit(account=SpecialAccounts.fees_receivable, amount=136, member=member, user_or_context='test')
+        t.credit(
+            account=SpecialAccounts.fees_receivable,
+            amount=136,
+            member=member,
+            user_or_context='test',
+        )
         t.save()
 
         assert member.balance == -739.0

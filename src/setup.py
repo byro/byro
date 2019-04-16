@@ -99,7 +99,7 @@ setup(
             'pytest-cov',
             'pytest-django',
             'pytest-sugar',
-        ],
+        ]
     },
     packages=find_packages(exclude=['tests', 'tests.*']),
     include_package_data=True,

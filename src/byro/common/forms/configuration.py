@@ -4,7 +4,6 @@ from byro.common.models import Configuration
 
 
 class InitialForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
@@ -16,10 +15,14 @@ class InitialForm(forms.ModelForm):
 
 
 class ConfigurationForm(forms.ModelForm):
-
     class Meta:
         model = Configuration
         fields = (
-            'name', 'address', 'url', 'language', 'currency',
-            'mail_from', 'liability_interval',
+            'name',
+            'address',
+            'url',
+            'language',
+            'currency',
+            'mail_from',
+            'liability_interval',
         )

@@ -22,7 +22,9 @@ def print_line(string, box=False, bold=False, color=None, size=None):
     if bold:
         string = '{BOLD}{string}{RESET}'.format(BOLD=BOLD, string=string, RESET=RESET)
     if color:
-        string = '{color}{string}{RESET}'.format(color=color, string=string, RESET=RESET)
+        string = '{color}{string}{RESET}'.format(
+            color=color, string=string, RESET=RESET
+        )
     if box:
         if size:
             if text_length + 2 < size:

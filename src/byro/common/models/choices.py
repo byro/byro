@@ -10,7 +10,9 @@ class ChoicesMeta(type):
 
     def __new__(cls, name, parents, dct):
         if 'valid_choices' not in dct:
-            dct['valid_choices'] = [dct[key] for key in dct if isinstance(key, str) and key.upper() == key]
+            dct['valid_choices'] = [
+                dct[key] for key in dct if isinstance(key, str) and key.upper() == key
+            ]
         return super(ChoicesMeta, cls).__new__(cls, name, parents, dct)
 
 
@@ -34,9 +36,7 @@ class Choices(object, metaclass=ChoicesMeta):
 
     @classproperty
     def choices(cls):
-        return (
-            (val, val) for val in cls.valid_choices
-        )
+        return ((val, val) for val in cls.valid_choices)
 
     @classproperty
     def max_length(cls):

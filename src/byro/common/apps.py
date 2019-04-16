@@ -10,6 +10,7 @@ class CommonConfig(AppConfig):
 def user_save_receiver(sender, instance, created, **kwargs):
     if created:
         from byro.common.models import LogEntry
+
         LogEntry.objects.create(
             content_object=instance,
             action_type="byro.common.user.created",
@@ -19,8 +20,8 @@ def user_save_receiver(sender, instance, created, **kwargs):
                     'active': instance.is_active,
                     'superuser': instance.is_superuser,
                     'staff': instance.is_staff,
-                }
-            }
+                },
+            },
         )
 
 

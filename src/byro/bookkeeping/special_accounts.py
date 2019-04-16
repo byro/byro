@@ -9,11 +9,12 @@ from .models import Account, AccountCategory, AccountTag
 
 
 class SpecialAccounts:
-
     @classmethod
     def special_account(cls, tag, category, name=None):
         tag, _ignore = AccountTag.objects.get_or_create(name=str(tag).lower())
-        accounts = list(Account.objects.filter(account_category=category, tags=tag).all())
+        accounts = list(
+            Account.objects.filter(account_category=category, tags=tag).all()
+        )
         if len(accounts) > 1:
             raise Account.MultipleObjectsReturned()
         if accounts:
@@ -21,12 +22,20 @@ class SpecialAccounts:
         else:
             # Old mechanism: Return an account that is named as the special one would.
             #  But also tag it.
-            account = Account.objects.filter(account_category=category, name=str(name)).first()
+            account = Account.objects.filter(
+                account_category=category, name=str(name)
+            ).first()
             if not account:
-                account = Account.objects.create(account_category=category, name=str(name))
+                account = Account.objects.create(
+                    account_category=category, name=str(name)
+                )
                 with suppress(django.db.utils.ProgrammingError):
                     with transaction.atomic():
-                        account.log(None, 'byro.bookkeeping.account.created', source="Automatic creation of special account")
+                        account.log(
+                            None,
+                            'byro.bookkeeping.account.created',
+                            source="Automatic creation of special account",
+                        )
             account.tags.add(tag)
             account.save()
         return account
@@ -41,7 +50,9 @@ class SpecialAccounts:
 
     @classproperty
     def fees_receivable(cls):
-        return cls.special_account('fees_receivable', AccountCategory.ASSET, _('Member fees receivable'))
+        return cls.special_account(
+            'fees_receivable', AccountCategory.ASSET, _('Member fees receivable')
+        )
 
     @classproperty
     def bank(cls):
@@ -49,8 +60,12 @@ class SpecialAccounts:
 
     @classproperty
     def opening_balance(cls):
-        return cls.special_account('opening_balance', AccountCategory.ASSET, _('Opening balance'))
+        return cls.special_account(
+            'opening_balance', AccountCategory.ASSET, _('Opening balance')
+        )
 
     @classproperty
     def lost_income(cls):
-        return cls.special_account('lost_income', AccountCategory.EXPENSE, _('Lost income'))
+        return cls.special_account(
+            'lost_income', AccountCategory.EXPENSE, _('Lost income')
+        )

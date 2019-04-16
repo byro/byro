@@ -18,7 +18,9 @@ from byro.office.signals import member_dashboard_tile
 
 
 class MemberConsentForm(forms.Form):
-    is_visible_to_members = forms.BooleanField(label=_('Consent: Visible to other members'), required=False)
+    is_visible_to_members = forms.BooleanField(
+        label=_('Consent: Visible to other members'), required=False
+    )
 
 
 class MemberBaseView(DetailView):
@@ -33,12 +35,15 @@ class MemberView(MemberBaseView):
 
     def get_bookings(self, member):
         account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
-        return Booking.objects.with_transaction_data().filter(
-            Q(debit_account__in=account_list) |
-            Q(credit_account__in=account_list),
-            member=member,
-            transaction__value_datetime__lte=now(),
-        ).order_by('-transaction__value_datetime')
+        return (
+            Booking.objects.with_transaction_data()
+            .filter(
+                Q(debit_account__in=account_list) | Q(credit_account__in=account_list),
+                member=member,
+                transaction__value_datetime__lte=now(),
+            )
+            .order_by('-transaction__value_datetime')
+        )
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -70,7 +75,9 @@ class MemberView(MemberBaseView):
         for __, response in member_dashboard_tile.send(self.request, member=obj):
             if not response:
                 continue
-            if isinstance(response, collections.Mapping) and response.get('public', False):
+            if isinstance(response, collections.Mapping) and response.get(
+                'public', False
+            ):
                 context['tiles'].append(response)
         return context
 
@@ -81,14 +88,16 @@ class MemberUpdateView(MemberBaseView, FormMixin):
     def get_success_url(self):
         return reverse(
             'public:memberpage:member.dashboard',
-            kwargs={'secret_token': self.kwargs['secret_token']}
+            kwargs={'secret_token': self.kwargs['secret_token']},
         )
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
-            self.object.profile_memberpage.is_visible_to_members = form.cleaned_data['is_visible_to_members']
+            self.object.profile_memberpage.is_visible_to_members = form.cleaned_data[
+                'is_visible_to_members'
+            ]
             self.object.profile_memberpage.save()
         return HttpResponseRedirect(self.get_success_url())
 
@@ -103,23 +112,32 @@ class MemberListView(ListView):
         config = Configuration.get_solo()
         context['config'] = config
         context['member_view_level'] = MemberViewLevel
-        context['member_undisclosed'] = Member.objects.exclude(profile_memberpage__is_visible_to_members=True).count()
+        context['member_undisclosed'] = Member.objects.exclude(
+            profile_memberpage__is_visible_to_members=True
+        ).count()
         return context
 
     def get_queryset(self):
         config = Configuration.get_solo()
-        if config.can_see_other_members not in (MemberViewLevel.NAME_ONLY, MemberViewLevel.NAME_AND_CONTACT):
+        if config.can_see_other_members not in (
+            MemberViewLevel.NAME_ONLY,
+            MemberViewLevel.NAME_AND_CONTACT,
+        ):
             raise Http404("Page does not exist")
 
         secret_token = self.kwargs.get('secret_token')
         if not secret_token:
             raise Http404("Page does not exist")
 
-        member = Member.all_objects.filter(profile_memberpage__secret_token=secret_token).first()
+        member = Member.all_objects.filter(
+            profile_memberpage__secret_token=secret_token
+        ).first()
         if not member:
             raise Http404("Page does not exist")
 
         if not member.is_active:
             raise Http404("Page does not exist")
 
-        return Member.objects.filter(profile_memberpage__is_visible_to_members=True).order_by('name')
+        return Member.objects.filter(
+            profile_memberpage__is_visible_to_members=True
+        ).order_by('name')

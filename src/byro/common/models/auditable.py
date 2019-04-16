@@ -10,11 +10,11 @@ class Auditable:
         to=get_user_model(),
         on_delete=models.PROTECT,
         related_name='+',  # no related lookup
-        null=True
+        null=True,
     )
     modified_by = models.ForeignKey(
         to=get_user_model(),
         on_delete=models.PROTECT,
         related_name='+',  # no related lookup
-        null=True
+        null=True,
     )

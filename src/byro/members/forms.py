@@ -8,14 +8,10 @@ from byro.common.forms.registration import DefaultDates
 from byro.common.models import Configuration
 from byro.members.models import Member, Membership, get_next_member_number
 
-MAPPING = {
-    'member': Member,
-    'membership': Membership,
-}
+MAPPING = {'member': Member, 'membership': Membership}
 
 
 class CreateMemberForm(forms.Form):
-
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
@@ -23,7 +19,7 @@ class CreateMemberForm(forms.Form):
         config = Configuration.get_solo().registration_form or []
         config = sorted(
             [field for field in config if field['position'] is not None],
-            key=lambda field: field['position']
+            key=lambda field: field['position'],
         )
         profiles = {
             profile.related_model.__name__: profile.related_model
@@ -48,7 +44,9 @@ class CreateMemberForm(forms.Form):
         elif default == DefaultDates.BEGINNING_YEAR:
             return today.replace(day=1, month=1)
         elif default == DefaultDates.BEGINNING_YEAR_NEXT:
-            return (today.replace(day=31, month=12) + timedelta(days=7)).replace(day=1, month=1)
+            return (today.replace(day=31, month=12) + timedelta(days=7)).replace(
+                day=1, month=1
+            )
         elif default == DefaultDates.FIXED_DATE:
             return field.get('default', None)
 

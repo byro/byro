@@ -40,18 +40,21 @@ class Document(models.Model, LogTargetMixin):
         to='members.Member',
         related_name='documents',
         on_delete=models.SET_NULL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
     )
     content_hash = models.CharField(max_length=300, null=True)
 
-    template = _('''
+    template = _(
+        '''
 Hi, {name},
 
 Please find attached a document we wanted to send you/that you requested.
 
 Thank you,
 {association}
-''').strip()
+'''
+    ).strip()
 
     def _get_log_properties(self):
         return {
@@ -89,18 +92,26 @@ Thank you,
                     h.update(chunk)
             self.content_hash = 'sha512:{}'.format(h.hexdigest())
             super().save(update_fields=['content_hash'])
-            self.log('internal: automatic checkpoint', '.stored', **self._get_log_properties())
+            self.log(
+                'internal: automatic checkpoint',
+                '.stored',
+                **self._get_log_properties()
+            )
 
         return retval
 
     def send(self, immediately=False, text=None, subject=None, email=None):
         from byro.common.models import Configuration
         from byro.mails.models import EMail
+
         us = Configuration.get_solo().name
         mail = EMail.objects.create(
             to=email or self.member.email,
-            text=text or self.template.format(name=self.member.name if self.member else email, association=us),
-            subject=_('[{association}] Your document').format(association=us)
+            text=text
+            or self.template.format(
+                name=self.member.name if self.member else email, association=us
+            ),
+            subject=_('[{association}] Your document').format(association=us),
         )
         mail.attachments.add(self)
         mail.save()
@@ -109,7 +120,9 @@ Thank you,
         return mail
 
     def get_display(self):
-        return '{} Document: {}'.format(self.get_direction_display().capitalize(), self.category, self.title)
+        return '{} Document: {}'.format(
+            self.get_direction_display().capitalize(), self.category, self.title
+        )
 
     def get_absolute_url(self):
         return reverse('office:documents.detail', kwargs={'pk': self.pk})
@@ -120,7 +133,9 @@ Thank you,
 
 @receiver(pre_delete, sender=Document, dispatch_uid='documents_models__log_deletion')
 def log_deletion(sender, instance, using, **kwargs):
-    instance.log('internal: automatic checkpoint', '.deleted', **instance._get_log_properties())
+    instance.log(
+        'internal: automatic checkpoint', '.deleted', **instance._get_log_properties()
+    )
 
 
 def get_document_category_names():

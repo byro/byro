@@ -8,11 +8,13 @@ def test_internal_follow_path():
     class A:
         class B:
             c = 3
+
         d = 1
 
         def e(self):
             class F:
                 g = 4
+
             return F()
 
     a = A()

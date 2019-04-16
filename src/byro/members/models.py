@@ -27,7 +27,9 @@ class Field:
     read_only = bool
     registration_form = dict
 
-    def __init__(self, field_id, name, description, path, registration_form=None, **kwargs):
+    def __init__(
+        self, field_id, name, description, path, registration_form=None, **kwargs
+    ):
         self.field_id = field_id
         self.name = name
         self.description = description
@@ -60,10 +62,14 @@ class Field:
 
     def setter(self, member, value):
         if self.read_only:
-            raise NotImplementedError("Writing to {} is not supported".format(self.path))
+            raise NotImplementedError(
+                "Writing to {} is not supported".format(self.path)
+            )
         target, prop = self._follow_path(member, self.path)
         if target is None:
-            raise AttributeError("Encountered 'None' while following {}".format(self.path))
+            raise AttributeError(
+                "Encountered 'None' while following {}".format(self.path)
+            )
         setattr(target, prop, value)
 
 
@@ -79,7 +85,6 @@ class MemberContactTypes(Choices):
 
 
 class MemberManager(models.Manager):
-
     def get_queryset(self):
         return super().get_queryset().filter(membership_type=MemberTypes.MEMBER)
 
@@ -103,7 +108,8 @@ def get_member_data(obj):
     return [
         (field.verbose_name, str(getattr(obj, field.name)))
         for field in obj._meta.fields
-        if field.name not in ('id', 'created_by', 'modified_by', 'created', 'modified', 'member')
+        if field.name
+        not in ('id', 'created_by', 'modified_by', 'created', 'modified', 'member')
     ]
 
 
@@ -113,28 +119,20 @@ class Member(Auditable, models.Model, LogTargetMixin):
     number = models.CharField(
         max_length=100,
         verbose_name=_('Membership number/ID'),
-        null=True, blank=True,
+        null=True,
+        blank=True,
         db_index=True,
     )
     name = models.CharField(
-        max_length=100,
-        verbose_name=_('Name'),
-        null=True, blank=True,
+        max_length=100, verbose_name=_('Name'), null=True, blank=True
     )
     address = models.TextField(
-        max_length=300,
-        verbose_name=_('Address'),
-        null=True, blank=True,
+        max_length=300, verbose_name=_('Address'), null=True, blank=True
     )
     email = models.EmailField(
-        max_length=200,
-        verbose_name=_('E-Mail'),
-        null=True, blank=True,
+        max_length=200, verbose_name=_('E-Mail'), null=True, blank=True
     )
-    membership_type = models.CharField(
-        max_length=40,
-        default=MemberTypes.MEMBER,
-    )
+    membership_type = models.CharField(max_length=40, default=MemberTypes.MEMBER)
     member_contact_type = models.CharField(
         max_length=MemberContactTypes.max_length,
         verbose_name=_('Contact type'),
@@ -149,7 +147,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
     @classproperty
     def profile_classes(cls) -> list:
         return [
-            related.related_model for related in cls._meta.related_objects
+            related.related_model
+            for related in cls._meta.related_objects
             if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
         ]
 
@@ -165,9 +164,36 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def get_fields(cls):
         result = []
 
-        result.append(Field('_internal_id', _('Internal database ID'), "", 'pk', computed=True, read_only=True))
-        result.append(Field('_internal_active', _('Member active?'), "", 'is_active', computed=True, read_only=True))
-        result.append(Field('_internal_balance', _('Account balance'), "", 'balance', computed=True, read_only=True))
+        result.append(
+            Field(
+                '_internal_id',
+                _('Internal database ID'),
+                "",
+                'pk',
+                computed=True,
+                read_only=True,
+            )
+        )
+        result.append(
+            Field(
+                '_internal_active',
+                _('Member active?'),
+                "",
+                'is_active',
+                computed=True,
+                read_only=True,
+            )
+        )
+        result.append(
+            Field(
+                '_internal_balance',
+                _('Account balance'),
+                "",
+                'balance',
+                computed=True,
+                read_only=True,
+            )
+        )
 
         reg_form = Configuration.get_solo().registration_form or []
         form_config = {entry['name']: entry for entry in reg_form}
@@ -180,10 +206,14 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
         for model in [cls, Membership] + cls.profile_classes:
             for field in model._meta.fields:
-                if field.name in ('id', 'member') or (model is Member and field.name == 'membership_type'):
+                if field.name in ('id', 'member') or (
+                    model is Member and field.name == 'membership_type'
+                ):
                     continue
 
-                f_id = "{}__{}".format(SPECIAL_NAMES.get(model, model.__name__), field.name)
+                f_id = "{}__{}".format(
+                    SPECIAL_NAMES.get(model, model.__name__), field.name
+                )
                 f_name = field.verbose_name or field.name
 
                 if issubclass(model, cls):
@@ -195,22 +225,48 @@ class Member(Auditable, models.Model, LogTargetMixin):
                     f_path = "{}.{}".format(profile_map[model], field.name)
                     f_name = "{} ({})".format(f_name, model.__name__)
 
-                result.append(Field(f_id, f_name, "", f_path, registration_form=form_config.get(f_id, None), computed=False, read_only=False))
+                result.append(
+                    Field(
+                        f_id,
+                        f_name,
+                        "",
+                        f_path,
+                        registration_form=form_config.get(f_id, None),
+                        computed=False,
+                        read_only=False,
+                    )
+                )
 
         return OrderedDict([(f.field_id, f) for f in result])
 
-    def _calc_balance(self, liability_cutoff=None, asset_cutoff=None, liability_start=None, asset_start=None) -> Decimal:
+    def _calc_balance(
+        self,
+        liability_cutoff=None,
+        asset_cutoff=None,
+        liability_start=None,
+        asset_start=None,
+    ) -> Decimal:
         _now = now()
         fees_receivable_account = SpecialAccounts.fees_receivable
         qs = Booking.objects.filter(member=self)
-        debits = qs.filter(debit_account=fees_receivable_account, transaction__value_datetime__lte=liability_cutoff or _now)
+        debits = qs.filter(
+            debit_account=fees_receivable_account,
+            transaction__value_datetime__lte=liability_cutoff or _now,
+        )
         if liability_start:
             debits = debits.filter(transaction__value_datetime__gte=liability_start)
-        credits = qs.filter(credit_account=fees_receivable_account, transaction__value_datetime__lte=asset_cutoff or _now)
+        credits = qs.filter(
+            credit_account=fees_receivable_account,
+            transaction__value_datetime__lte=asset_cutoff or _now,
+        )
         if asset_start:
             credits = credits.filter(transaction__value_datetime__gte=asset_start)
-        liability = debits.aggregate(liability=models.Sum('amount'))['liability'] or Decimal('0.00')
-        asset = credits.aggregate(asset=models.Sum('amount'))['asset'] or Decimal('0.00')
+        liability = debits.aggregate(liability=models.Sum('amount'))[
+            'liability'
+        ] or Decimal('0.00')
+        asset = credits.aggregate(asset=models.Sum('amount'))['asset'] or Decimal(
+            '0.00'
+        )
         return asset - liability
 
     @property
@@ -220,45 +276,68 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def create_balance(self, start, end, commit=True, create_if_zero=True):
         if self.balances.exists():
             if self.balances.filter(
-                models.Q(models.Q(start__lte=start) & models.Q(end__gte=start))  # start overlaps
-                | models.Q(models.Q(start__lte=end) & models.Q(end__gte=end))  # end overlaps
+                models.Q(
+                    models.Q(start__lte=start) & models.Q(end__gte=start)
+                )  # start overlaps
+                | models.Q(
+                    models.Q(start__lte=end) & models.Q(end__gte=end)
+                )  # end overlaps
             ).exists():
-                raise Exception('Cannot create overlapping balance: {} from {} to {}'.format(self, start, end))
-        amount = self._calc_balance(liability_cutoff=end, asset_cutoff=end, liability_start=start, asset_start=start)
+                raise Exception(
+                    'Cannot create overlapping balance: {} from {} to {}'.format(
+                        self, start, end
+                    )
+                )
+        amount = self._calc_balance(
+            liability_cutoff=end,
+            asset_cutoff=end,
+            liability_start=start,
+            asset_start=start,
+        )
         if not amount and not create_if_zero:
             return
-        balance = MemberBalance(
-            member=self,
-            start=start,
-            end=end,
-            amount=amount,
-        )
+        balance = MemberBalance(member=self, start=start, end=end, amount=amount)
         if commit is True:
             balance.save()
         return balance
 
     def statute_barred_debt(self, future_limit=relativedelta()) -> Decimal:
-        limit = relativedelta(months=Configuration.get_solo().liability_interval) - future_limit
-        last_unenforceable_date = now().replace(month=12, day=31) - limit - relativedelta(years=1)
+        limit = (
+            relativedelta(months=Configuration.get_solo().liability_interval)
+            - future_limit
+        )
+        last_unenforceable_date = (
+            now().replace(month=12, day=31) - limit - relativedelta(years=1)
+        )
         return max(Decimal('0.00'), -self._calc_balance(last_unenforceable_date))
 
     @property
     def donation_balance(self) -> Decimal:
-        return self.donations.aggregate(donations=models.Sum('amount'))['donations'] or Decimal('0.00')
+        return self.donations.aggregate(donations=models.Sum('amount'))[
+            'donations'
+        ] or Decimal('0.00')
 
     @property
     def donations(self):
-        return Booking.objects.filter(credit_account=SpecialAccounts.donations, member=self, transaction__value_datetime__lte=now())
+        return Booking.objects.filter(
+            credit_account=SpecialAccounts.donations,
+            member=self,
+            transaction__value_datetime__lte=now(),
+        )
 
     @property
     def fee_payments(self):
-        return Booking.objects.filter(debit_account=SpecialAccounts.fees_receivable, member=self, transaction__value_datetime__lte=now())
+        return Booking.objects.filter(
+            debit_account=SpecialAccounts.fees_receivable,
+            member=self,
+            transaction__value_datetime__lte=now(),
+        )
 
     @property
     def is_active(self):
         if not self.memberships.count():
             return False
-        result = (self.memberships.last().start <= now().date())
+        result = self.memberships.last().start <= now().date()
         if self.memberships.last().end:
             result = result and not (self.memberships.last().end < now().date())
         return result
@@ -280,7 +359,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
             if value in [None, 'None', '']:
                 value = '-'
             if isinstance(value, str) and '\n' in value:
-                value = '\n'.join([' ' * (key_length + 1) + line for line in value.split('\n')]).strip()
+                value = '\n'.join(
+                    [' ' * (key_length + 1) + line for line in value.split('\n')]
+                ).strip()
             key_value_text.append(key + value)
         key_value_text = '\n'.join(key_value_text)
         if text_data:
@@ -289,7 +370,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
             'association_name': config.name,
             'data': key_value_text,
             'number': self.number,
-            'balance': '{currency} {balance}'.format(currency=config.currency, balance=self.balance)
+            'balance': '{currency} {balance}'.format(
+                currency=config.currency, balance=self.balance
+            ),
         }
         return template.to_mail(self.email, context=context, save=False)
 
@@ -329,15 +412,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
         )
         if membership_ranges:
             date_range_q = reduce(
-                lambda a, b: a | b, [
-                    models.Q(transaction__value_datetime__gte=start) & models.Q(transaction__value_datetime__lte=end)
+                lambda a, b: a | b,
+                [
+                    models.Q(transaction__value_datetime__gte=start)
+                    & models.Q(transaction__value_datetime__lte=end)
                     for start, end in membership_ranges
-                ]
+                ],
             )
             dues_qs = dues_qs.filter(date_range_q)
         dues_in_db = {  # Must be a dictionary instead of set, to retrieve b later on
-            (b.transaction.value_datetime.date(), b.amount): b
-            for b in dues_qs.all()
+            (b.transaction.value_datetime.date(), b.amount): b for b in dues_qs.all()
         }
 
         # Step 3
@@ -348,7 +432,10 @@ class Member(Auditable, models.Model, LogTargetMixin):
         # Step 4
         for wrong_due in sorted(wrong_dues_in_db):
             booking = dues_in_db[wrong_due]
-            booking.transaction.reverse(memo=_('Due amount canceled because of change in membership amount'), user_or_context='internal: update_liabilites, membership amount changed',)
+            booking.transaction.reverse(
+                memo=_('Due amount canceled because of change in membership amount'),
+                user_or_context='internal: update_liabilites, membership amount changed',
+            )
 
         # Step 5:
         for (date, amount) in sorted(missing_dues):
@@ -358,8 +445,18 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 memo=_("Membership due"),
                 user_or_context='internal: update_liabilites, add missing liabilities',
             )
-            t.credit(account=src_account, amount=amount, member=self, user_or_context='internal: update_liabilites, add missing liabilities')
-            t.debit(account=dst_account, amount=amount, member=self, user_or_context='internal: update_liabilites, add missing liabilities',)
+            t.credit(
+                account=src_account,
+                amount=amount,
+                member=self,
+                user_or_context='internal: update_liabilites, add missing liabilities',
+            )
+            t.debit(
+                account=dst_account,
+                amount=amount,
+                member=self,
+                user_or_context='internal: update_liabilites, add missing liabilities',
+            )
             t.save()
 
         # Step 6:
@@ -372,7 +469,10 @@ class Member(Auditable, models.Model, LogTargetMixin):
             stray_liabilities_qs = stray_liabilities_qs.exclude(date_range_q)
         stray_liabilities_qs = stray_liabilities_qs.prefetch_related('transaction')
         for stray_liability in stray_liabilities_qs.all():
-            stray_liability.transaction.reverse(memo=_("Due amount outside of membership canceled"), user_or_context='internal: update_liabilites, reverse stray liabilities',)
+            stray_liability.transaction.reverse(
+                memo=_("Due amount outside of membership canceled"),
+                user_or_context='internal: update_liabilites, reverse stray liabilities',
+            )
 
     def __str__(self):
         return 'Member {self.number} ({self.name})'.format(self=self)
@@ -386,7 +486,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def log_entries(self):
         own_entries = [e.pk for e in super().log_entries()]
         ms_entries = [e.pk for m in self.memberships.all() for e in m.log_entries()]
-        return LogEntry.objects.filter(pk__in=own_entries+ms_entries)
+        return LogEntry.objects.filter(pk__in=own_entries + ms_entries)
 
 
 class FeeIntervals:
@@ -406,14 +506,12 @@ class FeeIntervals:
 
 
 class MembershipType(Auditable, models.Model):
-    name = models.CharField(
-        max_length=200,
-        verbose_name=_('name'),
-    )
+    name = models.CharField(max_length=200, verbose_name=_('name'))
     amount = models.DecimalField(
-        max_digits=8, decimal_places=2,
+        max_digits=8,
+        decimal_places=2,
         verbose_name=_('amount'),
-        help_text=_('Please enter the yearly fee for this membership type.')
+        help_text=_('Please enter the yearly fee for this membership type.'),
     )
 
 
@@ -421,19 +519,13 @@ class Membership(Auditable, models.Model, LogTargetMixin):
     LOG_TARGET_BASE = 'byro.members.membership'
 
     member = models.ForeignKey(
-        to='members.Member',
-        on_delete=models.CASCADE,
-        related_name='memberships',
+        to='members.Member', on_delete=models.CASCADE, related_name='memberships'
     )
-    start = models.DateField(
-        verbose_name=_('start'),
-    )
-    end = models.DateField(
-        verbose_name=_('end'),
-        null=True, blank=True,
-    )
+    start = models.DateField(verbose_name=_('start'))
+    end = models.DateField(verbose_name=_('end'), null=True, blank=True)
     amount = models.DecimalField(
-        max_digits=8, decimal_places=2,
+        max_digits=8,
+        decimal_places=2,
         verbose_name=_('membership fee'),
         help_text=_('The amount to be paid in the chosen interval'),
     )
@@ -464,10 +556,7 @@ class Membership(Auditable, models.Model, LogTargetMixin):
         return (self.start, end), dues
 
 
-SPECIAL_NAMES = {
-    Member: 'member',
-    Membership: 'membership',
-}
+SPECIAL_NAMES = {Member: 'member', Membership: 'membership'}
 
 SPECIAL_ORDER = [
     'member__number',
@@ -488,13 +577,29 @@ class MemberBalance(models.Model):
     As they MUST NOT overlap per member, they should be created via the
     ``Member.create_balance(start, end)`` method interface.
     """
+
     member = models.ForeignKey(
-        to='members.Member',
-        related_name='balances',
-        on_delete=models.PROTECT,
+        to='members.Member', related_name='balances', on_delete=models.PROTECT
     )
-    reference = models.CharField(null=True, blank=True, verbose_name=_('Reference'), help_text=_('For example an invoice number or a payment reference'), unique=True, max_length=50)
-    amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name=_('Amount'))
+    reference = models.CharField(
+        null=True,
+        blank=True,
+        verbose_name=_('Reference'),
+        help_text=_('For example an invoice number or a payment reference'),
+        unique=True,
+        max_length=50,
+    )
+    amount = models.DecimalField(
+        max_digits=8, decimal_places=2, verbose_name=_('Amount')
+    )
     start = models.DateTimeField(verbose_name=_('Start'))
     end = models.DateTimeField(verbose_name=_('End'))
-    state = models.CharField(choices=[('paid', _('paid')), ('partial', _('partially paid')), ('unpaid', _('unpaid'))], default='unpaid', max_length=7)
+    state = models.CharField(
+        choices=[
+            ('paid', _('paid')),
+            ('partial', _('partially paid')),
+            ('unpaid', _('unpaid')),
+        ],
+        default='unpaid',
+        max_length=7,
+    )

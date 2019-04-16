@@ -6,11 +6,7 @@ from byro.common.signals import unauthenticated_urls
 
 
 class SettingsMiddleware:
-    ALLOWED_URLS = (
-        'settings.registration',
-        'settings.initial',
-        'settings.plugins',
-    )
+    ALLOWED_URLS = ('settings.registration', 'settings.initial', 'settings.plugins')
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -26,11 +22,7 @@ class SettingsMiddleware:
 
 
 class PermissionMiddleware:
-    UNAUTHENTICATED_URLS = (
-        'login',
-        'logout',
-        'log.info',
-    )
+    UNAUTHENTICATED_URLS = ('login', 'logout', 'log.info')
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -59,6 +51,8 @@ class PermissionMiddleware:
                         break
 
         if not allow:
-            return redirect(reverse('common:login') + '?next={request.path}'.format(request=request))
+            return redirect(
+                reverse('common:login') + '?next={request.path}'.format(request=request)
+            )
         else:
             return self.get_response(request)

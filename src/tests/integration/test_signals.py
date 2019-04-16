@@ -34,7 +34,12 @@ def test_match_single_fee(member, partial_transaction):
             return False
         if not sender.is_balanced:
             member = Member.objects.first()
-            sender.credit(account=SpecialAccounts.fees_receivable, amount=10, member=member, user_or_context='test')
+            sender.credit(
+                account=SpecialAccounts.fees_receivable,
+                amount=10,
+                member=member,
+                user_or_context='test',
+            )
             return True
         return False
 
@@ -44,12 +49,14 @@ def test_match_single_fee(member, partial_transaction):
     assert len(call_log) == 2
 
     assert partial_transaction.is_balanced
-    assert SpecialAccounts.fees_receivable.balances(end=None)['credit'] == partial_transaction.bookings.first().amount
+    assert (
+        SpecialAccounts.fees_receivable.balances(end=None)['credit']
+        == partial_transaction.bookings.first().amount
+    )
 
 
 @pytest.mark.django_db
 def test_match_no_fee(member, partial_transaction):
-
     def derive_test_transaction(sender, signal):
         return False
 
@@ -73,7 +80,12 @@ def test_match_multiple_fees(member, partial_transaction):
             return False
         if not sender.is_balanced:
             member = Member.objects.first()
-            sender.credit(account=SpecialAccounts.donations, amount=5, member=member, user_or_context='test')
+            sender.credit(
+                account=SpecialAccounts.donations,
+                amount=5,
+                member=member,
+                user_or_context='test',
+            )
             return True
         return False
 
@@ -83,12 +95,21 @@ def test_match_multiple_fees(member, partial_transaction):
             return False
         if not sender.is_balanced:
             member = Member.objects.first()
-            sender.credit(account=SpecialAccounts.fees_receivable, amount=5, member=member, user_or_context='test')
+            sender.credit(
+                account=SpecialAccounts.fees_receivable,
+                amount=5,
+                member=member,
+                user_or_context='test',
+            )
             return True
         return False
 
-    with connected_signal(process_transaction, derive_test_transaction_donation, 'test-donation'):
-        with connected_signal(process_transaction, derive_test_transaction_fee, 'test-fee'):
+    with connected_signal(
+        process_transaction, derive_test_transaction_donation, 'test-donation'
+    ):
+        with connected_signal(
+            process_transaction, derive_test_transaction_fee, 'test-fee'
+        ):
             partial_transaction.process_transaction()
 
     assert dict(call_log) == {'d': 2, 'f': 2}
@@ -98,11 +119,13 @@ def test_match_multiple_fees(member, partial_transaction):
 
 
 def direct_match(sender, **kwargs):
-    return ['office:dashboard', ]
+    return ['office:dashboard']
 
 
 def lambda_match(sender, **kwargs):
-    return [lambda request, resolver_match: resolver_match.view_name == 'office:dashboard']
+    return [
+        lambda request, resolver_match: resolver_match.view_name == 'office:dashboard'
+    ]
 
 
 @pytest.mark.parametrize('variant', (direct_match, lambda_match))

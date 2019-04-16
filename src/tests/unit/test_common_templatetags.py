@@ -11,10 +11,13 @@ class request:
         self.GET = QueryDict(get)
 
 
-@pytest.mark.parametrize('GET,key,value,expected', (
-    ('foo=bar', 'foo', 'baz', ['foo=baz']),
-    ('foo=bar', 'fork', 'baz', ['foo=bar', 'fork=baz']),
-))
+@pytest.mark.parametrize(
+    'GET,key,value,expected',
+    (
+        ('foo=bar', 'foo', 'baz', ['foo=baz']),
+        ('foo=bar', 'fork', 'baz', ['foo=bar', 'fork=baz']),
+    ),
+)
 def test_templatetag_url_replace(GET, key, value, expected):
     result = url_replace(request(GET), key, value)
     assert all(e in result for e in expected)
@@ -22,16 +25,15 @@ def test_templatetag_url_replace(GET, key, value, expected):
 
 @pytest.mark.django_db
 def test_log_entry_formatting(mail_template, user):
-    assert (
-        format_log_entry(
-            LogEntry(
-                content_object=mail_template,
-                user=user,
-                data={'source': 'value'},
-                action_type='action.type',
-            )
+    assert format_log_entry(
+        LogEntry(
+            content_object=mail_template,
+            user=user,
+            data={'source': 'value'},
+            action_type='action.type',
         )
-        == 'action.type (<a href="/mails/templates/{}">Test Mail</a>)'.format(mail_template.pk)
+    ) == 'action.type (<a href="/mails/templates/{}">Test Mail</a>)'.format(
+        mail_template.pk
     )
     assert format_log_entry(
         LogEntry(

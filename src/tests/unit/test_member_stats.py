@@ -25,6 +25,7 @@ def test_stats_one_member(member):
 def test_stats_one_inactive_member(inactive_member):
     from byro.members.stats import get_member_statistics
     from byro.members.models import Membership
+
     assert Membership.objects.count()
 
     member_stats = get_member_statistics()

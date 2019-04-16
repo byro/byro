@@ -8,10 +8,7 @@ from byro.mails.models import EMail
 @pytest.fixture
 def document():
     f = SimpleUploadedFile('testresource.txt', b'a resource')
-    d = Document.objects.create(
-        document=f,
-        title='Test document',
-    )
+    d = Document.objects.create(document=f, title='Test document')
     yield d
     d.delete()
 

@@ -6,7 +6,11 @@ from byro.common.models import LogEntry
 
 @pytest.mark.django_db
 def test_log_create(member):
-    a = LogEntry.objects.create(content_object=member, action_type="test.test_log_create", data={'source': 'test'})
+    a = LogEntry.objects.create(
+        content_object=member,
+        action_type="test.test_log_create",
+        data={'source': 'test'},
+    )
 
     assert a
     assert a.pk
@@ -16,14 +20,27 @@ def test_log_create(member):
 
 @pytest.mark.django_db
 def test_log_filter_content_object(member):
-    LogEntry.objects.create(content_object=member, action_type="test.test_log_filter_content_object", data={'source': 'test'})
+    LogEntry.objects.create(
+        content_object=member,
+        action_type="test.test_log_filter_content_object",
+        data={'source': 'test'},
+    )
 
-    assert LogEntry.objects.filter(content_object=member, action_type="test.test_log_filter_content_object").count() == 1
+    assert (
+        LogEntry.objects.filter(
+            content_object=member, action_type="test.test_log_filter_content_object"
+        ).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
 def test_log_immutable(member):
-    LogEntry.objects.create(content_object=member, action_type="test.test_log_immutable", data={'source': 'test'})
+    LogEntry.objects.create(
+        content_object=member,
+        action_type="test.test_log_immutable",
+        data={'source': 'test'},
+    )
 
     a = LogEntry.objects.get(action_type="test.test_log_immutable")
 
@@ -37,7 +54,11 @@ def test_log_immutable(member):
 
 @pytest.mark.django_db
 def test_log_immutable_2(member):
-    LogEntry.objects.create(content_object=member, action_type="test.test_log_immutable_2", data={'source': 'test'})
+    LogEntry.objects.create(
+        content_object=member,
+        action_type="test.test_log_immutable_2",
+        data={'source': 'test'},
+    )
 
     a = LogEntry.objects.get(action_type="test.test_log_immutable_2")
 
@@ -62,7 +83,9 @@ def test_log_immutable_2(member):
 
 @pytest.mark.django_db
 def test_log_user(user, member):
-    a = LogEntry.objects.create(user=user, content_object=member, action_type="test.test_log_user")
+    a = LogEntry.objects.create(
+        user=user, content_object=member, action_type="test.test_log_user"
+    )
 
     assert a in LogEntry.objects.filter(user=user)
 

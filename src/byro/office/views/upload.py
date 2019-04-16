@@ -8,10 +8,9 @@ from byro.bookkeeping.models import RealTransactionSource
 
 
 class UploadForm(forms.ModelForm):
-
     class Meta:
         model = RealTransactionSource
-        fields = ('source_file', )
+        fields = ('source_file',)
 
 
 class UploadListView(ListView):
@@ -31,7 +30,11 @@ class CsvUploadView(FormView):
             form.instance.process()
             messages.success(self.request, _('The upload was processed successfully.'))
         except Exception as e:
-            messages.error(self.request, _('The upload was added successfully, but could not be processed: ') + str(e))
+            messages.error(
+                self.request,
+                _('The upload was added successfully, but could not be processed: ')
+                + str(e),
+            )
         self.form = form
         return super().form_valid(form)
 
@@ -48,7 +51,9 @@ class UploadProcessView(DetailView):
             obj.process()
             messages.success(self.request, _('The upload was processed successfully.'))
         except Exception as e:
-            messages.error(self.request, _('The upload could not be processed: ') + str(e))
+            messages.error(
+                self.request, _('The upload could not be processed: ') + str(e)
+            )
         return redirect('office:finance.uploads.list')
 
 
@@ -64,5 +69,10 @@ class UploadMatchView(DetailView):
                 success += 1
             except Exception:
                 errors += 1
-        messages.info(request, '{success} successful matches, {errors} errors.'.format(success=success, errors=errors))
+        messages.info(
+            request,
+            '{success} successful matches, {errors} errors.'.format(
+                success=success, errors=errors
+            ),
+        )
         return redirect('office:finance.uploads.list')

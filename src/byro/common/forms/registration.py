@@ -34,17 +34,10 @@ class DefaultDates:
 class DefaultBoolean:
     @classproperty
     def choices(cls):
-        return (
-            (None, '------------'),
-            (False, _('False')),
-            (True, _('True')),
-        )
+        return ((None, '------------'), (False, _('False')), (True, _('True')))
 
 
-SPECIAL_NAMES = {
-    Member: 'member',
-    Membership: 'membership',
-}
+SPECIAL_NAMES = {Member: 'member', Membership: 'membership'}
 SPECIAL_ORDER = [
     'member__number',
     'member__name',
@@ -57,7 +50,6 @@ SPECIAL_ORDER = [
 
 
 class RegistrationConfigForm(forms.Form):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields_extra = OrderedDict()
@@ -72,45 +64,69 @@ class RegistrationConfigForm(forms.Form):
 
             verbose_name = field.verbose_name or field.name
             if model not in SPECIAL_NAMES:
-                verbose_name = '{verbose_name} ({model.__name__})'.format(verbose_name=verbose_name, model=model)
+                verbose_name = '{verbose_name} ({model.__name__})'.format(
+                    verbose_name=verbose_name, model=model
+                )
 
             fields = OrderedDict()
-            fields['position'] = forms.IntegerField(required=False, label=_("Position in form"))
+            fields['position'] = forms.IntegerField(
+                required=False, label=_("Position in form")
+            )
             if isinstance(field, models.DateField):
-                fields['default_date'] = forms.ChoiceField(required=False, label=_('Default date'), choices=DefaultDates.choices)
+                fields['default_date'] = forms.ChoiceField(
+                    required=False,
+                    label=_('Default date'),
+                    choices=DefaultDates.choices,
+                )
             if isinstance(field, models.BooleanField):
                 fields['default_boolean'] = forms.ChoiceField(
                     required=False,
                     label=_('Default value'),
-                    choices=DefaultBoolean.choices)
+                    choices=DefaultBoolean.choices,
+                )
             default_field = self.build_default_field(field, model)
             if default_field:
                 fields['default'] = default_field
             for name, form_field in fields.items():
                 form_field.initial = entry.get(name, form_field.initial)
 
-            fieldsets.append((
-                (  # This part is responsible for sorting the model fields:
-                    data.get(key, {}).get('position', None) or 998,  # Position in form, if set (or 998)
-                    SPECIAL_ORDER.index(key) if key in SPECIAL_ORDER else 66,  # SPECIAL_ORDER first
-                    0 if model in SPECIAL_NAMES else 1,  # SPECIAL_NAMES first
-                ),
-                key,  # Fall back to sorting by key, otherwise
-                verbose_name,
-                OrderedDict(("{key}__{name}".format(key=key, name=name), value)  # TODO: make fields an ordered dict that prepends {key} to every key for more fanciness
-                            for name, value in fields.items())
-            ))
+            fieldsets.append(
+                (
+                    (  # This part is responsible for sorting the model fields:
+                        data.get(key, {}).get('position', None)
+                        or 998,  # Position in form, if set (or 998)
+                        SPECIAL_ORDER.index(key)
+                        if key in SPECIAL_ORDER
+                        else 66,  # SPECIAL_ORDER first
+                        0 if model in SPECIAL_NAMES else 1,  # SPECIAL_NAMES first
+                    ),
+                    key,  # Fall back to sorting by key, otherwise
+                    verbose_name,
+                    OrderedDict(
+                        (
+                            "{key}__{name}".format(key=key, name=name),
+                            value,
+                        )  # TODO: make fields an ordered dict that prepends {key} to every key for more fanciness
+                        for name, value in fields.items()
+                    ),
+                )
+            )
 
         fieldsets.sort()
         for _position, key, verbose_name, form_fields in fieldsets:
-            self.fields_extra[key] = (verbose_name, (self[name] for name in form_fields.keys()))
+            self.fields_extra[key] = (
+                verbose_name,
+                (self[name] for name in form_fields.keys()),
+            )
             self.fields.update(form_fields)
 
     @staticmethod
     def get_form_fields():
         for model in [Member, Membership] + Member.profile_classes:
             for field in model._meta.fields:
-                if field.name in ('id', 'member') or (model is Member and field.name == 'membership_type'):
+                if field.name in ('id', 'member') or (
+                    model is Member and field.name == 'membership_type'
+                ):
                     continue
                 yield (model, field)
 
@@ -120,26 +136,28 @@ class RegistrationConfigForm(forms.Form):
             return forms.ChoiceField(
                 required=False,
                 label=_('Default value'),
-                choices=[(None, '-----------')]+list(choices))
-        if not(model is Member and field.name == 'number'):
+                choices=[(None, '-----------')] + list(choices),
+            )
+        if not (model is Member and field.name == 'number'):
             if isinstance(field, models.CharField):
-                return forms.CharField(
-                    required=False,
-                    label=_('Default value'))
+                return forms.CharField(required=False, label=_('Default value'))
             elif isinstance(field, models.DecimalField):
                 return forms.DecimalField(
                     required=False,
                     label=_('Default value'),
                     max_digits=field.max_digits,
-                    decimal_places=field.decimal_places)
+                    decimal_places=field.decimal_places,
+                )
             elif isinstance(field, models.DateField):
-                return forms.CharField(
-                    required=False,
-                    label=_('Other/fixed date'))
+                return forms.CharField(required=False, label=_('Other/fixed date'))
 
     def clean(self):
         ret = super().clean()
-        positions = [value for (key, value) in ret.items() if key.endswith("__position") and value is not None]
+        positions = [
+            value
+            for (key, value) in ret.items()
+            if key.endswith("__position") and value is not None
+        ]
         if not len(list(positions)) == len(set(positions)):
             raise forms.ValidationError('Every position must be unique!')
         return ret

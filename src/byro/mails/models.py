@@ -14,31 +14,41 @@ from byro.mails.send import SendMailException
 
 class MailTemplate(Auditable, models.Model):
 
-    subject = I18nCharField(
-        max_length=200,
-        verbose_name=_('Subject'),
-    )
-    text = I18nTextField(
-        verbose_name=_('Text'),
-    )
+    subject = I18nCharField(max_length=200, verbose_name=_('Subject'))
+    text = I18nTextField(verbose_name=_('Text'))
     reply_to = models.EmailField(
         max_length=200,
-        blank=True, null=True,
+        blank=True,
+        null=True,
         verbose_name=_('Reply-To'),
-        help_text=_('Change the Reply-To address if you do not want to use the default orga address'),
+        help_text=_(
+            'Change the Reply-To address if you do not want to use the default orga address'
+        ),
     )
     bcc = models.CharField(
         max_length=1000,
-        blank=True, null=True,
+        blank=True,
+        null=True,
         verbose_name=_('BCC'),
-        help_text=_('Enter comma separated addresses. Will receive a blind copy of every mail sent from this template. This may be a LOT!'),
+        help_text=_(
+            'Enter comma separated addresses. Will receive a blind copy of every mail sent from this template. This may be a LOT!'
+        ),
     )
 
     def __str__(self):
         return '{self.subject}'.format(self=self)
 
-    def to_mail(self, email, locale=None, context=None, skip_queue=False, attachments=None, save=True):
+    def to_mail(
+        self,
+        email,
+        locale=None,
+        context=None,
+        skip_queue=False,
+        attachments=None,
+        save=True,
+    ):
         from byro.common.models import Configuration
+
         config = Configuration.get_solo()
         locale = locale or config.language
         with override(locale):
@@ -47,7 +57,9 @@ class MailTemplate(Auditable, models.Model):
                 subject = str(self.subject).format(**context)
                 text = str(self.text).format(**context)
             except KeyError as e:
-                raise SendMailException('Experienced KeyError when rendering Text: {e}'.format(e=e))
+                raise SendMailException(
+                    'Experienced KeyError when rendering Text: {e}'.format(e=e)
+                )
 
             mail = EMail(
                 to=email,
@@ -80,38 +92,37 @@ class EMail(Auditable, models.Model):
         help_text=_('One email address or several addresses separated by commas.'),
     )
     reply_to = models.CharField(
-        max_length=1000,
-        null=True, blank=True,
-        verbose_name=_('Reply-To'),
+        max_length=1000, null=True, blank=True, verbose_name=_('Reply-To')
     )
     cc = models.CharField(
         max_length=1000,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name=_('CC'),
         help_text=_('One email address or several addresses separated by commas.'),
     )
     bcc = models.CharField(
         max_length=1000,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name=_('BCC'),
         help_text=_('One email address or several addresses separated by commas.'),
     )
-    subject = models.CharField(
-        max_length=200,
-        verbose_name=_('Subject'),
-    )
-    members = models.ManyToManyField(
-        to='members.Member',
-        related_name='emails',
-    )
+    subject = models.CharField(max_length=200, verbose_name=_('Subject'))
+    members = models.ManyToManyField(to='members.Member', related_name='emails')
     text = models.TextField(verbose_name=_('Text'))
     sent = models.DateTimeField(null=True, blank=True, verbose_name=_('Sent at'))
-    template = models.ForeignKey(to=MailTemplate, null=True, blank=True, on_delete=models.SET_NULL)
-    attachments = models.ManyToManyField(
-        to='documents.Document',
-        related_name='mails',
+    template = models.ForeignKey(
+        to=MailTemplate, null=True, blank=True, on_delete=models.SET_NULL
     )
-    balance = models.ForeignKey(to='members.MemberBalance', on_delete=models.CASCADE, null=True, blank=True, related_name='reminder_mails')
+    attachments = models.ManyToManyField(to='documents.Document', related_name='mails')
+    balance = models.ForeignKey(
+        to='members.MemberBalance',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='reminder_mails',
+    )
 
     @property
     def attachment_ids(self):
@@ -124,6 +135,7 @@ class EMail(Auditable, models.Model):
             raise Exception('This mail has been sent already. It cannot be sent again.')
 
         from byro.mails.send import mail_send_task
+
         mail_send_task(
             to=self.to.split(','),
             subject=self.subject,

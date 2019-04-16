@@ -27,6 +27,11 @@ def get_member_statistics():
     result = []
 
     while date <= end:
-        result.append(((date.year, date.month), *get_member_statistics_for_month(date.month, date.year)))
+        result.append(
+            (
+                (date.year, date.month),
+                *get_member_statistics_for_month(date.month, date.year),
+            )
+        )
         date += relativedelta(months=1)
     return result

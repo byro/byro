@@ -16,7 +16,11 @@ class SourceState(Choices):
 
 class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
     source_file = models.FileField(upload_to='transaction_uploads/')
-    state = models.CharField(default=SourceState.NEW, choices=SourceState.choices, max_length=SourceState.max_length)
+    state = models.CharField(
+        default=SourceState.NEW,
+        choices=SourceState.choices,
+        max_length=SourceState.max_length,
+    )
 
     @transaction.atomic
     def process(self):
@@ -30,11 +34,16 @@ class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
         self.state = SourceState.PROCESSING
         self.save()
         from byro.bookkeeping.signals import process_csv_upload
+
         responses = process_csv_upload.send_robust(sender=self)
         if len(responses) > 1:
             self.state = SourceState.FAILED
             self.save()
-            raise Exception('More than one plugin tried to process the CSV upload: {}'.format([r[0].__module__ + '.' + r[0].__name__ for r in responses]))
+            raise Exception(
+                'More than one plugin tried to process the CSV upload: {}'.format(
+                    [r[0].__module__ + '.' + r[0].__name__ for r in responses]
+                )
+            )
         if len(responses) < 1:
             self.state = SourceState.FAILED
             self.save()

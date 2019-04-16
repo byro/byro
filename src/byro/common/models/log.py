@@ -21,16 +21,20 @@ from byro.common.utils import get_installed_software
 
 class ContentObjectManager(models.Manager):
     "An object manager that can handle filter(content_object=...)"
+
     def filter(self, *args, **kwargs):
         if 'content_object' in kwargs:
             content_object = kwargs.pop('content_object')
-            kwargs['content_type'] = ContentType.objects.get_for_model(type(content_object))
+            kwargs['content_type'] = ContentType.objects.get_for_model(
+                type(content_object)
+            )
             kwargs['object_id'] = content_object.pk
         return super().filter(*args, **kwargs)
 
 
 class LogEntryManager(ContentObjectManager):
     "Manager that is linking the log chain on .create()"
+
     def create(self, *args, **kwargs):
         kwargs['auth_prev'] = self.get_chain_end()
         return super().create(*args, **kwargs)
@@ -64,6 +68,7 @@ class LogEntry(models.Model):
         * orig_content_type: Copy of the ContentType value at LogEntry creation
         * orig_user_id: Copy of the user_id value at LogEntry creation
     """
+
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField(db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -74,7 +79,14 @@ class LogEntry(models.Model):
     data = JSONField(null=True)
 
     auth_hash = models.CharField(max_length=140, null=False, unique=True)
-    auth_prev = models.ForeignKey('self', on_delete=models.PROTECT, related_name='auth_next', to_field='auth_hash', null=False, blank=False)
+    auth_prev = models.ForeignKey(
+        'self',
+        on_delete=models.PROTECT,
+        related_name='auth_next',
+        to_field='auth_hash',
+        null=False,
+        blank=False,
+    )
     auth_data = JSONField(null=False)
 
     objects = LogEntryManager()
@@ -90,9 +102,14 @@ class LogEntry(models.Model):
         raise TypeError("Logs cannot be deleted.")
 
     def save(self, *args, **kwargs):
-        if kwargs.get('update_fields', None) == ['auth_hash'] and self.auth_hash.startswith('random:'):
+        if kwargs.get('update_fields', None) == [
+            'auth_hash'
+        ] and self.auth_hash.startswith('random:'):
             self._OVERRIDE_SAVE = ['auth_hash']
-        elif kwargs.get('update_fields', None) == ['auth_prev'] and self.auth_prev == 'undefined:0':
+        elif (
+            kwargs.get('update_fields', None) == ['auth_prev']
+            and self.auth_prev == 'undefined:0'
+        ):
             self._OVERRIDE_SAVE = ['auth_prev']
         else:
             if getattr(self, 'pk', None):
@@ -125,7 +142,11 @@ class LogEntry(models.Model):
             'hash_ver': 1,
             'nonce': base64.b64encode(hdd_nonce).decode('us-ascii'),
             'data_mac': 'blake2b:{}'.format(hdd_mac.decode('us-ascii')),
-            'orig_content_type': '{}.{}'.format(self.content_type.app_label, self.content_type.model) if self.content_type else None,
+            'orig_content_type': '{}.{}'.format(
+                self.content_type.app_label, self.content_type.model
+            )
+            if self.content_type
+            else None,
             'orig_user_id': self.user_id if self.user_id else None,
             'software_version': ", ".join(get_installed_software()),
         }
@@ -133,7 +154,11 @@ class LogEntry(models.Model):
         authenticated_dict = self.get_authenticated_dict()
 
         ad_encoded = canonicaljson.encode_canonical_json(authenticated_dict)
-        self.auth_hash = "blake2b:{}".format(nacl.hash.blake2b(ad_encoded, digest_size=64, person=PERSON_BYTES).decode('us-ascii'))
+        self.auth_hash = "blake2b:{}".format(
+            nacl.hash.blake2b(ad_encoded, digest_size=64, person=PERSON_BYTES).decode(
+                'us-ascii'
+            )
+        )
 
         if not self.auth_prev_id:
             self.auth_prev_id = self.auth_hash
@@ -143,7 +168,9 @@ class LogEntry(models.Model):
             'object_id': self.object_id,
             'datetime': self.datetime.isoformat(),
             'action_type': self.action_type,
-            'prev_hash': self.auth_prev_id if self.auth_prev_id and self.auth_prev_id != self.auth_hash else 'initial:0',
+            'prev_hash': self.auth_prev_id
+            if self.auth_prev_id and self.auth_prev_id != self.auth_hash
+            else 'initial:0',
             'auth_data': self.auth_data,
             'source': self.data['source'],
         }
@@ -152,7 +179,11 @@ class LogEntry(models.Model):
         if self.auth_data['hash_ver'] != 1:
             return False
 
-        if self.content_type is not None and '{}.{}'.format(self.content_type.app_label, self.content_type.model) != self.auth_data['orig_content_type']:
+        if (
+            self.content_type is not None
+            and '{}.{}'.format(self.content_type.app_label, self.content_type.model)
+            != self.auth_data['orig_content_type']
+        ):
             return False
 
         if self.user_id is not None and self.user_id != self.auth_data['orig_user_id']:
@@ -164,22 +195,34 @@ class LogEntry(models.Model):
         hdd_nonce = base64.b64decode(self.auth_data['nonce'])
         hdd_mac = nacl.hash.blake2b(hdd_encoded, digest_size=64, salt=hdd_nonce)
 
-        if 'blake2b:{}'.format(hdd_mac.decode('us-ascii')) != self.auth_data['data_mac']:  # FIXME Maybe fixed time comparison?
+        if (
+            'blake2b:{}'.format(hdd_mac.decode('us-ascii'))
+            != self.auth_data['data_mac']
+        ):  # FIXME Maybe fixed time comparison?
             return False
 
         authenticated_dict = self.get_authenticated_dict()
 
         ad_encoded = canonicaljson.encode_canonical_json(authenticated_dict)
-        auth_hash = "blake2b:{}".format(nacl.hash.blake2b(ad_encoded, digest_size=64, person=PERSON_BYTES).decode('us-ascii'))
+        auth_hash = "blake2b:{}".format(
+            nacl.hash.blake2b(ad_encoded, digest_size=64, person=PERSON_BYTES).decode(
+                'us-ascii'
+            )
+        )
 
         return auth_hash == self.auth_hash  # FIXME Maybe fixed time comparison?
 
 
 @receiver(pre_save, sender=LogEntry)
 def log_entry_pre_save(sender, instance, *args, **kwargs):
-    if getattr(instance, '_OVERRIDE_SAVE', None) == ['auth_hash'] and instance.auth_hash.startswith('random:'):
+    if getattr(instance, '_OVERRIDE_SAVE', None) == [
+        'auth_hash'
+    ] and instance.auth_hash.startswith('random:'):
         delattr(instance, '_OVERRIDE_SAVE')
-    elif getattr(instance, '_OVERRIDE_SAVE', None) == ['auth_prev'] and instance.auth_prev == 'undefined:0':
+    elif (
+        getattr(instance, '_OVERRIDE_SAVE', None) == ['auth_prev']
+        and instance.auth_prev == 'undefined:0'
+    ):
         delattr(instance, '_OVERRIDE_SAVE')
     elif instance.pk:
         raise TypeError("Logs cannot be modified.")
@@ -200,7 +243,9 @@ def flatten_objects(inobj, key_was=None):
         return inobj.strftime('%Y-%m-%d %H:%M:%S %Z')
     elif isinstance(inobj, datetime.date):
         return inobj.strftime('%Y-%m-%d')
-    elif isinstance(inobj, decimal.Decimal) or (key_was == 'amount' and isinstance(inobj, (int, float))):
+    elif isinstance(inobj, decimal.Decimal) or (
+        key_was == 'amount' and isinstance(inobj, (int, float))
+    ):
         return "{:.2f}".format(inobj)
     else:
         try:
@@ -208,7 +253,7 @@ def flatten_objects(inobj, key_was=None):
             return {
                 'object': content_type.name,
                 'ref': (content_type.app_label, content_type.model, inobj.pk),
-                'value': str(inobj)
+                'value': str(inobj),
             }
         except Exception:
             return str(inobj)
@@ -231,7 +276,9 @@ class LogTargetMixin:
 
         kwargs = flatten_objects(kwargs)
 
-        LogEntry.objects.create(content_object=self, user=user, action_type=action, data=dict(kwargs))
+        LogEntry.objects.create(
+            content_object=self, user=user, action_type=action, data=dict(kwargs)
+        )
 
     def log_entries(self):
         return LogEntry.objects.filter(content_object=self)
@@ -242,7 +289,9 @@ def log_call(action, log_on='retval'):
         @wraps(f)
         def decorator(*args, **kwargs):
             if 'user_or_context' not in kwargs:
-                raise TypeError("You need to provide a 'user_or_context' named parameter which indicates the responsible user (a User model object), request (a View instance or HttpRequest object), or generic context (a str).")
+                raise TypeError(
+                    "You need to provide a 'user_or_context' named parameter which indicates the responsible user (a User model object), request (a View instance or HttpRequest object), or generic context (a str)."
+                )
             user_or_context = kwargs.pop('user_or_context')
             user = kwargs.pop('user', None)
 
@@ -250,7 +299,9 @@ def log_call(action, log_on='retval'):
 
             log_kwargs = {k: v for k, v in kwargs.items() if v}
             log_args = list(args)
-            log_args = log_args[1:]   # Warning: we assume that args[0] is 'self'. Only works correctly with calls to bound methods
+            log_args = log_args[
+                1:
+            ]  # Warning: we assume that args[0] is 'self'. Only works correctly with calls to bound methods
             if log_args:
                 log_kwargs['_args'] = [v for v in log_args]
 

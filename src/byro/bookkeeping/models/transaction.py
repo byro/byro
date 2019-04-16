@@ -16,18 +16,23 @@ class TransactionQuerySet(models.QuerySet):
         qs = self.annotate(
             balances_debit=models.Sum(
                 models.Case(
-                    models.When(~models.Q(bookings__debit_account=None), then="bookings__amount"),
+                    models.When(
+                        ~models.Q(bookings__debit_account=None), then="bookings__amount"
+                    ),
                     default=0,
-                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2),
                 )
             ),
             balances_credit=models.Sum(
                 models.Case(
-                    models.When(~models.Q(bookings__credit_account=None), then="bookings__amount"),
+                    models.When(
+                        ~models.Q(bookings__credit_account=None),
+                        then="bookings__amount",
+                    ),
                     default=0,
-                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2),
                 )
-            )
+            ),
         )
         return qs
 
@@ -63,7 +68,7 @@ class Transaction(models.Model, LogTargetMixin):
         to=get_user_model(),
         on_delete=models.PROTECT,
         related_name='+',  # no related lookup
-        null=True
+        null=True,
     )
 
     reverses = models.ForeignKey(
@@ -79,16 +84,22 @@ class Transaction(models.Model, LogTargetMixin):
 
     @log_call('.debit.created', log_on='self')
     def debit(self, account, *args, **kwargs):
-        return Booking.objects.create(transaction=self, debit_account=account, *args, **kwargs)
+        return Booking.objects.create(
+            transaction=self, debit_account=account, *args, **kwargs
+        )
 
     @log_call('.credit.created', log_on='self')
     def credit(self, account, *args, **kwargs):
-        return Booking.objects.create(transaction=self, credit_account=account, *args, **kwargs)
+        return Booking.objects.create(
+            transaction=self, credit_account=account, *args, **kwargs
+        )
 
     @transaction.atomic
     def reverse(self, value_datetime=None, *args, **kwargs):
         if 'user_or_context' not in kwargs:
-            raise TypeError("You need to provide a 'user_or_context' named parameter which indicates the responsible user (a User model object), request (a View instance or HttpRequest object), or generic context (a str).")
+            raise TypeError(
+                "You need to provide a 'user_or_context' named parameter which indicates the responsible user (a User model object), request (a View instance or HttpRequest object), or generic context (a str)."
+            )
         user_or_context = kwargs.pop('user_or_context')
         user = kwargs.pop('user', None)
 
@@ -102,9 +113,21 @@ class Transaction(models.Model, LogTargetMixin):
         )
         for b in self.bookings.all():
             if b.credit_account:
-                t.debit(account=b.credit_account, amount=b.amount, member=b.member, user_or_context=user_or_context, user=user)
+                t.debit(
+                    account=b.credit_account,
+                    amount=b.amount,
+                    member=b.member,
+                    user_or_context=user_or_context,
+                    user=user,
+                )
             elif b.debit_account:
-                t.credit(account=b.debit_account, amount=b.amount, member=b.member, user_or_context=user_or_context, user=user)
+                t.credit(
+                    account=b.debit_account,
+                    amount=b.amount,
+                    member=b.member,
+                    user_or_context=user_or_context,
+                    user=user,
+                )
         t.save()
         self.log(user_or_context, '.reversed', user=user, reversed_by=t)
 
@@ -164,12 +187,17 @@ class Transaction(models.Model, LogTargetMixin):
         Returns the number of receivers that augmented the Transaction.
         """
         from byro.bookkeeping.signals import process_transaction
+
         response_counter = Counter()
         this_counter = Counter('dummy')
 
-        while (not response_counter or response_counter.most_common(1)[0][1] < 5) and sum(this_counter.values()) > 0:
+        while (
+            not response_counter or response_counter.most_common(1)[0][1] < 5
+        ) and sum(this_counter.values()) > 0:
             responses = process_transaction.send_robust(sender=self)
-            this_counter = Counter(receiver for receiver, response in responses if response)
+            this_counter = Counter(
+                receiver for receiver, response in responses if response
+            )
 
             for receiver, response in responses:
                 if isinstance(response, Exception):
@@ -180,7 +208,7 @@ class Transaction(models.Model, LogTargetMixin):
         if sum(response_counter.values()) < 1:
             raise Exception('No plugin tried to augment the transaction.')
 
-        response_counter += Counter()   # Remove zero and negative elements
+        response_counter += Counter()  # Remove zero and negative elements
         return len(response_counter)
 
     def __str__(self):
@@ -208,28 +236,31 @@ class BookingsQuerySet(models.QuerySet):
         qs = self.annotate(
             transaction_balances_debit=models.Sum(
                 models.Case(
-                    models.When(~models.Q(transaction__bookings__debit_account=None), then="transaction__bookings__amount"),
+                    models.When(
+                        ~models.Q(transaction__bookings__debit_account=None),
+                        then="transaction__bookings__amount",
+                    ),
                     default=0,
-                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2),
                 )
             ),
             transaction_balances_credit=models.Sum(
                 models.Case(
-                    models.When(~models.Q(transaction__bookings__credit_account=None), then="transaction__bookings__amount"),
+                    models.When(
+                        ~models.Q(transaction__bookings__credit_account=None),
+                        then="transaction__bookings__amount",
+                    ),
                     default=0,
-                    output_field=models.DecimalField(max_digits=8, decimal_places=2)
+                    output_field=models.DecimalField(max_digits=8, decimal_places=2),
                 )
-            )
+            ),
         )
         return qs
 
     def with_transaction_data(self):
         qs = self.with_transaction_balances()
         qs = qs.select_related(
-            'member',
-            'transaction',
-            'credit_account',
-            'debit_account',
+            'member', 'transaction', 'credit_account', 'debit_account'
         )
         qs = qs.prefetch_related(
             Prefetch('transaction__bookings', to_attr='cached_bookings'),
@@ -251,34 +282,30 @@ class Booking(models.Model):
         to=get_user_model(),
         on_delete=models.PROTECT,
         related_name='+',  # no related lookup
-        null=True
+        null=True,
     )
 
     transaction = models.ForeignKey(
-        to='Transaction',
-        related_name='bookings',
-        on_delete=models.PROTECT,
+        to='Transaction', related_name='bookings', on_delete=models.PROTECT
     )
-    amount = models.DecimalField(
-        max_digits=8, decimal_places=2,
-    )
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
     debit_account = models.ForeignKey(
         to='bookkeeping.Account',
         related_name='debits',
         on_delete=models.PROTECT,
-        null=True
+        null=True,
     )
     credit_account = models.ForeignKey(
         to='bookkeeping.Account',
         related_name='credits',
         on_delete=models.PROTECT,
-        null=True
+        null=True,
     )
     member = models.ForeignKey(
         to='members.Member',
         related_name='bookings',
         on_delete=models.PROTECT,
-        null=True
+        null=True,
     )
 
     importer = models.CharField(null=True, max_length=500)
@@ -303,8 +330,7 @@ class Booking(models.Model):
         # FUTURE: Should also add a signal or save handler for the same
         #   constraint in pure python
         db_constraints = {
-            'exactly_either_debit_or_credit':
-                'CHECK (NOT ((debit_account_id IS NULL) = (credit_account_id IS NULL)))',
+            'exactly_either_debit_or_credit': 'CHECK (NOT ((debit_account_id IS NULL) = (credit_account_id IS NULL)))'
         }
 
     def find_memo(self):

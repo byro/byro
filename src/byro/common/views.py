@@ -21,16 +21,24 @@ class LoginView(TemplateView):
         user = authenticate(username=username, password=password)
 
         if user is None:
-            messages.error(request, _('No user account matches the entered credentials.'))
+            messages.error(
+                request, _('No user account matches the entered credentials.')
+            )
             return redirect('common:login')
 
         if not user.is_active:
             messages.error(request, _('User account is deactivated.'))
-            LogEntry.objects.create(content_object=user, user=user, action_type="byro.common.login.deactivated")
+            LogEntry.objects.create(
+                content_object=user,
+                user=user,
+                action_type="byro.common.login.deactivated",
+            )
             return redirect('common:login')
 
         login(request, user)
-        LogEntry.objects.create(content_object=user, user=user, action_type="byro.common.login.success")
+        LogEntry.objects.create(
+            content_object=user, user=user, action_type="byro.common.login.success"
+        )
         url = urllib.parse.unquote(request.GET.get('next', ''))
         if url and is_safe_url(url, request.get_host()):
             return redirect(url)
@@ -40,7 +48,11 @@ class LoginView(TemplateView):
 
 def logout_view(request: HttpRequest) -> HttpResponseRedirect:
     if request.user:
-        LogEntry.objects.create(content_object=request.user, user=request.user, action_type="byro.common.logout")
+        LogEntry.objects.create(
+            content_object=request.user,
+            user=request.user,
+            action_type="byro.common.logout",
+        )
     logout(request)
     return redirect('/')
 

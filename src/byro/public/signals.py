@@ -14,13 +14,15 @@ from byro.office.signals import member_dashboard_tile, nav_event
 
 @receiver(unauthenticated_urls)
 def memberpage_unauthenticated_urls(sender, **kwargs):
-    return (lambda a, b: b.view_name.startswith("public:memberpage:"), )
+    return (lambda a, b: b.view_name.startswith("public:memberpage:"),)
 
 
 @receiver(nav_event)
 def memberpage_primary(sender, **kwargs):
     request = sender
-    if request.resolver_match and request.resolver_match.view_name.startswith("public:memberpage"):
+    if request.resolver_match and request.resolver_match.view_name.startswith(
+        "public:memberpage"
+    ):
         secret_token = request.resolver_match.kwargs.get('secret_token')
         if secret_token:
             kwargs = {'secret_token': secret_token}
@@ -29,17 +31,28 @@ def memberpage_primary(sender, **kwargs):
                 {
                     'label': _('Member page'),
                     'url': reverse('public:memberpage:member.dashboard', kwargs=kwargs),
-                    'active': request.resolver_match.view_name == 'public:memberpage.dashboard',
+                    'active': request.resolver_match.view_name
+                    == 'public:memberpage.dashboard',
                 }
             ]
-            if config.can_see_other_members in (MemberViewLevel.NAME_ONLY, MemberViewLevel.NAME_AND_CONTACT):
-                member = Member.all_objects.filter(profile_memberpage__secret_token=secret_token).first()
+            if config.can_see_other_members in (
+                MemberViewLevel.NAME_ONLY,
+                MemberViewLevel.NAME_AND_CONTACT,
+            ):
+                member = Member.all_objects.filter(
+                    profile_memberpage__secret_token=secret_token
+                ).first()
                 if member.is_active:
-                    result.append({
-                        'label': _('Member list'),
-                        'url': reverse('public:memberpage:member.list', kwargs=kwargs),
-                        'active': request.resolver_match.view_name == 'public:memberpage:member.list',
-                    })
+                    result.append(
+                        {
+                            'label': _('Member list'),
+                            'url': reverse(
+                                'public:memberpage:member.list', kwargs=kwargs
+                            ),
+                            'active': request.resolver_match.view_name
+                            == 'public:memberpage:member.list',
+                        }
+                    )
             return result
     return {}
 
@@ -49,7 +62,7 @@ def new_member_mail_info_memberpage(sender, signal, **kwargs):
     url = sender.profile_memberpage.get_url()
     if url:
         return _('Your personal member page is at {link}').format(
-            link=sender.profile_memberpage.get_url(),
+            link=sender.profile_memberpage.get_url()
         )
 
 
@@ -58,7 +71,7 @@ def new_member_office_mail_info_memberpage(sender, signal, **kwargs):
     url = sender.profile_memberpage.get_url()
     if url:
         return _('Their personal member page is at {link}').format(
-            link=sender.profile_memberpage.get_url(),
+            link=sender.profile_memberpage.get_url()
         )
 
 
@@ -68,7 +81,4 @@ def member_dashboard_page_link(sender, signal, member=None, **kwargs):
         return
     url = member.profile_memberpage.get_url()
     if url:
-        return {
-            'url': url,
-            'title': _('Public profile'),
-        }
+        return {'url': url, 'title': _('Public profile')}
