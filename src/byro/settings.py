@@ -75,7 +75,7 @@ for entry_point in iter_entry_points(group='byro.plugin', name=None):
 
 ## URL SETTINGS
 SITE_URL = config.get('site', 'url', fallback='http://localhost')
-INTERNAL_IPS = ['127.0.0.1', '::1']
+INTERNAL_IPS = ['127.0.0.1', '::1', 'localhost']
 ALLOWED_HOSTS = [
     SITE_URL
 ]
