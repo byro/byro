@@ -220,11 +220,11 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def create_balance(self, start, end, commit=True, create_if_zero=True):
         if self.balances.exists():
             if self.balances.filter(
-                models.Q(models.Q(start__lt=start) & models.Q(end__gt=start))  # start overlaps
-                | models.Q(models.Q(start__lt=end) & models.Q(end__gt=end))  # end overlaps
+                models.Q(models.Q(start__lte=start) & models.Q(end__gte=start))  # start overlaps
+                | models.Q(models.Q(start__lte=end) & models.Q(end__gte=end))  # end overlaps
             ).exists():
                 raise Exception('Cannot create overlapping balance: {} from {} to {}'.format(self, start, end))
-        amount = self._calc_balance(liability_cutoff=end, asset_cutoff=end, liability_start=start, asset_start=start),
+        amount = self._calc_balance(liability_cutoff=end, asset_cutoff=end, liability_start=start, asset_start=start)
         if not amount and not create_if_zero:
             return
         balance = MemberBalance(
