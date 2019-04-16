@@ -91,10 +91,10 @@ setup(
     ],
     extras_require={
         'dev': [
+            'black',
             'freezegun',
             'isort',
             'ipython',
-            'pylama',
             'pytest==3.9.3',
             'pytest-cov',
             'pytest-django',
