@@ -9,7 +9,7 @@ sudo: false
 install:
   - cd src
   - pip install -U pip setuptools wheel codecov coverage
-  - pip install -Ue ".[dev]"
+  - pip install -Ue .
 script:
   - bash ../.travis.sh $JOB
 cache:

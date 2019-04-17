@@ -11,8 +11,11 @@ if [ "$1" == "tests" ]; then
 fi
 
 if [ "$1" == "style" ]; then
-    isort --check-only --recursive --diff .
-    black -S --check --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py" .
+    if [  $(python -c "import sys; print(sys.version_info[1])") -gt 5 ]; then
+        pip install ".[dev]"
+        isort --check-only --recursive --diff .
+        black -S --check --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py" .
+    fi
 fi
 
 if [ "$1" == "docs" ]; then
