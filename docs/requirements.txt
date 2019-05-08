@@ -4,3 +4,16 @@ sphinx-intl
 sphinx_rtd_theme
 selenium
 pytest-selenium
+bootstrap4
+django-formset-js
+django-solo
+django_select2
+django-annoying
+django_db_constraints
+canonicaljson
+django-nacl-fields
+python-magic
+django-i18nfield
+python-dateutil
+django-localflavor
+
