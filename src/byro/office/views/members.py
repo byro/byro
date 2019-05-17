@@ -46,7 +46,6 @@ from byro.office.signals import (
     member_list_importers,
     member_view,
 )
-
 from .documents import DocumentUploadForm
 
 
@@ -1133,3 +1132,7 @@ class MemberLogView(MemberView):
         ctx = super().get_context_data(**kwargs)
         ctx['log_entries'] = self.get_member().log_entries()
         return ctx
+
+
+class MemberMailsView(MemberView):
+    template_name = 'office/member/mails.html'

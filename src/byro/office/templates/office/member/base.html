@@ -39,6 +39,14 @@
   </li>
   <li class="nav-item">
     <a
+            class="nav-link {% if "members.mails" in url_name %}active{% endif %}"
+            href="{% url "office:members.mails" pk=member.pk %}"
+    >
+        {% trans "Mail history" %}
+    </a>
+  </li>
+    <li class="nav-item">
+        <a
       class="nav-link {% if "members.finance" in url_name %}active{% endif %}"
       href="{% url "office:members.finance" pk=member.pk %}"
     >

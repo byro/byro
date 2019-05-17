@@ -1,0 +1,25 @@
+{% load i18n %}
+<table class="table table-sm">
+    <thead>
+    <tr>
+        <th class="table-column-large">{% trans "Subject" %}</th>
+        <th class="table-column-small">{% trans "To" %}</th>
+        <th class="table-column-small">{% trans "Sent" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for mail in mails %}
+        <tr class="table-light">
+            <td>
+                <a href="{% url "office:mails.mail.view" pk=mail.pk %}">
+                    {{ mail.subject }}
+                </a>
+            </td>
+            <td>{% if mail.to == "special:all" %}{% trans "All members" %}{% else %}{{ mail.to }}{% endif %}</td>
+            <td>
+                {{ mail.sent|date:"Y-m-d H:i" }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -36,6 +36,7 @@ urlpatterns = [
         url('operations$', members.MemberOperationsView.as_view(), name='members.operations'),
         url('record-disclosure$', members.MemberRecordDisclosureView.as_view(), name='members.record-disclosure'),
         url('log$', members.MemberLogView.as_view(), name='members.log'),
+        url('mails$', members.MemberMailsView.as_view(), name='members.mails'),
         url('documents$', members.MemberDocumentsView.as_view(), name='members.documents'),
         url('$', members.MemberDashboardView.as_view(), name='members.dashboard'),
     ])),

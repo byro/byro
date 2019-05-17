@@ -207,6 +207,9 @@ class Compose(SuccessMessageMixin, MailSendMixin, CreateView):
     success_url = '/mails/outbox'
     form_class = MailSpecialToFormClass
 
+    def get_initial(self):
+        return {k: v for (k, v) in self.request.GET.items()}
+
 
 class TemplateDelete(View):  # TODO
     pass
