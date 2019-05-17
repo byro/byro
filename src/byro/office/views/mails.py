@@ -8,17 +8,76 @@ from django.views.generic import CreateView, ListView, UpdateView, View
 from i18nfield.forms import I18nModelForm
 
 from byro.mails.models import EMail, MailTemplate
+from byro.members.models import Member
 
 
-class MailDetail(UpdateView):
-    queryset = EMail.objects.all()
-    template_name = 'office/mails/detail.html'
-    context_object_name = 'mail'
-    form_class = forms.modelform_factory(
-        EMail, fields=['to', 'reply_to', 'cc', 'bcc', 'subject', 'text']
+class RestrictedLanguagesI18nModelForm(I18nModelForm):
+    def __init__(self, *args, **kwargs):
+        if 'locales' not in kwargs:
+            from byro.common.models import Configuration
+
+            config = Configuration.get_solo()
+            kwargs['locales'] = [config.language or settings.LANGUAGE_CODE]
+        return super().__init__(*args, **kwargs)
+
+
+class MailSpecialToFormClass(forms.ModelForm):
+    class Meta:
+        model = EMail
+        form = RestrictedLanguagesI18nModelForm
+        fields = ['to', 'reply_to', 'cc', 'bcc', 'subject', 'text']
+
+    to_type = forms.ChoiceField(
+        choices=[('addr', _('Specific address')), ('member', _('Member')), ('all', _('All members'))],
+        widget=forms.RadioSelect,
+        initial='addr',
     )
-    success_url = '/mails/outbox'
 
+    to_member = forms.ModelChoiceField(Member.objects.filter(email__isnull=False).exclude(email=""), required=False,
+                                       empty_label=None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._decode_special(self.initial)
+        self.fields['to'].required = False  # FIXME Needs to be re-added in case no special mode is active
+        self.order_fields(['to_type', 'to_member'])
+
+    @staticmethod
+    def _decode_special(d):
+        if not d:
+            return
+        if 'to' in d:
+            to = d['to']
+            d['to_type'] = 'addr'
+            if to.startswith("special:"):
+                if to.startswith("special:all"):
+                    d['to_type'] = 'all'
+                    del d['to']
+                elif to.startswith('special:member:'):
+                    d['to_type'] = 'member'
+                    d['to_member'] = Member.objects.get(pk=to.split(":", 2)[2])
+                    del d['to']
+
+    def _encode_special(self):
+        if self.cleaned_data['to_type'] == 'all':
+            self.cleaned_data['to'] = 'special:all'
+        elif self.cleaned_data['to_type'] == 'member':
+            self.cleaned_data['to'] = 'special:member:{}'.format(self.cleaned_data['to_member'].pk)
+        self.initial['to_type'] = None
+        self.initial['to_member'] = None
+        del self.cleaned_data['to_type']
+        del self.cleaned_data['to_member']
+        self.instance.to = self.cleaned_data['to']
+        if not self.cleaned_data['to']:
+            self.add_error("to", _("Field cannot be empty"))
+            self.initial['to_type'] = "addr"
+
+    def clean(self):
+        self._encode_special()
+        return super().clean()
+
+
+class MailSendMixin:
     def form_valid(self, form):
         if form.instance.sent:
             raise forms.ValidationError(
@@ -35,6 +94,14 @@ class MailDetail(UpdateView):
         else:
             messages.success(self.request, _('Your changes have been saved.'))
         return result
+
+
+class MailDetail(MailSendMixin, UpdateView):
+    queryset = EMail.objects.all()
+    template_name = 'office/mails/detail.html'
+    context_object_name = 'mail'
+    form_class = MailSpecialToFormClass
+    success_url = '/mails/outbox'
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
@@ -110,16 +177,6 @@ class TemplateList(ListView):
     context_object_name = 'templates'
 
 
-class RestrictedLanguagesI18nModelForm(I18nModelForm):
-    def __init__(self, *args, **kwargs):
-        if 'locales' not in kwargs:
-            from byro.common.models import Configuration
-
-            config = Configuration.get_solo()
-            kwargs['locales'] = [config.language or settings.LANGUAGE_CODE]
-        return super().__init__(*args, **kwargs)
-
-
 MAIL_TEMPLATE_FORM_CLASS = forms.modelform_factory(
     MailTemplate,
     form=RestrictedLanguagesI18nModelForm,
@@ -143,33 +200,12 @@ class TemplateCreate(CreateView):
     form_class = MAIL_TEMPLATE_FORM_CLASS
 
 
-MAIL_SUBJECT_FORM_CLASS = forms.modelform_factory(
-    EMail,
-    form=RestrictedLanguagesI18nModelForm,
-    fields=['to', 'reply_to', 'cc', 'bcc', 'subject', 'text'],
-)
-
-
-class Compose(SuccessMessageMixin, CreateView):
+class Compose(SuccessMessageMixin, MailSendMixin, CreateView):
     model = MailTemplate
     template_name = 'office/mails/compose.html'
     context_object_name = 'template'
     success_url = '/mails/outbox'
-    form_class = MAIL_SUBJECT_FORM_CLASS
-
-    def form_valid(self, form):
-        result = super().form_valid(form)
-        if form.data.get('action', 'save') == 'send':
-            form.instance.send()
-            messages.success(
-                self.request, _('Your changes have been saved and the email was sent.')
-            )
-        else:
-            messages.success(
-                self.request,
-                _("The email was created successfully. Go to our outbox to send it."),
-            )
-        return result
+    form_class = MailSpecialToFormClass
 
 
 class TemplateDelete(View):  # TODO

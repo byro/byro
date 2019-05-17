@@ -1,0 +1,32 @@
+{% load i18n %}
+{% load bootstrap4 %}
+<div class="form-group row">
+    <label class="col-md-3 col-form-label">To</label>
+    <div class="col-md-9">
+        <div class="row">
+            <input type="radio" name="to_type" id="to_type__addr" value="addr"
+                   {% if form.to_type.initial == 'addr' %}checked{% endif %}
+                   {% if form.fields.to_type.disabled %}disabled{% endif %}
+            >
+            <label for="to_type__addr" class="col-md-8 col-form-label">
+                {% bootstrap_field form.to layout='horizontal' show_label=False %}
+            </label>
+        </div>
+        <div class="row">
+            <input type="radio" name="to_type" id="to_type__all" value="all"
+                   {% if form.to_type.initial == 'all' %}checked{% endif %}
+                   {% if form.fields.to_type.disabled %}disabled{% endif %}
+            >
+            <label for="to_type__all" class="col-md-8 col-form-label">{% trans "All members" %}</label>
+        </div>
+        <div class="row">
+            <input type="radio" name="to_type" id="to_type__member" value="member"
+                   {% if form.to_type.initial == 'member' %}checked{% endif %}
+                   {% if form.fields.to_type.disabled %}disabled{% endif %}
+            >
+            <label for="to_type__member" class="col-md-8 col-form-label">{% trans "Member" %}:
+                {% bootstrap_field form.to_member layout='horizontal' show_label=False %}
+            </label>
+        </div>
+    </div>
+</div>

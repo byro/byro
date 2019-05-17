@@ -12,7 +12,8 @@
             {% trans "Send email" %}
         </div>
         <div class="card-body">
-            {% bootstrap_form form layout='horizontal' %}
+            {% include "office/mails/special_to_part.html" %}
+            {% bootstrap_form form layout='horizontal' exclude='to,to_member,to_type' %}
             <div class="card-body">
                 <button class="btn btn-info" type="submit" name="action" value="save">{% trans "Save to outbox" %}</button>
                 <button class="btn btn-success" type="submit" name="action" value="send">

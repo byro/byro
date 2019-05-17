@@ -10,6 +10,7 @@ from i18nfield.fields import I18nCharField, I18nTextField
 
 from byro.common.models.auditable import Auditable
 from byro.mails.send import SendMailException
+from byro.members.models import Member
 
 
 class MailTemplate(Auditable, models.Model):
@@ -130,21 +131,49 @@ class EMail(Auditable, models.Model):
             return list(self.attachments.all().values_list('pk', flat=True))
         return []
 
+    def process_special_to(self):
+        # Handles "special:" adresses, except "special:all" which is handled inside send()
+        if self.to.startswith("special:"):
+            if self.to.startswith("special:member:"):
+                member = Member.all_objects.get(pk=self.to.split(":", 2)[2])
+                self.to = member.email
+                self.members.add(member)
+                self.save(update_fields=['to'])
+
     def send(self):
         if self.sent:
             raise Exception('This mail has been sent already. It cannot be sent again.')
 
-        from byro.mails.send import mail_send_task
+        self.process_special_to()
 
-        mail_send_task(
-            to=self.to.split(','),
-            subject=self.subject,
-            body=self.text,
-            sender=self.reply_to,
-            cc=(self.cc or '').split(','),
-            bcc=(self.bcc or '').split(','),
-            attachments=self.attachment_ids,
-        )
+        if self.to == "special:all" or not self.to.startswith("special:"):
+            send_tos = []
+
+            if self.to == "special:all":
+                for member in Member.objects.filter(email__isnull=False).exclude(email="").all():
+                    send_tos.append([member.email])
+                    self.members.add(member)
+
+            else:
+                to_addrs = self.to.split(',')
+                send_tos.append(to_addrs)
+
+                for addr in to_addrs:
+                    for member in Member.all_objects.filter(email__iexact=addr.lower()).all():
+                        self.members.add(member)
+
+            from byro.mails.send import mail_send_task
+
+            for to_addrs in send_tos:
+                mail_send_task(
+                    to=to_addrs,
+                    subject=self.subject,
+                    body=self.text,
+                    sender=self.reply_to,
+                    cc=(self.cc or '').split(','),
+                    bcc=(self.bcc or '').split(','),
+                    attachments=self.attachment_ids,
+                )
 
         self.sent = now()
         self.save(update_fields=['sent'])
