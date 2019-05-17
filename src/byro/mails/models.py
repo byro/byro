@@ -146,6 +146,10 @@ class EMail(Auditable, models.Model):
 
         self.process_special_to()
 
+        from byro.common.models import Configuration
+
+        config = Configuration.get_solo()
+
         if self.to == "special:all" or not self.to.startswith("special:"):
             send_tos = []
 
@@ -162,6 +166,10 @@ class EMail(Auditable, models.Model):
                     for member in Member.all_objects.filter(email__iexact=addr.lower()).all():
                         self.members.add(member)
 
+            headers = {}
+            if self.reply_to:
+                headers["Reply-To"] = self.reply_to
+
             from byro.mails.send import mail_send_task
 
             for to_addrs in send_tos:
@@ -169,10 +177,11 @@ class EMail(Auditable, models.Model):
                     to=to_addrs,
                     subject=self.subject,
                     body=self.text,
-                    sender=self.reply_to,
+                    sender=config.mail_from,
                     cc=(self.cc or '').split(','),
                     bcc=(self.bcc or '').split(','),
                     attachments=self.attachment_ids,
+                    headers=headers,
                 )
 
         self.sent = now()
