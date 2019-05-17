@@ -68,6 +68,7 @@ setup(
         'canonicaljson==1.1.4',  # https://github.com/matrix-org/python-canonicaljson/blob/master/CHANGES.md
         'chardet==3.0.*',  # https://github.com/chardet/chardet/releases
         'celery==4.3.*',  # search for "what's new" on http://docs.celeryproject.org/en/latest/
+        'csscompressor==0.9.*',  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         'dateparser==0.7.*',  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         'Django>=2.2.0,<2.3.0',  # https://docs.djangoproject.com/en/2.0/releases/
         'django-annoying==0.10.*',  # https://github.com/skorokithakis/django-annoying/releases
