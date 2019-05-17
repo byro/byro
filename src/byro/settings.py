@@ -9,7 +9,6 @@ from pkg_resources import iter_entry_points
 from byro.common.settings.config import build_config
 from byro.common.settings.utils import log_initial
 
-
 config, config_files = build_config()
 CONFIG = config
 
@@ -103,7 +102,8 @@ else:
         SECRET_KEY = get_random_string(50, chars)
         with open(SECRET_FILE, 'w') as f:
             os.chmod(SECRET_FILE, 0o600)
-            os.chown(SECRET_FILE, os.getuid(), os.getgid())
+            if hasattr(os, 'chown'):
+                os.chown(SECRET_FILE, os.getuid(), os.getgid())
             f.write(SECRET_KEY)
 
 
