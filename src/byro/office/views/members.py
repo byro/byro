@@ -41,6 +41,8 @@ from byro.members.signals import (
     new_member_office_mail_information,
     update_member,
 )
+from byro.members.timeline import get_document_timeline, get_finance_timeline, get_mail_timeline, get_ops_timeline, \
+    augment_timeline, sorted_merge
 from byro.office.signals import (
     member_dashboard_tile,
     member_list_importers,
@@ -1136,3 +1138,24 @@ class MemberLogView(MemberView):
 
 class MemberMailsView(MemberView):
     template_name = 'office/member/mails.html'
+
+
+class MemberTimelineView(MemberView):
+    template_name = 'office/member/timeline.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['timeline'] = self.get_timeline()
+        return ctx
+
+    def get_timeline(self):
+        member = self.get_member()
+
+        entries = sorted_merge(
+            get_finance_timeline(member),
+            get_mail_timeline(member),
+            get_ops_timeline(member),
+            get_document_timeline(member),
+        )
+
+        return augment_timeline(entries)

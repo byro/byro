@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^members/add$', members.MemberCreateView.as_view(), name='members.add'),
     url(r'^members/view/(?P<pk>\d+)/', include([
         url('data$', members.MemberDataView.as_view(), name='members.data'),
+        url('timeline$', members.MemberTimelineView.as_view(), name='members.timeline'),
         url('finance$', members.MemberFinanceView.as_view(), name='members.finance'),
         url('operations$', members.MemberOperationsView.as_view(), name='members.operations'),
         url('record-disclosure$', members.MemberRecordDisclosureView.as_view(), name='members.record-disclosure'),

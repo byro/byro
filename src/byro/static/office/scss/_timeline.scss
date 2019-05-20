@@ -1,0 +1,214 @@
+$tl-types: (
+        "ops": #2f96ea,
+        "finance": #31e843,
+        "mail": #e8bd31,
+        "document": #e83199,
+);
+
+$tl-thickness: 0.2rem;
+
+.timeline {
+  position: relative;
+}
+
+.tl-year::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  border-left: $tl-thickness solid $brand-primary;
+  top: 0;
+  bottom: 0;
+  left: 13rem;
+  margin-left: -($tl-thickness / 2);
+  z-index: 1;
+}
+
+.timeline-filter {
+  & {
+    margin-left: 13rem;
+  }
+
+  .btn-toolbar {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-toolbar > div {
+    background-color: white;
+  }
+
+  .btn-toolbar input[type=checkbox] {
+    margin-right: 0.2em;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 2em;
+    margin-top: -2.5ex;
+    border-left: $tl-thickness solid $brand-primary;
+    border-top: $tl-thickness solid $brand-primary;
+    margin-left: -($tl-thickness / 2);
+    border-top-left-radius: 1em;
+  }
+}
+
+/* .tl-month::after {
+  content: '';
+  position: absolute;
+  width: 0.8rem;
+  height: 0.15rem;
+  background-color: $brand-primary;
+  margin-top: 1ex;
+  left: 13rem;
+  margin-left: -0.4rem;
+  z-index: 1;
+} */
+
+
+.timeline {
+  .tl-year {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  .tl-year-content {
+    font-size: 120%;
+    font-weight: bold;
+    width: 4rem;
+  }
+
+  .tl-year-inner {
+    flex-grow: 1;
+  }
+
+  .tl-month {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  .tl-month-content {
+    margin-left: 2rem;
+    width: 3rem;
+  }
+
+  .tl-entry {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin-bottom: 1em;
+  }
+
+  .tl-entry-content {
+    flex-grow: 1;
+  }
+
+  .tl-month-inner {
+    margin-left: 1em;
+    flex-grow: 1;
+  }
+
+  .tl-entry-inner {
+    width: 100%;
+  }
+
+  .tl-entry-data {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  .tl-entry-icon {
+    width: 6rem;
+    text-align: center;
+    z-index: 2;
+  }
+
+  .tl-entry-icon .fa-stack {
+    top: -0.2em;
+  }
+
+  .tl-deleted {
+    .tl-entry-content, .tl-entry-date {
+      opacity: 0.4;
+    }
+
+    .tl-entry-icon .fa-ban {
+      opacity: 0.6;
+    }
+  }
+
+  .tl-entry-date {
+    margin-left: 6em + 0.8em;
+  }
+
+  .tl-entry-value {
+    font-size: 130%;
+    font-weight: bold;
+  }
+
+  span.tl-entry-value {
+    display: inline-block;
+    text-align: right;
+    min-width: 4rem;
+    padding-right: 0.2em;
+  }
+
+  .tl-entry-content.card {
+    border: 2px solid black;
+    border-radius: 1em;
+    overflow: hidden;
+  }
+
+  .tl-entry-content .card-header table th {
+    font-weight: inherit;
+    padding-right: 0.5em;
+    min-width: 4rem;
+  }
+
+  .tl-collapsed {
+    max-height: 4em;
+    overflow: hidden;
+  }
+
+  .tl-read-more {
+    display: block;
+    text-align: center;
+    background: linear-gradient(to bottom, transparent, white);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    padding-top: 2em;
+  }
+
+  .finance-memo {
+    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  }
+
+}
+
+@mixin tl-entry-color($color) {
+  .fa.fa-circle {
+    color: $color;
+  }
+  .tl-entry-content.card {
+    border-color: darken($color, 20);
+  }
+  .tl-entry-content .card-header {
+    background-color: lighten($color, 20);
+  }
+}
+
+@each $tl-type, $color in $tl-types {
+  .tl-entry-#{$tl-type} {
+    @include tl-entry-color($color);
+  }
+  .btn-tl-#{$tl-type} {
+    @include button-variant($color, $color);
+  }
+}
+

@@ -15,6 +15,14 @@
   </li>
   <li class="nav-item">
     <a
+            class="nav-link {% if "members.timeline" in url_name %}active{% endif %}"
+            href="{% url "office:members.timeline" pk=member.pk %}"
+    >
+        {% trans "Timeline" %}
+    </a>
+  </li>
+    <li class="nav-item">
+        <a
       class="nav-link {% if "members.data" in url_name %}active{% endif %}"
       href="{% url "office:members.data" pk=member.pk %}"
     >

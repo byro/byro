@@ -15,6 +15,7 @@ from .members import (
     MemberListView,
     MemberMailsView,
     MemberOperationsView,
+    MemberTimelineView,
 )
 from .settings import ConfigurationView, RegistrationConfigView
 from .transactions import TransactionDetailView
@@ -36,6 +37,7 @@ __all__ = [
     'MemberListExportView',
     'MemberListImportView',
     'MemberMailsView',
+    'MemberTimelineView',
     'UserListView',
     'UserCreateView',
     'UserDetailView',
