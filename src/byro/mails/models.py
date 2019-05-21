@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -154,7 +155,9 @@ class EMail(Auditable, models.Model):
             send_tos = []
 
             if self.to == "special:all":
-                for member in Member.objects.filter(email__isnull=False).exclude(email="").all():
+                for member in Member.objects.filter(Q(memberships__start__lte=now().date()) & (
+                        Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date())
+                )).filter(email__isnull=False).exclude(email="").all():
                     send_tos.append([member.email])
                     self.members.add(member)
 
