@@ -102,7 +102,7 @@ def get_ops_timeline(member):
         if membership.start:
             membership_ops.append(dict(subtype="membership-begin", date=membership.start, **base_data))
         if membership.end:
-            membership_ops.append(dict(subtype="membership-end", date=membership.start, **base_data))
+            membership_ops.append(dict(subtype="membership-end", date=membership.end, **base_data))
 
     return sorted_merge(
         sorted(membership_ops, reverse=True, key=lambda a: a["date"]),
