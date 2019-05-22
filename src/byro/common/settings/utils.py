@@ -32,7 +32,7 @@ def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
     image[-1] += ' ' * (img_width - len(image[-1]))
     image += [' ' * img_width for _ in range((len(lines) - len(image)))]
 
-    lines = [(image[n] + ' ' + lines[n][0], lines[n][1]) for n in range(len(lines))]
+    lines = [(image[n] + ' ' + line[0], line[1]) for n, line in enumerate(lines)]
 
     size = max(len(line[0]) for line in lines) + 4
     start_box(size)
