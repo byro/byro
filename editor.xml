@@ -1,6 +1,5 @@
 <application>
-  <component name="DefaultFont">
-    <option name="FONT_SIZE" value="13" />
-    <option name="FONT_SCALE" value="1.0833334" />
+  <component name="EditorSettings">
+    <option name="IS_WHITESPACES_SHOWN" value="true" />
   </component>
 </application>
