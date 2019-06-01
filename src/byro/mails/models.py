@@ -155,9 +155,18 @@ class EMail(Auditable, models.Model):
             send_tos = []
 
             if self.to == "special:all":
-                for member in Member.objects.filter(Q(memberships__start__lte=now().date()) & (
-                        Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date())
-                )).filter(email__isnull=False).exclude(email="").all():
+                for member in (
+                    Member.objects.filter(
+                        Q(memberships__start__lte=now().date())
+                        & (
+                            Q(memberships__end__isnull=True)
+                            | Q(memberships__end__gte=now().date())
+                        )
+                    )
+                    .filter(email__isnull=False)
+                    .exclude(email="")
+                    .all()
+                ):
                     send_tos.append([member.email])
                     self.members.add(member)
 
@@ -166,7 +175,9 @@ class EMail(Auditable, models.Model):
                 send_tos.append(to_addrs)
 
                 for addr in to_addrs:
-                    for member in Member.all_objects.filter(email__iexact=addr.lower()).all():
+                    for member in Member.all_objects.filter(
+                        email__iexact=addr.lower()
+                    ).all():
                         self.members.add(member)
 
             headers = {}

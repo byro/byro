@@ -28,18 +28,29 @@ class MailSpecialToFormClass(forms.ModelForm):
         fields = ['to', 'reply_to', 'cc', 'bcc', 'subject', 'text']
 
     to_type = forms.ChoiceField(
-        choices=[('addr', _('Specific address')), ('member', _('Member')), ('all', _('All members'))],
+        choices=[
+            ('addr', _('Specific address')),
+            ('member', _('Member')),
+            ('all', _('All members')),
+        ],
         widget=forms.RadioSelect,
         initial='addr',
     )
 
-    to_member = forms.ModelChoiceField(Member.objects.filter(email__isnull=False).exclude(email=""), required=False,
-                                       empty_label=None)
+    to_member = forms.ModelChoiceField(
+        Member.objects.filter(email__isnull=False).exclude(email=""),
+        required=False,
+        empty_label=None,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._decode_special(self.initial)
-        self.fields['to'].required = False  # FIXME Needs to be re-added in case no special mode is active
+        self.fields[
+            'to'
+        ].required = (
+            False
+        )  # FIXME Needs to be re-added in case no special mode is active
         self.order_fields(['to_type', 'to_member'])
 
     @staticmethod
@@ -62,7 +73,9 @@ class MailSpecialToFormClass(forms.ModelForm):
         if self.cleaned_data['to_type'] == 'all':
             self.cleaned_data['to'] = 'special:all'
         elif self.cleaned_data['to_type'] == 'member':
-            self.cleaned_data['to'] = 'special:member:{}'.format(self.cleaned_data['to_member'].pk)
+            self.cleaned_data['to'] = 'special:member:{}'.format(
+                self.cleaned_data['to_member'].pk
+            )
         self.initial['to_type'] = None
         self.initial['to_member'] = None
         del self.cleaned_data['to_type']

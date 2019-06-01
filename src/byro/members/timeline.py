@@ -27,7 +27,9 @@ def sorted_merge(*args):
     while any(e is not None for e in nextin):
         available = [i for (i, e) in enumerate(nextin) if e is not None]
         if len(available) > 1:
-            minindex = max(*available, key=lambda a: _date_compare_key(nextin[a]["date"]))
+            minindex = max(
+                *available, key=lambda a: _date_compare_key(nextin[a]["date"])
+            )
         else:
             minindex = available[0]
         yield nextin[minindex]
@@ -49,9 +51,11 @@ def get_mail_timeline(member):
 
 def get_finance_timeline(member):
     last_transaction_pk = None
-    for instance in Booking.objects.with_transaction_data()\
-            .filter(member=member, transaction__reverses__isnull=True)\
-            .order_by("-transaction__value_datetime", "-transaction__pk"):
+    for instance in (
+        Booking.objects.with_transaction_data()
+        .filter(member=member, transaction__reverses__isnull=True)
+        .order_by("-transaction__value_datetime", "-transaction__pk")
+    ):
         if instance.transaction.pk == last_transaction_pk:
             continue
         last_transaction_pk = instance.transaction.pk
@@ -63,10 +67,17 @@ def get_finance_timeline(member):
             "deleted": instance.transaction.reversed_by.first(),
         }
         b = list(instance.transaction.bookings.all())
-        if any(e.member == member and e.debit_account == SpecialAccounts.fees_receivable for e in b) and \
-                any(e.member == member and e.credit_account == SpecialAccounts.fees for e in b):
+        if any(
+            e.member == member and e.debit_account == SpecialAccounts.fees_receivable
+            for e in b
+        ) and any(
+            e.member == member and e.credit_account == SpecialAccounts.fees for e in b
+        ):
             yield dict(subtype="membership-due", value=instance.amount, **base_data)
-        elif any(e.member == member and e.credit_account == SpecialAccounts.fees_receivable for e in b):
+        elif any(
+            e.member == member and e.credit_account == SpecialAccounts.fees_receivable
+            for e in b
+        ):
             yield dict(subtype="membership-paid", value=instance.amount, **base_data)
         else:
             yield dict(subtype="other-transaction", value=instance.amount, **base_data)
@@ -91,18 +102,17 @@ def get_misc_ops_timeline(member):
 
 
 def get_ops_timeline(member):
-    membership_ops = [
-    ]
+    membership_ops = []
     for membership in member.memberships.all():
-        base_data = {
-            "type": "ops",
-            "icon": "user",
-            "instance": membership,
-        }
+        base_data = {"type": "ops", "icon": "user", "instance": membership}
         if membership.start:
-            membership_ops.append(dict(subtype="membership-begin", date=membership.start, **base_data))
+            membership_ops.append(
+                dict(subtype="membership-begin", date=membership.start, **base_data)
+            )
         if membership.end:
-            membership_ops.append(dict(subtype="membership-end", date=membership.end, **base_data))
+            membership_ops.append(
+                dict(subtype="membership-end", date=membership.end, **base_data)
+            )
 
     return sorted_merge(
         sorted(membership_ops, reverse=True, key=lambda a: a["date"]),
@@ -111,10 +121,7 @@ def get_ops_timeline(member):
 
 
 def get_file_icon(document):
-    return {
-        "application/pdf": "file-pdf-o",
-
-    }.get(document.mime_type_guessed, 'file-o')
+    return {"application/pdf": "file-pdf-o"}.get(document.mime_type_guessed, 'file-o')
 
 
 def get_document_timeline(member):
@@ -149,7 +156,7 @@ def add_dummy_entries(entries):
                     "type": "dummy",
                     "subtype": "dummy",
                     "instance": None,
-                    "date": datetime(year=output_year, month=output_month, day=1)
+                    "date": datetime(year=output_year, month=output_month, day=1),
                 }
         yield entry
 
@@ -168,8 +175,11 @@ def augment_timeline(entries):
             "year_last": False,
             "month_first": False,
             "month_last": False,
-            "entry_id": "{}:{}:{}".format(entry["type"], entry["subtype"], entry["instance"].pk) if entry[
-                "instance"] else None,
+            "entry_id": "{}:{}:{}".format(
+                entry["type"], entry["subtype"], entry["instance"].pk
+            )
+            if entry["instance"]
+            else None,
         }
         if last_year != entry["date"].year:
             tl["year_first"] = True

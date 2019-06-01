@@ -41,13 +41,20 @@ from byro.members.signals import (
     new_member_office_mail_information,
     update_member,
 )
-from byro.members.timeline import get_document_timeline, get_finance_timeline, get_mail_timeline, get_ops_timeline, \
-    augment_timeline, sorted_merge
+from byro.members.timeline import (
+    augment_timeline,
+    get_document_timeline,
+    get_finance_timeline,
+    get_mail_timeline,
+    get_ops_timeline,
+    sorted_merge,
+)
 from byro.office.signals import (
     member_dashboard_tile,
     member_list_importers,
     member_view,
 )
+
 from .documents import DocumentUploadForm
 
 
