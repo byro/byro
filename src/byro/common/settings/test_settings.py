@@ -26,6 +26,7 @@ MAIL_FROM = 'orga@orga.org'
 
 COMPRESS_ENABLED = COMPRESS_OFFLINE = False
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+GET_SOLO_TEMPLATE_TAG_NAME = 'get_solo'
 
 DEBUG = True
 DEBUG_PROPAGATE_EXCEPTIONS = True
