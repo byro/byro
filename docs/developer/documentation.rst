@@ -10,7 +10,8 @@ Start out in a shell in the repository. We'll start by generating a virtualenv a
 the required Python packages::
 
   python3 -m venv .venv
-  pip install -Ur src/requirements/documentation.txt
+  source venv/bin/activate
+  pip install -Ur docs/requirements.txt
 
 
 Writing documentation
