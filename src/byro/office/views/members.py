@@ -487,7 +487,18 @@ def default_csv_form_valid(view, form, dialect='excel'):
                         )
                         return redirect(view.request.get_full_path())
 
-            member = Member.objects.create()
+            do_update = False
+            have_changes = False
+            for verb_name, field in mapping.items():
+                if field.field_id == '_internal_id':
+                    member = Member.all_objects.filter(pk=indict[verb_name.strip()]).first()
+                    if member:
+                        do_update = True
+                        del indict[verb_name]
+
+            if not do_update:
+                member = Member.objects.create()
+
             membership_parms = {}
             for k, v in indict.items():
                 field = mapping[k.strip()]
@@ -498,10 +509,24 @@ def default_csv_form_valid(view, form, dialect='excel'):
                     if v:
                         membership_parms[field.field_id.split('__', 1)[1]] = v
                 else:
-                    field.setter(member, v)
-            member.log(view, '.created')
-            member.save()
-            create_membership(membership_parms, member)
+                    if do_update:
+                        if field.getter(member) != v:
+                            field.setter(member, v)
+                            have_changes = True
+                    else:
+                        field.setter(member, v)
+
+            if do_update:
+                if have_changes:
+                    member.log(view, '.updated')
+                    member.save()
+            else:
+                member.log(view, '.created')
+                member.save()
+
+                # FIXME Changing membership when do_update is not implemented
+                if membership_parms:
+                    create_membership(membership_parms, member)
 
     return redirect(reverse('office:members.list'))
 
