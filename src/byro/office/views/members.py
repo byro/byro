@@ -54,7 +54,6 @@ from byro.office.signals import (
     member_list_importers,
     member_view,
 )
-
 from .documents import DocumentUploadForm
 
 
@@ -717,7 +716,10 @@ class MemberDataView(MemberView):
         any_changed = False
         form_list = self.get_forms()
         for form in form_list:
-            if form.is_valid() and form.has_changed():
+            if not form.is_valid():
+                return self.get(self.request)
+        for form in form_list:
+            if form.has_changed():
                 if not getattr(form.instance, 'member', False):
                     form.instance.member = self.get_object()
                 any_changed = True
