@@ -1,7 +1,10 @@
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils.timezone import now
+
+from byro.members.models import Member
 
 pytestmark = pytest.mark.usefixtures('configuration')
 
@@ -137,3 +140,45 @@ def test_members_end_membership(member, membership, logged_in_client):
     content = response.content.decode()
     assert response.status_code == 302, content
     assert not member.is_active
+
+
+@pytest.mark.django_db
+def test_member_download_and_edit(member, membership, logged_in_client):
+    response = logged_in_client.post(
+        reverse('office:members.list.export'),
+        {
+            "field_list": [
+                '_internal_id',
+                'member__name',
+                'MemberSepa__iban',
+            ],
+            'member_filter': 'all',
+            'export_format': 'csv',
+
+        }
+    )
+
+    assert response['Content-Type'].startswith("text/csv")
+
+    response_body = b"".join(response.streaming_content)
+
+    assert member.name.encode('utf-8') in response_body
+
+    new_body = response_body.replace(
+        ",{},".format(member.name).encode('utf-8'),
+        ",{},{}".format("Fnord!", "DE11520513735120710131").encode('utf-8'),
+    )
+
+    new_response = logged_in_client.post(
+        reverse('office:members.list.import'),
+        {
+            'importer': 'byro.office.members.import.default_csv',
+            'upload_file': SimpleUploadedFile('members.csv', new_body, content_type=response['Content-Type'])
+        }
+    )
+
+    assert new_response.status_code == 302
+
+    new_member = Member.objects.filter(pk=member.pk).first()
+    assert new_member.name == 'Fnord!'
+    assert new_member.profile_sepa.iban == 'DE11520513735120710131'
