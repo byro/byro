@@ -71,6 +71,8 @@ class Field:
                 "Encountered 'None' while following {}".format(self.path)
             )
         setattr(target, prop, value)
+        if callable(getattr(target, 'save', None)):
+            target.save()
 
 
 class MemberTypes:
