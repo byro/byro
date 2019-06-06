@@ -53,3 +53,11 @@ def test_member_field_writing(member):
     assert member.name != 'Fnord'
     f['member__name'].setter(member, 'Fnord')
     assert member.name == 'Fnord'
+
+
+@pytest.mark.django_db
+def test_member_field_writing_sepa_iban(member):
+    f = Member.get_fields()
+
+    f['MemberSepa__iban'].setter(member, 'DE491234567890')
+    assert member.profile_sepa.iban == 'DE491234567890'
