@@ -229,7 +229,7 @@ class MemberBalanceView(MemberListMixin, FormView):
                     to=member.email,
                     balance=balance,
                     text=text.format(
-                        name=member.name, start=start, end=end, amount=amount
+                        name=member.name, start=start, end=end, amount=balance.amount
                     ),
                     subject=subject,
                 )
