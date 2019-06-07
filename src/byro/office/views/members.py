@@ -30,6 +30,7 @@ from django.views.generic.list import (
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry
+from byro.mail.models import EMail
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
@@ -215,24 +216,25 @@ class MemberBalanceView(MemberListMixin, FormView):
         text = form.cleaned_data.get('text')
         subject = form.cleaned_data.get('subject')
         for member in members:
+            balance = None
             try:
                 balance = member.create_balance(
                     start=start, end=end, create_if_zero=create_if_zero
                 )
                 balance_count += 1
-                if not balance_cutoff or balance.amount < -balance_cutoff:
-                    mail = EMail.objects.create(
-                        to=member.email,
-                        balance=balance,
-                        text=text.format(
-                            name=member.name, start=start, end=end, amount=amount
-                        ),
-                        subject=subject,
-                    )
-                    mail.members.add(member)
-                    mails += 1
             except Exception:
                 errors += 1
+            if balance and (not balance_cutoff or balance.amount < -balance_cutoff):
+                mail = EMail.objects.create(
+                    to=member.email,
+                    balance=balance,
+                    text=text.format(
+                        name=member.name, start=start, end=end, amount=amount
+                    ),
+                    subject=subject,
+                )
+                mail.members.add(member)
+                mails += 1
         message = str(
             _(
                 '{balance_count} balances were created and {mail_count} reminder emails were placed in the outbox.'
