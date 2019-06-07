@@ -503,6 +503,8 @@ def default_csv_form_valid(view, form, dialect='excel'):
 
             membership_parms = {}
             for k, v in indict.items():
+                if k.strip() not in mapping:
+                    continue
                 field = mapping[k.strip()]
                 #  FIXME We're special casing the Membership here, but really Field.setter should handle that
                 #  (In the case of 'member.memberships.last()' for the getter it should create a new Membership
