@@ -30,7 +30,7 @@ from django.views.generic.list import (
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry
-from byro.mail.models import EMail
+from byro.mails.models import EMail
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
