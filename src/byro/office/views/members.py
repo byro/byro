@@ -474,6 +474,8 @@ def default_csv_form_valid(view, form, dialect='excel'):
             if mapping is None:
                 mapping = {}
                 for k in indict.keys():
+                    if not k.strip():
+                        continue
                     for field in fields.values():
                         if str(field.name).strip() == k.strip():
                             mapping[k.strip()] = field
@@ -510,7 +512,8 @@ def default_csv_form_valid(view, form, dialect='excel'):
                         membership_parms[field.field_id.split('__', 1)[1]] = v
                 else:
                     if do_update:
-                        if field.getter(member) != v:
+                        old_v = field.getter(member)
+                        if old_v != v and not (old_v is None and not v):
                             field.setter(member, v)
                             have_changes = True
                     else:
