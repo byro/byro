@@ -221,7 +221,7 @@ class MemberBalanceView(MemberListMixin, FormView):
                 balance = member.create_balance(
                     start=start, end=end, create_if_zero=create_if_zero
                 )
-                balance_count += 1
+                balance_count += 1 if balance else 0
             except Exception:
                 errors += 1
             if balance and (not balance_cutoff or balance.amount < -balance_cutoff):
