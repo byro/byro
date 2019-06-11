@@ -4,6 +4,7 @@ from functools import reduce
 
 from dateutil.relativedelta import relativedelta
 from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.urls import reverse
 from django.utils.decorators import classproperty
@@ -86,9 +87,23 @@ class MemberContactTypes(Choices):
     ROLE = 'role'
 
 
+class MemberQuerySet(models.QuerySet):
+    def with_active_membership(self):
+        return self.filter(
+            Q(memberships__start__lte=now().date())
+            & (
+                    Q(memberships__end__isnull=True)
+                    | Q(memberships__end__gte=now().date())
+            )
+        ).order_by('-id').distinct()
+
+
 class MemberManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(membership_type=MemberTypes.MEMBER)
+        return MemberQuerySet(self.model, using=self._db).filter(membership_type=MemberTypes.MEMBER)
+
+    def with_active_membership(self):
+        return self.get_queryset().with_active_membership()
 
 
 class AllMemberManager(models.Manager):

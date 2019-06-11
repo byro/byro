@@ -197,17 +197,7 @@ class MemberBalanceView(MemberListMixin, FormView):
     form_class = MemberBalanceForm
 
     def form_valid(self, form):
-        members = (
-            Member.objects.filter(
-                Q(memberships__start__lte=now().date())
-                & (
-                    Q(memberships__end__isnull=True)
-                    | Q(memberships__end__gte=now().date())
-                )
-            )
-            .order_by('-id')
-            .distinct()
-        )
+        members = Member.objects.with_active_membership()
         mails = errors = balance_count = 0
         start = datetime.combine(form.cleaned_data.get('start'), time(0, 0))
         end = datetime.combine(form.cleaned_data.get('end'), time(23, 59))

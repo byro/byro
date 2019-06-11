@@ -12,9 +12,6 @@ class DashboardView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['member_count'] = Member.objects.all().count()
-        context['active_count'] = Membership.objects.filter(
-            Q(start__lte=now().date())
-            & (Q(end__isnull=True) | Q(end__gte=now().date()))
-        ).count()
+        context['active_count'] = Member.objects.with_active_membership().count()
         context['stats'] = get_member_statistics()
         return context
