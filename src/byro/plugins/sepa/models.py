@@ -1,6 +1,8 @@
-from enum import Enum
 from annoying.fields import AutoOneToOneField
+from contextlib import suppress
+from enum import Enum
 from schwifty import IBAN
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from localflavor.generic.models import BICField, IBANField
@@ -102,10 +104,11 @@ class MemberSepa(Auditable, models.Model):
 
     @property
     def iban_parsed(self):
-        try:
-            return IBAN(self.iban)
-        except ValueError:
-            return None
+        with suppress(ValueError):
+            if self.iban:
+                return IBAN(self.iban)
+
+        return None
 
     @property
     def bic_autocomplete(self):
@@ -116,10 +119,10 @@ class MemberSepa(Auditable, models.Model):
         if not iban_parsed:
             return None
 
-        try:
-            return iban_parsed.bic
-        except ValueError:
-            return None
+        with suppress(ValueError):
+            return str(iban_parsed.bic)
+
+        return None
 
     @property
     def sepa_direct_debit_state(self):
