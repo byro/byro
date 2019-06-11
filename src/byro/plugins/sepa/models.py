@@ -15,6 +15,17 @@ class MemberSepa(Auditable, models.Model):
     iban = IBANField(null=True, blank=True, verbose_name="IBAN")
     bic = BICField(null=True, blank=True, verbose_name="BIC")
 
+    mandate_state = models.CharField(
+        choices=[
+            ('inactive', _('Inactive')),
+            ('active', _('Active')),
+            ('bounced', _('Bounced')),
+            ('rescinded', _('Rescinded')),
+        ],
+        default='active', max_length=10, blank=False, null=False,
+        verbose_name=_("Mandate state"),
+    )
+
     institute = models.CharField(
         max_length=255, null=True, blank=True, verbose_name=_("IBAN Institute")
     )
