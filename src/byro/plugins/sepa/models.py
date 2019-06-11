@@ -1,9 +1,22 @@
+from enum import Enum
 from annoying.fields import AutoOneToOneField
+from schwifty import IBAN
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from localflavor.generic.models import BICField, IBANField
 
 from byro.common.models.auditable import Auditable
+
+
+class SepaDirectDebitState(Enum):
+    OK = _("OK")
+    NO_IBAN = _("No IBAN")
+    INVALID_IBAN = _("Invalid IBAN")
+    NO_BIC = _("No BIC")
+    BOUNCED = _("Debit bounced")
+    RESCINDED = _("Mandate rescinded")
+    INACTIVE = _("Direct debit deactivated")
+    NO_MANDATE_REFERENCE = _("No mandate reference")
 
 
 class MemberSepa(Auditable, models.Model):
@@ -85,4 +98,50 @@ class MemberSepa(Auditable, models.Model):
 
     @property
     def is_usable(self):
-        return bool(self.iban and self.bic and self.mandate_reference)
+        return self.sepa_direct_debit_state == SepaDirectDebitState.OK
+
+    @property
+    def iban_parsed(self):
+        try:
+            return IBAN(self.iban)
+        except ValueError:
+            return None
+
+    @property
+    def bic_autocomplete(self):
+        if self.bic:
+            return self.bic
+
+        iban_parsed = self.iban_parsed
+        if not iban_parsed:
+            return None
+
+        try:
+            return iban_parsed.bic
+        except ValueError:
+            return None
+
+    @property
+    def sepa_direct_debit_state(self):
+        if not self.iban:
+            return SepaDirectDebitState.NO_IBAN
+
+        if not self.iban_parsed:
+            return SepaDirectDebitState.INVALID_IBAN
+
+        if self.mandate_state == 'rescinded':
+            return SepaDirectDebitState.RESCINDED
+
+        if self.mandate_state == 'bounced':
+            return SepaDirectDebitState.BOUNCED
+
+        if self.mandate_state == 'inactive':
+            return SepaDirectDebitState.INACTIVE
+
+        if not self.bic_autocomplete:
+            return SepaDirectDebitState.NO_BIC
+
+        if not self.mandate_reference:
+            return SepaDirectDebitState.NO_MANDATE_REFERENCE
+
+        return SepaDirectDebitState.OK
