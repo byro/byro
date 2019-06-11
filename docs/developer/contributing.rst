@@ -28,7 +28,8 @@ but you should run the tests and checks locally as well, and consider your pull 
 ready once those tests pass.
 
 Please write helpful, well-formatted commit messages – you can find a guide here_. Once you
-have committed your work, add yourself to the ``CONTRIBUTORS`` file, and push your branch::
+have committed your work, add yourself to the
+``src/byro/office/templates/office/settings/about.html`` file, and push your branch::
 
   git push -u origin issue/123
 
