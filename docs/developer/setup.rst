@@ -62,7 +62,7 @@ Working with the code
 The first thing you need are all the main application's dependencies::
 
     (env)$ cd src/
-    (env)$ pip3 install -r requirements/production.txt -r requirements/development.txt
+    (env)$ pip3 install -e .
 
 .. note:: (Windows only) If you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
 
