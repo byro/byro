@@ -16,42 +16,42 @@ class MemberSepa(Auditable, models.Model):
     bic = BICField(null=True, blank=True, verbose_name="BIC")
 
     institute = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name="IBAN Institute"
+        max_length=255, null=True, blank=True, verbose_name=_("IBAN Institute")
     )
 
     issue_date = models.DateField(
         null=True,
         blank=True,
-        verbose_name="IBAN Issue Date",
-        help_text="The issue date of the direct debit mandate. (1970-01-01 means there is no issue date in the database )",
+        verbose_name=_("IBAN Issue Date"),
+        help_text=_("The issue date of the direct debit mandate. (1970-01-01 means there is no issue date in the database )"),
     )
 
     fullname = models.CharField(
         null=True,
         blank=True,
         max_length=255,
-        verbose_name="IBAN full name",
-        help_text="Full name for IBAN account owner",
+        verbose_name=_("IBAN full name"),
+        help_text=_("Full name for IBAN account owner"),
     )
 
     address = models.CharField(
         null=True,
         blank=True,
         max_length=255,
-        verbose_name="IBAN address",
-        help_text="Address line (e.g. Street / House Number)",
+        verbose_name=_("IBAN address"),
+        help_text=_("Address line (e.g. Street / House Number)"),
     )
 
     zip_code = models.CharField(
         null=True,
         blank=True,
         max_length=20,
-        verbose_name="IBAN zip code",
-        help_text="ZIP Code",
+        verbose_name=_("IBAN zip code"),
+        help_text=_("ZIP Code"),
     )
 
     city = models.CharField(
-        null=True, blank=True, max_length=255, verbose_name="IBAN City"
+        null=True, blank=True, max_length=255, verbose_name=_("IBAN City")
     )
 
     country = models.CharField(
@@ -59,15 +59,15 @@ class MemberSepa(Auditable, models.Model):
         blank=True,
         max_length=255,
         default="Deutschland",
-        verbose_name="IBAN Country",
+        verbose_name=_("IBAN Country"),
     )
 
     mandate_reference = models.CharField(
-        null=True, blank=True, max_length=255, verbose_name="IBAN Mandate Reference"
+        null=True, blank=True, max_length=255, verbose_name=_("IBAN Mandate Reference")
     )
 
     mandate_reason = models.CharField(
-        null=True, blank=True, max_length=255, verbose_name="IBAN Mandate Reason"
+        null=True, blank=True, max_length=255, verbose_name=_("IBAN Mandate Reason")
     )
 
     form_title = _('SEPA information')
