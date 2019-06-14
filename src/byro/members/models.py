@@ -417,6 +417,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
         # Step 1
         for membership in self.memberships.all():
+            if not membership.amount:
+                continue
             membership_range, membership_dues = membership.get_dues(_now=_now)
             membership_ranges.append(membership_range)
             dues |= membership_dues
