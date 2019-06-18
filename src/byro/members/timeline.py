@@ -49,7 +49,7 @@ def get_mail_timeline(member):
         }
 
 
-def get_finance_timeline(member):
+def get_base_finance_timeline(member):
     last_transaction_pk = None
     for instance in (
         Booking.objects.with_transaction_data()
@@ -83,8 +83,29 @@ def get_finance_timeline(member):
             yield dict(subtype="other-transaction", value=instance.amount, **base_data)
 
 
+def get_misc_finance_timeline(member):
+    for entry in member.log_entries().filter(action_type__startswith="byro.members.finance."):
+        base_data = {
+            "type": "finance",
+            "icon": "money",
+            "instance": entry,
+            "date": entry.datetime,
+        }
+        if entry.action_type == "byro.members.finance.sepadd.mandate_reference_assigned":
+            yield dict(base_data, subtype="sepadd-mandate-reference-assigned", icon="info")
+        else:
+            yield dict(base_data, subtype="other")
+
+
+def get_finance_timeline(member):
+    return sorted_merge(
+        get_base_finance_timeline(member),
+        get_misc_finance_timeline(member),
+    )
+
+
 def get_misc_ops_timeline(member):
-    for entry in member.log_entries():
+    for entry in member.log_entries().exclude(action_type__startswith="byro.members.finance."):
         base_data = {
             "type": "ops",
             "icon": "user",

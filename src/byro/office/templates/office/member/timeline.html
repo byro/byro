@@ -59,7 +59,7 @@
                                 {% endif %}
                             </span>
                         </div>
-                        {% if entry.type == "finance" %}
+                        {% if entry.type == "finance" and entry.instance.transaction %}
                             <div class="tl-entry-content card">
                                 {% if entry.subtype == "membership-due" %}
                                     <div class="card-header"><span class="tl-entry-value">{{ entry.value }}</span>
@@ -181,6 +181,13 @@
                                 {% if entry.instance.title %}
                                     <div class="card-body">{{ entry.instance.title }}</div>
                                 {% endif %}
+                            </div>
+                        {% elif entry.type == "finance" and entry.subtype == "sepadd-mandate-reference-assigned"%}
+                            <div class="tl-entry-content card">
+                                <div class="card-header">
+                                    {% trans "Direct Debit mandate reference assigned" %}:
+                                    <span class="tl-entry-value">{{ entry.instance.data.mandate_reference }}</span>
+                                </div>
                             </div>
                         {% else %}
                             <div class="tl-entry-content card">
