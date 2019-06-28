@@ -276,9 +276,9 @@ class Command(BaseCommand):
         )
         t.save()
 
-        for i in range(1, 4):
+        for month in range(1, 4):
             t = Transaction.objects.create(
-                value_datetime=(now() - relativedelta(months=i)).date(),
+                value_datetime=(now() - relativedelta(months=month)).date(),
                 user_or_context=SOURCE_TEST_DATA,
             )
             t.credit(
