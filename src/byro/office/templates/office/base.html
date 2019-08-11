@@ -27,10 +27,11 @@
         <script type="text/javascript">
             $(function(){
                 $('.datepicker').datepicker({
-                    'format': 'yyyy-mm-dd',
+                    'format': '{{ effective_date_format_js }}',
                     'calendarWeeks': true,
                     'todayHighlight': true,
                     'todayBtn': 'linked',
+                    'weekStart': 1,
                 });
             });
         </script>

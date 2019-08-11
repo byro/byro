@@ -2,6 +2,7 @@ import collections
 
 from django.conf import settings
 from django.http import Http404
+from django.utils import formats, translation
 from django.urls import resolve
 
 from byro.bookkeeping.models import Transaction
@@ -17,7 +18,11 @@ def byro_information(request):
         'pending_mails': EMail.objects.filter(sent__isnull=True).count(),
         'pending_transactions': Transaction.objects.unbalanced_transactions().count(),
         'log_end': LogEntry.objects.get_chain_end(),
+        'effective_date_format': formats.get_format("SHORT_DATE_FORMAT", lang=translation.get_language()),
     }
+
+    ctx['effective_date_format_js'] = ctx['effective_date_format']\
+        .replace('d', 'dd').replace('m', 'mm').replace('Y', 'yyyy')
 
     try:
         ctx['url_name'] = resolve(request.path_info).url_name
