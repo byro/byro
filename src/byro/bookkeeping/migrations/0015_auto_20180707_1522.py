@@ -7,14 +7,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bookkeeping', '0014_auto_20180707_1410'),
-    ]
+    dependencies = [("bookkeeping", "0014_auto_20180707_1410")]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='account_category',
-            field=models.CharField(choices=[('asset', 'Asset account'), ('liability', 'Liability account'), ('income', 'Income account'), ('expense', 'Expense account'), ('equity', 'Equity account')], max_length=9),
-        ),
+            model_name="account",
+            name="account_category",
+            field=models.CharField(
+                choices=[
+                    ("asset", "Asset account"),
+                    ("liability", "Liability account"),
+                    ("income", "Income account"),
+                    ("expense", "Expense account"),
+                    ("equity", "Equity account"),
+                ],
+                max_length=9,
+            ),
+        )
     ]

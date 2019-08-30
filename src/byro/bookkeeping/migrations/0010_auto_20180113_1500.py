@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bookkeeping', '0009_realtransactionsource_state'),
-    ]
+    dependencies = [("bookkeeping", "0009_realtransactionsource_state")]
 
     operations = [
         migrations.AlterField(
-            model_name='realtransaction',
-            name='purpose',
+            model_name="realtransaction",
+            name="purpose",
             field=models.CharField(max_length=1000),
-        ),
+        )
     ]

@@ -84,28 +84,36 @@ def get_base_finance_timeline(member):
 
 
 def get_misc_finance_timeline(member):
-    for entry in member.log_entries().filter(action_type__startswith="byro.members.finance."):
+    for entry in member.log_entries().filter(
+        action_type__startswith="byro.members.finance."
+    ):
         base_data = {
             "type": "finance",
             "icon": "money",
             "instance": entry,
             "date": entry.datetime,
         }
-        if entry.action_type == "byro.members.finance.sepadd.mandate_reference_assigned":
-            yield dict(base_data, subtype="sepadd-mandate-reference-assigned", icon="info")
+        if (
+            entry.action_type
+            == "byro.members.finance.sepadd.mandate_reference_assigned"
+        ):
+            yield dict(
+                base_data, subtype="sepadd-mandate-reference-assigned", icon="info"
+            )
         else:
             yield dict(base_data, subtype="other")
 
 
 def get_finance_timeline(member):
     return sorted_merge(
-        get_base_finance_timeline(member),
-        get_misc_finance_timeline(member),
+        get_base_finance_timeline(member), get_misc_finance_timeline(member)
     )
 
 
 def get_misc_ops_timeline(member):
-    for entry in member.log_entries().exclude(action_type__startswith="byro.members.finance."):
+    for entry in member.log_entries().exclude(
+        action_type__startswith="byro.members.finance."
+    ):
         base_data = {
             "type": "ops",
             "icon": "user",
@@ -142,11 +150,11 @@ def get_ops_timeline(member):
 
 
 def get_file_icon(document):
-    return {"application/pdf": "file-pdf-o"}.get(document.mime_type_guessed, 'file-o')
+    return {"application/pdf": "file-pdf-o"}.get(document.mime_type_guessed, "file-o")
 
 
 def get_document_timeline(member):
-    for document in member.documents.order_by('-date', '-id').all():
+    for document in member.documents.order_by("-date", "-id").all():
         base_data = {
             "type": "document",
             "icon": get_file_icon(document),

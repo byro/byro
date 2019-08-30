@@ -5,7 +5,7 @@ from byro.members.models import Member
 
 @pytest.fixture
 def member_bob():
-    member = Member.objects.create(email='bob@hacker.space')
+    member = Member.objects.create(email="bob@hacker.space")
     yield member
     [profile.delete() for profile in member.profiles]
     member.delete()

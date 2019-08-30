@@ -5,8 +5,9 @@ from django.db import migrations
 
 def init_templates(apps, schema_editor):
     from byro.mails import default
-    MailTemplate = apps.get_model('mails', 'MailTemplate')
-    Configuration = apps.get_model('common', 'Configuration')
+
+    MailTemplate = apps.get_model("mails", "MailTemplate")
+    Configuration = apps.get_model("common", "Configuration")
     config, _ = Configuration.objects.get_or_create()
     if not config.record_disclosure_template:
         template = MailTemplate.objects.create(
@@ -19,10 +20,6 @@ def init_templates(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0011_configuration_record_disclosure_template'),
-    ]
+    dependencies = [("common", "0011_configuration_record_disclosure_template")]
 
-    operations = [
-        migrations.RunPython(init_templates, migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(init_templates, migrations.RunPython.noop)]

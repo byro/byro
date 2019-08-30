@@ -11,31 +11,93 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='EMail',
+            name="EMail",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('to', models.CharField(help_text='One email address or several addresses separated by commas.', max_length=1000, verbose_name='To')),
-                ('reply_to', models.CharField(blank=True, max_length=1000, null=True, verbose_name='Reply-To')),
-                ('cc', models.CharField(blank=True, help_text='One email address or several addresses separated by commas.', max_length=1000, null=True, verbose_name='CC')),
-                ('bcc', models.CharField(blank=True, help_text='One email address or several addresses separated by commas.', max_length=1000, null=True, verbose_name='BCC')),
-                ('subject', models.CharField(max_length=200, verbose_name='Subject')),
-                ('text', models.TextField(verbose_name='Text')),
-                ('sent', models.DateTimeField(blank=True, null=True, verbose_name='Sent at')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "to",
+                    models.CharField(
+                        help_text="One email address or several addresses separated by commas.",
+                        max_length=1000,
+                        verbose_name="To",
+                    ),
+                ),
+                (
+                    "reply_to",
+                    models.CharField(
+                        blank=True, max_length=1000, null=True, verbose_name="Reply-To"
+                    ),
+                ),
+                (
+                    "cc",
+                    models.CharField(
+                        blank=True,
+                        help_text="One email address or several addresses separated by commas.",
+                        max_length=1000,
+                        null=True,
+                        verbose_name="CC",
+                    ),
+                ),
+                (
+                    "bcc",
+                    models.CharField(
+                        blank=True,
+                        help_text="One email address or several addresses separated by commas.",
+                        max_length=1000,
+                        null=True,
+                        verbose_name="BCC",
+                    ),
+                ),
+                ("subject", models.CharField(max_length=200, verbose_name="Subject")),
+                ("text", models.TextField(verbose_name="Text")),
+                (
+                    "sent",
+                    models.DateTimeField(blank=True, null=True, verbose_name="Sent at"),
+                ),
             ],
             bases=(byro.common.models.auditable.Auditable, models.Model),
         ),
         migrations.CreateModel(
-            name='MailTemplate',
+            name="MailTemplate",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('subject', i18nfield.fields.I18nCharField(max_length=200, verbose_name='Subject')),
-                ('text', i18nfield.fields.I18nTextField(verbose_name='Text')),
-                ('bcc', models.CharField(blank=True, help_text='Enter comma separated addresses. Will receive a blind copy of every mail sent from this template. This may be a LOT!', max_length=1000, null=True, verbose_name='BCC')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "subject",
+                    i18nfield.fields.I18nCharField(
+                        max_length=200, verbose_name="Subject"
+                    ),
+                ),
+                ("text", i18nfield.fields.I18nTextField(verbose_name="Text")),
+                (
+                    "bcc",
+                    models.CharField(
+                        blank=True,
+                        help_text="Enter comma separated addresses. Will receive a blind copy of every mail sent from this template. This may be a LOT!",
+                        max_length=1000,
+                        null=True,
+                        verbose_name="BCC",
+                    ),
+                ),
             ],
             bases=(byro.common.models.auditable.Auditable, models.Model),
         ),

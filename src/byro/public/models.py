@@ -25,13 +25,13 @@ class MemberpageProfile(models.Model):
     form_title = _("Memberpage settings")
 
     member = AutoOneToOneField(
-        to='members.Member', on_delete=models.CASCADE, related_name='profile_memberpage'
+        to="members.Member", on_delete=models.CASCADE, related_name="profile_memberpage"
     )
     secret_token = models.CharField(
         max_length=128, null=True, blank=True, default=generate_default_token
     )
     is_visible_to_members = models.BooleanField(
-        default=False, verbose_name=_('Consent: Visible to other members')
+        default=False, verbose_name=_("Consent: Visible to other members")
     )
     # publication_consent format: {"fields": {"profile_memberpage__secret_token": {"visibility": "share"}}}
     publication_consent = JSONField(default=get_default_consent, null=True, blank=True)
@@ -39,8 +39,8 @@ class MemberpageProfile(models.Model):
     def get_url(self):
         config = Configuration.get_solo()
         relative_url = reverse(
-            'public:memberpage:member.dashboard',
-            kwargs={'secret_token': self.secret_token},
+            "public:memberpage:member.dashboard",
+            kwargs={"secret_token": self.secret_token},
         )
         if config.public_base_url:
             return urljoin(config.public_base_url, relative_url)

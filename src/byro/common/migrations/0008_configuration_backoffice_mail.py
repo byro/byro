@@ -7,14 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0007_auto_20180224_2114'),
-    ]
+    dependencies = [("common", "0007_auto_20180224_2114")]
 
     operations = [
         migrations.AddField(
-            model_name='configuration',
-            name='backoffice_mail',
-            field=models.EmailField(blank=True, max_length=100, null=True, verbose_name='e-mail of backoffice'),
-        ),
+            model_name="configuration",
+            name="backoffice_mail",
+            field=models.EmailField(
+                blank=True,
+                max_length=100,
+                null=True,
+                verbose_name="e-mail of backoffice",
+            ),
+        )
     ]

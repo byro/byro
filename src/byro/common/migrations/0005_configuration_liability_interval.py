@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0004_auto_20180111_1807'),
-    ]
+    dependencies = [("common", "0004_auto_20180111_1807")]
 
     operations = [
         migrations.AddField(
-            model_name='configuration',
-            name='liability_interval',
-            field=models.IntegerField(default=36, help_text='For which interval should remaining fees be calculated?', verbose_name='Liability interval'),
-        ),
+            model_name="configuration",
+            name="liability_interval",
+            field=models.IntegerField(
+                default=36,
+                help_text="For which interval should remaining fees be calculated?",
+                verbose_name="Liability interval",
+            ),
+        )
     ]

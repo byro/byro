@@ -1,7 +1,7 @@
 from django.template.defaultfilters import register
 
 
-@register.filter(name='paginate_loop')
+@register.filter(name="paginate_loop")
 def translate_document_category(page_obj, context=5):
     items = [1, page_obj.number, page_obj.paginator.num_pages]
     for i in range(context):

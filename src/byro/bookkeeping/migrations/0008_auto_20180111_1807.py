@@ -9,22 +9,33 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bookkeeping', '0007_auto_20171206_1919'),
-    ]
+    dependencies = [("bookkeeping", "0007_auto_20171206_1919")]
 
     operations = [
         migrations.CreateModel(
-            name='RealTransactionSource',
+            name="RealTransactionSource",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('source_file', models.FileField(upload_to='transaction_uploads/')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("source_file", models.FileField(upload_to="transaction_uploads/")),
             ],
             bases=(byro.common.models.auditable.Auditable, models.Model),
         ),
         migrations.AddField(
-            model_name='realtransaction',
-            name='source',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='transactions', to='bookkeeping.RealTransactionSource'),
+            model_name="realtransaction",
+            name="source",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="transactions",
+                to="bookkeeping.RealTransactionSource",
+            ),
         ),
     ]

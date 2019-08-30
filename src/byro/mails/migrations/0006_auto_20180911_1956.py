@@ -4,11 +4,11 @@ from django.db import migrations
 
 
 def add_members_to_emails(apps, schema_editor):
-    Member = apps.get_model('members', 'Member')
-    EMail = apps.get_model('mails', 'EMail')
+    Member = apps.get_model("members", "Member")
+    EMail = apps.get_model("mails", "EMail")
 
     for email in EMail.objects.all():
-        for address in email.to.split(','):
+        for address in email.to.split(","):
             members = Member.objects.filter(email__iexact=address.strip().lower())
             if members.count() == 1:
                 email.members.add(members.first())
@@ -17,10 +17,8 @@ def add_members_to_emails(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('mails', '0005_email_members'),
-    ]
+    dependencies = [("mails", "0005_email_members")]
 
     operations = [
-        migrations.RunPython(add_members_to_emails, migrations.RunPython.noop),
+        migrations.RunPython(add_members_to_emails, migrations.RunPython.noop)
     ]

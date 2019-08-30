@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('mails', '0006_auto_20180911_1956'),
-    ]
+    dependencies = [("mails", "0006_auto_20180911_1956")]
 
     operations = [
         migrations.AlterField(
-            model_name='email',
-            name='members',
-            field=models.ManyToManyField(related_name='emails', to='members.Member'),
-        ),
+            model_name="email",
+            name="members",
+            field=models.ManyToManyField(related_name="emails", to="members.Member"),
+        )
     ]

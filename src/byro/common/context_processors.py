@@ -13,21 +13,21 @@ from byro.office.signals import nav_event
 
 def byro_information(request):
     ctx = {
-        'config': Configuration.get_solo(),
-        'pending_mails': EMail.objects.filter(sent__isnull=True).count(),
-        'pending_transactions': Transaction.objects.unbalanced_transactions().count(),
-        'log_end': LogEntry.objects.get_chain_end(),
+        "config": Configuration.get_solo(),
+        "pending_mails": EMail.objects.filter(sent__isnull=True).count(),
+        "pending_transactions": Transaction.objects.unbalanced_transactions().count(),
+        "log_end": LogEntry.objects.get_chain_end(),
     }
 
     try:
-        ctx['url_name'] = resolve(request.path_info).url_name
+        ctx["url_name"] = resolve(request.path_info).url_name
     except Http404:
-        ctx['url_name'] = ''
+        ctx["url_name"] = ""
 
     if settings.DEBUG:
-        ctx['development_warning'] = True
+        ctx["development_warning"] = True
 
-    ctx['byro_version'] = get_version()
+    ctx["byro_version"] = get_version()
 
     return ctx
 
@@ -42,4 +42,4 @@ def sidebar_information(request):
         else:
             _nav_event.extend(response)
 
-    return {'nav_event': _nav_event}
+    return {"nav_event": _nav_event}

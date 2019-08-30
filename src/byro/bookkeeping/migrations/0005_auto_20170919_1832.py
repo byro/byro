@@ -7,11 +7,13 @@ from django.db import migrations
 
 def create_accounts(apps, schema_editor):
     from byro.bookkeeping.models import AccountCategory
+
     Account = apps.get_model("bookkeeping", "Account")
-    for category in ("member_donation", "member_fees"):  # Not the constants, because the class got refactored
-        Account.objects.create(
-            account_category=category
-        )
+    for category in (
+        "member_donation",
+        "member_fees",
+    ):  # Not the constants, because the class got refactored
+        Account.objects.create(account_category=category)
 
 
 def delete_accounts(apps, schema_editor):
@@ -21,10 +23,6 @@ def delete_accounts(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bookkeeping', '0004_auto_20170919_1832'),
-    ]
+    dependencies = [("bookkeeping", "0004_auto_20170919_1832")]
 
-    operations = [
-        migrations.RunPython(create_accounts, delete_accounts),
-    ]
+    operations = [migrations.RunPython(create_accounts, delete_accounts)]

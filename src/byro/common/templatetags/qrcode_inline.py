@@ -18,5 +18,5 @@ def qrcode_inline(value):
     with io.BytesIO() as output:
         img.save(output, format="PNG")
         return "data:image/png;base64,{}".format(
-            base64.b64encode(output.getvalue()).decode('us-ascii')
+            base64.b64encode(output.getvalue()).decode("us-ascii")
         )

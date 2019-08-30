@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('members', '0003_membership_membershiptype'),
-    ]
+    dependencies = [("members", "0003_membership_membershiptype")]
 
     operations = [
         migrations.AlterField(
-            model_name='member',
-            name='address',
+            model_name="member",
+            name="address",
             field=models.TextField(blank=True, max_length=300, null=True),
-        ),
+        )
     ]

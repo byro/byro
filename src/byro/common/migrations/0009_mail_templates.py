@@ -7,13 +7,13 @@ from django.db import migrations
 
 def init_templates(apps, schema_editor):
     from byro.mails import default
-    MailTemplate = apps.get_model('mails', 'MailTemplate')
-    Configuration = apps.get_model('common', 'Configuration')
+
+    MailTemplate = apps.get_model("mails", "MailTemplate")
+    Configuration = apps.get_model("common", "Configuration")
     config, _ = Configuration.objects.get_or_create()
     if not config.leave_member_template:
         leave_member = MailTemplate.objects.create(
-            subject=default.LEAVE_MEMBER_SUBJECT,
-            text=default.LEAVE_MEMBER_TEXT,
+            subject=default.LEAVE_MEMBER_SUBJECT, text=default.LEAVE_MEMBER_TEXT
         )
         config.leave_member_template = leave_member
     if not config.leave_office_template:
@@ -27,10 +27,6 @@ def init_templates(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0008_configuration_backoffice_mail'),
-    ]
+    dependencies = [("common", "0008_configuration_backoffice_mail")]
 
-    operations = [
-        migrations.RunPython(init_templates, migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(init_templates, migrations.RunPython.noop)]

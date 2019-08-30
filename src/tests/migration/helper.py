@@ -43,9 +43,9 @@ class TestMigrations(TestCase):
             for db_name in self._databases_names(include_mirrors=False):
                 try:
                     call_command(
-                        'loaddata',
+                        "loaddata",
                         *fixtures,
-                        **{'verbosity': 0, 'commit': False, 'database': db_name}
+                        **{"verbosity": 0, "commit": False, "database": db_name}
                     )
                 except Exception:
                     self._rollback_atomics(self.cls_atomics)

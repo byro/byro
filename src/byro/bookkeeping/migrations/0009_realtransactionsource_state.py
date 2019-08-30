@@ -7,14 +7,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bookkeeping', '0008_auto_20180111_1807'),
-    ]
+    dependencies = [("bookkeeping", "0008_auto_20180111_1807")]
 
     operations = [
         migrations.AddField(
-            model_name='realtransactionsource',
-            name='state',
-            field=models.CharField(choices=[('new', 'new'), ('processing', 'processing'), ('processed', 'processed'), ('failed', 'failed')], default='new', max_length=10),
-        ),
+            model_name="realtransactionsource",
+            name="state",
+            field=models.CharField(
+                choices=[
+                    ("new", "new"),
+                    ("processing", "processing"),
+                    ("processed", "processed"),
+                    ("failed", "failed"),
+                ],
+                default="new",
+                max_length=10,
+            ),
+        )
     ]

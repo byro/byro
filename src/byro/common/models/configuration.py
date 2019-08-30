@@ -18,28 +18,28 @@ class ByroConfiguration(LogTargetMixin, SingletonModel):
 
 
 class MemberViewLevel(Choices):
-    NO = 'no'
-    NAME_ONLY = 'name-only'
-    NAME_AND_CONTACT = 'name-contact'
+    NO = "no"
+    NAME_ONLY = "name-only"
+    NAME_AND_CONTACT = "name-contact"
 
 
 class Configuration(ByroConfiguration):
-    LOG_TARGET_BASE = 'byro.settings'
+    LOG_TARGET_BASE = "byro.settings"
 
     name = models.CharField(
-        null=True, blank=True, max_length=100, verbose_name=_('Association name')
+        null=True, blank=True, max_length=100, verbose_name=_("Association name")
     )
     address = models.TextField(
-        null=True, blank=True, max_length=500, verbose_name=_('Association address')
+        null=True, blank=True, max_length=500, verbose_name=_("Association address")
     )
     url = models.CharField(
-        null=True, blank=True, max_length=200, verbose_name=_('Association URL')
+        null=True, blank=True, max_length=200, verbose_name=_("Association URL")
     )
     liability_interval = models.IntegerField(
         default=36,
-        verbose_name=_('Statute of limitations'),
+        verbose_name=_("Statute of limitations"),
         help_text=_(
-            'For which interval can you make members pay their outstanding fees?'
+            "For which interval can you make members pay their outstanding fees?"
         ),
     )
 
@@ -48,14 +48,14 @@ class Configuration(ByroConfiguration):
         null=True,
         blank=True,
         max_length=5,
-        verbose_name=_('Language'),
+        verbose_name=_("Language"),
     )
     currency = models.CharField(
         null=True,
         blank=True,
         max_length=3,
-        verbose_name=_('Currency'),
-        help_text=_('E.g. EUR'),
+        verbose_name=_("Currency"),
+        help_text=_("E.g. EUR"),
     )
     # Registration form configuration, contains settings for the fields to include when adding a new member
     registration_form = JSONField(null=True, blank=True)
@@ -65,12 +65,12 @@ class Configuration(ByroConfiguration):
         blank=True,
         verbose_name=_("External base URL of byro installation"),
         help_text=_(
-            "This field is used to generate the absolute URL for public pages. Leave it empty if it is the same as this page\'s base URL."
+            "This field is used to generate the absolute URL for public pages. Leave it empty if it is the same as this page's base URL."
         ),
     )
     can_see_other_members = models.CharField(
         max_length=MemberViewLevel.max_length,
-        verbose_name=_('Members can see other members'),
+        verbose_name=_("Members can see other members"),
         choices=MemberViewLevel.choices,
         default=MemberViewLevel.NO,
     )
@@ -78,54 +78,54 @@ class Configuration(ByroConfiguration):
         null=True,
         blank=True,
         max_length=100,
-        verbose_name=_('E-mail address used as sender'),
+        verbose_name=_("E-mail address used as sender"),
     )
     backoffice_mail = models.EmailField(
         null=True,
         blank=True,
         max_length=100,
-        verbose_name=_('E-mail address for notifications'),
+        verbose_name=_("E-mail address for notifications"),
     )
     welcome_member_template = models.ForeignKey(
-        to='mails.MailTemplate',
+        to="mails.MailTemplate",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
     )
     welcome_office_template = models.ForeignKey(
-        to='mails.MailTemplate',
+        to="mails.MailTemplate",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
     )
     leave_member_template = models.ForeignKey(
-        to='mails.MailTemplate',
+        to="mails.MailTemplate",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
     )
     leave_office_template = models.ForeignKey(
-        to='mails.MailTemplate',
+        to="mails.MailTemplate",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
     )
     record_disclosure_template = models.ForeignKey(
-        to='mails.MailTemplate',
+        to="mails.MailTemplate",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
     )
 
-    form_title = _('General settings')
+    form_title = _("General settings")
 
     def __str__(self):
         return "Settings"
 
     def get_absolute_url(self):
-        return reverse('office:settings.base')
+        return reverse("office:settings.base")

@@ -21,14 +21,14 @@ class CustomSMTPBackend(EmailBackend):
             (code, resp) = self.connection.mail(from_addr, [])
             if code != 250:
                 logger.warning(
-                    'Error testing mail settings, code %d, resp: %s' % (code, resp)
+                    "Error testing mail settings, code %d, resp: %s" % (code, resp)
                 )
                 raise SMTPSenderRefused(code, resp, from_addr)
             senderrs = {}
-            (code, resp) = self.connection.rcpt('test@example.com')
+            (code, resp) = self.connection.rcpt("test@example.com")
             if (code != 250) and (code != 251):
                 logger.warning(
-                    'Error testing mail settings, code %d, resp: %s' % (code, resp)
+                    "Error testing mail settings, code %d, resp: %s" % (code, resp)
                 )
                 raise SMTPRecipientsRefused(senderrs)
         finally:
@@ -92,5 +92,5 @@ def mail_send_task(
     try:
         backend.send_messages([email])
     except Exception:
-        logger.exception('Error sending email')
-        raise SendMailException('Failed to send an email to {}.'.format(to))
+        logger.exception("Error sending email")
+        raise SendMailException("Failed to send an email to {}.".format(to))

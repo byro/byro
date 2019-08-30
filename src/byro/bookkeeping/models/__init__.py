@@ -3,11 +3,11 @@ from .real_transaction import RealTransactionSource
 from .transaction import Booking, DocumentTransactionLink, Transaction
 
 __all__ = (
-    'Account',
-    'AccountTag',
-    'AccountCategory',
-    'RealTransactionSource',
-    'Transaction',
-    'Booking',
-    'DocumentTransactionLink',
+    "Account",
+    "AccountTag",
+    "AccountCategory",
+    "RealTransactionSource",
+    "Transaction",
+    "Booking",
+    "DocumentTransactionLink",
 )

@@ -37,7 +37,7 @@ class TransactionQuerySet(models.QuerySet):
         return qs
 
     def unbalanced_transactions(self):
-        return self.with_balances().exclude(balances_debit=models.F('balances_credit'))
+        return self.with_balances().exclude(balances_debit=models.F("balances_credit"))
 
 
 class TransactionManager(models.Manager):
@@ -50,7 +50,7 @@ class TransactionManager(models.Manager):
     def unbalanced_transactions(self):
         return self.get_queryset().unbalanced_transactions()
 
-    @log_call('.created')
+    @log_call(".created")
     def create(self, *args, **kwargs):
         return super().create(*args, **kwargs)
 
@@ -58,7 +58,7 @@ class TransactionManager(models.Manager):
 class Transaction(models.Model, LogTargetMixin):
     objects = TransactionManager()
 
-    LOG_TARGET_BASE = 'byro.bookkeeping.transaction'
+    LOG_TARGET_BASE = "byro.bookkeeping.transaction"
 
     memo = models.CharField(max_length=1000, null=True)
     booking_datetime = models.DateTimeField(null=True)
@@ -67,28 +67,28 @@ class Transaction(models.Model, LogTargetMixin):
     modified_by = models.ForeignKey(
         to=get_user_model(),
         on_delete=models.PROTECT,
-        related_name='+',  # no related lookup
+        related_name="+",  # no related lookup
         null=True,
     )
 
     reverses = models.ForeignKey(
-        to='Transaction',
+        to="Transaction",
         on_delete=models.PROTECT,
-        related_name='reversed_by',
+        related_name="reversed_by",
         null=True,
     )
 
     data = JSONField(null=True)
 
-    documents = models.ManyToManyField(Document, through='DocumentTransactionLink')
+    documents = models.ManyToManyField(Document, through="DocumentTransactionLink")
 
-    @log_call('.debit.created', log_on='self')
+    @log_call(".debit.created", log_on="self")
     def debit(self, account, *args, **kwargs):
         return Booking.objects.create(
             transaction=self, debit_account=account, *args, **kwargs
         )
 
-    @log_call('.credit.created', log_on='self')
+    @log_call(".credit.created", log_on="self")
     def credit(self, account, *args, **kwargs):
         return Booking.objects.create(
             transaction=self, credit_account=account, *args, **kwargs
@@ -96,12 +96,12 @@ class Transaction(models.Model, LogTargetMixin):
 
     @transaction.atomic
     def reverse(self, value_datetime=None, *args, **kwargs):
-        if 'user_or_context' not in kwargs:
+        if "user_or_context" not in kwargs:
             raise TypeError(
                 "You need to provide a 'user_or_context' named parameter which indicates the responsible user (a User model object), request (a View instance or HttpRequest object), or generic context (a str)."
             )
-        user_or_context = kwargs.pop('user_or_context')
-        user = kwargs.pop('user', None)
+        user_or_context = kwargs.pop("user_or_context")
+        user = kwargs.pop("user", None)
 
         t = Transaction.objects.create(
             value_datetime=value_datetime or self.value_datetime,
@@ -129,7 +129,7 @@ class Transaction(models.Model, LogTargetMixin):
                     user=user,
                 )
         t.save()
-        self.log(user_or_context, '.reversed', user=user, reversed_by=t)
+        self.log(user_or_context, ".reversed", user=user, reversed_by=t)
 
         return t
 
@@ -144,8 +144,8 @@ class Transaction(models.Model, LogTargetMixin):
     @property
     def balances(self):
         balances = {
-            'debit': self.debits.aggregate(total=models.Sum('amount'))['total'] or 0,
-            'credit': self.credits.aggregate(total=models.Sum('amount'))['total'] or 0,
+            "debit": self.debits.aggregate(total=models.Sum("amount"))["total"] or 0,
+            "credit": self.credits.aggregate(total=models.Sum("amount"))["total"] or 0,
         }
         return balances
 
@@ -157,17 +157,17 @@ class Transaction(models.Model, LogTargetMixin):
 
     @property
     def is_balanced(self):
-        if hasattr(self, 'balances_debit'):
+        if hasattr(self, "balances_debit"):
             return self.balances_debit == self.balances_credit
         else:
             balances = self.balances
-            return balances['debit'] == balances['credit']
+            return balances["debit"] == balances["credit"]
 
     def find_memo(self):
         if self.memo:
             return self.memo
 
-        if hasattr(self, 'cached_bookings'):
+        if hasattr(self, "cached_bookings"):
             for booking in self.cached_bookings:
                 if booking.memo:
                     return booking.memo
@@ -189,7 +189,7 @@ class Transaction(models.Model, LogTargetMixin):
         from byro.bookkeeping.signals import process_transaction
 
         response_counter = Counter()
-        this_counter = Counter('dummy')
+        this_counter = Counter("dummy")
 
         while (
             not response_counter or response_counter.most_common(1)[0][1] < 5
@@ -206,7 +206,7 @@ class Transaction(models.Model, LogTargetMixin):
             response_counter += this_counter
 
         if sum(response_counter.values()) < 1:
-            raise Exception('No plugin tried to augment the transaction.')
+            raise Exception("No plugin tried to augment the transaction.")
 
         response_counter += Counter()  # Remove zero and negative elements
         return len(response_counter)
@@ -220,7 +220,7 @@ class Transaction(models.Model, LogTargetMixin):
         )
 
     def get_absolute_url(self):
-        return reverse('office:finance.transactions.detail', kwargs={'pk': self.pk})
+        return reverse("office:finance.transactions.detail", kwargs={"pk": self.pk})
 
     def get_object_icon(self):
         return mark_safe('<i class="fa fa-money"></i> ')
@@ -260,13 +260,13 @@ class BookingsQuerySet(models.QuerySet):
     def with_transaction_data(self):
         qs = self.with_transaction_balances()
         qs = qs.select_related(
-            'member', 'transaction', 'credit_account', 'debit_account'
+            "member", "transaction", "credit_account", "debit_account"
         )
         qs = qs.prefetch_related(
-            Prefetch('transaction__bookings', to_attr='cached_bookings'),
-            'transaction__cached_bookings__credit_account',
-            'transaction__cached_bookings__debit_account',
-            'transaction__cached_bookings__member',
+            Prefetch("transaction__bookings", to_attr="cached_bookings"),
+            "transaction__cached_bookings__credit_account",
+            "transaction__cached_bookings__debit_account",
+            "transaction__cached_bookings__member",
         )
         return qs
 
@@ -281,29 +281,29 @@ class Booking(models.Model):
     modified_by = models.ForeignKey(
         to=get_user_model(),
         on_delete=models.PROTECT,
-        related_name='+',  # no related lookup
+        related_name="+",  # no related lookup
         null=True,
     )
 
     transaction = models.ForeignKey(
-        to='Transaction', related_name='bookings', on_delete=models.PROTECT
+        to="Transaction", related_name="bookings", on_delete=models.PROTECT
     )
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     debit_account = models.ForeignKey(
-        to='bookkeeping.Account',
-        related_name='debits',
+        to="bookkeeping.Account",
+        related_name="debits",
         on_delete=models.PROTECT,
         null=True,
     )
     credit_account = models.ForeignKey(
-        to='bookkeeping.Account',
-        related_name='credits',
+        to="bookkeeping.Account",
+        related_name="credits",
         on_delete=models.PROTECT,
         null=True,
     )
     member = models.ForeignKey(
-        to='members.Member',
-        related_name='bookings',
+        to="members.Member",
+        related_name="bookings",
         on_delete=models.PROTECT,
         null=True,
     )
@@ -311,15 +311,15 @@ class Booking(models.Model):
     importer = models.CharField(null=True, max_length=500)
     data = JSONField(null=True)
     source = models.ForeignKey(
-        to='bookkeeping.RealTransactionSource',
+        to="bookkeeping.RealTransactionSource",
         on_delete=models.SET_NULL,
-        related_name='bookings',
+        related_name="bookings",
         null=True,
     )
 
     def __str__(self):
         return "{booking_type} {account} {amount} {memo}".format(
-            booking_type='debit' if self.debit_account else 'credit',
+            booking_type="debit" if self.debit_account else "credit",
             account=self.debit_account or self.credit_account,
             amount=self.amount,
             memo=self.memo,
@@ -330,7 +330,7 @@ class Booking(models.Model):
         # FUTURE: Should also add a signal or save handler for the same
         #   constraint in pure python
         db_constraints = {
-            'exactly_either_debit_or_credit': 'CHECK (NOT ((debit_account_id IS NULL) = (credit_account_id IS NULL)))'
+            "exactly_either_debit_or_credit": "CHECK (NOT ((debit_account_id IS NULL) = (credit_account_id IS NULL)))"
         }
 
     def find_memo(self):
@@ -340,7 +340,7 @@ class Booking(models.Model):
 
     @property
     def counter_bookings(self):
-        if hasattr(self.transaction, 'cached_bookings'):
+        if hasattr(self.transaction, "cached_bookings"):
             # Was prefetched with with_transaction_data()
             if self.debit_account:
                 return [b for b in self.transaction.cached_bookings if b.credit_account]

@@ -7,19 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bookkeeping', '0010_auto_20180113_1500'),
-    ]
+    dependencies = [("bookkeeping", "0010_auto_20180113_1500")]
 
     operations = [
         migrations.AlterField(
-            model_name='realtransaction',
-            name='importer',
+            model_name="realtransaction",
+            name="importer",
             field=models.CharField(max_length=500, null=True),
         ),
         migrations.AlterField(
-            model_name='realtransaction',
-            name='originator',
+            model_name="realtransaction",
+            name="originator",
             field=models.CharField(max_length=500),
         ),
     ]

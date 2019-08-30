@@ -4,49 +4,32 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 
+
 def delete_old_accounts(apps, schema_editor):
-    Account = apps.get_model('bookkeeping', 'Account')
+    Account = apps.get_model("bookkeeping", "Account")
 
     Account.objects.filter(
-        models.Q(account_category='member_donation') | models.Q(account_category='member_fees')
+        models.Q(account_category="member_donation")
+        | models.Q(account_category="member_fees")
     ).delete()
+
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bookkeeping', '0013_new_data_model'),
-    ]
+    dependencies = [("bookkeeping", "0013_new_data_model")]
 
     operations = [
+        migrations.RemoveField(model_name="realtransaction", name="reverses"),
+        migrations.RemoveField(model_name="realtransaction", name="source"),
         migrations.RemoveField(
-            model_name='realtransaction',
-            name='reverses',
+            model_name="virtualtransaction", name="destination_account"
         ),
+        migrations.RemoveField(model_name="virtualtransaction", name="member"),
         migrations.RemoveField(
-            model_name='realtransaction',
-            name='source',
+            model_name="virtualtransaction", name="real_transaction"
         ),
-        migrations.RemoveField(
-            model_name='virtualtransaction',
-            name='destination_account',
-        ),
-        migrations.RemoveField(
-            model_name='virtualtransaction',
-            name='member',
-        ),
-        migrations.RemoveField(
-            model_name='virtualtransaction',
-            name='real_transaction',
-        ),
-        migrations.RemoveField(
-            model_name='virtualtransaction',
-            name='source_account',
-        ),
-        migrations.DeleteModel(
-            name='RealTransaction',
-        ),
-        migrations.DeleteModel(
-            name='VirtualTransaction',
-        ),
+        migrations.RemoveField(model_name="virtualtransaction", name="source_account"),
+        migrations.DeleteModel(name="RealTransaction"),
+        migrations.DeleteModel(name="VirtualTransaction"),
         migrations.RunPython(delete_old_accounts, migrations.RunPython.noop),
     ]

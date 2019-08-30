@@ -7,19 +7,18 @@ from django.db import migrations
 
 def init_templates(apps, schema_editor):
     from byro.mails import default
-    MailTemplate = apps.get_model('mails', 'MailTemplate')
-    Configuration = apps.get_model('common', 'Configuration')
+
+    MailTemplate = apps.get_model("mails", "MailTemplate")
+    Configuration = apps.get_model("common", "Configuration")
     config, _ = Configuration.objects.get_or_create()
     if not config.welcome_member_template:
         welcome_member = MailTemplate.objects.create(
-            subject=default.WELCOME_MEMBER_SUBJECT,
-            text=default.WELCOME_MEMBER_TEXT,
+            subject=default.WELCOME_MEMBER_SUBJECT, text=default.WELCOME_MEMBER_TEXT
         )
         config.welcome_member_template = welcome_member
     if not config.welcome_office_template:
         welcome_office = MailTemplate.objects.create(
-            subject=default.WELCOME_OFFICE_SUBJECT,
-            text=default.WELCOME_OFFICE_TEXT,
+            subject=default.WELCOME_OFFICE_SUBJECT, text=default.WELCOME_OFFICE_TEXT
         )
         config.welcome_office_template = welcome_office
     config.save()
@@ -27,10 +26,6 @@ def init_templates(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0006_auto_20180224_2114'),
-    ]
+    dependencies = [("common", "0006_auto_20180224_2114")]
 
-    operations = [
-        migrations.RunPython(init_templates, migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(init_templates, migrations.RunPython.noop)]

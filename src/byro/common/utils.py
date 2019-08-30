@@ -7,9 +7,9 @@ from django.apps import apps
 def get_plugins():
     result = []
     for app in apps.get_app_configs():
-        if hasattr(app, 'ByroPluginMeta'):
-            if getattr(app, 'name', '').startswith("byro.") and not hasattr(
-                app.ByroPluginMeta, 'version'
+        if hasattr(app, "ByroPluginMeta"):
+            if getattr(app, "name", "").startswith("byro.") and not hasattr(
+                app.ByroPluginMeta, "version"
             ):
                 continue
             result.append(app)
@@ -20,7 +20,7 @@ def get_version():
     # FIXME: In a release this should return the version
 
     with suppress(Exception):
-        retval = getattr(sys.modules[__name__], '_byro_git_version', None)
+        retval = getattr(sys.modules[__name__], "_byro_git_version", None)
         if retval:
             return retval
 
@@ -28,7 +28,7 @@ def get_version():
 
         retval = (
             subprocess.check_output(
-                ['git', 'describe', '--always', '--dirty', '--abbrev=40']
+                ["git", "describe", "--always", "--dirty", "--abbrev=40"]
             )
             .decode()
             .strip()
@@ -45,7 +45,7 @@ def get_installed_software():
     for plugin in get_plugins():
         retval.append(
             "{} {}".format(
-                plugin.name, getattr(plugin.ByroPluginMeta, 'version', '')
+                plugin.name, getattr(plugin.ByroPluginMeta, "version", "")
             ).strip()
         )
     return retval

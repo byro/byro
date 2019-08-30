@@ -10,26 +10,26 @@ from byro.documents.models import Document, get_document_category_names
 class DocumentUploadForm(forms.ModelForm):
     class Meta:
         model = Document
-        exclude = ('content_hash', 'member')
+        exclude = ("content_hash", "member")
 
     def __init__(self, *args, **kwargs):
-        initial_category = kwargs.pop('initial_category', 'byro.documents.misc')
+        initial_category = kwargs.pop("initial_category", "byro.documents.misc")
 
         super().__init__(*args, **kwargs)
 
         categories = get_document_category_names()
 
-        self.fields['category'] = forms.ChoiceField(
+        self.fields["category"] = forms.ChoiceField(
             choices=sorted(categories.items()), initial=initial_category
         )
-        if 'class' in self.fields['date'].widget.attrs:
-            self.fields['date'].widget.attrs['class'] += ' datepicker'
+        if "class" in self.fields["date"].widget.attrs:
+            self.fields["date"].widget.attrs["class"] += " datepicker"
         else:
-            self.fields['date'].widget.attrs['class'] = 'datepicker'
+            self.fields["date"].widget.attrs["class"] = "datepicker"
 
 
 class DocumentUploadView(FormView):
-    template_name = 'office/documents/add.html'
+    template_name = "office/documents/add.html"
     model = Document
     form_class = DocumentUploadForm
 
@@ -38,17 +38,17 @@ class DocumentUploadView(FormView):
         form.save()
         form.instance.log(
             self,
-            '.saved',
+            ".saved",
             file_name=form.instance.document.name,
             content_size=form.instance.document.size,
             content_hash=form.instance.content_hash,
         )
         try:
-            messages.success(self.request, _('The upload was processed successfully.'))
+            messages.success(self.request, _("The upload was processed successfully."))
         except Exception as e:
             messages.error(
                 self.request,
-                _('The upload was added successfully, but could not be processed: ')
+                _("The upload was added successfully, but could not be processed: ")
                 + str(e),
             )
         self.form = form
@@ -59,6 +59,6 @@ class DocumentUploadView(FormView):
 
 
 class DocumentDetailView(DetailView):
-    template_name = 'office/documents/detail.html'
+    template_name = "office/documents/detail.html"
     model = Document
-    context_object_name = 'document'
+    context_object_name = "document"

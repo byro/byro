@@ -9,14 +9,16 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sepa', '0001_initial'),
-    ]
+    dependencies = [("sepa", "0001_initial")]
 
     operations = [
         migrations.AlterField(
-            model_name='membersepa',
-            name='member',
-            field=annoying.fields.AutoOneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='profile_sepa', to='members.Member'),
-        ),
+            model_name="membersepa",
+            name="member",
+            field=annoying.fields.AutoOneToOneField(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="profile_sepa",
+                to="members.Member",
+            ),
+        )
     ]

@@ -5,14 +5,20 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('documents', '0003_auto_20181009_1816'),
-    ]
+    dependencies = [("documents", "0003_auto_20181009_1816")]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='direction',
-            field=models.CharField(choices=[('incoming', 'incoming'), ('outgoing', 'outgoing'), ('other', 'other')], default='outgoing', max_length=8),
-        ),
+            model_name="document",
+            name="direction",
+            field=models.CharField(
+                choices=[
+                    ("incoming", "incoming"),
+                    ("outgoing", "outgoing"),
+                    ("other", "other"),
+                ],
+                default="outgoing",
+                max_length=8,
+            ),
+        )
     ]

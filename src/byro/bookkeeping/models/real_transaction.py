@@ -8,14 +8,14 @@ from .transaction import Transaction
 
 
 class SourceState(Choices):
-    NEW = 'new'
-    PROCESSING = 'processing'
-    PROCESSED = 'processed'
-    FAILED = 'failed'
+    NEW = "new"
+    PROCESSING = "processing"
+    PROCESSED = "processed"
+    FAILED = "failed"
 
 
 class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
-    source_file = models.FileField(upload_to='transaction_uploads/')
+    source_file = models.FileField(upload_to="transaction_uploads/")
     state = models.CharField(
         default=SourceState.NEW,
         choices=SourceState.choices,
@@ -40,14 +40,14 @@ class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
             self.state = SourceState.FAILED
             self.save()
             raise Exception(
-                'More than one plugin tried to process the CSV upload: {}'.format(
-                    [r[0].__module__ + '.' + r[0].__name__ for r in responses]
+                "More than one plugin tried to process the CSV upload: {}".format(
+                    [r[0].__module__ + "." + r[0].__name__ for r in responses]
                 )
             )
         if len(responses) < 1:
             self.state = SourceState.FAILED
             self.save()
-            raise Exception('No plugin tried to process the CSV upload.')
+            raise Exception("No plugin tried to process the CSV upload.")
         receiver, response = responses[0]
 
         if isinstance(response, Exception):

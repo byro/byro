@@ -59,11 +59,11 @@ from .documents import DocumentUploadForm
 
 
 class MemberView(DetailView):
-    context_object_name = 'member'
+    context_object_name = "member"
     model = Member
 
     def get_member(self):
-        return Member.all_objects.get(pk=self.kwargs.get('pk'))
+        return Member.all_objects.get(pk=self.kwargs.get("pk"))
 
     def get_queryset(self):
         return Member.all_objects.all()
@@ -74,13 +74,13 @@ class MemberView(DetailView):
             r[1]
             for r in member_view.send_robust(self.get_object(), request=self.request)
         ]
-        ctx['member_views'] = responses
-        ctx['member'] = self.get_member()
+        ctx["member_views"] = responses
+        ctx["member"] = self.get_member()
         return ctx
 
 
 class MemberListMixin:
-    def get_members_queryset(self, search=None, _filter='active'):
+    def get_members_queryset(self, search=None, _filter="active"):
         qs = Member.objects.all()
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(number=search))
@@ -90,24 +90,24 @@ class MemberListMixin:
             Q(memberships__end__isnull=True) | Q(memberships__end__gte=now().date())
         )
         inactive_q = ~active_q
-        if _filter == 'all':
+        if _filter == "all":
             pass
-        elif _filter == 'inactive':
+        elif _filter == "inactive":
             qs = qs.filter(inactive_q)
         else:  # Default to 'active'
             qs = qs.filter(active_q)
-        return qs.order_by('-id').distinct()
+        return qs.order_by("-id").distinct()
 
 
 class MemberListView(MemberListMixin, ListView):
-    template_name = 'office/member/list.html'
-    context_object_name = 'members'
+    template_name = "office/member/list.html"
+    context_object_name = "members"
     model = Member
     paginate_by = 50
 
     def get_queryset(self):
-        search = self.request.GET.get('q')
-        _filter = self.request.GET.get('filter', 'active')
+        search = self.request.GET.get("q")
+        _filter = self.request.GET.get("filter", "active")
         return self.get_members_queryset(search, _filter)
 
     def post(self, request, *args, **kwargs):
@@ -117,13 +117,13 @@ class MemberListView(MemberListMixin, ListView):
 
 
 class MemberDisclosureView(MemberListMixin, TemplateView):
-    template_name = 'office/member/disclosure.html'
-    context_object_name = 'members'
+    template_name = "office/member/disclosure.html"
+    context_object_name = "members"
     model = Member
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['count'] = self.get_members_queryset().count()
+        context["count"] = self.get_members_queryset().count()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -133,33 +133,33 @@ class MemberDisclosureView(MemberListMixin, TemplateView):
         messages.success(
             request,
             _(
-                'Generated {count} data disclosure emails and placed them in the outbox.'
+                "Generated {count} data disclosure emails and placed them in the outbox."
             ).format(count=len(members)),
         )
-        return redirect('/members/list')
+        return redirect("/members/list")
 
 
 class MemberBalanceForm(forms.Form):
-    start = forms.DateField(label=_('Start of balance timeframe'))
-    end = forms.DateField(label=_('End of balance timeframe'))
+    start = forms.DateField(label=_("Start of balance timeframe"))
+    end = forms.DateField(label=_("End of balance timeframe"))
     create_if_zero = forms.BooleanField(
-        label=_('Create balances even if there was no payment due in the time chosen?'),
+        label=_("Create balances even if there was no payment due in the time chosen?"),
         required=False,
         initial=False,
     )
     balance_cutoff = forms.DecimalField(
         required=False,
-        label=_('Balance cutoff'),
+        label=_("Balance cutoff"),
         help_text=_(
-            'Only members with a deficit greater than this will receive an email.'
+            "Only members with a deficit greater than this will receive an email."
         ),
         min_value=0,
     )
-    subject = forms.CharField(label=_('Subject'))
+    subject = forms.CharField(label=_("Subject"))
     text = forms.CharField(
-        label=_('Text'),
+        label=_("Text"),
         initial=_(
-            '''Hello {name},
+            """Hello {name},
 
 we wanted to let you know that within the time from {start}
 to {end} you incurred unpaid liabilities in the amount of
@@ -167,7 +167,7 @@ to {end} you incurred unpaid liabilities in the amount of
    EUR {amount}
 
 Please settle this amount as soon as possible, or let us
-know if you think this email is incorrect.'''
+know if you think this email is incorrect."""
         ),
         widget=forms.Textarea,
     )
@@ -175,36 +175,36 @@ know if you think this email is incorrect.'''
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
-        self.fields['start'].widget.attrs['class'] = ' datepicker'
-        self.fields['end'].widget.attrs['class'] = ' datepicker'
+        self.fields["start"].widget.attrs["class"] = " datepicker"
+        self.fields["end"].widget.attrs["class"] = " datepicker"
         # TODO: set start/end
 
     def clean(self):
         cleaned_data = super().clean()
-        end = cleaned_data.get('end')
-        start = cleaned_data.get('start')
+        end = cleaned_data.get("end")
+        start = cleaned_data.get("start")
         if end >= datetime.now().date():
-            raise forms.ValidationError(_('End must be in the past!'))
+            raise forms.ValidationError(_("End must be in the past!"))
         if end < start:
-            raise forms.ValidationError(_('Start must be before end!'))
+            raise forms.ValidationError(_("Start must be before end!"))
         return cleaned_data
 
 
 class MemberBalanceView(MemberListMixin, FormView):
-    template_name = 'office/member/balance.html'
-    context_object_name = 'members'
+    template_name = "office/member/balance.html"
+    context_object_name = "members"
     model = Member
     form_class = MemberBalanceForm
 
     def form_valid(self, form):
         members = Member.objects.with_active_membership()
         mails = errors = balance_count = 0
-        start = datetime.combine(form.cleaned_data.get('start'), time(0, 0))
-        end = datetime.combine(form.cleaned_data.get('end'), time(23, 59))
-        create_if_zero = form.cleaned_data.get('create_if_zero')
-        balance_cutoff = form.cleaned_data.get('balance_cutoff')
-        text = form.cleaned_data.get('text')
-        subject = form.cleaned_data.get('subject')
+        start = datetime.combine(form.cleaned_data.get("start"), time(0, 0))
+        end = datetime.combine(form.cleaned_data.get("end"), time(23, 59))
+        create_if_zero = form.cleaned_data.get("create_if_zero")
+        balance_cutoff = form.cleaned_data.get("balance_cutoff")
+        text = form.cleaned_data.get("text")
+        subject = form.cleaned_data.get("subject")
         for member in members:
             balance = None
             try:
@@ -227,19 +227,19 @@ class MemberBalanceView(MemberListMixin, FormView):
                 mails += 1
         message = str(
             _(
-                '{balance_count} balances were created and {mail_count} reminder emails were placed in the outbox.'
+                "{balance_count} balances were created and {mail_count} reminder emails were placed in the outbox."
             ).format(balance_count=balance_count, mail_count=mails)
         )
         if errors:
-            message += ' ' + str(
+            message += " " + str(
                 _(
-                    '{errors} balances could not be created due to errors. Presumably, these members already have balances overlapping this timeframe.'.format(
+                    "{errors} balances could not be created due to errors. Presumably, these members already have balances overlapping this timeframe.".format(
                         errors=errors
                     )
                 )
             )
         messages.success(self.request, message)
-        return redirect('/members/list')
+        return redirect("/members/list")
 
 
 class MemberListExportForm(forms.Form):
@@ -248,15 +248,15 @@ class MemberListExportForm(forms.Form):
     )
     member_filter = forms.ChoiceField(
         choices=[
-            ('active', _('Active members')),
-            ('inactive', _('Only inactive members')),
-            ('all', _('All members')),
+            ("active", _("Active members")),
+            ("inactive", _("Only inactive members")),
+            ("all", _("All members")),
         ]
     )
     export_format = forms.ChoiceField(
         choices=[
-            ('csv', _("CSV (Comma Separated Values)")),
-            ('csv_de', _("CSV (Semicolon Separated Values, German Windows versions)")),
+            ("csv", _("CSV (Comma Separated Values)")),
+            ("csv_de", _("CSV (Semicolon Separated Values, German Windows versions)")),
             # ('xlsx', _("XLSX (Excel)")),
         ]
     )
@@ -264,18 +264,18 @@ class MemberListExportForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         fields = Member.get_fields()
-        self.fields['field_list'].choices = [
+        self.fields["field_list"].choices = [
             (f.field_id, f.name) for f in fields.values()
         ]
-        self.fields['field_list'].initial = [
+        self.fields["field_list"].initial = [
             f.field_id
             for f in fields.values()
-            if f.registration_form.get('position', -1) > -1
+            if f.registration_form.get("position", -1) > -1
         ]
 
 
 class csv_excel_de(csv.excel):
-    delimiter = ';'
+    delimiter = ";"
 
 
 def filter_excel_de(data):
@@ -294,8 +294,8 @@ def filter_excel_de(data):
 class MemberListExportView(
     FormView, MemberListMixin, MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 ):
-    template_name = 'office/member/list_export.html'
-    context_object_name = 'members'
+    template_name = "office/member/list_export.html"
+    context_object_name = "members"
     model = Member
     form_class = MemberListExportForm
 
@@ -306,7 +306,7 @@ class MemberListExportView(
     @transaction.atomic
     def form_valid(self, form):
         fields = Member.get_fields()
-        selected_fields = form.cleaned_data['field_list']
+        selected_fields = form.cleaned_data["field_list"]
         header = collections.OrderedDict(
             [
                 (f.field_id, f.name)
@@ -329,29 +329,29 @@ class MemberListExportView(
             user=self.request.user,
             action_type="byro.members.export",
             data={
-                'filter': form.cleaned_data['member_filter'],
-                'format': form.cleaned_data['export_format'],
-                'fields': collections.OrderedDict(
+                "filter": form.cleaned_data["member_filter"],
+                "format": form.cleaned_data["export_format"],
+                "fields": collections.OrderedDict(
                     [(f_id, str(f_name)) for (f_id, f_name) in header.items()]
                 ),
             },
         )
 
-        if form.cleaned_data['export_format'].startswith('csv'):
+        if form.cleaned_data["export_format"].startswith("csv"):
             return self.export_csv(
-                header, data, csv_format=form.cleaned_data['export_format']
+                header, data, csv_format=form.cleaned_data["export_format"]
             )
 
         return redirect(self.request.get_full_path())
 
-    def export_csv(self, header, data, csv_format='default'):
+    def export_csv(self, header, data, csv_format="default"):
         class EchoBOM:
             """Dummy, based on the Django docs.
             This one adds one feature: It outputs a Unicode BOM (Byte-Order Mark) as the first
             character."""
 
             def write(self, value):
-                if not hasattr(self, 'have_bom'):
+                if not hasattr(self, "have_bom"):
                     self.have_bom = True
                     return "\ufeff" + value
                 else:
@@ -364,21 +364,21 @@ class MemberListExportView(
         writer = csv.DictWriter(
             pseudo_buffer,
             header.keys(),
-            dialect={'csv_de': csv_excel_de}.get(csv_format, 'excel'),
+            dialect={"csv_de": csv_excel_de}.get(csv_format, "excel"),
         )
-        converter = {'csv_de': row_converter_de}.get(csv_format, lambda x: x)
+        converter = {"csv_de": row_converter_de}.get(csv_format, lambda x: x)
         response = StreamingHttpResponse(
             (writer.writerow(converter(row)) for row in chain([header], data)),
-            content_type='text/csv; charset=utf-8',
-            charset='utf-8',
+            content_type="text/csv; charset=utf-8",
+            charset="utf-8",
         )
         response[
-            'Content-Disposition'
+            "Content-Disposition"
         ] = 'attachment; filename="members_{}.csv"'.format(now().date())
         return response
 
     def get_data(self, form, field_mapping):
-        qs = self.get_members_queryset(_filter=form.cleaned_data['member_filter'])
+        qs = self.get_members_queryset(_filter=form.cleaned_data["member_filter"])
         for m in qs.all():
             yield {f_id: f_getter(m) for (f_id, f_getter) in field_mapping}
 
@@ -390,15 +390,15 @@ def get_member_list_importers():
 class MemberListImportForm(forms.Form):
     importer = forms.ChoiceField(
         choices=lambda: tuple(
-            (i['id'], i['label']) for i in get_member_list_importers()
+            (i["id"], i["label"]) for i in get_member_list_importers()
         )
     )
     upload_file = forms.FileField()
 
 
 class MemberListImportView(FormView):
-    template_name = 'office/member/list_import.html'
-    context_object_name = 'members'
+    template_name = "office/member/list_import.html"
+    context_object_name = "members"
     model = Member
     form_class = MemberListImportForm
 
@@ -411,11 +411,11 @@ class MemberListImportView(FormView):
 
     @transaction.atomic
     def form_valid(self, form):
-        importers = {i['id']: i for i in get_member_list_importers()}
+        importers = {i["id"]: i for i in get_member_list_importers()}
 
-        importer = importers[form.cleaned_data['importer']]
+        importer = importers[form.cleaned_data["importer"]]
         sha256sum = hashlib.sha256()
-        for chunk in form.cleaned_data['upload_file'].chunks():
+        for chunk in form.cleaned_data["upload_file"].chunks():
             sha256sum.update(chunk)
 
         LogEntry.objects.create(
@@ -424,42 +424,42 @@ class MemberListImportView(FormView):
             user=self.request.user,
             action_type="byro.members.import",
             data={
-                'importer': form.cleaned_data['importer'],
-                'sha256': sha256sum.hexdigest(),
+                "importer": form.cleaned_data["importer"],
+                "sha256": sha256sum.hexdigest(),
             },
         )
 
-        return importer['form_valid'](self, form)
+        return importer["form_valid"](self, form)
 
 
 def get_encoding(form):
     detector = UniversalDetector()
-    for chunk in form.cleaned_data['upload_file'].chunks():
+    for chunk in form.cleaned_data["upload_file"].chunks():
         detector.feed(chunk)
         if detector.done:
             break
     detector.close()
-    return detector.result['encoding']
+    return detector.result["encoding"]
 
 
 def create_membership(membership_parms, member):
     if membership_parms:
-        for k in 'start', 'end':
+        for k in "start", "end":
             #  FIXME Also, we should find a way to handle dates in a generic way
             if membership_parms.get(k, None):
                 membership_parms[k] = dateparser.parse(
-                    membership_parms[k], languages=[settings.LANGUAGE_CODE, 'en']
+                    membership_parms[k], languages=[settings.LANGUAGE_CODE, "en"]
                 )
         Membership.objects.create(member=member, **membership_parms)
 
 
 @transaction.atomic
-def default_csv_form_valid(view, form, dialect='excel'):
+def default_csv_form_valid(view, form, dialect="excel"):
     mapping = None
     fields = Member.get_fields()
     encoding = get_encoding(form)
 
-    with form.cleaned_data['upload_file'].open() as fp:
+    with form.cleaned_data["upload_file"].open() as fp:
         instream = unicodecsv.DictReader(fp, dialect=dialect, encoding=encoding)
 
         for indict in instream:
@@ -484,8 +484,10 @@ def default_csv_form_valid(view, form, dialect='excel'):
             do_update = False
             have_changes = False
             for verb_name, field in mapping.items():
-                if field.field_id == '_internal_id':
-                    member = Member.all_objects.filter(pk=indict[verb_name.strip()]).first()
+                if field.field_id == "_internal_id":
+                    member = Member.all_objects.filter(
+                        pk=indict[verb_name.strip()]
+                    ).first()
                     if member:
                         do_update = True
                         del indict[verb_name]
@@ -503,7 +505,7 @@ def default_csv_form_valid(view, form, dialect='excel'):
                 #  if no Membership exists.)
                 if field.field_id.startswith("membership__"):
                     if v:
-                        membership_parms[field.field_id.split('__', 1)[1]] = v
+                        membership_parms[field.field_id.split("__", 1)[1]] = v
                 else:
                     if do_update:
                         old_v = field.getter(member)
@@ -515,45 +517,45 @@ def default_csv_form_valid(view, form, dialect='excel'):
 
             if do_update:
                 if have_changes:
-                    member.log(view, '.updated')
+                    member.log(view, ".updated")
                     member.save()
             else:
-                member.log(view, '.created')
+                member.log(view, ".created")
                 member.save()
 
                 # FIXME Changing membership when do_update is not implemented
                 if membership_parms:
                     create_membership(membership_parms, member)
 
-    return redirect(reverse('office:members.list'))
+    return redirect(reverse("office:members.list"))
 
 
 @receiver(member_list_importers)
 def default_csv_importer(sender, **kwargs):
     return {
-        'id': 'byro.office.members.import.default_csv',
-        'label': _('Generic CSV import (Comma Separated Values)'),
-        'form_valid': default_csv_form_valid,
+        "id": "byro.office.members.import.default_csv",
+        "label": _("Generic CSV import (Comma Separated Values)"),
+        "form_valid": default_csv_form_valid,
     }
 
 
 @receiver(member_list_importers)
 def default_csv_importer_german(sender, **kwargs):
     return {
-        'id': 'byro.office.members.import.default_csv_german',
-        'label': _(
-            'Generic CSV import (Semicolon Separated Values, German Windows versions)'
+        "id": "byro.office.members.import.default_csv_german",
+        "label": _(
+            "Generic CSV import (Semicolon Separated Values, German Windows versions)"
         ),
-        'form_valid': partial(default_csv_form_valid, dialect=csv_excel_de),
+        "form_valid": partial(default_csv_form_valid, dialect=csv_excel_de),
     }
 
 
 class MemberCreateView(FormView):
-    template_name = 'office/member/add.html'
+    template_name = "office/member/add.html"
     form_class = CreateMemberForm
 
     def get_object(self):
-        return Member.objects.get(pk=self.kwargs['pk'])
+        return Member.objects.get(pk=self.kwargs["pk"])
 
     @transaction.atomic
     def form_valid(self, form):
@@ -561,38 +563,38 @@ class MemberCreateView(FormView):
         form.save()
         messages.success(
             self.request,
-            _('The member was added, please edit additional details if applicable.'),
+            _("The member was added, please edit additional details if applicable."),
         )
-        form.instance.log(self, '.created')
+        form.instance.log(self, ".created")
 
         responses = new_member.send_robust(sender=form.instance)
         for module, response in responses:
             if isinstance(response, Exception):
                 messages.warning(
                     self.request,
-                    _('Some post processing steps could not be completed: ')
+                    _("Some post processing steps could not be completed: ")
                     + str(response),
                 )
         config = Configuration.get_solo()
 
         if config.welcome_member_template and form.instance.email:
             context = {
-                'name': config.name,
-                'contact': config.mail_from,
-                'number': form.instance.number,
-                'member_name': form.instance.name,
+                "name": config.name,
+                "contact": config.mail_from,
+                "number": form.instance.number,
+                "member_name": form.instance.name,
             }
             responses = [
                 r[1]
                 for r in new_member_mail_information.send_robust(sender=form.instance)
                 if r
             ]
-            context['additional_information'] = '\n'.join(responses).strip()
+            context["additional_information"] = "\n".join(responses).strip()
             config.welcome_member_template.to_mail(
                 email=form.instance.email, context=context
             )
         if config.welcome_office_template:
-            context = {'member_name': form.instance.name}
+            context = {"member_name": form.instance.name}
             responses = [
                 r[1]
                 for r in new_member_office_mail_information.send_robust(
@@ -600,18 +602,18 @@ class MemberCreateView(FormView):
                 )
                 if r
             ]
-            context['additional_information'] = '\n'.join(responses).strip()
+            context["additional_information"] = "\n".join(responses).strip()
             config.welcome_office_template.to_mail(
                 email=config.backoffice_mail, context=context
             )
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('office:members.data', kwargs={'pk': self.form.instance.pk})
+        return reverse("office:members.data", kwargs={"pk": self.form.instance.pk})
 
 
 class MemberDashboardView(MemberView):
-    template_name = 'office/member/dashboard.html'
+    template_name = "office/member/dashboard.html"
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -620,33 +622,33 @@ class MemberDashboardView(MemberView):
             return context
         first = obj.memberships.first().start
         delta = now().date() - first
-        context['member_since'] = {
-            'days': int(delta.total_seconds() / (60 * 60 * 24)),
-            'years': round(delta.days / 365, 1),
-            'first': first,
+        context["member_since"] = {
+            "days": int(delta.total_seconds() / (60 * 60 * 24)),
+            "years": round(delta.days / 365, 1),
+            "first": first,
         }
-        context['current_membership'] = {
-            'amount': obj.memberships.last().amount,
-            'interval': obj.memberships.last().get_interval_display(),
+        context["current_membership"] = {
+            "amount": obj.memberships.last().amount,
+            "interval": obj.memberships.last().get_interval_display(),
         }
-        context['statute_barred_debt'] = {'now': obj.statute_barred_debt()}
-        context['statute_barred_debt']['in1year'] = (
+        context["statute_barred_debt"] = {"now": obj.statute_barred_debt()}
+        context["statute_barred_debt"]["in1year"] = (
             obj.statute_barred_debt(relativedelta(years=1))
-            - context['statute_barred_debt']['now']
+            - context["statute_barred_debt"]["now"]
         )
 
-        context['tiles'] = []
+        context["tiles"] = []
         for __, response in member_dashboard_tile.send(self.request, member=obj):
             if not response:
                 continue
             if isinstance(response, collections.Mapping):
-                context['tiles'].append(response)
+                context["tiles"].append(response)
 
         return context
 
 
 class MemberDataView(MemberView):
-    template_name = 'office/member/data.html'
+    template_name = "office/member/data.html"
 
     def _instantiate(
         self,
@@ -658,45 +660,45 @@ class MemberDataView(MemberView):
         empty=False,
     ):
         params = {
-            'instance': (
+            "instance": (
                 getattr(
-                    member, profile_class._meta.get_field('member').related_query_name()
+                    member, profile_class._meta.get_field("member").related_query_name()
                 )
                 if profile_class
                 else instance
             )
             if not empty
             else None,
-            'prefix': prefix
+            "prefix": prefix
             or (
                 profile_class.__name__
                 if profile_class
-                else instance.__class__.__name__ + '_'
+                else instance.__class__.__name__ + "_"
                 if instance
-                else 'member_'
+                else "member_"
             ),
-            'data': self.request.POST if self.request.method == 'POST' else None,
+            "data": self.request.POST if self.request.method == "POST" else None,
         }
         return form_class(**params)
 
     def get_forms(self):
         obj = self.get_object()
         membership_create_form = forms.modelform_factory(
-            Membership, fields=['start', 'end', 'interval', 'amount']
+            Membership, fields=["start", "end", "interval", "amount"]
         )
         for key in membership_create_form.base_fields:
-            setattr(membership_create_form.base_fields[key], 'required', False)
+            setattr(membership_create_form.base_fields[key], "required", False)
         return (
             [
                 self._instantiate(
-                    forms.modelform_factory(Member, exclude=['membership_type']),
+                    forms.modelform_factory(Member, exclude=["membership_type"]),
                     member=obj,
                     instance=obj,
                 )
             ]
             + [
                 self._instantiate(
-                    forms.modelform_factory(Membership, exclude=['member']),
+                    forms.modelform_factory(Membership, exclude=["member"]),
                     member=obj,
                     instance=m,
                     prefix=m.id,
@@ -718,7 +720,7 @@ class MemberDataView(MemberView):
                         fields=[
                             f.name
                             for f in profile_class._meta.fields
-                            if f.name not in ['id', 'member']
+                            if f.name not in ["id", "member"]
                         ],
                     ),
                     member=obj,
@@ -730,7 +732,7 @@ class MemberDataView(MemberView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['forms'] = self.get_forms()
+        context["forms"] = self.get_forms()
         return context
 
     @transaction.atomic
@@ -742,19 +744,19 @@ class MemberDataView(MemberView):
                 return self.get(self.request)
         for form in form_list:
             if form.has_changed():
-                if not getattr(form.instance, 'member', False):
+                if not getattr(form.instance, "member", False):
                     form.instance.member = self.get_object()
                 any_changed = True
                 form.save()
         if any_changed:
-            self.get_object().log(self, '.updated')
-            messages.success(self.request, _('Your changes have been saved.'))
+            self.get_object().log(self, ".updated")
+            messages.success(self.request, _("Your changes have been saved."))
             update_member.send_robust(sender=self.request, form_list=form_list)
-        return redirect(reverse('office:members.data', kwargs=self.kwargs))
+        return redirect(reverse("office:members.data", kwargs=self.kwargs))
 
 
 class MemberFinanceView(MemberView):
-    template_name = 'office/member/finance.html'
+    template_name = "office/member/finance.html"
     paginate_by = 50
 
     def get_bookings(self):
@@ -768,15 +770,15 @@ class MemberFinanceView(MemberView):
                 transaction__value_datetime__lte=now(),
             )
             .order_by(
-                '-transaction__value_datetime',
-                '-booking_datetime',
-                '-transaction__booking_datetime',
+                "-transaction__value_datetime",
+                "-booking_datetime",
+                "-transaction__booking_datetime",
             )
         )
         if not member.balances.exists():
             return bookings
         result = []
-        balances = list(member.balances.order_by('-start'))
+        balances = list(member.balances.order_by("-start"))
         current_balance = balances.pop(0)
         current_balance.bookings = []
         for booking in bookings:
@@ -798,13 +800,13 @@ class MemberFinanceView(MemberView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['member'] = self.get_member()
-        context['bookings'] = self.get_bookings()
+        context["member"] = self.get_member()
+        context["bookings"] = self.get_bookings()
         return context
 
 
 class MemberDocumentsView(MemberView, FormView):
-    template_name = 'office/member/documents.html'
+    template_name = "office/member/documents.html"
     paginate_by = 50
     form_class = DocumentUploadForm
 
@@ -814,7 +816,7 @@ class MemberDocumentsView(MemberView, FormView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['member'] = self.get_member()
+        context["member"] = self.get_member()
         return context
 
     def get_form(self):
@@ -822,7 +824,7 @@ class MemberDocumentsView(MemberView, FormView):
         return form
 
     def get_success_url(self):
-        return reverse('office:members.documents', kwargs={'pk': self.get_member().pk})
+        return reverse("office:members.documents", kwargs={"pk": self.get_member().pk})
 
     @transaction.atomic
     def form_valid(self, form):
@@ -833,7 +835,7 @@ class MemberDocumentsView(MemberView, FormView):
         form.save()
         member.log(
             self,
-            '.document.created',
+            ".document.created",
             document=form.instance,
             content_hash=form.instance.content_hash,
         )
@@ -842,24 +844,24 @@ class MemberDocumentsView(MemberView, FormView):
 
 
 class MemberAccountAdjustmentForm(forms.Form):
-    form_title = _('Adjust member account balance')
+    form_title = _("Adjust member account balance")
 
     date = forms.DateField(initial=lambda: now().date())
     adjustment_reason = forms.ChoiceField(
-        choices=[('initial', _("Initial balance")), ('waiver', _("Fees waived"))]
+        choices=[("initial", _("Initial balance")), ("waiver", _("Fees waived"))]
     )
     adjustment_memo = forms.CharField(required=False)
     adjustment_type = forms.ChoiceField(
         widget=forms.RadioSelect,
         choices=[
-            ('relative', _('Relative (Add or subtract amount to/from balance)')),
-            ('absolute', _('Absolute (Balance should be)')),
+            ("relative", _("Relative (Add or subtract amount to/from balance)")),
+            ("absolute", _("Absolute (Balance should be)")),
         ],
-        initial='relative',
+        initial="relative",
     )
-    amount = forms.DecimalField(initial=Decimal('0.00'), decimal_places=2)
+    amount = forms.DecimalField(initial=Decimal("0.00"), decimal_places=2)
 
-    date.widget.attrs.update({'class': 'datepicker'})
+    date.widget.attrs.update({"class": "datepicker"})
 
 
 class MultipleFormsMixin:
@@ -867,7 +869,7 @@ class MultipleFormsMixin:
         raise NotImplementedError
 
     def mangle_button(self, name, prefix):
-        return 'submit_{}_{}'.format(prefix, name)
+        return "submit_{}_{}".format(prefix, name)
 
     def get_forms(self):
         """Instantiate forms, return a list of tuples like get_operations(), but with Form objects and expanded prefix values."""
@@ -881,7 +883,7 @@ class MultipleFormsMixin:
                     form_class(
                         prefix=prefix,
                         data=self.request.POST
-                        if self.request.method == 'POST'
+                        if self.request.method == "POST"
                         else None,
                     ),
                     buttons,
@@ -893,7 +895,7 @@ class MultipleFormsMixin:
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['forms'] = self.get_forms()
+        context["forms"] = self.get_forms()
         return context
 
     def post(self, *args, **kwargs):
@@ -916,9 +918,9 @@ class MultipleFormsMixin:
 
 
 class MemberOperationsView(MultipleFormsMixin, MemberView):
-    template_name = 'office/member/operations.html'
+    template_name = "office/member/operations.html"
     membership_form_class = forms.modelform_factory(
-        Membership, fields=['start', 'end', 'interval', 'amount']
+        Membership, fields=["start", "end", "interval", "amount"]
     )
 
     def get_operations(self):
@@ -937,21 +939,21 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
         # Add Leave forms for all current memberships
         def _create_ms_leave_form(*args, **kwargs):
             f = self.membership_form_class(instance=ms, *args, **kwargs)
-            f.fields['start'].disabled = True
-            f.fields['interval'].disabled = True
-            f.fields['amount'].disabled = True
-            f.fields['end'].required = True
-            f.fields['end'].widget.attrs['class'] = 'datepicker'
+            f.fields["start"].disabled = True
+            f.fields["interval"].disabled = True
+            f.fields["amount"].disabled = True
+            f.fields["end"].required = True
+            f.fields["end"].widget.attrs["class"] = "datepicker"
             return f
 
-        for ms in member.memberships.all().order_by('-start'):
+        for ms in member.memberships.all().order_by("-start"):
             if ms.start <= now_.date() and (not ms.end or ms.end > now_.date()):
                 retval.append(
                     (
-                        'ms_{}_leave'.format(ms.pk),
-                        _('End membership'),
+                        "ms_{}_leave".format(ms.pk),
+                        _("End membership"),
                         _create_ms_leave_form,
-                        {'end': _('End membership')},
+                        {"end": _("End membership")},
                         lambda *args, **kwargs: self.end_membership(
                             ms, *args, **kwargs
                         ),
@@ -961,10 +963,10 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
         # Add account adjustment form
         retval.append(
             (
-                'member_account_adjustment',
-                _('Adjust member account balance'),
+                "member_account_adjustment",
+                _("Adjust member account balance"),
                 MemberAccountAdjustmentForm,
-                {'adjust': _('Adjust balance')},
+                {"adjust": _("Adjust balance")},
                 self.adjust_balance,
             )
         )
@@ -974,34 +976,34 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
     @transaction.atomic
     def adjust_balance(self, form, active_buttons):
         memo = (
-            form.cleaned_data['adjustment_memo']
-            or dict(form.fields['adjustment_reason'].choices).get(
-                form.cleaned_data['adjustment_reason'], None
+            form.cleaned_data["adjustment_memo"]
+            or dict(form.fields["adjustment_reason"].choices).get(
+                form.cleaned_data["adjustment_reason"], None
             )
-            or _('Account adjustment')
+            or _("Account adjustment")
         )
 
         member = self.get_member()
         now_ = now()
 
-        if form.cleaned_data['adjustment_type'] == 'relative':
-            amount = form.cleaned_data['amount']
+        if form.cleaned_data["adjustment_type"] == "relative":
+            amount = form.cleaned_data["amount"]
         else:
             old_balance = member._calc_balance(
-                form.cleaned_data['date'], form.cleaned_data['date']
+                form.cleaned_data["date"], form.cleaned_data["date"]
             )
-            amount = old_balance - form.cleaned_data['amount']
+            amount = old_balance - form.cleaned_data["amount"]
 
         amount_, from_, to_ = None, None, None
 
         if amount != 0:
-            if form.cleaned_data['adjustment_reason'] == 'initial':
+            if form.cleaned_data["adjustment_reason"] == "initial":
                 amount_, from_, to_ = (
                     amount,
                     SpecialAccounts.opening_balance,
                     SpecialAccounts.fees_receivable,
                 )
-            elif form.cleaned_data['adjustment_reason'] == 'waiver':
+            elif form.cleaned_data["adjustment_reason"] == "waiver":
                 if amount < 0:
                     amount_, from_, to_ = (
                         -amount,
@@ -1025,7 +1027,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
             to_member = member if to_ == SpecialAccounts.fees_receivable else None
 
             t = Transaction.objects.create(
-                value_datetime=form.cleaned_data['date'],
+                value_datetime=form.cleaned_data["date"],
                 booking_datetime=now_,
                 user_or_context=self,
                 memo=memo,
@@ -1037,34 +1039,34 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
             balance = member.balance
 
-            if form.cleaned_data['adjustment_reason'] == 'initial':
-                member.log(self, '.finance.initial_balance', balance=balance)
-            elif form.cleaned_data['adjustment_reason'] == 'waiver':
-                member.log(self, '.finance.fees_waived', amount=amount)
+            if form.cleaned_data["adjustment_reason"] == "initial":
+                member.log(self, ".finance.initial_balance", balance=balance)
+            elif form.cleaned_data["adjustment_reason"] == "waiver":
+                member.log(self, ".finance.fees_waived", amount=amount)
             else:
                 member.log(
-                    self, '.finance.account_adjusted', balance=balance, amount=amount
+                    self, ".finance.account_adjusted", balance=balance, amount=amount
                 )
 
             messages.success(
                 self.request,
                 _(
-                    'Membership account adjusted by {amount}, current balance is {balance}'
+                    "Membership account adjusted by {amount}, current balance is {balance}"
                 ).format(amount=amount, balance=balance),
             )
 
     @transaction.atomic
     def end_membership(self, ms, form, active_buttons):
         if form.instance.end:
-            if not getattr(form.instance, 'member', False):
+            if not getattr(form.instance, "member", False):
                 form.instance.member = self.get_object()
 
             form.save()
-            form.instance.log(self, '.ended')
+            form.instance.log(self, ".ended")
             messages.success(
                 self.request,
                 _(
-                    'The membership has been terminated. Please check the outbox for the notifications.'
+                    "The membership has been terminated. Please check the outbox for the notifications."
                 ),
             )
 
@@ -1075,18 +1077,18 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                 if isinstance(response, Exception):
                     messages.warning(
                         self.request,
-                        _('Some post processing steps could not be completed: ')
+                        _("Some post processing steps could not be completed: ")
                         + str(response),
                     )
 
             config = Configuration.get_solo()
             if config.leave_member_template:
                 context = {
-                    'name': config.name,
-                    'contact': config.mail_from,
-                    'number': form.instance.member.number,
-                    'member_name': form.instance.member.name,
-                    'end': form.instance.end,
+                    "name": config.name,
+                    "contact": config.mail_from,
+                    "number": form.instance.member.number,
+                    "member_name": form.instance.member.name,
+                    "end": form.instance.end,
                 }
                 responses = [
                     r[1]
@@ -1095,14 +1097,14 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                     )
                     if r
                 ]
-                context['additional_information'] = '\n'.join(responses).strip()
+                context["additional_information"] = "\n".join(responses).strip()
                 config.leave_member_template.to_mail(
                     email=form.instance.member.email, context=context
                 )
             if config.leave_office_template:
                 context = {
-                    'member_name': form.instance.member.name,
-                    'end': form.instance.end,
+                    "member_name": form.instance.member.name,
+                    "end": form.instance.end,
                 }
                 responses = [
                     r[1]
@@ -1111,7 +1113,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                     )
                     if r
                 ]
-                context['additional_information'] = '\n'.join(responses).strip()
+                context["additional_information"] = "\n".join(responses).strip()
                 config.leave_office_template.to_mail(
                     email=config.backoffice_mail, context=context
                 )
@@ -1119,21 +1121,21 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
 class MemberListTypeaheadView(View):
     def dispatch(self, request, *args, **kwargs):
-        search = request.GET.get('search')
+        search = request.GET.get("search")
         if not search or len(search) < 2:
-            return JsonResponse({'count': 0, 'results': []})
+            return JsonResponse({"count": 0, "results": []})
 
         queryset = Member.objects.filter(
             Q(name__icontains=search) | Q(profile_profile__nick__icontains=search)
         )
         return JsonResponse(
             {
-                'count': len(queryset),
-                'results': [
+                "count": len(queryset),
+                "results": [
                     {
-                        'id': member.pk,
-                        'nick': member.profile_profile.nick,
-                        'name': member.name,
+                        "id": member.pk,
+                        "nick": member.profile_profile.nick,
+                        "name": member.name,
                     }
                     for member in queryset
                 ],
@@ -1142,41 +1144,41 @@ class MemberListTypeaheadView(View):
 
 
 class MemberRecordDisclosureView(MemberView):
-    template_name = 'office/member/data_disclosure.html'
+    template_name = "office/member/data_disclosure.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['mail'] = self.get_member().record_disclosure_email
+        ctx["mail"] = self.get_member().record_disclosure_email
         return ctx
 
     def post(self, request, *args, **kwargs):
         self.get_member().record_disclosure_email.save()
-        self.get_member().log(self, '.disclosure_email_generated')
+        self.get_member().log(self, ".disclosure_email_generated")
         messages.success(
-            request, _('The email was generated and can be sent in the outbox.')
+            request, _("The email was generated and can be sent in the outbox.")
         )
-        return redirect(reverse('office:members.dashboard', kwargs=self.kwargs))
+        return redirect(reverse("office:members.dashboard", kwargs=self.kwargs))
 
 
 class MemberLogView(MemberView):
-    template_name = 'office/member/log.html'
+    template_name = "office/member/log.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['log_entries'] = self.get_member().log_entries()
+        ctx["log_entries"] = self.get_member().log_entries()
         return ctx
 
 
 class MemberMailsView(MemberView):
-    template_name = 'office/member/mails.html'
+    template_name = "office/member/mails.html"
 
 
 class MemberTimelineView(MemberView):
-    template_name = 'office/member/timeline.html'
+    template_name = "office/member/timeline.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['timeline'] = self.get_timeline()
+        ctx["timeline"] = self.get_timeline()
         return ctx
 
     def get_timeline(self):

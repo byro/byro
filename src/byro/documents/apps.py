@@ -3,10 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class DocumentsConfig(AppConfig):
-    name = 'byro.documents'
+    name = "byro.documents"
 
     class ByroPluginMeta:
         document_categories = {
-            'byro.documents.misc': _('Miscellaneous document'),
-            'byro.documents.registration_form': _('Registration form'),
+            "byro.documents.misc": _("Miscellaneous document"),
+            "byro.documents.registration_form": _("Registration form"),
         }

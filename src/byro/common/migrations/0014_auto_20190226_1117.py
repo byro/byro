@@ -5,19 +5,32 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0013_logentry_logchain'),
-    ]
+    dependencies = [("common", "0013_logentry_logchain")]
 
     operations = [
         migrations.AddField(
-            model_name='configuration',
-            name='can_see_other_members',
-            field=models.CharField(choices=[('no', 'no'), ('name-only', 'name-only'), ('name-contact', 'name-contact')], default='no', max_length=12, verbose_name='Members can see other members'),
+            model_name="configuration",
+            name="can_see_other_members",
+            field=models.CharField(
+                choices=[
+                    ("no", "no"),
+                    ("name-only", "name-only"),
+                    ("name-contact", "name-contact"),
+                ],
+                default="no",
+                max_length=12,
+                verbose_name="Members can see other members",
+            ),
         ),
         migrations.AddField(
-            model_name='configuration',
-            name='public_base_url',
-            field=models.URLField(blank=True, help_text="This field is used to generate the absolute URL for public pages. Leave it empty if it is the same as this page's base URL.", max_length=512, null=True, verbose_name='External base URL of byro installation'),
+            model_name="configuration",
+            name="public_base_url",
+            field=models.URLField(
+                blank=True,
+                help_text="This field is used to generate the absolute URL for public pages. Leave it empty if it is the same as this page's base URL.",
+                max_length=512,
+                null=True,
+                verbose_name="External base URL of byro installation",
+            ),
         ),
     ]

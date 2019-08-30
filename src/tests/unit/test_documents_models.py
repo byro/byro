@@ -7,19 +7,19 @@ from byro.mails.models import EMail
 
 @pytest.fixture
 def document():
-    f = SimpleUploadedFile('testresource.txt', b'a resource')
-    d = Document.objects.create(document=f, title='Test document')
+    f = SimpleUploadedFile("testresource.txt", b"a resource")
+    d = Document.objects.create(document=f, title="Test document")
     yield d
     d.delete()
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('immediately', (True, False))
+@pytest.mark.parametrize("immediately", (True, False))
 def test_document_send(document, member, immediately):
     count = EMail.objects.count()
     document.member = member
     document.save()
-    assert 'Document' in document.get_display()
+    assert "Document" in document.get_display()
     document.send(immediately=immediately)
     assert EMail.objects.count() == count + 1
     mail = EMail.objects.last()

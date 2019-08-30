@@ -9,18 +9,22 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0001_initial'),
-        ('bookkeeping', '0003_auto_20170812_1237'),
+        ("members", "0001_initial"),
+        ("bookkeeping", "0003_auto_20170812_1237"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='virtualtransaction',
-            name='member',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='transactions', to='members.Member'),
+            model_name="virtualtransaction",
+            name="member",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="transactions",
+                to="members.Member",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='account',
-            unique_together=set([('account_category', 'name')]),
+            name="account", unique_together=set([("account_category", "name")])
         ),
     ]
