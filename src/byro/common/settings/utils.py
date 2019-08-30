@@ -1,9 +1,14 @@
+import os
+
 from itertools import repeat
 
 
 def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
     from byro.common.console import start_box, end_box, print_line
     from byro import __version__
+
+    if os.geteuid() == 0:
+        print_line('You are running pretalx as root, why?', bold=True)
 
     mode = 'development' if debug else 'production'
     lines = [
