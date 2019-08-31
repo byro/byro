@@ -1,13 +1,13 @@
-from annoying.fields import AutoOneToOneField
 from contextlib import suppress
 from enum import Enum
-from schwifty import IBAN
 
+from annoying.fields import AutoOneToOneField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from localflavor.generic.models import BICField, IBANField
 
 from byro.common.models.auditable import Auditable
+from schwifty import IBAN
 
 
 class SepaDirectDebitState(Enum):
