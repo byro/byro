@@ -7,19 +7,19 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profile', '0004_auto_20171206_1919'),
-    ]
+    dependencies = [("profile", "0004_auto_20171206_1919")]
 
     operations = [
         migrations.AlterField(
-            model_name='memberprofile',
-            name='birth_date',
-            field=models.DateField(blank=True, null=True, verbose_name='Birth date'),
+            model_name="memberprofile",
+            name="birth_date",
+            field=models.DateField(blank=True, null=True, verbose_name="Birth date"),
         ),
         migrations.AlterField(
-            model_name='memberprofile',
-            name='nick',
-            field=models.CharField(blank=True, max_length=200, null=True, verbose_name='Nick'),
+            model_name="memberprofile",
+            name="nick",
+            field=models.CharField(
+                blank=True, max_length=200, null=True, verbose_name="Nick"
+            ),
         ),
     ]

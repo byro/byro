@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0002_configuration_mail_from'),
-    ]
+    dependencies = [("common", "0002_configuration_mail_from")]
 
     operations = [
         migrations.AlterField(
-            model_name='configuration',
-            name='address',
-            field=models.TextField(blank=True, max_length=500, null=True, verbose_name='address'),
-        ),
+            model_name="configuration",
+            name="address",
+            field=models.TextField(
+                blank=True, max_length=500, null=True, verbose_name="address"
+            ),
+        )
     ]

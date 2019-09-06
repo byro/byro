@@ -6,15 +6,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('mails', '0007_auto_20180929_0915'),
-        ('common', '0011_logentry'),
-    ]
+    dependencies = [("mails", "0007_auto_20180929_0915"), ("common", "0011_logentry")]
 
     operations = [
         migrations.AddField(
-            model_name='configuration',
-            name='record_disclosure_template',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='mails.MailTemplate'),
-        ),
+            model_name="configuration",
+            name="record_disclosure_template",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="mails.MailTemplate",
+            ),
+        )
     ]

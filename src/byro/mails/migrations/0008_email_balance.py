@@ -7,14 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0010_memberbalance'),
-        ('mails', '0007_auto_20180929_0915'),
+        ("members", "0010_memberbalance"),
+        ("mails", "0007_auto_20180929_0915"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='email',
-            name='balance',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='reminder_mails', to='members.MemberBalance'),
-        ),
+            model_name="email",
+            name="balance",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="reminder_mails",
+                to="members.MemberBalance",
+            ),
+        )
     ]

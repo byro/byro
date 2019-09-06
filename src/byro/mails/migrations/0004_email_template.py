@@ -6,14 +6,17 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('mails', '0003_mailtemplate_reply_to'),
-    ]
+    dependencies = [("mails", "0003_mailtemplate_reply_to")]
 
     operations = [
         migrations.AddField(
-            model_name='email',
-            name='template',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='mails.MailTemplate'),
-        ),
+            model_name="email",
+            name="template",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="mails.MailTemplate",
+            ),
+        )
     ]

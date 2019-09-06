@@ -9,7 +9,7 @@ def test_log_create(member):
     a = LogEntry.objects.create(
         content_object=member,
         action_type="test.test_log_create",
-        data={'source': 'test'},
+        data={"source": "test"},
     )
 
     assert a
@@ -23,7 +23,7 @@ def test_log_filter_content_object(member):
     LogEntry.objects.create(
         content_object=member,
         action_type="test.test_log_filter_content_object",
-        data={'source': 'test'},
+        data={"source": "test"},
     )
 
     assert (
@@ -39,7 +39,7 @@ def test_log_immutable(member):
     LogEntry.objects.create(
         content_object=member,
         action_type="test.test_log_immutable",
-        data={'source': 'test'},
+        data={"source": "test"},
     )
 
     a = LogEntry.objects.get(action_type="test.test_log_immutable")
@@ -57,7 +57,7 @@ def test_log_immutable_2(member):
     LogEntry.objects.create(
         content_object=member,
         action_type="test.test_log_immutable_2",
-        data={'source': 'test'},
+        data={"source": "test"},
     )
 
     a = LogEntry.objects.get(action_type="test.test_log_immutable_2")
@@ -92,4 +92,4 @@ def test_log_user(user, member):
     with pytest.raises(Exception):
         LogEntry.objects.create(content_object=member, action_type="test.test_log_user")
 
-    assert LogEntry.objects.filter(user=user).first().data['source'] == str(user)
+    assert LogEntry.objects.filter(user=user).first().data["source"] == str(user)

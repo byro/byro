@@ -23,21 +23,21 @@ from django.conf.urls.static import static
 
 raw_plugin_patterns = []
 for app in apps.get_app_configs():
-    if hasattr(app, 'ByroPluginMeta'):
-        if importlib.util.find_spec(app.name + '.urls'):
-            urlmod = importlib.import_module(app.name + '.urls')
+    if hasattr(app, "ByroPluginMeta"):
+        if importlib.util.find_spec(app.name + ".urls"):
+            urlmod = importlib.import_module(app.name + ".urls")
             single_plugin_patterns = []
-            if hasattr(urlmod, 'urlpatterns'):
+            if hasattr(urlmod, "urlpatterns"):
                 single_plugin_patterns += urlmod.urlpatterns
             raw_plugin_patterns.append(
-                url(r'', include((single_plugin_patterns, app.label)))
+                url(r"", include((single_plugin_patterns, app.label)))
             )
 
 urlpatterns = [
-    url(r'', include((raw_plugin_patterns, 'plugins'))),
-    url(r'', include('byro.common.urls', namespace='common')),
-    url(r'', include('byro.office.urls', namespace='office')),
-    url(r'^p/', include('byro.public.urls', namespace='public')),
+    url(r"", include((raw_plugin_patterns, "plugins"))),
+    url(r"", include("byro.common.urls", namespace="common")),
+    url(r"", include("byro.office.urls", namespace="office")),
+    url(r"^p/", include("byro.public.urls", namespace="public")),
 ]
 
 if settings.DEBUG:
@@ -45,4 +45,5 @@ if settings.DEBUG:
 
     with suppress(ImportError):
         import debug_toolbar
-        urlpatterns.insert(0, url(r'^__debug__/', include(debug_toolbar.urls)))
+
+        urlpatterns.insert(0, url(r"^__debug__/", include(debug_toolbar.urls)))

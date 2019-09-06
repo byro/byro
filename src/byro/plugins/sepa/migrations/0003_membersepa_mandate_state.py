@@ -5,14 +5,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sepa', '0002_auto_20171013_1436'),
-    ]
+    dependencies = [("sepa", "0002_auto_20171013_1436")]
 
     operations = [
         migrations.AddField(
-            model_name='membersepa',
-            name='mandate_state',
-            field=models.CharField(choices=[('inactive', 'Inactive'), ('active', 'Active'), ('bounced', 'Bounced'), ('rescinded', 'Rescinded')], default='active', max_length=10, verbose_name='Mandate state'),
-        ),
+            model_name="membersepa",
+            name="mandate_state",
+            field=models.CharField(
+                choices=[
+                    ("inactive", "Inactive"),
+                    ("active", "Active"),
+                    ("bounced", "Bounced"),
+                    ("rescinded", "Rescinded"),
+                ],
+                default="active",
+                max_length=10,
+                verbose_name="Mandate state",
+            ),
+        )
     ]

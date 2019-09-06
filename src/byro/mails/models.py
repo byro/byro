@@ -16,29 +16,29 @@ from byro.members.models import Member
 
 class MailTemplate(Auditable, models.Model):
 
-    subject = I18nCharField(max_length=200, verbose_name=_('Subject'))
-    text = I18nTextField(verbose_name=_('Text'))
+    subject = I18nCharField(max_length=200, verbose_name=_("Subject"))
+    text = I18nTextField(verbose_name=_("Text"))
     reply_to = models.EmailField(
         max_length=200,
         blank=True,
         null=True,
-        verbose_name=_('Reply-To'),
+        verbose_name=_("Reply-To"),
         help_text=_(
-            'Change the Reply-To address if you do not want to use the default orga address'
+            "Change the Reply-To address if you do not want to use the default orga address"
         ),
     )
     bcc = models.CharField(
         max_length=1000,
         blank=True,
         null=True,
-        verbose_name=_('BCC'),
+        verbose_name=_("BCC"),
         help_text=_(
-            'Enter comma separated addresses. Will receive a blind copy of every mail sent from this template. This may be a LOT!'
+            "Enter comma separated addresses. Will receive a blind copy of every mail sent from this template. This may be a LOT!"
         ),
     )
 
     def __str__(self):
-        return '{self.subject}'.format(self=self)
+        return "{self.subject}".format(self=self)
 
     def to_mail(
         self,
@@ -60,7 +60,7 @@ class MailTemplate(Auditable, models.Model):
                 text = str(self.text).format(**context)
             except KeyError as e:
                 raise SendMailException(
-                    'Experienced KeyError when rendering Text: {e}'.format(e=e)
+                    "Experienced KeyError when rendering Text: {e}".format(e=e)
                 )
 
             mail = EMail(
@@ -81,7 +81,7 @@ class MailTemplate(Auditable, models.Model):
         return mail
 
     def get_absolute_url(self):
-        return reverse('office:mails.templates.view', kwargs={'pk': self.pk})
+        return reverse("office:mails.templates.view", kwargs={"pk": self.pk})
 
     def get_object_icon(self):
         return mark_safe('<i class="fa fa-envelope-o"></i> ')
@@ -90,46 +90,46 @@ class MailTemplate(Auditable, models.Model):
 class EMail(Auditable, models.Model):
     to = models.CharField(
         max_length=1000,
-        verbose_name=_('To'),
-        help_text=_('One email address or several addresses separated by commas.'),
+        verbose_name=_("To"),
+        help_text=_("One email address or several addresses separated by commas."),
     )
     reply_to = models.CharField(
-        max_length=1000, null=True, blank=True, verbose_name=_('Reply-To')
+        max_length=1000, null=True, blank=True, verbose_name=_("Reply-To")
     )
     cc = models.CharField(
         max_length=1000,
         null=True,
         blank=True,
-        verbose_name=_('CC'),
-        help_text=_('One email address or several addresses separated by commas.'),
+        verbose_name=_("CC"),
+        help_text=_("One email address or several addresses separated by commas."),
     )
     bcc = models.CharField(
         max_length=1000,
         null=True,
         blank=True,
-        verbose_name=_('BCC'),
-        help_text=_('One email address or several addresses separated by commas.'),
+        verbose_name=_("BCC"),
+        help_text=_("One email address or several addresses separated by commas."),
     )
-    subject = models.CharField(max_length=200, verbose_name=_('Subject'))
-    members = models.ManyToManyField(to='members.Member', related_name='emails')
-    text = models.TextField(verbose_name=_('Text'))
-    sent = models.DateTimeField(null=True, blank=True, verbose_name=_('Sent at'))
+    subject = models.CharField(max_length=200, verbose_name=_("Subject"))
+    members = models.ManyToManyField(to="members.Member", related_name="emails")
+    text = models.TextField(verbose_name=_("Text"))
+    sent = models.DateTimeField(null=True, blank=True, verbose_name=_("Sent at"))
     template = models.ForeignKey(
         to=MailTemplate, null=True, blank=True, on_delete=models.SET_NULL
     )
-    attachments = models.ManyToManyField(to='documents.Document', related_name='mails')
+    attachments = models.ManyToManyField(to="documents.Document", related_name="mails")
     balance = models.ForeignKey(
-        to='members.MemberBalance',
+        to="members.MemberBalance",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='reminder_mails',
+        related_name="reminder_mails",
     )
 
     @property
     def attachment_ids(self):
-        if hasattr(self, 'attachments'):
-            return list(self.attachments.all().values_list('pk', flat=True))
+        if hasattr(self, "attachments"):
+            return list(self.attachments.all().values_list("pk", flat=True))
         return []
 
     def process_special_to(self):
@@ -139,11 +139,11 @@ class EMail(Auditable, models.Model):
                 member = Member.all_objects.get(pk=self.to.split(":", 2)[2])
                 self.to = member.email
                 self.members.add(member)
-                self.save(update_fields=['to'])
+                self.save(update_fields=["to"])
 
     def send(self):
         if self.sent:
-            raise Exception('This mail has been sent already. It cannot be sent again.')
+            raise Exception("This mail has been sent already. It cannot be sent again.")
 
         self.process_special_to()
 
@@ -171,7 +171,7 @@ class EMail(Auditable, models.Model):
                     self.members.add(member)
 
             else:
-                to_addrs = self.to.split(',')
+                to_addrs = self.to.split(",")
                 send_tos.append(to_addrs)
 
                 for addr in to_addrs:
@@ -192,14 +192,14 @@ class EMail(Auditable, models.Model):
                     subject=self.subject,
                     body=self.text,
                     sender=config.mail_from,
-                    cc=(self.cc or '').split(','),
-                    bcc=(self.bcc or '').split(','),
+                    cc=(self.cc or "").split(","),
+                    bcc=(self.bcc or "").split(","),
                     attachments=self.attachment_ids,
                     headers=headers,
                 )
 
         self.sent = now()
-        self.save(update_fields=['sent'])
+        self.save(update_fields=["sent"])
 
     def copy_to_draft(self):
         new_mail = deepcopy(self)

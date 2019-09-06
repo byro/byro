@@ -15,20 +15,20 @@ from byro.common.models.choices import Choices
 
 class AccountCategory(Choices):
     # Categories for double-entry bookkeeping
-    ASSET = 'asset'  # de: Aktiva, for example your bank account or cash
-    LIABILITY = 'liability'  # de: Passiva, for example invoices you have to pay
-    INCOME = 'income'  # de: Ertragskonten, for example for fees paid
-    EXPENSE = 'expense'  # de: Aufwandskonten, for example for fees to be paid
-    EQUITY = 'equity'  # de: Eigenkapital, assets less liabilities
+    ASSET = "asset"  # de: Aktiva, for example your bank account or cash
+    LIABILITY = "liability"  # de: Passiva, for example invoices you have to pay
+    INCOME = "income"  # de: Ertragskonten, for example for fees paid
+    EXPENSE = "expense"  # de: Aufwandskonten, for example for fees to be paid
+    EQUITY = "equity"  # de: Eigenkapital, assets less liabilities
 
     @classproperty
     def choices(cls):
         return (
-            (cls.ASSET, _('Asset account')),
-            (cls.LIABILITY, _('Liability account')),
-            (cls.INCOME, _('Income account')),
-            (cls.EXPENSE, _('Expense account')),
-            (cls.EQUITY, _('Equity account')),
+            (cls.ASSET, _("Asset account")),
+            (cls.LIABILITY, _("Liability account")),
+            (cls.INCOME, _("Income account")),
+            (cls.EXPENSE, _("Expense account")),
+            (cls.EQUITY, _("Equity account")),
         )
 
 
@@ -45,15 +45,15 @@ class Account(Auditable, models.Model, LogTargetMixin):
         choices=AccountCategory.choices, max_length=AccountCategory.max_length
     )
     name = models.CharField(max_length=300, null=True)  # e.g. 'Laser donations'
-    tags = models.ManyToManyField(AccountTag, related_name='accounts')
+    tags = models.ManyToManyField(AccountTag, related_name="accounts")
 
     class Meta:
-        unique_together = (('account_category', 'name'),)
+        unique_together = (("account_category", "name"),)
 
     def __str__(self):
         if self.name:
             return self.name
-        return '{self.account_category} account #{self.id}'.format(self=self)
+        return "{self.account_category} account #{self.id}".format(self=self)
 
     @property
     def bookings(self):
@@ -96,8 +96,8 @@ class Account(Auditable, models.Model, LogTargetMixin):
         qs = self._filter_by_date(self.transactions, start, end)
 
         result = qs.with_balances().aggregate(
-            debit=models.functions.Coalesce(models.Sum('balances_debit'), 0),
-            credit=models.functions.Coalesce(models.Sum('balances_credit'), 0),
+            debit=models.functions.Coalesce(models.Sum("balances_debit"), 0),
+            credit=models.functions.Coalesce(models.Sum("balances_credit"), 0),
         )
 
         # ASSET, EXPENSE:  Debit increases balance, credit decreases it
@@ -108,16 +108,16 @@ class Account(Auditable, models.Model, LogTargetMixin):
             AccountCategory.INCOME,
             AccountCategory.EQUITY,
         ):
-            result['net'] = result['credit'] - result['debit']
+            result["net"] = result["credit"] - result["debit"]
         else:
-            result['net'] = result['debit'] - result['credit']
+            result["net"] = result["debit"] - result["credit"]
 
-        result = {k: Decimal(v).quantize(Decimal('0.01')) for k, v in result.items()}
+        result = {k: Decimal(v).quantize(Decimal("0.01")) for k, v in result.items()}
 
         return result
 
     def get_absolute_url(self):
-        return reverse('office:finance.accounts.detail', kwargs={'pk': self.pk})
+        return reverse("office:finance.accounts.detail", kwargs={"pk": self.pk})
 
     def get_object_icon(self):
         return mark_safe('<i class="fa fa-bank"></i> ')

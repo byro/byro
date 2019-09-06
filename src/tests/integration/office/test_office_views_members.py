@@ -6,12 +6,12 @@ from django.utils.timezone import now
 
 from byro.members.models import Member
 
-pytestmark = pytest.mark.usefixtures('configuration')
+pytestmark = pytest.mark.usefixtures("configuration")
 
 
 @pytest.mark.django_db
 def test_members_list(member, membership, inactive_member, logged_in_client):
-    response = logged_in_client.get(reverse('office:members.list'))
+    response = logged_in_client.get(reverse("office:members.list"))
     content = response.content.decode()
     assert response.status_code == 200, content
     assert member.name in content
@@ -21,7 +21,7 @@ def test_members_list(member, membership, inactive_member, logged_in_client):
 @pytest.mark.django_db
 def test_filtered_members_list(member, membership, inactive_member, logged_in_client):
     response = logged_in_client.get(
-        reverse('office:members.list') + '?filter=all&q=' + member.name[:4]
+        reverse("office:members.list") + "?filter=all&q=" + member.name[:4]
     )
     content = response.content.decode()
     assert response.status_code == 200, content
@@ -31,7 +31,7 @@ def test_filtered_members_list(member, membership, inactive_member, logged_in_cl
 
 @pytest.mark.django_db
 def test_inactive_members_list(member, membership, inactive_member, logged_in_client):
-    response = logged_in_client.get(reverse('office:members.list') + '?filter=inactive')
+    response = logged_in_client.get(reverse("office:members.list") + "?filter=inactive")
     content = response.content.decode()
     assert response.status_code == 200, content
     assert member.name not in content
@@ -40,7 +40,7 @@ def test_inactive_members_list(member, membership, inactive_member, logged_in_cl
 
 @pytest.mark.django_db
 def test_all_members_list(member, membership, inactive_member, logged_in_client):
-    response = logged_in_client.get(reverse('office:members.list') + '?filter=all')
+    response = logged_in_client.get(reverse("office:members.list") + "?filter=all")
     content = response.content.decode()
     assert response.status_code == 200, content
     assert member.name in content
@@ -50,7 +50,7 @@ def test_all_members_list(member, membership, inactive_member, logged_in_client)
 @pytest.mark.django_db
 def test_member_view(member, membership, logged_in_client):
     response = logged_in_client.get(
-        reverse('office:members.dashboard', kwargs={'pk': member.pk})
+        reverse("office:members.dashboard", kwargs={"pk": member.pk})
     )
     content = response.content.decode()
     assert response.status_code == 200, content
@@ -61,10 +61,10 @@ def test_member_view(member, membership, logged_in_client):
 def test_member_view_different_public_address(
     member, membership, logged_in_client, configuration
 ):
-    configuration.public_base_url = 'https://complicated.long.url.example.org'
+    configuration.public_base_url = "https://complicated.long.url.example.org"
     configuration.save()
     response = logged_in_client.get(
-        reverse('office:members.dashboard', kwargs={'pk': member.pk})
+        reverse("office:members.dashboard", kwargs={"pk": member.pk})
     )
     content = response.content.decode()
     assert response.status_code == 200, content
@@ -75,11 +75,11 @@ def test_member_view_different_public_address(
 @pytest.mark.django_db
 def test_members_export_list_csv(member, membership, inactive_member, logged_in_client):
     response = logged_in_client.post(
-        reverse('office:members.list.export'),
+        reverse("office:members.list.export"),
         {
-            'member_filter': 'all',
-            'export_format': 'csv',
-            'field_list': ['_internal_id', 'member__name'],
+            "member_filter": "all",
+            "export_format": "csv",
+            "field_list": ["_internal_id", "member__name"],
         },
     )
     content = b"".join(response.streaming_content).decode()
@@ -93,13 +93,13 @@ def test_members_export_list_csv(member, membership, inactive_member, logged_in_
 def test_members_adjust_account_initial(member, logged_in_client):
     assert member.balance == 0
     response = logged_in_client.post(
-        reverse('office:members.operations', kwargs={'pk': member.pk}),
+        reverse("office:members.operations", kwargs={"pk": member.pk}),
         {
-            'member_account_adjustment-date': str(now().date()),
-            'member_account_adjustment-adjustment_reason': 'initial',
-            'member_account_adjustment-adjustment_type': 'absolute',
-            'member_account_adjustment-amount': '23',
-            'submit_member_account_adjustment_adjust': 'adjust',
+            "member_account_adjustment-date": str(now().date()),
+            "member_account_adjustment-adjustment_reason": "initial",
+            "member_account_adjustment-adjustment_type": "absolute",
+            "member_account_adjustment-amount": "23",
+            "submit_member_account_adjustment_adjust": "adjust",
         },
     )
     content = response.content.decode()
@@ -111,13 +111,13 @@ def test_members_adjust_account_initial(member, logged_in_client):
 def test_members_adjust_account_waiver(member, logged_in_client):
     assert member.balance == 0
     response = logged_in_client.post(
-        reverse('office:members.operations', kwargs={'pk': member.pk}),
+        reverse("office:members.operations", kwargs={"pk": member.pk}),
         {
-            'member_account_adjustment-date': str(now().date()),
-            'member_account_adjustment-adjustment_reason': 'waiver',
-            'member_account_adjustment-adjustment_type': 'relative',
-            'member_account_adjustment-amount': '-2',
-            'submit_member_account_adjustment_adjust': 'adjust',
+            "member_account_adjustment-date": str(now().date()),
+            "member_account_adjustment-adjustment_reason": "waiver",
+            "member_account_adjustment-adjustment_type": "relative",
+            "member_account_adjustment-amount": "-2",
+            "submit_member_account_adjustment_adjust": "adjust",
         },
     )
     content = response.content.decode()
@@ -129,12 +129,12 @@ def test_members_adjust_account_waiver(member, logged_in_client):
 def test_members_end_membership(member, membership, logged_in_client):
     assert member.is_active
     response = logged_in_client.post(
-        reverse('office:members.operations', kwargs={'pk': member.pk}),
+        reverse("office:members.operations", kwargs={"pk": member.pk}),
         {
-            'ms_{}_leave-end'.format(membership.pk): (
+            "ms_{}_leave-end".format(membership.pk): (
                 now() + relativedelta(days=-1)
             ).date(),
-            'submit_ms_{}_leave_end'.format(membership.pk): 'end',
+            "submit_ms_{}_leave_end".format(membership.pk): "end",
         },
     )
     content = response.content.decode()
@@ -145,40 +145,37 @@ def test_members_end_membership(member, membership, logged_in_client):
 @pytest.mark.django_db
 def test_member_download_and_edit(member, membership, logged_in_client):
     response = logged_in_client.post(
-        reverse('office:members.list.export'),
+        reverse("office:members.list.export"),
         {
-            "field_list": [
-                '_internal_id',
-                'member__name',
-                'MemberSepa__iban',
-            ],
-            'member_filter': 'all',
-            'export_format': 'csv',
-
-        }
+            "field_list": ["_internal_id", "member__name", "MemberSepa__iban"],
+            "member_filter": "all",
+            "export_format": "csv",
+        },
     )
 
-    assert response['Content-Type'].startswith("text/csv")
+    assert response["Content-Type"].startswith("text/csv")
 
     response_body = b"".join(response.streaming_content)
 
-    assert member.name.encode('utf-8') in response_body
+    assert member.name.encode("utf-8") in response_body
 
     new_body = response_body.replace(
-        ",{},".format(member.name).encode('utf-8'),
-        ",{},{}".format("Fnord!", "DE11520513735120710131").encode('utf-8'),
+        ",{},".format(member.name).encode("utf-8"),
+        ",{},{}".format("Fnord!", "DE11520513735120710131").encode("utf-8"),
     )
 
     new_response = logged_in_client.post(
-        reverse('office:members.list.import'),
+        reverse("office:members.list.import"),
         {
-            'importer': 'byro.office.members.import.default_csv',
-            'upload_file': SimpleUploadedFile('members.csv', new_body, content_type=response['Content-Type'])
-        }
+            "importer": "byro.office.members.import.default_csv",
+            "upload_file": SimpleUploadedFile(
+                "members.csv", new_body, content_type=response["Content-Type"]
+            ),
+        },
     )
 
     assert new_response.status_code == 302
 
     new_member = Member.objects.filter(pk=member.pk).first()
-    assert new_member.name == 'Fnord!'
-    assert new_member.profile_sepa.iban == 'DE11520513735120710131'
+    assert new_member.name == "Fnord!"
+    assert new_member.profile_sepa.iban == "DE11520513735120710131"

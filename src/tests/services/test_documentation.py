@@ -15,10 +15,10 @@ with open(os.path.join(doc_dir, "developer/plugins/general.rst"), "r") as doc_fi
 
 
 @pytest.mark.parametrize(
-    "app", [app for app in settings.INSTALLED_APPS if app.startswith('byro.')]
+    "app", [app for app in settings.INSTALLED_APPS if app.startswith("byro.")]
 )
 def test_documentation_includes_signals(app):
-    app = 'byro.' + app.split(".")[1]
+    app = "byro." + app.split(".")[1]
     with suppress(ImportError):
         module = importlib.import_module(app + ".signals")
         for key in dir(module):

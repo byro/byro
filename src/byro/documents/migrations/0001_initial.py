@@ -11,20 +11,42 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('members', '0006_auto_20180113_1849'),
-    ]
+    dependencies = [("members", "0006_auto_20180113_1849")]
 
     operations = [
         migrations.CreateModel(
-            name='Document',
+            name="Document",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('document', models.FileField(upload_to='documents/')),
-                ('category', models.CharField(max_length=300, null=True)),
-                ('direction', models.CharField(choices=[('incoming', 'incoming'), ('outgoing', 'outgoing')], default='outgoing', max_length=8)),
-                ('member', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='documents', to='members.Member')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("document", models.FileField(upload_to="documents/")),
+                ("category", models.CharField(max_length=300, null=True)),
+                (
+                    "direction",
+                    models.CharField(
+                        choices=[("incoming", "incoming"), ("outgoing", "outgoing")],
+                        default="outgoing",
+                        max_length=8,
+                    ),
+                ),
+                (
+                    "member",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="documents",
+                        to="members.Member",
+                    ),
+                ),
             ],
             bases=(byro.common.models.auditable.Auditable, models.Model),
-        ),
+        )
     ]

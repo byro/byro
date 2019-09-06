@@ -16,18 +16,18 @@ from byro.common.models.choices import Choices
 
 
 class DocumentDirection(Choices):
-    INCOMING = 'incoming'
-    OUTGOING = 'outgoing'
-    OTHER = 'other'
+    INCOMING = "incoming"
+    OUTGOING = "outgoing"
+    OTHER = "other"
 
 
 class Document(models.Model, LogTargetMixin):
-    LOG_TARGET_BASE = 'byro.documents.document'
+    LOG_TARGET_BASE = "byro.documents.document"
 
     class Meta:
-        ordering = ('-date', 'title', '-id')
+        ordering = ("-date", "title", "-id")
 
-    document = models.FileField(upload_to='documents/%Y/%m/', max_length=1000)
+    document = models.FileField(upload_to="documents/%Y/%m/", max_length=1000)
     date = models.DateField(null=True, default=now)
     title = models.CharField(max_length=300, null=True)
     category = models.CharField(max_length=300, null=True)
@@ -37,8 +37,8 @@ class Document(models.Model, LogTargetMixin):
         default=DocumentDirection.OUTGOING,
     )
     member = models.ForeignKey(
-        to='members.Member',
-        related_name='documents',
+        to="members.Member",
+        related_name="documents",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -46,34 +46,34 @@ class Document(models.Model, LogTargetMixin):
     content_hash = models.CharField(max_length=300, null=True)
 
     template = _(
-        '''
+        """
 Hi, {name},
 
 Please find attached a document we wanted to send you/that you requested.
 
 Thank you,
 {association}
-'''
+"""
     ).strip()
 
     def _get_log_properties(self):
         return {
             f.name: getattr(self, f.name)
             for f in self._meta.get_fields()
-            if f.name not in ('id', 'mails') and hasattr(self, f.name)
+            if f.name not in ("id", "mails") and hasattr(self, f.name)
         }
 
     @cached_property
     def content_hash_ok(self):
         h = sha512()
-        with self.document.open(mode='rb') as f:
+        with self.document.open(mode="rb") as f:
             for chunk in f.chunks():
                 h.update(chunk)
-        return self.content_hash == 'sha512:{}'.format(h.hexdigest())
+        return self.content_hash == "sha512:{}".format(h.hexdigest())
 
     @cached_property
     def mime_type_guessed(self):
-        with self.document.open(mode='rb') as f:
+        with self.document.open(mode="rb") as f:
             chunk = next(f.chunks())
             return magic.from_buffer(chunk, mime=True)
 
@@ -87,14 +87,14 @@ Thank you,
         # the API allows adding file content after the fact
         if self.document and not self.content_hash:
             h = sha512()
-            with self.document.open(mode='rb') as f:
+            with self.document.open(mode="rb") as f:
                 for chunk in f.chunks():
                     h.update(chunk)
-            self.content_hash = 'sha512:{}'.format(h.hexdigest())
-            super().save(update_fields=['content_hash'])
+            self.content_hash = "sha512:{}".format(h.hexdigest())
+            super().save(update_fields=["content_hash"])
             self.log(
-                'internal: automatic checkpoint',
-                '.stored',
+                "internal: automatic checkpoint",
+                ".stored",
                 **self._get_log_properties()
             )
 
@@ -111,7 +111,7 @@ Thank you,
             or self.template.format(
                 name=self.member.name if self.member else email, association=us
             ),
-            subject=_('[{association}] Your document').format(association=us),
+            subject=_("[{association}] Your document").format(association=us),
         )
         mail.attachments.add(self)
         mail.save()
@@ -120,21 +120,21 @@ Thank you,
         return mail
 
     def get_display(self):
-        return '{} Document: {}'.format(
+        return "{} Document: {}".format(
             self.get_direction_display().capitalize(), self.category, self.title
         )
 
     def get_absolute_url(self):
-        return reverse('office:documents.detail', kwargs={'pk': self.pk})
+        return reverse("office:documents.detail", kwargs={"pk": self.pk})
 
     def get_object_icon(self):
         return mark_safe('<i class="fa fa-file-o"></i> ')
 
 
-@receiver(pre_delete, sender=Document, dispatch_uid='documents_models__log_deletion')
+@receiver(pre_delete, sender=Document, dispatch_uid="documents_models__log_deletion")
 def log_deletion(sender, instance, using, **kwargs):
     instance.log(
-        'internal: automatic checkpoint', '.deleted', **instance._get_log_properties()
+        "internal: automatic checkpoint", ".deleted", **instance._get_log_properties()
     )
 
 
@@ -142,7 +142,7 @@ def get_document_category_names():
     categories = {}
 
     for app in apps.get_app_configs():
-        if hasattr(app, 'ByroPluginMeta'):
-            categories.update(getattr(app.ByroPluginMeta, 'document_categories', {}))
+        if hasattr(app, "ByroPluginMeta"):
+            categories.update(getattr(app.ByroPluginMeta, "document_categories", {}))
 
     return categories

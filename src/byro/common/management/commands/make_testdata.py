@@ -11,7 +11,7 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration
 from byro.members.models import FeeIntervals, Member, Membership, MembershipType
 
-SOURCE_TEST_DATA = 'Import of test data'
+SOURCE_TEST_DATA = "Import of test data"
 
 
 def make_date(delta, end=False):
@@ -29,13 +29,13 @@ class Command(BaseCommand):
 
     def create_configs(self):
         config = Configuration.get_solo()
-        config.name = 'Der Verein e.V.'
-        config.address = 'Erich-Weinert-Straße 53\n39104 Magdeburg'
-        config.url = 'https://dervereindervere.in'
-        config.language = 'de'
-        config.currency = 'EUR'
-        config.mail_from = 'verein@dervereindervere.in'
-        config.backoffice_mail = 'vorstanz@dervereindervere.in'
+        config.name = "Der Verein e.V."
+        config.address = "Erich-Weinert-Straße 53\n39104 Magdeburg"
+        config.url = "https://dervereindervere.in"
+        config.language = "de"
+        config.currency = "EUR"
+        config.mail_from = "verein@dervereindervere.in"
+        config.backoffice_mail = "vorstanz@dervereindervere.in"
         config.registration_form = [
             {"name": "member__number", "position": 1},
             {"name": "member__name", "position": 2},
@@ -50,7 +50,7 @@ class Command(BaseCommand):
             {"name": "membership__amount", "default": "23", "position": 7},
         ]
         config.save()
-        config.log(SOURCE_TEST_DATA, '.changed')
+        config.log(SOURCE_TEST_DATA, ".changed")
 
     def make_paid(self, member, vaguely=False, overly=False, donates=0, pays_for=None):
         member.update_liabilites()
@@ -110,14 +110,14 @@ class Command(BaseCommand):
             t.save()
 
     def create_membership_types(self):
-        MembershipType.objects.create(name='Standard membership', amount=120)
+        MembershipType.objects.create(name="Standard membership", amount=120)
 
     def create_members(self):
         has_left = Member.objects.create(
-            number='1',
-            name='Francis Foundingmember',
-            address='Foo St 1\nSome Place',
-            email='francis@group.org',
+            number="1",
+            name="Francis Foundingmember",
+            address="Foo St 1\nSome Place",
+            email="francis@group.org",
         )
         Membership.objects.create(
             member=has_left,
@@ -126,14 +126,14 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        has_left.log(SOURCE_TEST_DATA, '.created')
+        has_left.log(SOURCE_TEST_DATA, ".created")
         self.make_paid(has_left)
 
         does_not_pay = Member.objects.create(
-            number='2',
-            name='Yohnny Yolo',
-            address='Bar St 1\nSome Distant Place',
-            email='yolo@group.org',
+            number="2",
+            name="Yohnny Yolo",
+            address="Bar St 1\nSome Distant Place",
+            email="yolo@group.org",
         )
         Membership.objects.create(
             member=does_not_pay,
@@ -141,14 +141,14 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        does_not_pay.log(SOURCE_TEST_DATA, '.created')
+        does_not_pay.log(SOURCE_TEST_DATA, ".created")
         does_not_pay.update_liabilites()
 
         pays_occasionally = Member.objects.create(
-            number='3',
-            name='Olga Occasional',
-            address='Currently unknown',
-            email='olga@group.org',
+            number="3",
+            name="Olga Occasional",
+            address="Currently unknown",
+            email="olga@group.org",
         )
         Membership.objects.create(
             member=pays_occasionally,
@@ -156,14 +156,14 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        pays_occasionally.log(SOURCE_TEST_DATA, '.created')
+        pays_occasionally.log(SOURCE_TEST_DATA, ".created")
         self.make_paid(pays_occasionally, vaguely=True)
 
         pays_regularly = Member.objects.create(
-            number='4',
-            name='Dennis Diligent',
-            address='Best St 3\nFoo Town\nMy Country\nEarth\nUniverse',
-            email='dennis@group.org',
+            number="4",
+            name="Dennis Diligent",
+            address="Best St 3\nFoo Town\nMy Country\nEarth\nUniverse",
+            email="dennis@group.org",
         )
         Membership.objects.create(
             member=pays_regularly,
@@ -171,14 +171,14 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        pays_regularly.log(SOURCE_TEST_DATA, '.created')
+        pays_regularly.log(SOURCE_TEST_DATA, ".created")
         self.make_paid(pays_regularly)
 
         pays_too_much = Member.objects.create(
-            number='5',
-            name='Omar Overachiever',
-            address='SuperBest St 3\nSuperFoo Town',
-            email='omar@group.org',
+            number="5",
+            name="Omar Overachiever",
+            address="SuperBest St 3\nSuperFoo Town",
+            email="omar@group.org",
         )
         Membership.objects.create(
             member=pays_too_much,
@@ -186,14 +186,14 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        pays_too_much.log(SOURCE_TEST_DATA, '.created')
+        pays_too_much.log(SOURCE_TEST_DATA, ".created")
         self.make_paid(pays_too_much, overly=True)
 
         will_join = Member.objects.create(
-            number='6',
-            name='Francine Futuremember',
-            address='Future St 3\nFuture Town',
-            email='francine@group.org',
+            number="6",
+            name="Francine Futuremember",
+            address="Future St 3\nFuture Town",
+            email="francine@group.org",
         )
         Membership.objects.create(
             member=will_join,
@@ -201,13 +201,13 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        will_join.log(SOURCE_TEST_DATA, '.created')
+        will_join.log(SOURCE_TEST_DATA, ".created")
 
         giver = Member.objects.create(
-            number='7',
-            name='George Giver',
-            address='Generous St 3\nEnd-of-the-rainbow Hearth',
-            email='george@group.org',
+            number="7",
+            name="George Giver",
+            address="Generous St 3\nEnd-of-the-rainbow Hearth",
+            email="george@group.org",
         )
         Membership.objects.create(
             member=giver,
@@ -215,14 +215,14 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        giver.log(SOURCE_TEST_DATA, '.created')
+        giver.log(SOURCE_TEST_DATA, ".created")
         self.make_paid(giver, donates=5)
 
         is_payed_for = Member.objects.create(
-            number='8',
-            name='Peter Partner',
-            address='Commune St 3\nFamily Shire',
-            email='peter@group.org',
+            number="8",
+            name="Peter Partner",
+            address="Commune St 3\nFamily Shire",
+            email="peter@group.org",
         )
         Membership.objects.create(
             member=is_payed_for,
@@ -230,14 +230,14 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        is_payed_for.log(SOURCE_TEST_DATA, '.created')
+        is_payed_for.log(SOURCE_TEST_DATA, ".created")
         is_payed_for.update_liabilites()
 
         pays_other = Member.objects.create(
-            number='9',
-            name='Aaron Alsopayer',
-            address='Commune St 3\nFamily Shire',
-            email='aaron@group.org',
+            number="9",
+            name="Aaron Alsopayer",
+            address="Commune St 3\nFamily Shire",
+            email="aaron@group.org",
         )
         Membership.objects.create(
             member=pays_other,
@@ -245,7 +245,7 @@ class Command(BaseCommand):
             interval=FeeIntervals.MONTHLY,
             amount=10,
         )
-        pays_other.log(SOURCE_TEST_DATA, '.created')
+        pays_other.log(SOURCE_TEST_DATA, ".created")
         self.make_paid(pays_other, pays_for=is_payed_for)
 
     def create_bank_chaff(self):

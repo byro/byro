@@ -7,14 +7,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('members', '0008_member_member_contact_type'),
-    ]
+    dependencies = [("members", "0008_member_member_contact_type")]
 
     operations = [
         migrations.AlterField(
-            model_name='member',
-            name='member_contact_type',
-            field=models.CharField(choices=[('organization', 'organization'), ('person', 'person'), ('role', 'role')], default='person', max_length=12, verbose_name='Contact type'),
-        ),
+            model_name="member",
+            name="member_contact_type",
+            field=models.CharField(
+                choices=[
+                    ("organization", "organization"),
+                    ("person", "person"),
+                    ("role", "role"),
+                ],
+                default="person",
+                max_length=12,
+                verbose_name="Contact type",
+            ),
+        )
     ]

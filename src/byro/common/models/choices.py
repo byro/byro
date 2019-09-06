@@ -9,8 +9,8 @@ class ChoicesMeta(type):
         return OrderedDict()
 
     def __new__(cls, name, parents, dct):
-        if 'valid_choices' not in dct:
-            dct['valid_choices'] = [
+        if "valid_choices" not in dct:
+            dct["valid_choices"] = [
                 dct[key] for key in dct if isinstance(key, str) and key.upper() == key
             ]
         return super(ChoicesMeta, cls).__new__(cls, name, parents, dct)
@@ -40,7 +40,7 @@ class Choices(object, metaclass=ChoicesMeta):
 
     @classproperty
     def max_length(cls):
-        if hasattr(cls, 'valid_choices'):
+        if hasattr(cls, "valid_choices"):
             return max([len(val) for val in cls.valid_choices])
         else:
             return max([len(val) for val, _ in cls.choices])

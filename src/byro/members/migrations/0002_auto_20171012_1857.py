@@ -7,29 +7,27 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('members', '0001_initial'),
-    ]
+    dependencies = [("members", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='member',
-            name='address',
+            model_name="member",
+            name="address",
             field=models.CharField(blank=True, max_length=300, null=True),
         ),
         migrations.AddField(
-            model_name='member',
-            name='name',
+            model_name="member",
+            name="name",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='member',
-            name='number',
+            model_name="member",
+            name="number",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AlterField(
-            model_name='member',
-            name='email',
+            model_name="member",
+            name="email",
             field=models.EmailField(blank=True, max_length=200, null=True),
         ),
     ]

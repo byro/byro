@@ -17,26 +17,26 @@ FORMATTER_REGISTRY = {}
 def default_formatter(entry):
     with suppress(TemplateDoesNotExist):
         tmpl = get_template("log_entry/{}.html".format(entry.action_type))
-        return tmpl.render({'log_entry': entry})
+        return tmpl.render({"log_entry": entry})
 
     data = dict(entry.data or {})
-    data.pop('source', None)
+    data.pop("source", None)
 
     co = entry.content_object
     related_object = ""
     if co:
         url = None
-        if hasattr(co, 'get_absolute_url'):
+        if hasattr(co, "get_absolute_url"):
             url = co.get_absolute_url()
         elif isinstance(co, get_user_model()):
-            url = reverse('office:settings.users.detail', kwargs={'pk': co.pk})
+            url = reverse("office:settings.users.detail", kwargs={"pk": co.pk})
 
         if url:
             related_object = mark_safe(
                 ' (<a href="{}">{}</a>)'.format(escape(url), escape(str(co)))
             )
         else:
-            related_object = mark_safe(' ({})'.format(escape(co)))
+            related_object = mark_safe(" ({})".format(escape(co)))
 
     extra_data = ""
     if data:
@@ -47,7 +47,7 @@ def default_formatter(entry):
     )
 
 
-@register.filter(name='format_log_entry')
+@register.filter(name="format_log_entry")
 def format_log_entry(entry):
     if not FORMATTER_REGISTRY:
         for module, response in log_formatters.send_robust(sender=__name__):
@@ -57,7 +57,7 @@ def format_log_entry(entry):
     return FORMATTER_REGISTRY.get(entry.action_type, default_formatter)(entry)
 
 
-@register.filter(name='format_log_source')
+@register.filter(name="format_log_source")
 def format_log_source(entry):
     user = ""
     if entry.user:
@@ -65,35 +65,35 @@ def format_log_source(entry):
             '<span class="fa fa-user"></span> {}'.format(escape(entry.user))
         )
 
-    source = entry.data.get('source', "")
-    if source.startswith('internal: '):
+    source = entry.data.get("source", "")
+    if source.startswith("internal: "):
         source = mark_safe(
             '<span class="fa fa-gears"></span> {}'.format(escape(source[10:]))
         )
 
     if entry.user:
-        if entry.data.get('source', None) == str(entry.user):
+        if entry.data.get("source", None) == str(entry.user):
             return user
         else:
-            return mark_safe('{} (via {})'.format(source, user))
+            return mark_safe("{} (via {})".format(source, user))
     else:
         return source
 
 
-@register.filter(name='format_log_object')
+@register.filter(name="format_log_object")
 def format_log_object(obj, key=None):
     with suppress(Exception):
-        if 'object' in obj and 'ref' in obj and 'value' in obj:
+        if "object" in obj and "ref" in obj and "value" in obj:
             with suppress(Exception):
                 content_object = ContentType.objects.get(
-                    app_label=obj['ref'][0], model=obj['ref'][1]
-                ).get_object_for_this_type(pk=obj['ref'][2])
+                    app_label=obj["ref"][0], model=obj["ref"][1]
+                ).get_object_for_this_type(pk=obj["ref"][2])
 
-                if obj['value'] == str(content_object):
+                if obj["value"] == str(content_object):
                     url = content_object.get_absolute_url()
-                    str_val = mark_safe(escape(str(obj['value'])))
+                    str_val = mark_safe(escape(str(obj["value"])))
 
-                    if hasattr(content_object, 'get_object_icon'):
+                    if hasattr(content_object, "get_object_icon"):
                         icon = content_object.get_object_icon()
                     else:
                         icon = ""
@@ -105,30 +105,30 @@ def format_log_object(obj, key=None):
 
             return mark_safe(
                 "<i>{} object</i>: {!r}".format(
-                    escape(str(obj['object'])), escape(str(obj['value']))
+                    escape(str(obj["object"])), escape(str(obj["value"]))
                 )
             )
 
-        if key == 'category' and '.' in obj:
+        if key == "category" and "." in obj:
             cats = get_document_category_names()
             if obj in cats:
                 return "{} ({})".format(cats[obj], obj)
 
-        if key == 'content_hash':
-            parts = str(obj).split(':', 1)
+        if key == "content_hash":
+            parts = str(obj).split(":", 1)
             if len(parts) == 2:
                 return mark_safe(
                     '{}: <tt title="{}">{} &hellip; {}</tt>'.format(
                         escape(parts[0]),
                         escape(parts[1]),
                         escape(parts[1][: (6 * 2)]),
-                        escape(parts[1][-(6 * 2):]),
+                        escape(parts[1][-(6 * 2) :]),
                     )
                 )
 
     return obj
 
 
-@register.filter(name='items_sorted')
+@register.filter(name="items_sorted")
 def items_sorted(data):
     return sorted(data)

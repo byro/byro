@@ -10,24 +10,44 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('common', '0010_auto_20180929_1052'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("common", "0010_auto_20180929_1052"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='LogEntry',
+            name="LogEntry",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('object_id', models.PositiveIntegerField(db_index=True)),
-                ('datetime', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('action_type', models.CharField(max_length=255)),
-                ('data', django.contrib.postgres.fields.jsonb.JSONField(null=True)),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='contenttypes.ContentType')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("object_id", models.PositiveIntegerField(db_index=True)),
+                ("datetime", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("action_type", models.CharField(max_length=255)),
+                ("data", django.contrib.postgres.fields.jsonb.JSONField(null=True)),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="contenttypes.ContentType",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'ordering': ('-datetime', '-id'),
-            },
-        ),
+            options={"ordering": ("-datetime", "-id")},
+        )
     ]

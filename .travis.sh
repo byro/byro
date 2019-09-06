@@ -14,7 +14,7 @@ if [ "$1" == "style" ]; then
     if [  $(python -c "import sys; print(sys.version_info[1])") -gt 5 ]; then
         pip install ".[dev]"
         isort --check-only --recursive --diff .
-        black -S --check --exclude "/(\.eggs|\.git|\.mypy_cache|\.nox|\.tox|\.venv|_build|build|static|static.dist|dist|migrations)/|urls.py" .
+        black --check .
     fi
 fi
 

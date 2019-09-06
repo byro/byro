@@ -6,21 +6,60 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('members', '0009_auto_20180512_1810'),
-    ]
+    dependencies = [("members", "0009_auto_20180512_1810")]
 
     operations = [
         migrations.CreateModel(
-            name='MemberBalance',
+            name="MemberBalance",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('reference', models.CharField(blank=True, help_text='For example an invoice number or a payment reference', max_length=50, null=True, unique=True, verbose_name='Reference')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=8, verbose_name='Amount')),
-                ('start', models.DateTimeField(verbose_name='Start')),
-                ('end', models.DateTimeField(verbose_name='End')),
-                ('state', models.CharField(choices=[('paid', 'paid'), ('partial', 'partially paid'), ('unpaid', 'unpaid')], default='unpaid', max_length=7)),
-                ('member', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='balances', to='members.Member')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "reference",
+                    models.CharField(
+                        blank=True,
+                        help_text="For example an invoice number or a payment reference",
+                        max_length=50,
+                        null=True,
+                        unique=True,
+                        verbose_name="Reference",
+                    ),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=8, verbose_name="Amount"
+                    ),
+                ),
+                ("start", models.DateTimeField(verbose_name="Start")),
+                ("end", models.DateTimeField(verbose_name="End")),
+                (
+                    "state",
+                    models.CharField(
+                        choices=[
+                            ("paid", "paid"),
+                            ("partial", "partially paid"),
+                            ("unpaid", "unpaid"),
+                        ],
+                        default="unpaid",
+                        max_length=7,
+                    ),
+                ),
+                (
+                    "member",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="balances",
+                        to="members.Member",
+                    ),
+                ),
             ],
-        ),
+        )
     ]

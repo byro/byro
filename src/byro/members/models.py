@@ -72,35 +72,41 @@ class Field:
                 "Encountered 'None' while following {}".format(self.path)
             )
         setattr(target, prop, value)
-        if callable(getattr(target, 'save', None)):
+        if callable(getattr(target, "save", None)):
             target.save()
 
 
 class MemberTypes:
-    MEMBER = 'member'
-    EXTERNAL = 'external'
+    MEMBER = "member"
+    EXTERNAL = "external"
 
 
 class MemberContactTypes(Choices):
-    ORGANIZATION = 'organization'
-    PERSON = 'person'
-    ROLE = 'role'
+    ORGANIZATION = "organization"
+    PERSON = "person"
+    ROLE = "role"
 
 
 class MemberQuerySet(models.QuerySet):
     def with_active_membership(self):
-        return self.filter(
-            Q(memberships__start__lte=now().date())
-            & (
+        return (
+            self.filter(
+                Q(memberships__start__lte=now().date())
+                & (
                     Q(memberships__end__isnull=True)
                     | Q(memberships__end__gte=now().date())
+                )
             )
-        ).order_by('-id').distinct()
+            .order_by("-id")
+            .distinct()
+        )
 
 
 class MemberManager(models.Manager):
     def get_queryset(self):
-        return MemberQuerySet(self.model, using=self._db).filter(membership_type=MemberTypes.MEMBER)
+        return MemberQuerySet(self.model, using=self._db).filter(
+            membership_type=MemberTypes.MEMBER
+        )
 
     def with_active_membership(self):
         return self.get_queryset().with_active_membership()
@@ -111,7 +117,7 @@ class AllMemberManager(models.Manager):
 
 
 def get_next_member_number():
-    all_numbers = Member.all_objects.all().values_list('number', flat=True)
+    all_numbers = Member.all_objects.all().values_list("number", flat=True)
     numeric_numbers = [n for n in all_numbers if n is not None and n.isdigit()]
     try:
         return max(int(n) for n in numeric_numbers) + 1
@@ -120,44 +126,44 @@ def get_next_member_number():
 
 
 def get_member_data(obj):
-    if hasattr(obj, 'get_member_data'):
+    if hasattr(obj, "get_member_data"):
         return obj.get_member_data()
     return [
         (field.verbose_name, str(getattr(obj, field.name)))
         for field in obj._meta.fields
         if field.name
-        not in ('id', 'created_by', 'modified_by', 'created', 'modified', 'member')
+        not in ("id", "created_by", "modified_by", "created", "modified", "member")
     ]
 
 
 class Member(Auditable, models.Model, LogTargetMixin):
-    LOG_TARGET_BASE = 'byro.members'
+    LOG_TARGET_BASE = "byro.members"
 
     number = models.CharField(
         max_length=100,
-        verbose_name=_('Membership number/ID'),
+        verbose_name=_("Membership number/ID"),
         null=True,
         blank=True,
         db_index=True,
     )
     name = models.CharField(
-        max_length=100, verbose_name=_('Name'), null=True, blank=True
+        max_length=100, verbose_name=_("Name"), null=True, blank=True
     )
     address = models.TextField(
-        max_length=300, verbose_name=_('Address'), null=True, blank=True
+        max_length=300, verbose_name=_("Address"), null=True, blank=True
     )
     email = models.EmailField(
-        max_length=200, verbose_name=_('E-Mail'), null=True, blank=True
+        max_length=200, verbose_name=_("E-Mail"), null=True, blank=True
     )
     membership_type = models.CharField(max_length=40, default=MemberTypes.MEMBER)
     member_contact_type = models.CharField(
         max_length=MemberContactTypes.max_length,
-        verbose_name=_('Contact type'),
+        verbose_name=_("Contact type"),
         choices=MemberContactTypes.choices,
         default=MemberContactTypes.PERSON,
     )
 
-    form_title = _('Member')
+    form_title = _("Member")
     objects = MemberManager()
     all_objects = AllMemberManager()
 
@@ -166,7 +172,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
         return [
             related.related_model
             for related in cls._meta.related_objects
-            if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
+            if isinstance(related, OneToOneRel) and related.name.startswith("profile_")
         ]
 
     @property
@@ -174,7 +180,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
         return [
             getattr(self, related.name)
             for related in self._meta.related_objects
-            if isinstance(related, OneToOneRel) and related.name.startswith('profile_')
+            if isinstance(related, OneToOneRel) and related.name.startswith("profile_")
         ]
 
     @classmethod
@@ -183,48 +189,48 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
         result.append(
             Field(
-                '_internal_id',
-                _('Internal database ID'),
+                "_internal_id",
+                _("Internal database ID"),
                 "",
-                'pk',
+                "pk",
                 computed=True,
                 read_only=True,
             )
         )
         result.append(
             Field(
-                '_internal_active',
-                _('Member active?'),
+                "_internal_active",
+                _("Member active?"),
                 "",
-                'is_active',
+                "is_active",
                 computed=True,
                 read_only=True,
             )
         )
         result.append(
             Field(
-                '_internal_balance',
-                _('Account balance'),
+                "_internal_balance",
+                _("Account balance"),
                 "",
-                'balance',
+                "balance",
                 computed=True,
                 read_only=True,
             )
         )
 
         reg_form = Configuration.get_solo().registration_form or []
-        form_config = {entry['name']: entry for entry in reg_form}
+        form_config = {entry["name"]: entry for entry in reg_form}
 
         profile_map = {
             profile.related_model: profile.name
             for profile in cls._meta.related_objects
-            if isinstance(profile, OneToOneRel) and profile.name.startswith('profile_')
+            if isinstance(profile, OneToOneRel) and profile.name.startswith("profile_")
         }
 
         for model in [cls, Membership] + cls.profile_classes:
             for field in model._meta.fields:
-                if field.name in ('id', 'member') or (
-                    model is Member and field.name == 'membership_type'
+                if field.name in ("id", "member") or (
+                    model is Member and field.name == "membership_type"
                 ):
                     continue
 
@@ -278,11 +284,11 @@ class Member(Auditable, models.Model, LogTargetMixin):
         )
         if asset_start:
             credits = credits.filter(transaction__value_datetime__gte=asset_start)
-        liability = debits.aggregate(liability=models.Sum('amount'))[
-            'liability'
-        ] or Decimal('0.00')
-        asset = credits.aggregate(asset=models.Sum('amount'))['asset'] or Decimal(
-            '0.00'
+        liability = debits.aggregate(liability=models.Sum("amount"))[
+            "liability"
+        ] or Decimal("0.00")
+        asset = credits.aggregate(asset=models.Sum("amount"))["asset"] or Decimal(
+            "0.00"
         )
         return asset - liability
 
@@ -301,7 +307,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 )  # end overlaps
             ).exists():
                 raise Exception(
-                    'Cannot create overlapping balance: {} from {} to {}'.format(
+                    "Cannot create overlapping balance: {} from {} to {}".format(
                         self, start, end
                     )
                 )
@@ -326,13 +332,13 @@ class Member(Auditable, models.Model, LogTargetMixin):
         last_unenforceable_date = (
             now().replace(month=12, day=31) - limit - relativedelta(years=1)
         )
-        return max(Decimal('0.00'), -self._calc_balance(last_unenforceable_date))
+        return max(Decimal("0.00"), -self._calc_balance(last_unenforceable_date))
 
     @property
     def donation_balance(self) -> Decimal:
-        return self.donations.aggregate(donations=models.Sum('amount'))[
-            'donations'
-        ] or Decimal('0.00')
+        return self.donations.aggregate(donations=models.Sum("amount"))[
+            "donations"
+        ] or Decimal("0.00")
 
     @property
     def donations(self):
@@ -371,23 +377,23 @@ class Member(Auditable, models.Model, LogTargetMixin):
         key_length = min(max(len(d[0]) for d in key_value_data), 20)
         key_value_text = []
         for key, value in key_value_data:
-            key = (key + ':').ljust(key_length) + ' '
+            key = (key + ":").ljust(key_length) + " "
             value = value.strip()
-            if value in [None, 'None', '']:
-                value = '-'
-            if isinstance(value, str) and '\n' in value:
-                value = '\n'.join(
-                    [' ' * (key_length + 1) + line for line in value.split('\n')]
+            if value in [None, "None", ""]:
+                value = "-"
+            if isinstance(value, str) and "\n" in value:
+                value = "\n".join(
+                    [" " * (key_length + 1) + line for line in value.split("\n")]
                 ).strip()
             key_value_text.append(key + value)
-        key_value_text = '\n'.join(key_value_text)
+        key_value_text = "\n".join(key_value_text)
         if text_data:
-            key_value_text += '\n' + '\n'.join(text_data)
+            key_value_text += "\n" + "\n".join(text_data)
         context = {
-            'association_name': config.name,
-            'data': key_value_text,
-            'number': self.number,
-            'balance': '{currency} {balance}'.format(
+            "association_name": config.name,
+            "data": key_value_text,
+            "number": self.number,
+            "balance": "{currency} {balance}".format(
                 currency=config.currency, balance=self.balance
             ),
         }
@@ -452,8 +458,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
         for wrong_due in sorted(wrong_dues_in_db):
             booking = dues_in_db[wrong_due]
             booking.transaction.reverse(
-                memo=_('Due amount canceled because of change in membership amount'),
-                user_or_context='internal: update_liabilites, membership amount changed',
+                memo=_("Due amount canceled because of change in membership amount"),
+                user_or_context="internal: update_liabilites, membership amount changed",
             )
 
         # Step 5:
@@ -462,19 +468,19 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 value_datetime=date,
                 booking_datetime=_now,
                 memo=_("Membership due"),
-                user_or_context='internal: update_liabilites, add missing liabilities',
+                user_or_context="internal: update_liabilites, add missing liabilities",
             )
             t.credit(
                 account=src_account,
                 amount=amount,
                 member=self,
-                user_or_context='internal: update_liabilites, add missing liabilities',
+                user_or_context="internal: update_liabilites, add missing liabilities",
             )
             t.debit(
                 account=dst_account,
                 amount=amount,
                 member=self,
-                user_or_context='internal: update_liabilites, add missing liabilities',
+                user_or_context="internal: update_liabilites, add missing liabilities",
             )
             t.save()
 
@@ -486,18 +492,18 @@ class Member(Auditable, models.Model, LogTargetMixin):
         )
         if membership_ranges:
             stray_liabilities_qs = stray_liabilities_qs.exclude(date_range_q)
-        stray_liabilities_qs = stray_liabilities_qs.prefetch_related('transaction')
+        stray_liabilities_qs = stray_liabilities_qs.prefetch_related("transaction")
         for stray_liability in stray_liabilities_qs.all():
             stray_liability.transaction.reverse(
                 memo=_("Due amount outside of membership canceled"),
-                user_or_context='internal: update_liabilites, reverse stray liabilities',
+                user_or_context="internal: update_liabilites, reverse stray liabilities",
             )
 
     def __str__(self):
-        return 'Member {self.number} ({self.name})'.format(self=self)
+        return "Member {self.number} ({self.name})".format(self=self)
 
     def get_absolute_url(self):
-        return reverse('office:members.data', kwargs={'pk': self.pk})
+        return reverse("office:members.data", kwargs={"pk": self.pk})
 
     def get_object_icon(self):
         return mark_safe('<i class="fa fa-user"></i> ')
@@ -517,47 +523,47 @@ class FeeIntervals:
     @classproperty
     def choices(cls):
         return (
-            (cls.MONTHLY, _('monthly')),
-            (cls.QUARTERLY, _('quarterly')),
-            (cls.BIANNUAL, _('biannually')),
-            (cls.ANNUALLY, _('annually')),
+            (cls.MONTHLY, _("monthly")),
+            (cls.QUARTERLY, _("quarterly")),
+            (cls.BIANNUAL, _("biannually")),
+            (cls.ANNUALLY, _("annually")),
         )
 
 
 class MembershipType(Auditable, models.Model):
-    name = models.CharField(max_length=200, verbose_name=_('name'))
+    name = models.CharField(max_length=200, verbose_name=_("name"))
     amount = models.DecimalField(
         max_digits=8,
         decimal_places=2,
-        verbose_name=_('amount'),
-        help_text=_('Please enter the yearly fee for this membership type.'),
+        verbose_name=_("amount"),
+        help_text=_("Please enter the yearly fee for this membership type."),
     )
 
 
 class Membership(Auditable, models.Model, LogTargetMixin):
-    LOG_TARGET_BASE = 'byro.members.membership'
+    LOG_TARGET_BASE = "byro.members.membership"
 
     member = models.ForeignKey(
-        to='members.Member', on_delete=models.CASCADE, related_name='memberships'
+        to="members.Member", on_delete=models.CASCADE, related_name="memberships"
     )
-    start = models.DateField(verbose_name=_('start'))
-    end = models.DateField(verbose_name=_('end'), null=True, blank=True)
+    start = models.DateField(verbose_name=_("start"))
+    end = models.DateField(verbose_name=_("end"), null=True, blank=True)
     amount = models.DecimalField(
         max_digits=8,
         decimal_places=2,
-        verbose_name=_('membership fee'),
-        help_text=_('The amount to be paid in the chosen interval'),
+        verbose_name=_("membership fee"),
+        help_text=_("The amount to be paid in the chosen interval"),
     )
     interval = models.IntegerField(
         choices=FeeIntervals.choices,
-        verbose_name=_('payment interval'),
-        help_text=_('How often does the member pay their fees?'),
+        verbose_name=_("payment interval"),
+        help_text=_("How often does the member pay their fees?"),
     )
 
-    form_title = _('Membership')
+    form_title = _("Membership")
 
     def get_absolute_url(self):
-        return reverse('office:members.data', kwargs={'pk': self.member.pk})
+        return reverse("office:members.data", kwargs={"pk": self.member.pk})
 
     def get_dues(self, _now=None):
         _now = _now or now()
@@ -575,16 +581,16 @@ class Membership(Auditable, models.Model, LogTargetMixin):
         return (self.start, end), dues
 
 
-SPECIAL_NAMES = {Member: 'member', Membership: 'membership'}
+SPECIAL_NAMES = {Member: "member", Membership: "membership"}
 
 SPECIAL_ORDER = [
-    'member__number',
-    'member__name',
-    'member__address',
-    'member__email',
-    'membership__start',
-    'membership__interval',
-    'membership__amount',
+    "member__number",
+    "member__name",
+    "member__address",
+    "member__email",
+    "membership__start",
+    "membership__interval",
+    "membership__amount",
 ]
 
 
@@ -598,27 +604,27 @@ class MemberBalance(models.Model):
     """
 
     member = models.ForeignKey(
-        to='members.Member', related_name='balances', on_delete=models.PROTECT
+        to="members.Member", related_name="balances", on_delete=models.PROTECT
     )
     reference = models.CharField(
         null=True,
         blank=True,
-        verbose_name=_('Reference'),
-        help_text=_('For example an invoice number or a payment reference'),
+        verbose_name=_("Reference"),
+        help_text=_("For example an invoice number or a payment reference"),
         unique=True,
         max_length=50,
     )
     amount = models.DecimalField(
-        max_digits=8, decimal_places=2, verbose_name=_('Amount')
+        max_digits=8, decimal_places=2, verbose_name=_("Amount")
     )
-    start = models.DateTimeField(verbose_name=_('Start'))
-    end = models.DateTimeField(verbose_name=_('End'))
+    start = models.DateTimeField(verbose_name=_("Start"))
+    end = models.DateTimeField(verbose_name=_("End"))
     state = models.CharField(
         choices=[
-            ('paid', _('paid')),
-            ('partial', _('partially paid')),
-            ('unpaid', _('unpaid')),
+            ("paid", _("paid")),
+            ("partial", _("partially paid")),
+            ("unpaid", _("unpaid")),
         ],
-        default='unpaid',
+        default="unpaid",
         max_length=7,
     )

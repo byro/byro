@@ -10,23 +10,60 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Configuration',
+            name="Configuration",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=100, null=True, verbose_name='name')),
-                ('address', models.CharField(blank=True, max_length=500, null=True, verbose_name='address')),
-                ('url', models.CharField(blank=True, max_length=200, null=True, verbose_name='url')),
-                ('language', models.CharField(blank=True, max_length=5, null=True, verbose_name='language')),
-                ('currency', models.CharField(blank=True, max_length=3, null=True, verbose_name='currency')),
-                ('registration_form', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True, verbose_name='registration form configuration')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True, max_length=100, null=True, verbose_name="name"
+                    ),
+                ),
+                (
+                    "address",
+                    models.CharField(
+                        blank=True, max_length=500, null=True, verbose_name="address"
+                    ),
+                ),
+                (
+                    "url",
+                    models.CharField(
+                        blank=True, max_length=200, null=True, verbose_name="url"
+                    ),
+                ),
+                (
+                    "language",
+                    models.CharField(
+                        blank=True, max_length=5, null=True, verbose_name="language"
+                    ),
+                ),
+                (
+                    "currency",
+                    models.CharField(
+                        blank=True, max_length=3, null=True, verbose_name="currency"
+                    ),
+                ),
+                (
+                    "registration_form",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True,
+                        null=True,
+                        verbose_name="registration form configuration",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

@@ -5,39 +5,62 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('members', '0004_auto_20171013_1436'),
-    ]
+    dependencies = [("members", "0004_auto_20171013_1436")]
 
     operations = [
         migrations.AlterField(
-            model_name='member',
-            name='address',
-            field=models.TextField(blank=True, max_length=300, null=True, verbose_name='Address'),
+            model_name="member",
+            name="address",
+            field=models.TextField(
+                blank=True, max_length=300, null=True, verbose_name="Address"
+            ),
         ),
         migrations.AlterField(
-            model_name='member',
-            name='email',
-            field=models.EmailField(blank=True, max_length=200, null=True, verbose_name='E-Mail'),
+            model_name="member",
+            name="email",
+            field=models.EmailField(
+                blank=True, max_length=200, null=True, verbose_name="E-Mail"
+            ),
         ),
         migrations.AlterField(
-            model_name='member',
-            name='name',
-            field=models.CharField(blank=True, max_length=100, null=True, verbose_name='Name'),
+            model_name="member",
+            name="name",
+            field=models.CharField(
+                blank=True, max_length=100, null=True, verbose_name="Name"
+            ),
         ),
         migrations.AlterField(
-            model_name='member',
-            name='number',
-            field=models.CharField(blank=True, max_length=100, null=True, verbose_name='Membership number/ID'),
+            model_name="member",
+            name="number",
+            field=models.CharField(
+                blank=True,
+                max_length=100,
+                null=True,
+                verbose_name="Membership number/ID",
+            ),
         ),
         migrations.AlterField(
-            model_name='membership',
-            name='amount',
-            field=models.DecimalField(decimal_places=2, help_text='The amount to be paid in the chosen interval', max_digits=8, verbose_name='membership fee'),
+            model_name="membership",
+            name="amount",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="The amount to be paid in the chosen interval",
+                max_digits=8,
+                verbose_name="membership fee",
+            ),
         ),
         migrations.AlterField(
-            model_name='membership',
-            name='interval',
-            field=models.IntegerField(choices=[(1, 'monthly'), (3, 'quarterly'), (6, 'biannually'), (12, 'annually')], help_text='How often does the member pay their fees?', verbose_name='payment interval'),
+            model_name="membership",
+            name="interval",
+            field=models.IntegerField(
+                choices=[
+                    (1, "monthly"),
+                    (3, "quarterly"),
+                    (6, "biannually"),
+                    (12, "annually"),
+                ],
+                help_text="How often does the member pay their fees?",
+                verbose_name="payment interval",
+            ),
         ),
     ]

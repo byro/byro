@@ -5,25 +5,25 @@ from byro.mails.send import SendMailException
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('skip_queue', (True, False))
+@pytest.mark.parametrize("skip_queue", (True, False))
 def test_template_to_mail(mail_template, skip_queue):
     count = EMail.objects.count()
-    mail_template.to_mail('test@localhost', skip_queue=skip_queue)
+    mail_template.to_mail("test@localhost", skip_queue=skip_queue)
     assert EMail.objects.count() == count + 1
     obj = EMail.objects.last()
     assert obj.subject == mail_template.subject
     assert obj.text == mail_template.text
-    assert obj.to == 'test@localhost'
+    assert obj.to == "test@localhost"
     assert (obj.sent is None) is not skip_queue
     assert str(mail_template) == mail_template.subject
 
 
 @pytest.mark.django_db
 def test_template_to_mail_fail(mail_template):
-    mail_template.subject = '{incorrect_key}'
+    mail_template.subject = "{incorrect_key}"
     count = EMail.objects.count()
     with pytest.raises(SendMailException):
-        mail_template.to_mail('test@localhost')
+        mail_template.to_mail("test@localhost")
     assert EMail.objects.count() == count
 
 

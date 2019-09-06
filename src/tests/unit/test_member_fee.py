@@ -14,7 +14,7 @@ from byro.members.models import FeeIntervals, Member, Membership
 @pytest.fixture
 @pytest.mark.django_db
 def new_member():
-    m = Member.objects.create(number='007')
+    m = Member.objects.create(number="007")
     yield m
     m.delete()
 
@@ -195,13 +195,13 @@ def test_liabilities_limit(member):
         assert member.balance == -900.0
         assert member.statute_barred_debt() == 160.0
 
-        t = Transaction.objects.create(value_datetime=test_date, user_or_context='test')
-        t.debit(account=SpecialAccounts.bank, amount=12, user_or_context='test')
+        t = Transaction.objects.create(value_datetime=test_date, user_or_context="test")
+        t.debit(account=SpecialAccounts.bank, amount=12, user_or_context="test")
         t.credit(
             account=SpecialAccounts.fees_receivable,
             amount=12,
             member=member,
-            user_or_context='test',
+            user_or_context="test",
         )
         t.save()
 
@@ -210,14 +210,14 @@ def test_liabilities_limit(member):
 
         t = Transaction.objects.create(
             value_datetime=test_date.replace(year=2007, month=7, day=1),
-            user_or_context='test',
+            user_or_context="test",
         )
-        t.debit(account=SpecialAccounts.bank, amount=13, user_or_context='test')
+        t.debit(account=SpecialAccounts.bank, amount=13, user_or_context="test")
         t.credit(
             account=SpecialAccounts.fees_receivable,
             amount=13,
             member=member,
-            user_or_context='test',
+            user_or_context="test",
         )
         t.save()
 
@@ -226,14 +226,14 @@ def test_liabilities_limit(member):
 
         t = Transaction.objects.create(
             value_datetime=test_date.replace(year=2007, month=12, day=31),
-            user_or_context='test',
+            user_or_context="test",
         )
-        t.debit(account=SpecialAccounts.bank, amount=136, user_or_context='test')
+        t.debit(account=SpecialAccounts.bank, amount=136, user_or_context="test")
         t.credit(
             account=SpecialAccounts.fees_receivable,
             amount=136,
             member=member,
-            user_or_context='test',
+            user_or_context="test",
         )
         t.save()
 

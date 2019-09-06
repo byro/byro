@@ -23,16 +23,16 @@ def memberpage_primary(sender, **kwargs):
     if request.resolver_match and request.resolver_match.view_name.startswith(
         "public:memberpage"
     ):
-        secret_token = request.resolver_match.kwargs.get('secret_token')
+        secret_token = request.resolver_match.kwargs.get("secret_token")
         if secret_token:
-            kwargs = {'secret_token': secret_token}
+            kwargs = {"secret_token": secret_token}
             config = Configuration.get_solo()
             result = [
                 {
-                    'label': _('Member page'),
-                    'url': reverse('public:memberpage:member.dashboard', kwargs=kwargs),
-                    'active': request.resolver_match.view_name
-                    == 'public:memberpage.dashboard',
+                    "label": _("Member page"),
+                    "url": reverse("public:memberpage:member.dashboard", kwargs=kwargs),
+                    "active": request.resolver_match.view_name
+                    == "public:memberpage.dashboard",
                 }
             ]
             if config.can_see_other_members in (
@@ -45,12 +45,12 @@ def memberpage_primary(sender, **kwargs):
                 if member.is_active:
                     result.append(
                         {
-                            'label': _('Member list'),
-                            'url': reverse(
-                                'public:memberpage:member.list', kwargs=kwargs
+                            "label": _("Member list"),
+                            "url": reverse(
+                                "public:memberpage:member.list", kwargs=kwargs
                             ),
-                            'active': request.resolver_match.view_name
-                            == 'public:memberpage:member.list',
+                            "active": request.resolver_match.view_name
+                            == "public:memberpage:member.list",
                         }
                     )
             return result
@@ -61,7 +61,7 @@ def memberpage_primary(sender, **kwargs):
 def new_member_mail_info_memberpage(sender, signal, **kwargs):
     url = sender.profile_memberpage.get_url()
     if url:
-        return _('Your personal member page is at {link}').format(
+        return _("Your personal member page is at {link}").format(
             link=sender.profile_memberpage.get_url()
         )
 
@@ -70,7 +70,7 @@ def new_member_mail_info_memberpage(sender, signal, **kwargs):
 def new_member_office_mail_info_memberpage(sender, signal, **kwargs):
     url = sender.profile_memberpage.get_url()
     if url:
-        return _('Their personal member page is at {link}').format(
+        return _("Their personal member page is at {link}").format(
             link=sender.profile_memberpage.get_url()
         )
 
@@ -81,4 +81,4 @@ def member_dashboard_page_link(sender, signal, member=None, **kwargs):
         return
     url = member.profile_memberpage.get_url()
     if url:
-        return {'url': url, 'title': _('Public profile')}
+        return {"url": url, "title": _("Public profile")}

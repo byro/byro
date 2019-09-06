@@ -33,7 +33,7 @@ class SpecialAccounts:
                     with transaction.atomic():
                         account.log(
                             None,
-                            'byro.bookkeeping.account.created',
+                            "byro.bookkeeping.account.created",
                             source="Automatic creation of special account",
                         )
             account.tags.add(tag)
@@ -42,30 +42,30 @@ class SpecialAccounts:
 
     @classproperty
     def fees(cls):
-        return cls.special_account('fees', AccountCategory.INCOME, _('Member fees'))
+        return cls.special_account("fees", AccountCategory.INCOME, _("Member fees"))
 
     @classproperty
     def donations(cls):
-        return cls.special_account('donations', AccountCategory.INCOME, _('Donations'))
+        return cls.special_account("donations", AccountCategory.INCOME, _("Donations"))
 
     @classproperty
     def fees_receivable(cls):
         return cls.special_account(
-            'fees_receivable', AccountCategory.ASSET, _('Member fees receivable')
+            "fees_receivable", AccountCategory.ASSET, _("Member fees receivable")
         )
 
     @classproperty
     def bank(cls):
-        return cls.special_account('bank', AccountCategory.ASSET, _('Bank'))
+        return cls.special_account("bank", AccountCategory.ASSET, _("Bank"))
 
     @classproperty
     def opening_balance(cls):
         return cls.special_account(
-            'opening_balance', AccountCategory.ASSET, _('Opening balance')
+            "opening_balance", AccountCategory.ASSET, _("Opening balance")
         )
 
     @classproperty
     def lost_income(cls):
         return cls.special_account(
-            'lost_income', AccountCategory.EXPENSE, _('Lost income')
+            "lost_income", AccountCategory.EXPENSE, _("Lost income")
         )

@@ -6,67 +6,89 @@ from django.db import migrations, models
 
 from uuid import uuid4
 
+
 def fill_hash(apps, schema_editor):
-    LogEntry = apps.get_model('common', 'LogEntry')
+    LogEntry = apps.get_model("common", "LogEntry")
     for entry in LogEntry.objects.filter(auth_hash__isnull=True).all():
         entry.auth_hash = "random:{}".format(uuid4().hex)
-        entry.save(update_fields=['auth_hash'])
+        entry.save(update_fields=["auth_hash"])
+
 
 def fill_prev(apps, schema_editor):
-    LogEntry = apps.get_model('common', 'LogEntry')
+    LogEntry = apps.get_model("common", "LogEntry")
     prev = None
-    for entry in LogEntry.objects.filter(auth_prev='undefined:0').order_by('datetime', 'id').all():
+    for entry in (
+        LogEntry.objects.filter(auth_prev="undefined:0")
+        .order_by("datetime", "id")
+        .all()
+    ):
         entry.auth_prev = prev or entry
         prev = entry
-        entry.save(update_fields=['auth_prev'])
+        entry.save(update_fields=["auth_prev"])
+
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('common', '0012_auto_20180929_1317'),
-    ]
+    dependencies = [("common", "0012_auto_20180929_1317")]
 
     operations = [
         # https://stackoverflow.com/questions/28429933/django-migrations-using-runpython-to-commit-changes/39541048#39541048
-        migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE',
-            reverse_sql=migrations.RunSQL.noop),
+        migrations.RunSQL(
+            "SET CONSTRAINTS ALL IMMEDIATE", reverse_sql=migrations.RunSQL.noop
+        ),
         migrations.AlterField(
-            model_name='logentry',
-            name='datetime',
-            field=models.DateTimeField(db_index=True, default=django.utils.timezone.now),
+            model_name="logentry",
+            name="datetime",
+            field=models.DateTimeField(
+                db_index=True, default=django.utils.timezone.now
+            ),
         ),
         migrations.AddField(
-            model_name='logentry',
-            name='auth_data',
+            model_name="logentry",
+            name="auth_data",
             field=django.contrib.postgres.fields.jsonb.JSONField(default={}),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='logentry',
-            name='auth_hash',
+            model_name="logentry",
+            name="auth_hash",
             field=models.CharField(null=True, max_length=70),
         ),
         migrations.RunPython(fill_hash, migrations.RunPython.noop),
         migrations.AlterField(
-            model_name='logentry',
-            name='auth_hash',
+            model_name="logentry",
+            name="auth_hash",
             field=models.CharField(max_length=140, unique=True, null=False),
         ),
         migrations.AddField(
-            model_name='logentry',
-            name='auth_prev',
-            field=models.ForeignKey(default='undefined:0', on_delete=django.db.models.deletion.PROTECT, related_name='auth_next', to='common.LogEntry', to_field='auth_hash', null=False, blank=False),
+            model_name="logentry",
+            name="auth_prev",
+            field=models.ForeignKey(
+                default="undefined:0",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="auth_next",
+                to="common.LogEntry",
+                to_field="auth_hash",
+                null=False,
+                blank=False,
+            ),
             preserve_default=False,
         ),
         migrations.RunPython(fill_prev, migrations.RunPython.noop),
         migrations.AddIndex(
-            model_name='logentry',
-            index=models.Index(fields=['content_type', 'object_id'], name='common_loge_content_43b532_idx'),
+            model_name="logentry",
+            index=models.Index(
+                fields=["content_type", "object_id"],
+                name="common_loge_content_43b532_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='logentry',
-            index=models.Index(fields=['action_type'], name='common_loge_action__1810d9_idx'),
+            model_name="logentry",
+            index=models.Index(
+                fields=["action_type"], name="common_loge_action__1810d9_idx"
+            ),
         ),
-        migrations.RunSQL(migrations.RunSQL.noop,
-            reverse_sql='SET CONSTRAINTS ALL IMMEDIATE'),
+        migrations.RunSQL(
+            migrations.RunSQL.noop, reverse_sql="SET CONSTRAINTS ALL IMMEDIATE"
+        ),
     ]

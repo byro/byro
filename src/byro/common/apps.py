@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 
 
 class CommonConfig(AppConfig):
-    name = 'byro.common'
+    name = "byro.common"
 
 
 def user_save_receiver(sender, instance, created, **kwargs):
@@ -15,11 +15,11 @@ def user_save_receiver(sender, instance, created, **kwargs):
             content_object=instance,
             action_type="byro.common.user.created",
             data={
-                'source': 'User creation checkpoint',
-                'flags': {
-                    'active': instance.is_active,
-                    'superuser': instance.is_superuser,
-                    'staff': instance.is_staff,
+                "source": "User creation checkpoint",
+                "flags": {
+                    "active": instance.is_active,
+                    "superuser": instance.is_superuser,
+                    "staff": instance.is_staff,
                 },
             },
         )
