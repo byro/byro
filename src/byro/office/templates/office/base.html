@@ -24,6 +24,7 @@
         <script type="text/javascript" src="{% static "vendored/bootstrap/js/bootstrap.min.js" %}"></script>
         <script type="text/javascript" src="{% static "vendored/select2/js/select2.full.min.js" %}"></script>
         <script type="text/javascript" src="{% static "vendored/bootstrap-datepicker/js/bootstrap-datepicker.min.js" %}"></script>
+    {% endcompress %}
         <script type="text/javascript">
             $(function(){
                 $('.datepicker').datepicker({
@@ -35,7 +36,6 @@
                 });
             });
         </script>
-    {% endcompress %}
     {% block scripts %}
     {% endblock %}
 </head>
