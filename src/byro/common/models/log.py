@@ -1,6 +1,7 @@
 import base64
 import datetime
 import decimal
+import uuid
 from functools import wraps
 
 import canonicaljson
@@ -243,6 +244,8 @@ def flatten_objects(inobj, key_was=None):
         return inobj.strftime("%Y-%m-%d %H:%M:%S %Z")
     elif isinstance(inobj, datetime.date):
         return inobj.strftime("%Y-%m-%d")
+    elif isinstance(inobj, uuid.UUID):
+        return str(inobj)
     elif isinstance(inobj, decimal.Decimal) or (
         key_was == "amount" and isinstance(inobj, (int, float))
     ):
