@@ -140,7 +140,7 @@ class LogEntry(models.Model):
             self.datetime = now()
 
         self.auth_data = {
-            "hash_ver": 1,
+            "hash_ver": 2,
             "nonce": base64.b64encode(hdd_nonce).decode("us-ascii"),
             "data_mac": "blake2b:{}".format(hdd_mac.decode("us-ascii")),
             "orig_content_type": "{}.{}".format(
@@ -166,7 +166,8 @@ class LogEntry(models.Model):
 
     def get_authenticated_dict(self):
         return {
-            "object_id": self.object_id,
+            "object_id": str(self.object_id)
+            if not isinstance(self.object_id, (int, str)) else self.object_id,
             "datetime": self.datetime.isoformat(),
             "action_type": self.action_type,
             "prev_hash": self.auth_prev_id
@@ -177,7 +178,7 @@ class LogEntry(models.Model):
         }
 
     def verify(self):
-        if self.auth_data["hash_ver"] != 1:
+        if self.auth_data["hash_ver"] not in (1, 2):
             return False
 
         if (

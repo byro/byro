@@ -15,7 +15,7 @@ ADD byro.docker.cfg /byro/byro.cfg
 RUN cd /byro && pip3 install -e .
 RUN cd /byro && /bin/zsh install_local_plugins.sh
 
-CMD ["/bin/bash"]
+CMD ["runserver", "0.0.0.0:8020"]
 
 WORKDIR /byro
-ENTRYPOINT ["python3","manage.py","runserver"]
+ENTRYPOINT ["/usr/bin/env", "python3", "manage.py"]
