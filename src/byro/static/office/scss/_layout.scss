@@ -3,6 +3,9 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
+.alert-error {
+    @extend .alert-danger;
+}
 #page-wrapper {
     display: flex;
     flex-direction: row;
