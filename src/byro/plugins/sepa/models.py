@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from localflavor.generic.models import BICField, IBANField
 
 from byro.common.models.auditable import Auditable
-from schwifty import IBAN
+from schwifty import IBAN, BIC
 
 
 class SepaDirectDebitState(Enum):
@@ -15,6 +15,7 @@ class SepaDirectDebitState(Enum):
     NO_IBAN = _("No IBAN")
     INVALID_IBAN = _("Invalid IBAN")
     NO_BIC = _("No BIC")
+    INVALID_BIC = _("Invalid BIC")
     BOUNCED = _("Debit bounced")
     RESCINDED = _("Mandate rescinded")
     INACTIVE = _("Direct debit deactivated")
@@ -130,6 +131,15 @@ class MemberSepa(Auditable, models.Model):
         return None
 
     @property
+    def bic_parsed(self):
+        with suppress(ValueError):
+            bic = self.bic_autocomplete
+            if bic:
+                return BIC(bic)
+
+        return None
+
+    @property
     def sepa_direct_debit_state(self):
         if not self.iban:
             return SepaDirectDebitState.NO_IBAN
@@ -148,6 +158,13 @@ class MemberSepa(Auditable, models.Model):
 
         if not self.bic_autocomplete:
             return SepaDirectDebitState.NO_BIC
+
+        bic = self.bic_parsed
+        if not bic:
+            return SepaDirectDebitState.INVALID_BIC
+
+        if bic.country_code == "DE" and not bic.exists:
+            return SepaDirectDebitState.INVALID_BIC
 
         if not self.mandate_reference:
             return SepaDirectDebitState.NO_MANDATE_REFERENCE
