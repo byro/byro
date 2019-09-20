@@ -5,9 +5,9 @@ from annoying.fields import AutoOneToOneField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from localflavor.generic.models import BICField, IBANField
+from schwifty import BIC, IBAN
 
 from byro.common.models.auditable import Auditable
-from schwifty import IBAN, BIC
 
 
 class SepaDirectDebitState(Enum):

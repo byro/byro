@@ -1,8 +1,6 @@
-from django.db.models import Q
-from django.utils.timezone import now
 from django.views.generic import TemplateView
 
-from byro.members.models import Member, Membership
+from byro.members.models import Member
 from byro.members.stats import get_member_statistics
 
 

@@ -454,7 +454,7 @@ def create_membership(membership_parms, member):
         Membership.objects.create(member=member, **membership_parms)
 
 
-@transaction.atomic
+@transaction.atomic  # noqa
 def default_csv_form_valid(view, form, dialect="excel"):
     mapping = None
     fields = Member.get_fields()

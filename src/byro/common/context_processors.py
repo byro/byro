@@ -2,8 +2,8 @@ import collections
 
 from django.conf import settings
 from django.http import Http404
-from django.utils import formats, translation
 from django.urls import resolve
+from django.utils import formats, translation
 
 from byro.bookkeeping.models import Transaction
 from byro.common.models import Configuration, LogEntry
