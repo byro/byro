@@ -164,7 +164,10 @@ class MemberSepa(Auditable, models.Model):
             return SepaDirectDebitState.INVALID_BIC
 
         if bic.country_code == "DE" and not bic.exists:
-            return SepaDirectDebitState.INVALID_BIC
+            # PBNKDEFF and PBNKDEFFXXX should be the same
+            b_ = BIC(str(bic)+"XXX")
+            if not b_.exists:
+                return SepaDirectDebitState.INVALID_BIC
 
         if not self.mandate_reference:
             return SepaDirectDebitState.NO_MANDATE_REFERENCE
