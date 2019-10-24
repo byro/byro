@@ -167,7 +167,8 @@ class LogEntry(models.Model):
     def get_authenticated_dict(self):
         return {
             "object_id": str(self.object_id)
-            if not isinstance(self.object_id, (int, str)) else self.object_id,
+            if not isinstance(self.object_id, (int, str))
+            else self.object_id,
             "datetime": self.datetime.isoformat(),
             "action_type": self.action_type,
             "prev_hash": self.auth_prev_id

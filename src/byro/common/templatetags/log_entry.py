@@ -122,7 +122,7 @@ def format_log_object(obj, key=None):
                         escape(parts[0]),
                         escape(parts[1]),
                         escape(parts[1][: (6 * 2)]),
-                        escape(parts[1][-(6 * 2):]),
+                        escape(parts[1][-(6 * 2) :]),
                     )
                 )
 
