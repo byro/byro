@@ -573,7 +573,7 @@ class Membership(Auditable, models.Model, LogTargetMixin):
             try:
                 end = _now.replace(day=self.start.day).date()
             except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
-                end = _now + relativedelta(day=1, months=1, days=-1).date()
+                end = (_now + relativedelta(day=1, months=1, days=-1)).date()
         date = self.start
         while date <= end:
             dues.add((date, self.amount))
