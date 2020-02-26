@@ -405,6 +405,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
         src_account = SpecialAccounts.fees
         dst_account = SpecialAccounts.fees_receivable
 
+        config = Configuration.get_solo()
+
         # Step 1: Identify all dates and amounts that should be due at those dates
         #  (in python, store as a list; hits database once to get list of memberships)
         # Step 2: Find all due amounts within the data ranges, ignore reversed liabilities
@@ -421,12 +423,13 @@ class Member(Auditable, models.Model, LogTargetMixin):
         dues = set()
         membership_ranges = []
         _now = now()
+        _from = config.accounting_of_membership_fees_from
 
         # Step 1
         for membership in self.memberships.all():
             if not membership.amount:
                 continue
-            membership_range, membership_dues = membership.get_dues(_now=_now)
+            membership_range, membership_dues = membership.get_dues(_now=_now, _from=_from)
             membership_ranges.append(membership_range)
             dues |= membership_dues
 
@@ -566,20 +569,23 @@ class Membership(Auditable, models.Model, LogTargetMixin):
     def get_absolute_url(self):
         return reverse("office:members.data", kwargs={"pk": self.member.pk})
 
-    def get_dues(self, _now=None):
+    def get_dues(self, _now=None, _from=None):
         _now = _now or now()
         dues = set()
         end = self.end
+        start = self.start
+        if _from is not None and start < _from:
+            start = _from
         if not end:
             try:
-                end = _now.replace(day=self.start.day).date()
+                end = _now.replace(day=start.day).date()
             except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
                 end = (_now + relativedelta(day=1, months=1, days=-1)).date()
-        date = self.start
+        date = start
         while date <= end:
             dues.add((date, self.amount))
             date += relativedelta(months=self.interval)
-        return (self.start, end), dues
+        return (start, end), dues
 
 
 SPECIAL_NAMES = {Member: "member", Membership: "membership"}

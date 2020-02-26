@@ -25,4 +25,5 @@ class ConfigurationForm(forms.ModelForm):
             "currency",
             "mail_from",
             "liability_interval",
+            "accounting_of_membership_fees_from",
         )
