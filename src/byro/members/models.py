@@ -524,6 +524,33 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 user_or_context="internal: update_liabilites, reverse stray liabilities",
             )
 
+    @transaction.atomic
+    def adjust_balance(self, user_or_context, memo, amount, from_, to_, value_datetime):
+        now_ = now()
+
+        if amount == 0:
+            return False
+
+        if amount < 0:
+            amount = -amount
+            from_, to_ = to_, from_
+
+        from_member = self if from_ == SpecialAccounts.fees_receivable else None
+        to_member = self if to_ == SpecialAccounts.fees_receivable else None
+
+        t = Transaction.objects.create(
+            value_datetime=value_datetime,
+            booking_datetime=now_,
+            user_or_context=user_or_context,
+            memo=memo,
+        )
+        t.debit(account=to_, member=to_member, amount=amount, user_or_context=user_or_context)
+        t.credit(
+            account=from_, member=from_member, amount=amount, user_or_context=user_or_context
+        )
+
+        return True
+
     def __str__(self):
         return "Member {self.number} ({self.name})".format(self=self)
 
