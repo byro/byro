@@ -218,6 +218,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 read_only=True,
             )
         )
+        result.append(
+            Field(
+                "_internal_last_transaction",
+                _("Last Member Fee Transaction Timestamp"),
+                "",
+                "last_membership_fee_transaction_timestamp",
+                computed=True,
+                read_only=True,
+            )
+        )
 
         reg_form = Configuration.get_solo().registration_form or []
         form_config = {entry["name"]: entry for entry in reg_form}
@@ -296,6 +306,20 @@ class Member(Auditable, models.Model, LogTargetMixin):
     @property
     def balance(self) -> Decimal:
         return self._calc_balance()
+
+    def _calc_last_membership_fee_transaction_timestamp(self):
+        _now = now()
+        fees_receivable_account = SpecialAccounts.fees_receivable
+        qs = Booking.objects.filter(
+            Q(debit_account=fees_receivable_account) | Q(credit_account=fees_receivable_account),
+            member=self,
+            transaction__value_datetime__lte=_now
+        )
+        return qs.aggregate(last_transaction=models.Max("transaction__value_datetime"))['last_transaction']
+
+    @property
+    def last_membership_fee_transaction_timestamp(self):
+        return self._calc_last_membership_fee_transaction_timestamp()
 
     def create_balance(self, start, end, commit=True, create_if_zero=True):
         if self.balances.exists():
