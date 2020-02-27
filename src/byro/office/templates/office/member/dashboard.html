@@ -22,6 +22,10 @@
         </h1>
         <span class="dashboard-description">
             {% trans "current balance" %}
+            <br>
+            {% blocktrans with start=member.last_membership_fee_transaction_timestamp|date trimmed %}
+                Last transaction on {{ start }}.
+            {% endblocktrans %}
         </span>
     </div>
     {% if statute_barred_debt.in1year %}
