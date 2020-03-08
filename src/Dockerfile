@@ -4,7 +4,9 @@ MAINTAINER byro team
 EXPOSE 8020
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get install -y zsh gettext libjpeg-dev libmagic-dev
+RUN apt-get update && \
+    apt-get install -y zsh gettext libjpeg-dev libmagic-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN useradd uid1000 -d /home/uid1000
 RUN mkdir -p /home/uid1000 && chown uid1000: /home/uid1000
