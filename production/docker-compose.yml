@@ -1,0 +1,70 @@
+version: "2.1"
+
+services:
+  manage:
+    build: ../src/
+    user: uid1000
+    environment:
+        PYTHONUNBUFFERED: 1
+        DJANGO_SETTINGS_MODULE: byro.settings
+        DEVELOPMENT: 0
+    entrypoint: ['python', '-m', 'byro']
+    command: "help"
+    volumes:
+      - ../../byro-data/byro.cfg:/byro/byro.cfg:rw
+      - ../../byro-data/data:/var/byro/data
+      - ../../byro-data/static.dist:/byro/static.dist:rw
+    restart: "no"
+
+  gunicorn:
+    build: ../src/
+    user: uid1000
+    environment:
+        PYTHONUNBUFFERED: 1
+        DJANGO_SETTINGS_MODULE: byro.settings
+        DEVELOPMENT: 0
+    working_dir: '/byro'
+    entrypoint:
+      - 'gunicorn'
+    command: >
+      byro.wsgi --name byro --workers 4
+      --max-requests 1200 --max-requests-jitter 50
+      --log-level=info
+      --bind=0.0.0.0:8345
+    links:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../../byro-data/byro.cfg:/byro/byro.cfg:ro
+      - ../../byro-data/data:/var/byro/data
+      - ../../byro-data/static.dist:/byro/static.dist:rw
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:stable-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../../byro-data/data/media:/var/byro/data/media:ro
+      - ../../byro-data/static.dist:/var/byro/static.dist:ro
+    links:
+      - gunicorn
+    restart: unless-stopped
+    ports:
+      - 8345:80
+
+  db:
+    image: postgres:10-alpine
+    environment:
+        POSTGRES_PASSWORD: byro
+        POSTGRES_DB: byro
+        POSTGRES_USER: byro
+    volumes:
+      - ../../byro-data/db/:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
