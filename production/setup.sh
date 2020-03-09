@@ -56,16 +56,12 @@ start_migrate() {
     echo "Performing migrations..."
     "${COMPOSE[@]}" run manage migrate
     touch "$COMPLETE_MIGRATE"
-
-    start_rebuild
 }
 
 start_rebuild() {
      echo "Running rebuild..."
     "${COMPOSE[@]}" run manage collectstatic
     touch "$COMPLETE_REBUILD"
-    
-    start_superuser
 }
 
 start_superuser () {
@@ -94,17 +90,43 @@ If you want to expose that to the world, make sure to disable "Debug" in the con
 EOF
 }
 
+plugin() {
+    repo="$1"
+    name="$(basename "$repo" .git)"
+    git clone "$repo" "../src/local/${name}"
+    "${COMPOSE[@]}" build
+    
+    start_migrate
+    start_rebuild
+}
 
-case "$*" in
-
+arg="${1:-}"
+case "$arg" in
 stop)
     stop
+    ;;
+logs)
+    "${COMPOSE[@]}" logs --tail=20 -f
+    ;;
+plugin)
+    repo="$2"
+    plugin "$repo"
+    start
+    ;;
+fints)
+    plugin https://github.com/henryk/byro-fints
+    "${COMPOSE[@]}" run --user root manage makemessages -l de -i build -i dist -i "*egg*"
+    "${COMPOSE[@]}" restart gunicorn
     ;;
 help|--help|-h|h)
     cat <<EOF
 Usage:
-    ./setup.sh          Run setup
-    ./setup.sh stop     Stop running services
+    $0          Run setup
+    $0 stop     Stop running services
+    $0 logs     Tail the logs
+    $0 plugin <git-url>
+                install a plugin from a git url
+    $0 fints    install the byron-fints plugin
 EOF
     ;;
 "")
@@ -112,13 +134,22 @@ EOF
         create_config
     elif [[ ! -f "$COMPLETE_MIGRATE" ]]; then
         start_db
+
         start_migrate
+        start_rebuild
+        start_superuser
+
     elif [[ ! -f "$COMPLETE_REBUILD" ]]; then
         start_db
+        
         start_rebuild
+        start_superuser
+
     elif [[ ! -f "$COMPLETE_SUPERUSER" ]]; then
         start_db
+        
         start_superuser
+
     else
         start
     fi
