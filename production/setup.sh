@@ -86,7 +86,7 @@ All done!
 Your software should now be running at this URL:
 http://127.0.0.1:8345/
 
-If you want to expose that to the world, make sure to disable "Debug" in the config and put an SSL certificate on it!
+If you want to expose that to the world, make sure to disable "Debug" in the config and put a TLS certificate on it!
 EOF
 }
 
