@@ -205,7 +205,7 @@ Next Steps: Updates
 
 .. warning:: While we try hard not to issue breaking updates, **please perform a backup before every upgrade**.
 
-To upgrade byro, please first read through our :ref:`changelog` and if
+To upgrade byro, please first read through our changelog and if
 available our release blog post to check for relevant update notes. Also, make
 sure you have a current backup.
 

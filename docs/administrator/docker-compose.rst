@@ -1,5 +1,5 @@
 Installation via docker-compose
-=============================
+===============================
 
 In the folder `production/` of the byro repository, you can find setup scripts
 and a `docker-compose.yml`, which will help you set up a production deployment of byro using docker.
@@ -20,10 +20,10 @@ This guide assumes that you have installed and set up the following system servi
 Step 1: Configuration
 ---------------------
 
-Checkout the repository, and run the setup script:
+Checkout the repository, and run the setup script::
 
-  # git clone https://github.com/byro/byro
-  # byro/production/setup.sh
+    # git clone https://github.com/byro/byro
+    # byro/production/setup.shß
 
 This will create a folder `byro-data/` next to the byro folder, which will
 contain all your data.
@@ -45,25 +45,25 @@ Open this file in an editor, and configure the following aspects:
           information.
 
 Step 2: Deployment
---------------------
+------------------
 
-After you have changed your configuration, run the setup script again:
+After you have changed your configuration, run the setup script again::
 
-  # byro/production/setup.sh
+    # byro/production/setup.sh
 
 Your database will now be created, and you will be prompted to create a superuser.
 After that, your deployment will be complete. You can use the `setup.sh` script
-to perform additional tasks, such as stopping your deployment, tailing the logs,
+to perform further tasks, such as stopping your deployment, tailing the logs,
 or installing byro plugins.
 
-For more information, run
+For more information, run::
 
-  # byro/production/setup.sh help
+    # byro/production/setup.sh help
 
 Step 3: Install the FinTS plugin (optional)
 -------------------------------------------
 
-The following call will install the `byro-fints plugin`_. 
+The following call will install the `byro-fints plugin`_::
 
   # byro/production/setup.sh fints
 
