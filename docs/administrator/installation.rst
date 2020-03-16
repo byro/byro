@@ -4,6 +4,8 @@ Installation
 This guide will help you to install byro on a Linux distribution, as long as
 the prerequisites are present.
 
+Note: there is also an experimental deployment available via `docker-compose`_.
+
 Step 0: Prerequisites
 ---------------------
 
@@ -203,7 +205,7 @@ Next Steps: Updates
 
 .. warning:: While we try hard not to issue breaking updates, **please perform a backup before every upgrade**.
 
-To upgrade byro, please first read through our :ref:`changelog` and if
+To upgrade byro, please first read through our changelog and if
 available our release blog post to check for relevant update notes. Also, make
 sure you have a current backup.
 
@@ -229,4 +231,4 @@ If you want to upgrade byro to a specific release, you can substitute
 .. _PostgreSQL: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-9-4-on-debian-8
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
 .. _strong encryption settings: https://mozilla.github.io/server-side-tls/ssl-config-generator/
-
+.. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose/
