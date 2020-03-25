@@ -1,3 +1,4 @@
+import subprocess
 import sys
 from contextlib import suppress
 
@@ -17,27 +18,22 @@ def get_plugins():
 
 
 def get_version():
-    # FIXME: In a release this should return the version
-
     with suppress(Exception):
         retval = getattr(sys.modules[__name__], "_byro_git_version", None)
         if retval:
             return retval
 
-        import subprocess
-
         retval = (
             subprocess.check_output(
-                ["git", "describe", "--always", "--dirty", "--abbrev=40"]
+                ["git", "describe", "--always", "--dirty", "--abbrev=40"],
+                stderr=subprocess.PIPE,
             )
             .decode()
             .strip()
         )
         sys.modules[__name__]._byro_git_version = retval
-
         return retval
-
-    return None
+    return ""
 
 
 def get_installed_software():
