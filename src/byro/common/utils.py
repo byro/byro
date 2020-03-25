@@ -33,6 +33,11 @@ def get_version():
         )
         sys.modules[__name__]._byro_git_version = retval
         return retval
+
+    with suppress(Exception):
+        from byro import __version__
+        return __version__
+
     return ""
 
 
