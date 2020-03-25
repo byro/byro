@@ -95,6 +95,7 @@ setup(
     extras_require={
         "dev": [
             "black",
+            "check-manifest",
             "freezegun",
             "isort",
             "ipython",

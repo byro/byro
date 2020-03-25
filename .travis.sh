@@ -15,6 +15,7 @@ if [ "$1" == "style" ]; then
         pip install ".[dev]"
         isort --check-only --recursive --diff .
         black --check .
+        check-manifest .
     fi
 fi
 
