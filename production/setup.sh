@@ -49,6 +49,10 @@ EOF
     rm -f "$CONFIG.bak"
 }
 
+manage() {
+    "${COMPOSE[@]}" run manage "$@"
+}
+
 start_db() {
     echo "Starting database in background..."
     "${COMPOSE[@]}" up -d db
@@ -56,7 +60,7 @@ start_db() {
 
 start_migrate() {
     echo "Performing migrations..."
-    "${COMPOSE[@]}" run manage migrate
+    manage migrate
     touch "$COMPLETE_MIGRATE"
 }
 
@@ -74,7 +78,7 @@ You will be prompted for an email address, and a password.
 Please choose your password to be secure and do not forget it.
 ===
 EOF
-    "${COMPOSE[@]}" run manage createsuperuser --username admin
+    manage createsuperuser --username admin
     
     touch "$COMPLETE_SUPERUSER"
     start
@@ -117,18 +121,31 @@ plugin)
     ;;
 fints)
     plugin https://github.com/henryk/byro-fints
-    "${COMPOSE[@]}" run --user root manage makemessages -l de -i build -i dist -i "*egg*"
-    "${COMPOSE[@]}" restart gunicorn
+    ;;
+manage)
+    shift
+    manage "$@"
+    ;;
+db)
+    docker exec -it byro_db_1 psql -U byro
     ;;
 help|--help|-h|h)
     cat <<EOF
 Usage:
+  General:
     $0          Run setup
     $0 stop     Stop running services
     $0 logs     Tail the logs
+
+  Plugins:
     $0 plugin <git-url>
                 install a plugin from a git url
     $0 fints    install the byron-fints plugin
+
+  Plumbing:
+    $0 manage [args]
+                directly run "python -m byro [args]"
+    $0 db       get a psql shell to the database
 EOF
     ;;
 "")
