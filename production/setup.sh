@@ -61,8 +61,8 @@ start_migrate() {
 }
 
 start_rebuild() {
-     echo "Running rebuild..."
-    "${COMPOSE[@]}" run manage collectstatic
+    echo "Running rebuild..."
+    manage collectstatic --noinput
     touch "$COMPLETE_REBUILD"
 }
 
