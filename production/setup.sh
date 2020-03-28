@@ -93,17 +93,29 @@ Your software should now be running at this URL:
 http://127.0.0.1:8345/
 
 If you want to expose that to the world, make sure to disable "Debug" in the config and put a TLS certificate on it!
+
+If you want to do other tasks like install plugins, run '$0 help' for more info
 EOF
 }
 
 plugin() {
     repo="$1"
     name="$(basename "$repo" .git)"
-    git clone "$repo" "../src/local/${name}"
+    path="../src/local/${name}"
+    if [[ ! -d "$path" ]]; then
+        git clone "$repo" "../src/local/${name}"
+    else
+        pushd "$path" >/dev/null
+        git pull
+        popd >/dev/null
+    fi
     "${COMPOSE[@]}" build
     
     start_migrate
     start_rebuild
+    
+    "${COMPOSE[@]}" run --user root manage makemessages -l de -i build -i dist -i "*egg*"
+    "${COMPOSE[@]}" up -d gunicorn
 }
 
 arg="${1:-}"
@@ -117,7 +129,6 @@ logs)
 plugin)
     repo="$2"
     plugin "$repo"
-    start
     ;;
 fints)
     plugin https://github.com/henryk/byro-fints
