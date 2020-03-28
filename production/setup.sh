@@ -44,7 +44,9 @@ EOF
     
     start_db
     IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' byro_db_1)"
-    sed -i "s/MAIL_HOST/$IP/" "$CONFIG"
+    # BSD sed needs a suffix for -i, GNU doesn't care
+    sed -i.bak "s/MAIL_HOST/$IP/" "$CONFIG"
+    rm -f "$CONFIG.bak"
 }
 
 start_db() {
