@@ -44,7 +44,13 @@ EOF
     
     start_db
     IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' byro_db_1)"
-    sed -i "s/MAIL_HOST/$IP/" "$CONFIG"
+    # BSD sed needs a suffix for -i, GNU doesn't care
+    sed -i.bak "s/MAIL_HOST/$IP/" "$CONFIG"
+    rm -f "$CONFIG.bak"
+}
+
+manage() {
+    "${COMPOSE[@]}" run manage "$@"
 }
 
 start_db() {
@@ -54,13 +60,13 @@ start_db() {
 
 start_migrate() {
     echo "Performing migrations..."
-    "${COMPOSE[@]}" run manage migrate
+    manage migrate
     touch "$COMPLETE_MIGRATE"
 }
 
 start_rebuild() {
-     echo "Running rebuild..."
-    "${COMPOSE[@]}" run manage collectstatic
+    echo "Running rebuild..."
+    manage collectstatic --noinput
     touch "$COMPLETE_REBUILD"
 }
 
@@ -72,7 +78,7 @@ You will be prompted for an email address, and a password.
 Please choose your password to be secure and do not forget it.
 ===
 EOF
-    "${COMPOSE[@]}" run manage createsuperuser --username admin
+    manage createsuperuser --username admin
     
     touch "$COMPLETE_SUPERUSER"
     start
@@ -87,17 +93,29 @@ Your software should now be running at this URL:
 http://127.0.0.1:8345/
 
 If you want to expose that to the world, make sure to disable "Debug" in the config and put a TLS certificate on it!
+
+If you want to do other tasks like install plugins, run '$0 help' for more info
 EOF
 }
 
 plugin() {
     repo="$1"
     name="$(basename "$repo" .git)"
-    git clone "$repo" "../src/local/${name}"
+    path="../src/local/${name}"
+    if [[ ! -d "$path" ]]; then
+        git clone "$repo" "../src/local/${name}"
+    else
+        pushd "$path" >/dev/null
+        git pull
+        popd >/dev/null
+    fi
     "${COMPOSE[@]}" build
     
     start_migrate
     start_rebuild
+    
+    "${COMPOSE[@]}" run --user root manage makemessages -l de -i build -i dist -i "*egg*"
+    "${COMPOSE[@]}" up -d gunicorn
 }
 
 arg="${1:-}"
@@ -111,22 +129,34 @@ logs)
 plugin)
     repo="$2"
     plugin "$repo"
-    start
     ;;
 fints)
     plugin https://github.com/henryk/byro-fints
-    "${COMPOSE[@]}" run --user root manage makemessages -l de -i build -i dist -i "*egg*"
-    "${COMPOSE[@]}" restart gunicorn
+    ;;
+manage)
+    shift
+    manage "$@"
+    ;;
+db)
+    docker exec -it byro_db_1 psql -U byro
     ;;
 help|--help|-h|h)
     cat <<EOF
 Usage:
+  General:
     $0          Run setup
     $0 stop     Stop running services
     $0 logs     Tail the logs
+
+  Plugins:
     $0 plugin <git-url>
                 install a plugin from a git url
     $0 fints    install the byron-fints plugin
+
+  Plumbing:
+    $0 manage [args]
+                directly run "python -m byro [args]"
+    $0 db       get a psql shell to the database
 EOF
     ;;
 "")
