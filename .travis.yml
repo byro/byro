@@ -2,10 +2,8 @@ dist: xenial  # required to run 3.7+
 language: python
 sudo: true
 python:
-  - "3.5"
   - "3.6"
   - "3.7"
-sudo: false
 install:
   - cd src
   - pip install -U pip setuptools wheel codecov coverage
