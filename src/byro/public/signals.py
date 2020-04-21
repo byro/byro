@@ -2,7 +2,6 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from byro.common.models.configuration import Configuration, MemberViewLevel
 from byro.common.signals import unauthenticated_urls
 from byro.members.models import Member
 from byro.members.signals import (
@@ -26,7 +25,6 @@ def memberpage_primary(sender, **kwargs):
         secret_token = request.resolver_match.kwargs.get("secret_token")
         if secret_token:
             kwargs = {"secret_token": secret_token}
-            config = Configuration.get_solo()
             result = [
                 {
                     "label": _("Member page"),

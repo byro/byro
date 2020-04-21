@@ -96,6 +96,7 @@ setup(
         "dev": [
             "black",
             "check-manifest",
+            "flake8",
             "freezegun",
             "isort",
             "ipython",

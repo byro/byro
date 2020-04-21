@@ -15,7 +15,7 @@ from byro.bookkeeping.models import (
     Transaction,
 )
 from byro.bookkeeping.special_accounts import SpecialAccounts
-from byro.common.models.configuration import Configuration, MemberViewLevel
+from byro.common.models.configuration import Configuration
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
 from byro.plugins.sepa.models import MemberSepa
