@@ -73,14 +73,14 @@ setup(
         "Django>=2.2.0,<2.3.0",  # https://docs.djangoproject.com/en/2.0/releases/
         "django-annoying==0.10.*",  # https://github.com/skorokithakis/django-annoying/releases
         "django-bootstrap4==0.0.*",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
-        "django-compressor==2.2.*",  # https://django-compressor.readthedocs.io/en/latest/changelog/
+        "django-compressor==2.4.*",  # https://django-compressor.readthedocs.io/en/latest/changelog/
         "django-db-constraints==0.3.*",
-        "django-extensions==2.1.*",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
+        "django-extensions==2.2.*",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
         "django-formset-js-improved==0.5.0.2",  # no changelog, https://github.com/pretix/django-formset-js
-        "django-i18nfield==1.4.*",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
-        "django-libsass==0.7",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
+        "django-i18nfield==1.7.*",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
+        "django-libsass==0.8",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
         "django-localflavor==2.1.*",
-        "django-select2==6.3.*",  # https://github.com/applegrew/django-select2/releases
+        "django-select2==7.2.*",  # https://github.com/applegrew/django-select2/releases
         "django-solo==1.1.*",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
         "psycopg2-binary",
