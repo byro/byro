@@ -21,8 +21,9 @@ if [ "$1" == "style" ]; then
 fi
 
 if [ "$1" == "docs" ]; then
-    cd ../docs
-    pip install -r requirements.txt
+    cd ..
+    pip install -r docs/requirements.txt  # We need to go the roundabout way to mirror rtd
+    cd docs/
     make html
     make linkcheck
     npm install -g write-good
