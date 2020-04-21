@@ -1,4 +1,5 @@
 import pytest
+
 from byro.mails.models import EMail
 from byro.mails.send import SendMailException
 

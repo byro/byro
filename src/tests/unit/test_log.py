@@ -1,6 +1,6 @@
+import pytest
 from django.db import transaction
 
-import pytest
 from byro.common.models import LogEntry
 
 

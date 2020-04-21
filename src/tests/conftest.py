@@ -1,5 +1,6 @@
 import os.path
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -7,7 +8,6 @@ from django.core.management import call_command
 from django.shortcuts import reverse
 from django.utils.timezone import now
 
-import pytest
 from byro.bookkeeping.models import (
     Account,
     AccountCategory,

@@ -1,14 +1,14 @@
 from itertools import repeat
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from freezegun import freeze_time
 
-import pytest
 from byro.bookkeeping.models import Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration
 from byro.members.models import FeeIntervals, Member, Membership
-from freezegun import freeze_time
 
 
 @pytest.fixture

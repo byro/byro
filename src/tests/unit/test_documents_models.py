@@ -1,6 +1,6 @@
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-import pytest
 from byro.documents.models import Document
 from byro.mails.models import EMail
 

@@ -1,6 +1,6 @@
+import pytest
 from django.http.request import QueryDict
 
-import pytest
 from byro.common.models.log import LogEntry
 from byro.common.templatetags.log_entry import format_log_entry, format_log_source
 from byro.common.templatetags.url_replace import url_replace

@@ -1,6 +1,6 @@
+import pytest
 from django.db.models import Q
 
-import pytest
 from helper import TestMigrations
 
 

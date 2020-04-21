@@ -1,8 +1,8 @@
 from contextlib import suppress
 
+import pytest
 from django.utils.timezone import now
 
-import pytest
 from byro.bookkeeping.models import (
     Account,
     AccountCategory,

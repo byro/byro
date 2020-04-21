@@ -1,9 +1,9 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils.timezone import now
 
-import pytest
 from byro.members.models import Member
 
 pytestmark = pytest.mark.usefixtures("configuration")

@@ -1,6 +1,5 @@
-from django.shortcuts import reverse
-
 import pytest
+from django.shortcuts import reverse
 
 
 @pytest.mark.django_db
