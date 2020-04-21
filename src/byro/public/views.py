@@ -118,13 +118,6 @@ class MemberListView(ListView):
         return context
 
     def get_queryset(self):
-        config = Configuration.get_solo()
-        if config.can_see_other_members not in (
-            MemberViewLevel.NAME_ONLY,
-            MemberViewLevel.NAME_AND_CONTACT,
-        ):
-            raise Http404("Page does not exist")
-
         secret_token = self.kwargs.get("secret_token")
         if not secret_token:
             raise Http404("Page does not exist")

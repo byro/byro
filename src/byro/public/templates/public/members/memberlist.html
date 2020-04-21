@@ -6,7 +6,6 @@
 
 {% block public_content %}
 
-{% if config.can_see_other_members != member_view_level.NO %}
 {% if members %}
 <table class="table table-sm">
     <thead>
@@ -34,7 +33,6 @@
 <div class="alert alert-primary">{% blocktrans trimmed %}
 Currently no members have consented to their information being shared.
 {% endblocktrans %}</div>
-{% endif %}
 {% endif %}
 
 {% include "office/pagination.html" %}

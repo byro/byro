@@ -109,11 +109,9 @@
         <p class="card-text">{{member.email}}</p>
         <address class="card-text" style="white-space: pre">{{member.address}}</address>
     </div>
-    {% if config.can_see_other_members != member_view_level.NO and is_active %}
     <div class="card-footer text-right">
         {# save visibility changes #}
     </div>
-    {% endif %}
 </div>
 
 {% endwith %}

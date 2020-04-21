@@ -35,24 +35,20 @@ def memberpage_primary(sender, **kwargs):
                     == "public:memberpage.dashboard",
                 }
             ]
-            if config.can_see_other_members in (
-                MemberViewLevel.NAME_ONLY,
-                MemberViewLevel.NAME_AND_CONTACT,
-            ):
-                member = Member.all_objects.filter(
-                    profile_memberpage__secret_token=secret_token
-                ).first()
-                if member.is_active:
-                    result.append(
-                        {
-                            "label": _("Member list"),
-                            "url": reverse(
-                                "public:memberpage:member.list", kwargs=kwargs
-                            ),
-                            "active": request.resolver_match.view_name
-                            == "public:memberpage:member.list",
-                        }
-                    )
+            member = Member.all_objects.filter(
+                profile_memberpage__secret_token=secret_token
+            ).first()
+            if member.is_active:
+                result.append(
+                    {
+                        "label": _("Member list"),
+                        "url": reverse(
+                            "public:memberpage:member.list", kwargs=kwargs
+                        ),
+                        "active": request.resolver_match.view_name
+                        == "public:memberpage:member.list",
+                    }
+                )
             return result
     return {}
 

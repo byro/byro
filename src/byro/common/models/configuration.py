@@ -68,12 +68,6 @@ class Configuration(ByroConfiguration):
             "This field is used to generate the absolute URL for public pages. Leave it empty if it is the same as this page's base URL."
         ),
     )
-    can_see_other_members = models.CharField(
-        max_length=MemberViewLevel.max_length,
-        verbose_name=_("Members can see other members"),
-        choices=MemberViewLevel.choices,
-        default=MemberViewLevel.NO,
-    )
     mail_from = models.EmailField(
         null=True,
         blank=True,

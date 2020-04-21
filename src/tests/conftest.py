@@ -27,7 +27,6 @@ def configuration():
     config.name = "Association Name"
     config.backoffice_mail = "associationname@example.com"
     config.mail_from = "associationname@example.com"
-    config.can_see_other_members = MemberViewLevel.NAME_AND_CONTACT
     config.save()
     return config
 
