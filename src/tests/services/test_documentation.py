@@ -2,9 +2,10 @@ import importlib
 import os
 from contextlib import suppress
 
-import pytest
 from django.conf import settings
 from django.dispatch import Signal
+
+import pytest
 
 here = os.path.dirname(__file__)
 doc_dir = os.path.join(here, "../../../docs")

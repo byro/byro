@@ -1,5 +1,4 @@
 import pytest
-
 from byro.members.models import Field, Member
 
 

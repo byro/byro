@@ -1,7 +1,7 @@
-import pytest
 from django.shortcuts import reverse
 from django.utils.timezone import now
 
+import pytest
 from byro.common.models import LogEntry
 
 

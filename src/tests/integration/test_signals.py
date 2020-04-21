@@ -1,8 +1,8 @@
 from collections import Counter
 
-import pytest
 from django.shortcuts import reverse
 
+import pytest
 from byro.bookkeeping.signals import process_transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.signals import unauthenticated_urls

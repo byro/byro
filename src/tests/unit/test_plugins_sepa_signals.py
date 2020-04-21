@@ -1,5 +1,4 @@
 import pytest
-
 from byro.plugins.sepa.signals import (
     leave_member_office_mail_info_sepa,
     new_member_mail_info_sepa,

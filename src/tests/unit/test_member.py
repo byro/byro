@@ -1,5 +1,4 @@
 import pytest
-
 from byro.members.models import Member, get_next_member_number
 
 

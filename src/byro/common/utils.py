@@ -36,6 +36,7 @@ def get_version():
 
     with suppress(Exception):
         from byro import __version__
+
         return __version__
 
     return ""

@@ -42,9 +42,7 @@ def memberpage_primary(sender, **kwargs):
                 result.append(
                     {
                         "label": _("Member list"),
-                        "url": reverse(
-                            "public:memberpage:member.list", kwargs=kwargs
-                        ),
+                        "url": reverse("public:memberpage:member.list", kwargs=kwargs),
                         "active": request.resolver_match.view_name
                         == "public:memberpage:member.list",
                     }

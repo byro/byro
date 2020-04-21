@@ -49,8 +49,8 @@ class MailSpecialToFormClass(forms.ModelForm):
         self.fields[
             "to"
         ].required = (
-            False
-        )  # FIXME Needs to be re-added in case no special mode is active
+            False  # FIXME Needs to be re-added in case no special mode is active
+        )
         self.order_fields(["to_type", "to_member"])
 
     @staticmethod
