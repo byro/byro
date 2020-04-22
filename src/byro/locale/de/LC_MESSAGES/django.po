@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 12:15+0000\n"
-"PO-Revision-Date: 2019-06-18 14:17+0200\n"
+"POT-Creation-Date: 2020-04-22 00:14+0000\n"
+"PO-Revision-Date: 2020-04-22 02:17+0200\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.3\n"
 
 #: byro/bookkeeping/apps.py:10
 msgid "Receipt"
@@ -201,19 +201,15 @@ msgstr ""
 "Mitgliederseiten zu generieren. Leergelassen ist es dieselbe URL, die für "
 "diese Seite genutzt wird."
 
-#: byro/common/models/configuration.py:73
-msgid "Members can see other members"
-msgstr "Mitglieder können andere Mitglieder sehen"
-
-#: byro/common/models/configuration.py:81
+#: byro/common/models/configuration.py:75
 msgid "E-mail address used as sender"
 msgstr "Absenderadresse"
 
-#: byro/common/models/configuration.py:87
+#: byro/common/models/configuration.py:81
 msgid "E-mail address for notifications"
 msgstr "Adresse für Benachrichtigungen"
 
-#: byro/common/models/configuration.py:125
+#: byro/common/models/configuration.py:119
 msgid "General settings"
 msgstr "Allgemeine Einstellungen"
 
@@ -299,7 +295,7 @@ msgstr "Account ist deaktiviert."
 msgid "Miscellaneous document"
 msgstr "Sonstiges Dokument"
 
-#: byro/documents/apps.py:11 byro/office/templates/office/base.html:94
+#: byro/documents/apps.py:11 byro/office/templates/office/base.html:95
 #: byro/office/templates/office/member/timeline.html:176
 msgid "Registration form"
 msgstr "Beitrittsformular"
@@ -478,12 +474,12 @@ msgstr ""
 #: byro/office/templates/office/mails/sent_mails_part.html:5
 #: byro/office/templates/office/mails/templates.html:22
 #: byro/office/templates/office/member/data_disclosure.html:10
-#: byro/office/views/members.py:158
+#: byro/office/views/members.py:159
 msgid "Subject"
 msgstr "Betreff"
 
 #: byro/mails/models.py:20 byro/mails/models.py:115
-#: byro/office/views/members.py:160
+#: byro/office/views/members.py:161
 msgid "Text"
 msgstr "Text"
 
@@ -529,32 +525,32 @@ msgstr "CC"
 msgid "Sent at"
 msgstr "Verschickt"
 
-#: byro/members/models.py:138
+#: byro/members/models.py:144
 msgid "Membership number/ID"
 msgstr "Mitgliedsnummer"
 
-#: byro/members/models.py:144 byro/office/templates/office/account/list.html:20
+#: byro/members/models.py:150 byro/office/templates/office/account/list.html:20
 #: byro/office/templates/office/member/list.html:45
 #: byro/office/templates/office/upload/list.html:16
 #: byro/office/templates/office/user/list.html:18 byro/office/views/users.py:15
-#: byro/public/templates/public/members/memberlist.html:14
+#: byro/public/templates/public/members/memberlist.html:13
 msgid "Name"
 msgstr "Name"
 
-#: byro/members/models.py:147
-#: byro/public/templates/public/members/memberlist.html:17
+#: byro/members/models.py:153
+#: byro/public/templates/public/members/memberlist.html:16
 msgid "Address"
 msgstr "Adresse"
 
-#: byro/members/models.py:150 byro/office/templates/office/user/list.html:19
+#: byro/members/models.py:156 byro/office/templates/office/user/list.html:19
 msgid "E-Mail"
 msgstr "E-Mail-Adresse"
 
-#: byro/members/models.py:155
+#: byro/members/models.py:161
 msgid "Contact type"
 msgstr "Kontakt-Typ"
 
-#: byro/members/models.py:160
+#: byro/members/models.py:166
 #: byro/office/templates/office/account/detail.html:21
 #: byro/office/templates/office/mails/special_to_part.html:27
 #: byro/office/templates/office/transaction/detail.html:19
@@ -562,125 +558,125 @@ msgstr "Kontakt-Typ"
 msgid "Member"
 msgstr "Mitglied"
 
-#: byro/members/models.py:187
+#: byro/members/models.py:193
 msgid "Internal database ID"
 msgstr "Interne Datenbank-ID"
 
-#: byro/members/models.py:197
+#: byro/members/models.py:203
 msgid "Member active?"
 msgstr "Mitglied aktiv?"
 
-#: byro/members/models.py:207
+#: byro/members/models.py:213
 msgid "Account balance"
 msgstr "Kontostand"
 
-#: byro/members/models.py:240
+#: byro/members/models.py:246
 msgid "Current membership"
 msgstr "Aktuelle Mitgliedschaft"
 
-#: byro/members/models.py:455
+#: byro/members/models.py:461
 msgid "Due amount canceled because of change in membership amount"
 msgstr "Ausstehender Betrag durch Änderung des Mitgliedsbeitrags storniert"
 
-#: byro/members/models.py:464
+#: byro/members/models.py:470
 #: byro/office/templates/office/member/timeline.html:66
 msgid "Membership due"
 msgstr "Mitgliedsbeitrag fällig"
 
-#: byro/members/models.py:492
+#: byro/members/models.py:498
 msgid "Due amount outside of membership canceled"
 msgstr "Ausstehender Betrag außerhalb der Mitgliedschaft storniert"
 
-#: byro/members/models.py:520
+#: byro/members/models.py:526
 msgid "monthly"
 msgstr "monatlich"
 
-#: byro/members/models.py:521
+#: byro/members/models.py:527
 msgid "quarterly"
 msgstr "pro Quartal"
 
-#: byro/members/models.py:522
+#: byro/members/models.py:528
 msgid "biannually"
 msgstr "halbjährlich"
 
-#: byro/members/models.py:523
+#: byro/members/models.py:529
 msgid "annually"
 msgstr "jährlich"
 
-#: byro/members/models.py:528
+#: byro/members/models.py:534
 msgid "name"
 msgstr "Name"
 
-#: byro/members/models.py:532
+#: byro/members/models.py:538
 msgid "amount"
 msgstr "Betrag"
 
-#: byro/members/models.py:533
+#: byro/members/models.py:539
 msgid "Please enter the yearly fee for this membership type."
 msgstr "Bitte gib den Jahresbeitrag für diesen Beitragstyp ein."
 
-#: byro/members/models.py:543
+#: byro/members/models.py:549
 msgid "start"
 msgstr "Beginn"
 
-#: byro/members/models.py:544
+#: byro/members/models.py:550
 msgid "end"
 msgstr "Ende"
 
-#: byro/members/models.py:548
+#: byro/members/models.py:554
 #: byro/office/templates/office/member/dashboard.html:88
 #: byro/public/templates/public/members/dashboard.html:73
 msgid "membership fee"
 msgstr "Beitrag"
 
-#: byro/members/models.py:549
+#: byro/members/models.py:555
 msgid "The amount to be paid in the chosen interval"
 msgstr "Der Beitrag, der im angegebenen Intervall gezahlt werden soll"
 
-#: byro/members/models.py:553
+#: byro/members/models.py:559
 msgid "payment interval"
 msgstr "Intervall"
 
-#: byro/members/models.py:554
+#: byro/members/models.py:560
 msgid "How often does the member pay their fees?"
 msgstr "Wie oft soll das Mitglied zahlen?"
 
-#: byro/members/models.py:557
+#: byro/members/models.py:563
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
-#: byro/members/models.py:606
+#: byro/members/models.py:612
 msgid "Reference"
 msgstr "Referenznummer"
 
-#: byro/members/models.py:607
+#: byro/members/models.py:613
 msgid "For example an invoice number or a payment reference"
 msgstr "Beispielsweise eine Rechnungsnummer oder eine Zahlungsreferenz"
 
-#: byro/members/models.py:612
+#: byro/members/models.py:618
 #: byro/office/templates/office/member/finance_table.html:6
 #: byro/office/templates/office/realtransaction/list.html:28
 #: byro/office/templates/office/realtransaction/match.html:15
 msgid "Amount"
 msgstr "Betrag"
 
-#: byro/members/models.py:614
+#: byro/members/models.py:620
 msgid "Start"
 msgstr "Beginn"
 
-#: byro/members/models.py:615
+#: byro/members/models.py:621
 msgid "End"
 msgstr "Ende"
 
-#: byro/members/models.py:618
+#: byro/members/models.py:624
 msgid "paid"
 msgstr "bezahlt"
 
-#: byro/members/models.py:619
+#: byro/members/models.py:625
 msgid "partially paid"
 msgstr "teilweise bezahlt"
 
-#: byro/members/models.py:620
+#: byro/members/models.py:626
 msgid "unpaid"
 msgstr "nicht bezahlt"
 
@@ -811,7 +807,7 @@ msgid "Originator/Recipient"
 msgstr "Urheber/Empfänger"
 
 #: byro/office/templates/office/account/list.html:5
-#: byro/office/templates/office/base.html:144
+#: byro/office/templates/office/base.html:145
 msgid "Accounts"
 msgstr "Konten"
 
@@ -847,64 +843,64 @@ msgstr "Kontostand"
 msgid "Default"
 msgstr "Standard"
 
-#: byro/office/templates/office/base.html:70
+#: byro/office/templates/office/base.html:71
 msgid "Log in"
 msgstr "Anmelden"
 
-#: byro/office/templates/office/base.html:74
+#: byro/office/templates/office/base.html:75
 #: byro/office/templates/office/dashboard.html:4
 #: byro/office/templates/office/member/base.html:13
 #: byro/office/templates/office/member/dashboard.html:4
 msgid "Dashboard"
 msgstr "Überblick"
 
-#: byro/office/templates/office/base.html:80
+#: byro/office/templates/office/base.html:81
 #: byro/office/templates/office/settings/base.html:4
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: byro/office/templates/office/base.html:88
+#: byro/office/templates/office/base.html:89
 msgid "General"
 msgstr "Allgemeine Einstellungen"
 
-#: byro/office/templates/office/base.html:97
+#: byro/office/templates/office/base.html:98
 #: byro/office/templates/office/user/list.html:5
 msgid "Users"
 msgstr "Benutzer"
 
-#: byro/office/templates/office/base.html:115
+#: byro/office/templates/office/base.html:116
 msgid "Log"
 msgstr "Logbuch"
 
-#: byro/office/templates/office/base.html:121
+#: byro/office/templates/office/base.html:122
 msgid "About"
 msgstr "Über"
 
-#: byro/office/templates/office/base.html:126
+#: byro/office/templates/office/base.html:127
 msgid "Members"
 msgstr "Mitglieder"
 
-#: byro/office/templates/office/base.html:136
+#: byro/office/templates/office/base.html:137
 #: byro/office/templates/office/member/base.html:61
 #: byro/office/templates/office/member/finance.html:4
 msgid "Finance"
 msgstr "Finanzen"
 
-#: byro/office/templates/office/base.html:147
+#: byro/office/templates/office/base.html:148
 msgid "Transaction Upload"
 msgstr "Transaktions-Import"
 
-#: byro/office/templates/office/base.html:169
+#: byro/office/templates/office/base.html:170
 #: byro/office/templates/office/mails/base.html:4
 msgid "Mails"
 msgstr "E-Mails"
 
-#: byro/office/templates/office/base.html:205
+#: byro/office/templates/office/base.html:206
 #, python-format
 msgid "powered by <a %(a_attr)s>byro</a>"
 msgstr "powered by <a %(a_attr)s>byro</a>"
 
-#: byro/office/templates/office/base.html:210
+#: byro/office/templates/office/base.html:211
 msgid "running in development mode"
 msgstr "Entwicklungsmodus"
 
@@ -1058,7 +1054,7 @@ msgstr "Verschickt"
 #: byro/office/templates/office/mails/sent_mails_part.html:18
 #: byro/office/templates/office/mails/special_to_part.html:20
 #: byro/office/templates/office/member/list.html:31
-#: byro/office/views/mails.py:34 byro/office/views/members.py:253
+#: byro/office/views/mails.py:34 byro/office/views/members.py:254
 msgid "All members"
 msgstr "Alle Mitglieder"
 
@@ -1113,8 +1109,6 @@ msgstr "Erstellen"
 
 #: byro/office/templates/office/member/base.html:21
 #: byro/office/templates/office/member/timeline.html:6
-#: byro/office/templates/office/member/timeline_copy.html:5
-#: byro/office/templates/office/member/timeline_templ.html:5
 msgid "Timeline"
 msgstr "Zeitleiste"
 
@@ -1262,12 +1256,12 @@ msgid "Export member list"
 msgstr "Mitgliederliste exportieren"
 
 #: byro/office/templates/office/member/list.html:29
-#: byro/office/views/members.py:251
+#: byro/office/views/members.py:252
 msgid "Active members"
 msgstr "Aktive Mitglieder"
 
 #: byro/office/templates/office/member/list.html:30
-#: byro/office/views/members.py:252
+#: byro/office/views/members.py:253
 msgid "Only inactive members"
 msgstr "Inaktive Mitglieder"
 
@@ -1456,17 +1450,27 @@ msgstr "version %(byro_version)s"
 
 #: byro/office/templates/office/settings/about.html:20
 msgid ""
-"<p>byro is free software released under the FIXME license.</p> <p>Originally "
-"written by Tobias Kunze (<a href=\"https://github.com/rixx\"><i class=\"fa "
-"fa-github\"></i> rixx</a>), with contributions by Henryk Plötz (<a href="
-"\"https://github.com/henryk\"><i class=\"fa fa-github\"></i> henryk</a>), "
-"luto (<a href=\"https://github.com/luto\"><i class=\"fa fa-github\"></i> "
-"luto</a>), Andreas Madsack (<a href=\"https://github.com/mfa\"><i class=\"fa "
-"fa-github\"></i> mfa</a>), and <a href=\"https://github.com/byro/byro/graphs/"
-"contributors\">several others</a>.</p> <p>The byro logo was graciously "
-"provided by Markus Kempken (<a href=\"http://enigmation.de\">enigmation.de</"
-"a>).</p>"
+"<p>byro is free software released under the Apache license.</p> "
+"<p>Originally written by Tobias Kunze (<a href=\"https://github.com/rixx"
+"\"><i class=\"fa fa-github\"></i> rixx</a>), with contributions by Henryk "
+"Plötz (<a href=\"https://github.com/henryk\"><i class=\"fa fa-github\"></i> "
+"henryk</a>), luto (<a href=\"https://github.com/luto\"><i class=\"fa fa-"
+"github\"></i> luto</a>), Andreas Madsack (<a href=\"https://github.com/mfa"
+"\"><i class=\"fa fa-github\"></i> mfa</a>), and <a href=\"https://github.com/"
+"byro/byro/graphs/contributors\">several others</a>.</p> <p>The byro logo was "
+"graciously provided by Markus Kempken (<a href=\"http://enigmation.de"
+"\">enigmation.de</a>).</p>"
 msgstr ""
+"<p>byro ist freie Software, die gemäß der Apache-Lizenz veröffentlicht wird."
+"</p> <p>Ursprünglich geschrieben von Tobias Kunze (<a href=\"https://github."
+"com/rixx\"><i class=\"fa fa-github\"></i> rixx</a>), mit Beiträgen von "
+"Henryk Plötz (<a href=\"https://github.com/henryk\"><i class=\"fa fa-github"
+"\"></i> henryk</a>), luto (<a href=\"https://github.com/luto\"><i class=\"fa "
+"fa-github\"></i> luto</a>), Andreas Madsack (<a href=\"https://github.com/mfa"
+"\"><i class=\"fa fa-github\"></i> mfa</a>), und <a href=\"https://github.com/"
+"byro/byro/graphs/contributors\">weiteren</a>.</p> <p>Das byro-Logo wurde von "
+"Markus Kempken (<a href=\"http://enigmation.de\">enigmation.de</a>) erstellt."
+"</p>"
 
 #: byro/office/templates/office/settings/about.html:40
 msgid "Installed plugins"
@@ -1601,7 +1605,7 @@ msgstr ""
 "wenn nötig."
 
 #: byro/office/views/accounts.py:90 byro/office/views/mails.py:108
-#: byro/office/views/members.py:751
+#: byro/office/views/members.py:754
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
 
@@ -1658,35 +1662,35 @@ msgstr "Die Mail wurde verschickt."
 msgid "No mail has been sent."
 msgstr "Keine Mail wurde verschickt."
 
-#: byro/office/views/members.py:136
+#: byro/office/views/members.py:137
 #, python-brace-format
 msgid "Generated {count} data disclosure emails and placed them in the outbox."
 msgstr "{count} Datenbriefe wurden erstellt und in den Postausgang gelegt."
 
-#: byro/office/views/members.py:143
+#: byro/office/views/members.py:144
 msgid "Start of balance timeframe"
 msgstr "Beginn des Bilanzzeitraums"
 
-#: byro/office/views/members.py:144
+#: byro/office/views/members.py:145
 msgid "End of balance timeframe"
 msgstr "Ende des Bilanzzeitraums"
 
-#: byro/office/views/members.py:146
+#: byro/office/views/members.py:147
 msgid "Create balances even if there was no payment due in the time chosen?"
 msgstr ""
 "Abschluss erstellen, auch wenn in dem Zeitfenster keine Zahlung fällig wurde?"
 
-#: byro/office/views/members.py:152
+#: byro/office/views/members.py:153
 msgid "Balance cutoff"
 msgstr "Erinnerungs-Minimum"
 
-#: byro/office/views/members.py:154
+#: byro/office/views/members.py:155
 msgid "Only members with a deficit greater than this will receive an email."
 msgstr ""
 "Nur Mitglieder mit einem ausstehenden Beitrag oberhalb dieser Grenze werden "
 "eine Mail erhalten."
 
-#: byro/office/views/members.py:162
+#: byro/office/views/members.py:163
 #, python-brace-format
 msgid ""
 "Hello {name},\n"
@@ -1709,15 +1713,15 @@ msgstr ""
 "zu zahlen. Bitte hole dies so bald wie möglich nach, oder lass\n"
 "uns wissen, wenn diese Erinnerung irrtümlich versandt wurde."
 
-#: byro/office/views/members.py:187
+#: byro/office/views/members.py:188
 msgid "End must be in the past!"
 msgstr "Das Ende muss in der Vergangenheit liegen!"
 
-#: byro/office/views/members.py:189
+#: byro/office/views/members.py:190
 msgid "Start must be before end!"
 msgstr "Der Start muss vor dem Ende liegen!"
 
-#: byro/office/views/members.py:230
+#: byro/office/views/members.py:231
 #, python-brace-format
 msgid ""
 "{balance_count} balances were created and {mail_count} reminder emails were "
@@ -1726,7 +1730,7 @@ msgstr ""
 "{balance_count} Abschlüsse wurden erstellt und {mail_count} "
 "Zahlungserinnerungen wurden in den Postausgang gelegt."
 
-#: byro/office/views/members.py:236
+#: byro/office/views/members.py:237
 #, python-brace-format
 msgid ""
 "{errors} balances could not be created due to errors. Presumably, these "
@@ -1736,74 +1740,74 @@ msgstr ""
 "lagen für diese Mitglieder bereits Zahlungsaufforderungen in einem "
 "überlappenden Zeitraum vor."
 
-#: byro/office/views/members.py:258
+#: byro/office/views/members.py:259
 msgid "CSV (Comma Separated Values)"
 msgstr "CSV (Komma-Separierte Werte)"
 
-#: byro/office/views/members.py:259
+#: byro/office/views/members.py:260
 msgid "CSV (Semicolon Separated Values, German Windows versions)"
 msgstr "CSV (Semikolon-Separierte Werte, deutsche Windows-Versionen)"
 
-#: byro/office/views/members.py:478
+#: byro/office/views/members.py:479
 msgid "Couldn't map input column '{}' to field"
 msgstr "Konnte die Eingangsspalte '{}' keinem Datenbank-Feld zuordnen"
 
-#: byro/office/views/members.py:535
+#: byro/office/views/members.py:538
 msgid "Generic CSV import (Comma Separated Values)"
 msgstr "Generischer CSV-Import (Komma-Separierte Werte)"
 
-#: byro/office/views/members.py:545
+#: byro/office/views/members.py:548
 msgid ""
 "Generic CSV import (Semicolon Separated Values, German Windows versions)"
 msgstr ""
 "Generischer CSV-Import (Semikolon-Separierte Werte, deutsche Windows-"
 "Versionen)"
 
-#: byro/office/views/members.py:564
+#: byro/office/views/members.py:567
 msgid "The member was added, please edit additional details if applicable."
 msgstr ""
 "Das Mitglied wurde gespeichert, bitte füge zusätzliche Informationen hinzu, "
 "wenn nötig."
 
-#: byro/office/views/members.py:573 byro/office/views/members.py:1080
+#: byro/office/views/members.py:576 byro/office/views/members.py:1081
 msgid "Some post processing steps could not be completed: "
 msgstr ""
 "Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht durchgeführt "
 "werden: "
 
-#: byro/office/views/members.py:847 byro/office/views/members.py:967
+#: byro/office/views/members.py:848 byro/office/views/members.py:968
 msgid "Adjust member account balance"
 msgstr "Mitgliedskontostand korrigieren"
 
-#: byro/office/views/members.py:851
+#: byro/office/views/members.py:852
 msgid "Initial balance"
 msgstr "Anfangssaldo"
 
-#: byro/office/views/members.py:851
+#: byro/office/views/members.py:852
 msgid "Fees waived"
 msgstr "Mitgliedsbeiträge erlassen"
 
-#: byro/office/views/members.py:857
+#: byro/office/views/members.py:858
 msgid "Relative (Add or subtract amount to/from balance)"
 msgstr "Relativ (Betrag abziehen oder aufaddieren)"
 
-#: byro/office/views/members.py:858
+#: byro/office/views/members.py:859
 msgid "Absolute (Balance should be)"
 msgstr "Absolut (Sollbetrag eingeben)"
 
-#: byro/office/views/members.py:954 byro/office/views/members.py:956
+#: byro/office/views/members.py:955 byro/office/views/members.py:957
 msgid "End membership"
 msgstr "Mitgliedschaft beenden"
 
-#: byro/office/views/members.py:969
+#: byro/office/views/members.py:970
 msgid "Adjust balance"
 msgstr "Saldo korrigieren"
 
-#: byro/office/views/members.py:983
+#: byro/office/views/members.py:984
 msgid "Account adjustment"
 msgstr "Kontenkorrektur"
 
-#: byro/office/views/members.py:1017
+#: byro/office/views/members.py:1018
 msgid ""
 "Fee waiving needs to decrease debts. Use a negative value in relative mode, "
 "or a value higher than the current one in absolute mode."
@@ -1812,13 +1816,13 @@ msgstr ""
 "im relativen Modus oder einen Wert, der höher ist als der aktuelle, im "
 "absoluten Modus."
 
-#: byro/office/views/members.py:1054
+#: byro/office/views/members.py:1055
 #, python-brace-format
 msgid "Membership account adjusted by {amount}, current balance is {balance}"
 msgstr ""
 "Mitgliedskonto korrigiert um {amount}, Aktueller Kontostand ist {balance}"
 
-#: byro/office/views/members.py:1069
+#: byro/office/views/members.py:1070
 msgid ""
 "The membership has been terminated. Please check the outbox for the "
 "notifications."
@@ -1826,7 +1830,7 @@ msgstr ""
 "Die Mitgliedschaft wurde beendet. Bitte sieh dir die Benachrichtigungsmails "
 "im Postausgang an."
 
-#: byro/office/views/members.py:1158
+#: byro/office/views/members.py:1159
 msgid "The email was generated and can be sent in the outbox."
 msgstr ""
 "Die E-Mail wurde erstellt und kann jetzt im Postausgang versendet werden."
@@ -1877,7 +1881,7 @@ msgstr "Allgemeine Informationen"
 
 #: byro/plugins/sepa/models.py:14
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: byro/plugins/sepa/models.py:15
 msgid "No IBAN"
@@ -1892,50 +1896,54 @@ msgid "No BIC"
 msgstr "Kein BIC"
 
 #: byro/plugins/sepa/models.py:18
+msgid "Invalid BIC"
+msgstr "Ungültige BIC"
+
+#: byro/plugins/sepa/models.py:19
 msgid "Debit bounced"
 msgstr "Lastschrift zurückgegangen"
 
-#: byro/plugins/sepa/models.py:19
+#: byro/plugins/sepa/models.py:20
 msgid "Mandate rescinded"
 msgstr "Mandat zurückgezogen"
 
-#: byro/plugins/sepa/models.py:20
+#: byro/plugins/sepa/models.py:21
 msgid "Direct debit deactivated"
 msgstr "Lastschrift deaktiviert"
 
-#: byro/plugins/sepa/models.py:21
+#: byro/plugins/sepa/models.py:22
 msgid "No mandate reference"
 msgstr "Keine Mandatsreferenz"
 
-#: byro/plugins/sepa/models.py:35
+#: byro/plugins/sepa/models.py:36
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: byro/plugins/sepa/models.py:36
+#: byro/plugins/sepa/models.py:37
 msgid "Active"
 msgstr "Aktiv"
 
-#: byro/plugins/sepa/models.py:37
+#: byro/plugins/sepa/models.py:38
 msgid "Bounced"
 msgstr "Zurückgegangen"
 
-#: byro/plugins/sepa/models.py:38
+#: byro/plugins/sepa/models.py:39
 msgid "Rescinded"
 msgstr "Zurückgezogen"
 
-#: byro/plugins/sepa/models.py:41
+#: byro/plugins/sepa/models.py:45
 msgid "Mandate state"
 msgstr "Mandatszustand"
 
-#: byro/plugins/sepa/models.py:45
+#: byro/plugins/sepa/models.py:49
 msgid "IBAN Institute"
 msgstr "IBAN-Institut"
 
-#: byro/plugins/sepa/models.py:51
+#: byro/plugins/sepa/models.py:55
 msgid "IBAN Issue Date"
 msgstr "IBAN-Ausstellungsdatum"
 
-#: byro/plugins/sepa/models.py:52
+#: byro/plugins/sepa/models.py:57
 msgid ""
 "The issue date of the direct debit mandate. (1970-01-01 means there is no "
 "issue date in the database )"
@@ -1943,47 +1951,47 @@ msgstr ""
 "Das Ausstellungsdatum des Lastschriftmandats. (1970-01-01 bedeutet, dass es "
 "kein Ausstellungsdatum in der Datenbank gibt)"
 
-#: byro/plugins/sepa/models.py:59
+#: byro/plugins/sepa/models.py:65
 msgid "IBAN full name"
 msgstr "Vollständiger Name zur IBAN"
 
-#: byro/plugins/sepa/models.py:60
+#: byro/plugins/sepa/models.py:66
 msgid "Full name for IBAN account owner"
 msgstr "Voller Name für den IBAN-Kontoinhaber"
 
-#: byro/plugins/sepa/models.py:67
+#: byro/plugins/sepa/models.py:73
 msgid "IBAN address"
 msgstr "IBAN-Adresse"
 
-#: byro/plugins/sepa/models.py:68
+#: byro/plugins/sepa/models.py:74
 msgid "Address line (e.g. Street / House Number)"
 msgstr "Adresszeile (z.B. Straße/Hausnummer)"
 
-#: byro/plugins/sepa/models.py:75
+#: byro/plugins/sepa/models.py:81
 msgid "IBAN zip code"
 msgstr "IBAN-PLZ"
 
-#: byro/plugins/sepa/models.py:76
+#: byro/plugins/sepa/models.py:82
 msgid "ZIP Code"
 msgstr "Postleitzahl"
 
-#: byro/plugins/sepa/models.py:80
+#: byro/plugins/sepa/models.py:86
 msgid "IBAN City"
 msgstr "IBAN-Stadt"
 
-#: byro/plugins/sepa/models.py:88
+#: byro/plugins/sepa/models.py:94
 msgid "IBAN Country"
 msgstr "IBAN-Land"
 
-#: byro/plugins/sepa/models.py:92
+#: byro/plugins/sepa/models.py:98
 msgid "IBAN Mandate Reference"
 msgstr "IBAN-Mandatsreferenz"
 
-#: byro/plugins/sepa/models.py:96
+#: byro/plugins/sepa/models.py:102
 msgid "IBAN Mandate Reason"
-msgstr ""
+msgstr "IBAN-Mandatsgrund"
 
-#: byro/plugins/sepa/models.py:99
+#: byro/plugins/sepa/models.py:105
 msgid "SEPA information"
 msgstr "SEPA-Informationen"
 
@@ -2047,28 +2055,28 @@ msgstr "Einstellungen zu Mitgliederseiten"
 msgid "Consent: Visible to other members"
 msgstr "Zustimmung: Sichtbar für andere Mitglieder"
 
-#: byro/public/signals.py:32 byro/public/templates/public/members/base.html:6
+#: byro/public/signals.py:30 byro/public/templates/public/members/base.html:6
 #: byro/public/templates/public/members/dashboard.html:5
 msgid "Member page"
 msgstr "Mitgliedsseite"
 
-#: byro/public/signals.py:48
+#: byro/public/signals.py:42
 #: byro/public/templates/public/members/memberlist.html:4
 #: byro/public/templates/public/members/memberlist.html:5
 msgid "Member list"
 msgstr "Mitgliederliste"
 
-#: byro/public/signals.py:64
+#: byro/public/signals.py:56
 #, python-brace-format
 msgid "Your personal member page is at {link}"
 msgstr "Deine persönliche Mitgliedsseite ist hier: {link}"
 
-#: byro/public/signals.py:73
+#: byro/public/signals.py:65
 #, python-brace-format
 msgid "Their personal member page is at {link}"
 msgstr "Die persönliche Mitgliedsseite ist hier: {link}"
 
-#: byro/public/signals.py:84
+#: byro/public/signals.py:76
 msgid "Public profile"
 msgstr "Öffentliches Profil"
 
@@ -2133,28 +2141,29 @@ msgstr "Beigetreten am %(start)s"
 msgid "No current active membership"
 msgstr "Keine aktive Mitgliedschaft"
 
-#: byro/public/templates/public/members/dashboard.html:120
+#: byro/public/templates/public/members/dashboard.html:118
 msgid "Membership history"
 msgstr "Mitgliedschaftsverlauf"
 
-#: byro/public/templates/public/members/dashboard.html:132
+#: byro/public/templates/public/members/dashboard.html:130
 msgid "Finance details"
 msgstr "Finanzdetails"
 
-#: byro/public/templates/public/members/memberlist.html:16
+#: byro/public/templates/public/members/memberlist.html:15
 msgid "E-mail"
 msgstr "E-Mail"
 
-#: byro/public/templates/public/members/memberlist.html:34
+#: byro/public/templates/public/members/memberlist.html:33
 msgid "Currently no members have consented to their information being shared."
 msgstr "Derzeit haben keine Mitglieder ihre Stammdaten freigegeben."
 
-#: byro/public/templates/public/members/memberlist.html:43
-#, python-format
+#: byro/public/templates/public/members/memberlist.html:41
 msgid ""
-"Another %(count)s members have not consented to their information being "
-"shared."
-msgstr "Weitere %(count)s Mitglieder haben ihre Stammdaten nicht freigegeben."
+"This list is not complete, as some members have not consented to their "
+"information being shared."
+msgstr ""
+"Diese Liste ist nicht vollständig, da manche Mitglieder der Anzeige ihrer "
+"Daten nicht zugestimmt haben."
 
 #: byro/settings.py:205
 msgid "English"
@@ -2163,6 +2172,9 @@ msgstr "Englisch"
 #: byro/settings.py:205
 msgid "German"
 msgstr "Deutsch"
+
+#~ msgid "Members can see other members"
+#~ msgstr "Mitglieder können andere Mitglieder sehen"
 
 #~ msgid "The email was created successfully. Go to our outbox to send it."
 #~ msgstr ""

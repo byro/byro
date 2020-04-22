@@ -38,8 +38,8 @@ Currently no members have consented to their information being shared.
 {% include "office/pagination.html" %}
 
 {% if member_undisclosed and members %}
-<div class="alert alert-secondary">{% blocktrans with count=member_undisclosed trimmed %}
-Another {{count}} members have not consented to their information being shared.
+<div class="alert alert-secondary">{% blocktrans with trimmed %}
+This list is not complete, as some members have not consented to their information being shared.
 {% endblocktrans %}</div>
 {% endif %}
 
