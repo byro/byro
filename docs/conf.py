@@ -106,4 +106,8 @@ texinfo_documents = [
 locale_dirs = ['locale']
 gettext_compact = False
 
-linkcheck_ignore = [r'http://localhost.*', 'https://byro.yourdomain.com/']
+linkcheck_ignore = [
+    r'http://localhost.*',
+    'https://byro.yourdomain.com/',
+    'https://github.com/byro/byro/issues/new',  # Redirects to login page
+]
