@@ -625,7 +625,7 @@ class MemberDashboardView(MemberView):
         delta = now().date() - first
         context["member_since"] = {
             "days": int(delta.total_seconds() / (60 * 60 * 24)),
-            "years": round(delta.days / 365, 1),
+            "years": int(round(delta.days / 365, 1)),
             "first": first,
         }
         context["current_membership"] = {

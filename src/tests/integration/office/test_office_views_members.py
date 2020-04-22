@@ -84,7 +84,7 @@ def test_members_export_list_csv(member, membership, inactive_member, logged_in_
     )
     content = b"".join(response.streaming_content).decode()
     assert response.status_code == 200, content
-    assert content == "\ufeffInternal database ID,Name\r\n{},{}\r\n{},{}\r\n".format(
+    assert content == "\ufeffInterne Datenbank-ID,Name\r\n{},{}\r\n{},{}\r\n".format(
         inactive_member.pk, inactive_member.name, member.pk, member.name
     )
 
