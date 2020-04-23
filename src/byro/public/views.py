@@ -15,12 +15,7 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration, MemberViewLevel
 from byro.members.models import Member
 from byro.office.signals import member_dashboard_tile
-
-
-class MemberConsentForm(forms.Form):
-    is_visible_to_members = forms.BooleanField(
-        label=_("Consent: Visible to other members"), required=False
-    )
+from byro.public.forms import PrivacyConsentForm
 
 
 class MemberBaseView(DetailView):
@@ -30,8 +25,9 @@ class MemberBaseView(DetailView):
     model = Member
 
 
-class MemberView(MemberBaseView):
+class MemberView(FormMixin, MemberBaseView):
     template_name = "public/members/dashboard.html"
+    form_class = PrivacyConsentForm
 
     def get_bookings(self, member):
         account_list = [SpecialAccounts.donations, SpecialAccounts.fees_receivable]
@@ -59,6 +55,13 @@ class MemberView(MemberBaseView):
         if not memberships:
             return context
 
+        member_fields = obj.get_fields()
+        for field in context["form"]:
+            field.meta = (
+                member_fields[field.name].getter(obj)
+                if field.name in member_fields
+                else ""
+            ) or ""
         first = memberships[0].start
         delta = timedelta()
         for ms in memberships:
@@ -81,9 +84,10 @@ class MemberView(MemberBaseView):
                 context["tiles"].append(response)
         return context
 
-
-class MemberUpdateView(MemberBaseView, FormMixin):
-    form_class = MemberConsentForm
+    def get_form_kwargs(self, *args, **kwargs):
+        result = super().get_form_kwargs(*args, **kwargs)
+        result["member"] = self.get_object()
+        return result
 
     def get_success_url(self):
         return reverse(
@@ -95,10 +99,7 @@ class MemberUpdateView(MemberBaseView, FormMixin):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
-            self.object.profile_memberpage.is_visible_to_members = form.cleaned_data[
-                "is_visible_to_members"
-            ]
-            self.object.profile_memberpage.save()
+            form.save()
         return HttpResponseRedirect(self.get_success_url())
 
 

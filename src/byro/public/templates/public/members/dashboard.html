@@ -1,28 +1,17 @@
 {% extends "public/members/base.html" %}
 {% load i18n %}
+{% load bootstrap4 %}
 
 
 {% block title %}{% blocktrans %}Member page{% endblocktrans %}{% endblock %}
 {% block headline %}
 {% blocktrans with name=member.name %}Personal member page of {{ name }}{% endblocktrans %}
-</h1><div class="alert alert-info d-flex mt-4">
-        <form method="POST" action="{% url 'public:memberpage:member.update' secret_token=member.profile_memberpage.secret_token %}" class="d-flex justify-content-between w-100 align-items-center">
-            {% csrf_token %}
-            {% if member.profile_memberpage.is_visible_to_members %}
-            <span>{% trans "Your profile is visible to other members." %}</span>
-            <button type="submit" name="disable_consent" class="btn btn-secondary"><i class="fa fa-eye-slash"></i> {% trans 'Revoke consent' %}</button>
-            {% else %}
-            <span>{% trans "You are currently not visible to other members." %}</span>
-            <input type="hidden" id="id_is_visible_to_members" name="is_visible_to_members" value="1">
-            <button type="submit" name="enable_consent" class="btn btn-success btn-inline"><i class="fa fa-eye"></i> {% trans 'I hereby consent that other members may see my information in the member list' %}</button>
-            {% endif %}
-        </form>
-</div><h1>
 {% endblock %}
 
 {% block public_content %}
 {% with is_active=member.is_active %}
 
+<form method="post">
 <div class="dashboard-list">
     <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
         <h1>
@@ -106,13 +95,43 @@
         {% endif %}
     </div>
     <div class="card-body">
-        <p class="card-text">{{member.email}}</p>
-        <address class="card-text" style="white-space: pre">{{member.address}}</address>
+        <p>{% blocktrans trimmed %}
+        Hier können Sie einwilligen, dass Teile Ihrer Stammdaten anderen Mitgliedern in der Mitgliedsliste zugänglich werden.
+        Nur Daten, die Sie auch explizit anhaken werden anderen Mitgliedern gezeigt.
+        {% endblocktrans %}</p>
+        <div class="ml-3">
+        <p>
+        {% bootstrap_field form.is_visible_to_members layout="inline" %}
+        </p>
+        </div>
+            {% csrf_token %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Datenfeld" %}</th>
+                        <th>{% trans "Datensatz" %}</th>
+                        <th>{% trans "Einwilligung zur Veröffentlichung" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for field in form %}{% if field.name != "is_visible_to_members" %}
+                    <tr>
+                        <td>{{ field.label }}</td>
+                        <td>{{ field.meta }}</td>
+                        <td>{{ field }}</td>
+                    </tr>
+                {% endif %}{% endfor %}
+                </tbody>
+            </table>
+
     </div>
     <div class="card-footer text-right">
-        {# save visibility changes #}
+        <p class="d-flex">
+        <button type="submit" class="btn btn-lg btn-primary ml-auto">{% trans "Save" %}</button>
+        </p>
     </div>
 </div>
+</form>
 
 {% endwith %}
 <h4 class="mt-4">{% trans "Membership history" %}</h4>

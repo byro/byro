@@ -4,7 +4,6 @@ from . import views
 
 member_pages = [
     url(r"^$", views.MemberView.as_view(), name="member.dashboard"),
-    url(r"^update$", views.MemberUpdateView.as_view(), name="member.update"),
     url(r"^list$", views.MemberListView.as_view(), name="member.list"),
 ]
 
