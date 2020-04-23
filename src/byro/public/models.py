@@ -46,3 +46,15 @@ class MemberpageProfile(models.Model):
             return urljoin(config.public_base_url, relative_url)
         else:
             return relative_url
+
+    def get_public_data(self):
+        result = []
+        if not self.is_visible_to_members or not self.publication_consent:
+            return result
+        all_fields = self.member.get_fields()
+        for key, value in self.publication_consent.get("fields", {}).items():
+            if not value.get("visibility") == "share" or key not in all_fields:
+                continue
+            field = all_fields[key]
+            result.append({"label": field.name, "value": field.getter(self.member)})
+        return result

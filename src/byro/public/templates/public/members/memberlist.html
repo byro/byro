@@ -7,28 +7,21 @@
 {% block public_content %}
 
 {% if members %}
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th>{% trans "Name" %}</th>
-            {% if config.can_see_other_members == member_view_level.NAME_AND_CONTACT %}
-                <th>{% trans "E-mail" %}</th>
-                <th>{% trans "Address" %}</th>
-            {% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for member in members %}
-            <tr>
-                <td>{{member.name}}</td>
-                {% if config.can_see_other_members == member_view_level.NAME_AND_CONTACT %}
-                    <td>{{ member.email }}</td>
-                    <td><address style="white-space: pre">{{member.address}}</address></td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    {% for member in members %}
+        <div class="card">
+            <h5 class="card-header">{{ member.name }}</h5>
+            <div class="card-body">
+                <table class="table table-condensed">
+                    {% for line in member.profile_memberpage.get_public_data %}
+                    <tr>
+                        <th>{{ line.label }}</th>
+                        <td>{{ line.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% endfor %}
 {% else %}
 <div class="alert alert-primary">{% blocktrans trimmed %}
 Currently no members have consented to their information being shared.
@@ -38,7 +31,7 @@ Currently no members have consented to their information being shared.
 {% include "office/pagination.html" %}
 
 {% if member_undisclosed and members %}
-<div class="alert alert-secondary">{% blocktrans with trimmed %}
+<div class="alert alert-secondary">{% blocktrans trimmed %}
 This list is not complete, as some members have not consented to their information being shared.
 {% endblocktrans %}</div>
 {% endif %}
