@@ -39,8 +39,10 @@ class PrivacyConsentForm(forms.Form):
                 required=False,
                 label=value.name,
                 initial=self.member.profile_memberpage.publication_consent.get(
-                    key, {}
-                ).get("visibility"),
+                    "fields", {}
+                )
+                .get(key, {})
+                .get("visibility"),
             )
 
     def save(self):
