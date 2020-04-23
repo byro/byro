@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 class PrivacyConsentForm(forms.Form):
     is_visible_to_members = forms.BooleanField(
         label=_(
-            "Ja, meine Stammdaten dürfen in der Mitgliedsliste anderen Mitgliedern gezeigt werden."
+            "Yes, my data may be shown in the member list, where it will be visible to other members."
         ),
         required=False,
     )
