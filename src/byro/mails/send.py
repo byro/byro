@@ -6,6 +6,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import override
 from i18nfield.strings import LazyI18nString
+from inlinestyler.utils import inline_css
 
 from byro.common.models import Configuration
 
@@ -74,6 +75,7 @@ def mail_send_task(
     subject: str,
     body: str,
     sender: str,
+    html: str = None,
     cc: list = None,
     bcc: list = None,
     headers: dict = None,
@@ -82,6 +84,8 @@ def mail_send_task(
     email = EmailMultiAlternatives(
         subject, body, sender, to=to, cc=cc, bcc=bcc, headers=headers
     )
+    if html is not None:
+        email.attach_alternative(inline_css(html), "text/html")
     if attachments:
         from byro.documents.models import Document
 

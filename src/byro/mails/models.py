@@ -167,18 +167,20 @@ class EMail(Auditable, models.Model):
                     .exclude(email="")
                     .all()
                 ):
-                    send_tos.append([member.email])
+                    send_tos.append(member)
                     self.members.add(member)
 
             else:
                 to_addrs = self.to.split(",")
-                send_tos.append(to_addrs)
-
                 for addr in to_addrs:
-                    for member in Member.all_objects.filter(
+                    member = Member.all_objects.filter(
                         email__iexact=addr.lower()
-                    ).all():
+                    ).first()
+                    if member:
+                        send_tos.append(member)
                         self.members.add(member)
+                    else:
+                        send_tos.append(addr)
 
             headers = {}
             if self.reply_to:
@@ -186,11 +188,22 @@ class EMail(Auditable, models.Model):
 
             from byro.mails.send import mail_send_task
 
-            for to_addrs in send_tos:
+            for addr in send_tos:
+                body = self.text
+                if isinstance(addr, Member):
+                    signature = _(
+                        "You are receiving this email due to your membership in {name}."
+                    ).format(name=config.name)
+                    signature += "\n"
+                    signature += _(
+                        "You can see your member page at this URL: {url}"
+                    ).format(url=addr.profile_memberpage.get_url())
+                    body += "\n\n-- \n" + signature
+                    addr = member.email
                 mail_send_task(
-                    to=to_addrs,
+                    to=[addr],
                     subject=self.subject,
-                    body=self.text,
+                    body=body,
                     sender=config.mail_from,
                     cc=(self.cc or "").split(","),
                     bcc=(self.bcc or "").split(","),

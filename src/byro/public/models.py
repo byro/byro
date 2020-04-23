@@ -2,6 +2,7 @@ import string
 from urllib.parse import urljoin
 
 from annoying.fields import AutoOneToOneField
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
@@ -45,7 +46,7 @@ class MemberpageProfile(models.Model):
         if config.public_base_url:
             return urljoin(config.public_base_url, relative_url)
         else:
-            return relative_url
+            return urljoin(settings.SITE_URL, relative_url)
 
     def get_public_data(self):
         result = []
