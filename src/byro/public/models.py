@@ -29,7 +29,11 @@ class MemberpageProfile(models.Model):
         to="members.Member", on_delete=models.CASCADE, related_name="profile_memberpage"
     )
     secret_token = models.CharField(
-        max_length=128, null=True, blank=True, default=generate_default_token
+        max_length=128,
+        null=True,
+        blank=True,
+        default=generate_default_token,
+        unique=True,
     )
     is_visible_to_members = models.BooleanField(
         default=False, verbose_name=_("Consent: Visible to other members")
