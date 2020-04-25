@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -141,6 +141,7 @@ class EMail(Auditable, models.Model):
                 self.members.add(member)
                 self.save(update_fields=["to"])
 
+    @transaction.atomic
     def send(self):
         if self.sent:
             raise Exception("This mail has been sent already. It cannot be sent again.")
@@ -199,7 +200,7 @@ class EMail(Auditable, models.Model):
                         "You can see your member page at this URL: {url}"
                     ).format(url=addr.profile_memberpage.get_url())
                     body += "\n\n-- \n" + signature
-                    addr = member.email
+                    addr = addr.email
                 mail_send_task(
                     to=[addr],
                     subject=self.subject,
