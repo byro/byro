@@ -123,3 +123,5 @@ transaction_uploads/
 .pytest_cache/
 data/
 *.sql*
+
+byro.cfg
