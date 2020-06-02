@@ -51,8 +51,8 @@ session::
 
 You should now see a ``(env)`` prepended to your shell prompt. You have to do this in every shell
 you use to work with byro (or configure your shell to do so automatically). If you are working on
-Ubuntu or Debian, we strongly recommend upgrading your pip and setuptools installation inside the
-virtual environment, otherwise some of the dependencies might fail::
+Ubuntu or Debian, we strongly recommend upgrading your ``pip`` and ``setuptools`` installation
+inside the virtual environment, otherwise some of the dependencies might fail::
 
     (env)$ pip3 install -U pip setuptools wheel
 
@@ -64,7 +64,7 @@ The first thing you need are all the main application's dependencies::
     (env)$ cd src/
     (env)$ pip3 install -e .
 
-.. note:: (Windows only) If you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
+.. note:: Under Windows, if you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
 
 Next, if you have custom database settings or other settings you need, make a new
 file ``byro.cfg`` with contents like these::
