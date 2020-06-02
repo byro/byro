@@ -67,22 +67,19 @@ The first thing you need are all the main application's dependencies::
 .. note:: (Windows only) If you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
 
 Next, if you have custom database settings or other settings you need, make a new
-file ``byro/local_settings.py`` with contents like these::
+file ``byro.cfg`` with contents like these::
 
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'byro',
-            'USER': 'byro',
-            'PASSWORD': 'byro',
-            'HOST': 'localhost',
-        }
-    }
+    [database]
+    name = byro
+    user = byro
+    password = byro
+    host = localhost
+    port = 5432
 
-(The default -- and recommended -- installation uses PostgreSQL "Peer Authentication", in which the
+The default -- and recommended -- installation uses PostgreSQL "Peer Authentication", in which the
 Unix user is mapped to the Postgres database user. This works only for local connections, and only
 on Linux, most BSDs, OS X, and Solaris, but provides the highest level of security and the least
-amount of configuration. In this mode the keys ``USER``, ``PASSWORD``, and ``HOST`` MUST NOT be set.)
+amount of configuration. In this mode the keys ``user``, ``password``, and ``host`` MUST be omitted.
 
 Then, create the local database::
 
