@@ -42,13 +42,13 @@ cmdclass = {"build": CustomBuild}
 setup(
     name="byro",
     version=byro_version,
+    license="Apache License 2.0",
     python_requires=">=3.5",
     description="Membership and fees management for associations, clubs and groups",
     long_description=long_description,
     url="https://byro.cloud",
     author="Tobias Kunze",
     author_email="r@rixx.de",
-    license="Apache License 2.0",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
@@ -108,5 +108,6 @@ setup(
     },
     packages=find_packages(exclude=["tests", "tests.*"]),
     include_package_data=True,
+    zip_safe=False,
     cmdclass=cmdclass,
 )
