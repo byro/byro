@@ -24,7 +24,7 @@ is still a work in progress, it is already usable and in active use.
 .. image:: docs/img/screenshots/office_dashboard.png
 
 Development and Production Setup
------------------
+--------------------------------
 
 Please refer to the `development`_ or the `production documentation`_.
 
@@ -60,10 +60,10 @@ GitHub. You can see all byro plugins on GitHub `here`_.
 .. |byro| image:: docs/img/logo/byro_128.png
    :alt: byro
 .. _developer documentation: http://byro.readthedocs.io/en/latest/
-.. _administrator documentation: https://byro.readthedocs.io/en/latest/administrator/
 .. _development: https://byro.readthedocs.io/en/latest/developer/setup/
 .. _byro: https://byro.cloud
 .. _here: https://github.com/topics/byro-plugin
 .. _byro-mailman: https://github.com/byro/byro-mailman
 .. _byro-gemeinnuetzigkeit: https://github.com/byro/byro-gemeinnuetzigkeit
 .. _byro-shackspace: https://github.com/byro/byro-shackspace
+.. _production documentation: https://byro.readthedocs.io/en/latest/administrator/
