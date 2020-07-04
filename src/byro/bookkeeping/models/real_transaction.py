@@ -65,22 +65,9 @@ class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
         self.save()
         return response
 
+
     @property
     def transactions(self):
         """Get all transactions"""
-        return TransactionSet(self)
-
-
-class TransactionSet:
-    """
-    This is a pseudo related manager, providing a minimal
-    implementation for `all()`.
-    """
-    def __init__(self, source):
-        """Set real transaction source"""
-        self.source = source
-
-    def all(self):
-        """Get all transactions via bookings"""
-        return (b.transaction for b in self.source.bookings.all())
+        return Transaction.objects.filter(bookings__source=self)
 
