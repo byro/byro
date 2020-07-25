@@ -84,12 +84,18 @@ class Transaction(models.Model, LogTargetMixin):
 
     @log_call(".debit.created", log_on="self")
     def debit(self, account, *args, **kwargs):
+        if self.credits.count() > 1 and self.debits.count() > 0:
+            raise Exception("Bug: Can't create debit. It should only be allowed to have either multiple debits or multiple credits.")
+
         return Booking.objects.create(
             transaction=self, debit_account=account, *args, **kwargs
         )
 
     @log_call(".credit.created", log_on="self")
     def credit(self, account, *args, **kwargs):
+        if self.debits.count() > 1 and self.credits.count() > 0:
+            raise Exception("Bug: Can't create credit. It should only be allowed to have either multiple debits or multiple credits.")
+
         return Booking.objects.create(
             transaction=self, credit_account=account, *args, **kwargs
         )
