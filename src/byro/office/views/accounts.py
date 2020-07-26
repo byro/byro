@@ -26,6 +26,16 @@ class AccountListView(ListView):
     context_object_name = "accounts"
     model = Account
 
+    def get_balance_params(self):
+        if self.request.GET.get("") == "unbalanced":
+            # TODO, FIXME: assert account id
+            return { 'peer_account' : 3 }
+
+    def get_queryset(self):
+        #transaction_qs = Transaction.objects.all()
+        qs = Account.objects.get_queryset().with_balance() # transaction_qs)
+        return qs
+
 
 class AccountCreateView(FormView):
     template_name = "office/account/add.html"

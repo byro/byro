@@ -48,11 +48,9 @@
                         {{ account.get_account_category_display }}
                     {% endif %}
                 </a></td>
-                {% with balances=account.balances %}
-                <td class="text-md-right">{{ balances.debit|default:"" }}</td>
-                <td class="text-md-right">{{ balances.credit|default:"" }}</td>
-                <td class="text-md-right">{{ balances.net }}</td>
-                {% endwith %}
+                <td class="text-md-right">{{ account.debit_amount|default:"" }}</td>
+                <td class="text-md-right">{{ account.credit_amount|default:"" }}</td>
+                <td class="text-md-right">{{ account.net_amount|default:""}}</td>
             </tr>
         {% endfor %}
     </tbody>
