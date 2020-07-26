@@ -43,10 +43,7 @@ class AccountTag(models.Model):
 
 class AccountQuerySet(models.QuerySet):
 
-    def with_balance(self): #, transaction_qs):
-
-        only_consider_account_id = 3
-
+    def with_balance(self, only_consider_account_id=None):
         # This query is a bit complex:
         #
         # 1. We rely on the fact, that a transaction can only have either

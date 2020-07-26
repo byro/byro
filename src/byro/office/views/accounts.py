@@ -33,7 +33,13 @@ class AccountListView(ListView):
 
     def get_queryset(self):
         #transaction_qs = Transaction.objects.all()
-        qs = Account.objects.get_queryset().with_balance() # transaction_qs)
+        only_consider_account_id = None
+
+        asset_id_filter = self.request.GET.get('asset_id_filter', "all")
+        if asset_id_filter != "all" and asset_id_filter.isnumeric():
+            only_consider_account_id = int(asset_id_filter)
+
+        qs = Account.objects.get_queryset().with_balance(only_consider_account_id)
         return qs
 
 
