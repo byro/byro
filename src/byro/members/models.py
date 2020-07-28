@@ -574,11 +574,19 @@ class Membership(Auditable, models.Model, LogTargetMixin):
                 end = _now.replace(day=self.start.day).date()
             except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
                 end = (_now + relativedelta(day=1, months=1, days=-1)).date()
-        date = self.start
+
+        # We do not calculate fees outside the liability interval.
+        liability_interval = Configuration.get_solo().liability_interval
+        liability_start = (
+            _now - relativedelta(day=1, months=liability_interval)).date()
+
+        start = max(self.start, liability_start).replace(day=1)
+        date = start
         while date <= end:
             dues.add((date, self.amount))
             date += relativedelta(months=self.interval)
-        return (self.start, end), dues
+
+        return (start, end), dues
 
 
 SPECIAL_NAMES = {Member: "member", Membership: "membership"}
