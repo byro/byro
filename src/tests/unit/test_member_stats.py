@@ -23,8 +23,8 @@ def test_stats_one_member(member):
 
 @pytest.mark.django_db
 def test_stats_one_inactive_member(inactive_member):
-    from byro.members.stats import get_member_statistics
     from byro.members.models import Membership
+    from byro.members.stats import get_member_statistics
 
     assert Membership.objects.count()
 

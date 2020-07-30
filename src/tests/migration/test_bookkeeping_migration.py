@@ -1,6 +1,5 @@
 import pytest
 from django.db.models import Q
-
 from helper import TestMigrations
 
 
@@ -56,7 +55,7 @@ class TestBookkeepingMigrationsFirst(TestWithShackdataBase):
         assert Account.objects.filter(tags__name="fees_receivable").count() == 1
 
     def test_transactions_migrated(self):
-        from byro.bookkeeping.models import Transaction, Booking
+        from byro.bookkeeping.models import Booking, Transaction
 
         # All RealTransaction lead to one Transaction, as do VirtualTransaction with no RealTransaction
         assert (
