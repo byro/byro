@@ -11,6 +11,7 @@ recursive-include byro/static *
 recursive-include byro/common/templates *
 recursive-include byro/office/templates *
 recursive-include byro/public/templates *
+recursive-exclude tests *
 global-exclude *.py[co]
 global-exclude __pycache__
 exclude local_settings.py
