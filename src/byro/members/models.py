@@ -423,13 +423,15 @@ class Member(Auditable, models.Model, LogTargetMixin):
         dues = set()
         membership_ranges = []
         _now = now()
-        _from = config.accounting_of_membership_fees_from
+        _from = config.accounting_start
 
         # Step 1
         for membership in self.memberships.all():
             if not membership.amount:
                 continue
-            membership_range, membership_dues = membership.get_dues(_now=_now, _from=_from)
+            membership_range, membership_dues = membership.get_dues(
+                _now=_now, _from=_from
+            )
             membership_ranges.append(membership_range)
             dues |= membership_dues
 
