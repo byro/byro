@@ -1,5 +1,4 @@
-"""
-WSGI config for byro project.
+"""WSGI config for byro project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

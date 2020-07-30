@@ -10,7 +10,8 @@ from byro.members.models import Member
 
 
 class connected_signal:
-    """ connect a signal and make sure it is disconnected after use, so it doesn't leak into other tests. """
+    """connect a signal and make sure it is disconnected after use, so it
+    doesn't leak into other tests."""
 
     def __init__(self, signal, receiver, uid="test-plugin"):
         self.signal = signal

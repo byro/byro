@@ -21,7 +21,7 @@ from byro.common.utils import get_installed_software
 
 
 class ContentObjectManager(models.Manager):
-    "An object manager that can handle filter(content_object=...)"
+    """An object manager that can handle filter(content_object=...)"""
 
     def filter(self, *args, **kwargs):
         if "content_object" in kwargs:
@@ -34,7 +34,7 @@ class ContentObjectManager(models.Manager):
 
 
 class LogEntryManager(ContentObjectManager):
-    "Manager that is linking the log chain on .create()"
+    """Manager that is linking the log chain on .create()"""
 
     def create(self, *args, **kwargs):
         kwargs["auth_prev"] = self.get_chain_end()

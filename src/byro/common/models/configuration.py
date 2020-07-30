@@ -10,8 +10,8 @@ from byro.common.models.log import LogTargetMixin
 
 
 class ByroConfiguration(LogTargetMixin, SingletonModel):
-    """ Use this class to build a configuration set that will automatically
-    show up on the office settings interface. """
+    """Use this class to build a configuration set that will automatically show
+    up on the office settings interface."""
 
     class Meta:
         abstract = True

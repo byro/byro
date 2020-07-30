@@ -97,6 +97,7 @@ setup(
         "dev": [
             "black",
             "check-manifest",
+            "docformatter",
             "flake8",
             "freezegun",
             "isort",

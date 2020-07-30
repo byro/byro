@@ -151,7 +151,7 @@ class Transaction(models.Model, LogTargetMixin):
 
     @property
     def is_read_only(self):
-        "Advisory property: don't modify this Transaction or its Bookings"
+        """Advisory property: don't modify this Transaction or its Bookings."""
         # Future proof: For now, don't modify balanced transactions
         return self.is_balanced
 
@@ -180,9 +180,8 @@ class Transaction(models.Model, LogTargetMixin):
 
     @transaction.atomic
     def process_transaction(self):
-        """
-        Collects responses to the signal `process_transaction`.
-        Re-raises received Exceptions.
+        """Collects responses to the signal `process_transaction`. Re-raises
+        received Exceptions.
 
         Returns the number of receivers that augmented the Transaction.
         """

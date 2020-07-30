@@ -41,8 +41,9 @@ class Field:
 
     @staticmethod
     def _follow_path(start, path):
-        """Follow a python.dot.path until its penultimate item, then return the current object and the name of the last descriptor.
-        Allows 'func()' syntax to call a method along the way without arguments.
+        """Follow a python.dot.path until its penultimate item, then return the
+        current object and the name of the last descriptor. Allows 'func()'
+        syntax to call a method along the way without arguments.
 
         Examples:
             _follow_path(m, 'pk')  ->  m, 'pk'
@@ -595,8 +596,7 @@ SPECIAL_ORDER = [
 
 
 class MemberBalance(models.Model):
-    """
-    Member balance entries are similar in nature to invoices, describing the
+    """Member balance entries are similar in nature to invoices, describing the
     amount owed over a certain period in time.
 
     As they MUST NOT overlap per member, they should be created via the
