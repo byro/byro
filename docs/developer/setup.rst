@@ -77,7 +77,7 @@ file ``byro.cfg`` with contents like these::
     port = 5432
 
 The default -- and recommended -- installation uses PostgreSQL "Peer Authentication", in which the
-Unix user is mapped to the Postgres database user. This works only for local connections, and only
+Unix user is mapped to the PostgreSQL database user. This works only for local connections, and only
 on Linux, most BSDs, OS X, and Solaris, but provides the highest level of security and the least
 amount of configuration. In this mode the keys ``user``, ``password``, and ``host`` MUST be omitted.
 

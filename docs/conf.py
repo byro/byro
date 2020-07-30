@@ -14,6 +14,14 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "byro.settings")
 django.setup()
 
+# PyEnchant is required for spellchecking only, and somewhat bothersome
+# to install on some systems.
+try:
+    import enchant
+    HAS_PYENCHANT = True
+except:
+    HAS_PYENCHANT = False
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -21,6 +29,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
 ]
+if HAS_PYENCHANT:
+    extensions.append('sphinxcontrib.spelling')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -111,3 +121,9 @@ linkcheck_ignore = [
     'https://byro.yourdomain.com/',
     'https://github.com/byro/byro/issues/new',  # Redirects to login page
 ]
+
+# Spelling options
+if HAS_PYENCHANT:
+    spelling_lang = 'en_US'
+    spelling_word_list_filename='spelling_wordlist.txt'
+    spelling_show_suggestions=True
