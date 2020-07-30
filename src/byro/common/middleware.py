@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.shortcuts import redirect, reverse
 from django.urls import resolve
+from django.utils import translation
 
 from byro.common.models.configuration import Configuration
 from byro.common.signals import unauthenticated_urls
@@ -13,6 +15,7 @@ class SettingsMiddleware:
 
     def __call__(self, request):
         url = resolve(request.path_info)
+        translation.activate(settings.DEFAULT_LANGUAGE)
         if not request.user.is_anonymous and url.url_name not in self.ALLOWED_URLS:
             config = Configuration.get_solo()
             values = ("name", "backoffice_mail", "mail_from")

@@ -1,5 +1,6 @@
 import os
 from contextlib import suppress
+from pathlib import Path
 from urllib.parse import urlparse
 
 from django.utils.crypto import get_random_string
@@ -204,10 +205,11 @@ USE_L10N = True
 USE_TZ = True
 LANGUAGES = [("en", _("English")), ("de", _("German"))]
 LANGUAGES_NATURAL_NAMES = [("en", "English"), ("de", "Deutsch")]
-LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), "locale"),)
+LOCALE_PATHS = (Path(__file__).resolve().parent / "locale",)
 FORMAT_MODULE_PATH = ["byro.common.formats"]
 TIME_ZONE = config.get("locale", "time_zone")
-LANGUAGE_CODE = config.get("locale", "language_code")
+LANGUAGE_CODE = "en"
+DEFAULT_LANGUAGE = config.get("locale", "language_code") or "de"
 
 
 ## AUTHENTICATION SETTINGS
