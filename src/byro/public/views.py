@@ -1,12 +1,10 @@
 import collections
 from datetime import timedelta
 
-from django import forms
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import FormMixin
 
