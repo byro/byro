@@ -42,7 +42,7 @@ class Configuration(ByroConfiguration):
             "For which interval can you make members pay their outstanding fees?"
         ),
     )
-    accounting_of_membership_fees_from = models.DateField(
+    accounting_start = models.DateField(
         null=True,
         blank=True,
         verbose_name=_("Start accounting Membership Fees from"),
