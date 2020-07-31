@@ -95,6 +95,8 @@ def membership(member):
     today = now()
     begin_last_month = today.replace(day=1) - relativedelta(months=+1)
     end_this_month = today.replace(day=1) + relativedelta(months=+1, days=-1)
+    if end_this_month == today:
+        end_this_month += relativedelta(months=1)
     ms = Membership.objects.create(
         member=member,
         start=begin_last_month,
