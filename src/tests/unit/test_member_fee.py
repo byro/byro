@@ -14,9 +14,7 @@ from byro.members.models import FeeIntervals, Member, Membership
 @pytest.fixture
 @pytest.mark.django_db
 def new_member():
-    m = Member.objects.create(number="007")
-    yield m
-    m.delete()
+    return Member.objects.create(number="007")
 
 
 @pytest.fixture
@@ -24,19 +22,13 @@ def member_membership(new_member):
     today = timezone.now()
     begin_last_month = today.replace(day=1) - relativedelta(months=+1)
     end_this_month = today.replace(day=1) + relativedelta(months=+1, days=-1)
-    ms = Membership.objects.create(
+    return Membership.objects.create(
         member=new_member,
         start=begin_last_month,
         end=end_this_month,
         amount=20,
         interval=FeeIntervals.MONTHLY,
     )
-    yield ms
-    [
-        (t.bookings.all().delete(), t.delete())
-        for t in Transaction.objects.filter(bookings__member=ms.member).all()
-    ]
-    ms.delete()
 
 
 @pytest.mark.django_db
@@ -114,19 +106,13 @@ def member_membership_second(new_member):
     today = timezone.now().date()
     begin_some_time_ago = today.replace(day=1) - relativedelta(months=4)
     end_two_months_ago = today.replace(day=1) + relativedelta(months=-2, days=-1)
-    ms = Membership.objects.create(
+    return Membership.objects.create(
         member=new_member,
         start=begin_some_time_ago,
         end=end_two_months_ago,
         amount=8,
         interval=FeeIntervals.MONTHLY,
     )
-    yield ms
-    [
-        (t.bookings.all().delete(), t.delete())
-        for t in Transaction.objects.filter(bookings__member=ms.member).all()
-    ]
-    ms.delete()
 
 
 @pytest.mark.django_db

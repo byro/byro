@@ -9,8 +9,9 @@ from byro.plugins.sepa.signals import (
 
 @pytest.mark.django_db
 def test_new_member_info_sepa(member_with_sepa_profile):
-    assert str(new_member_mail_info_sepa(member_with_sepa_profile, None)).startswith(
-        "Your SEPA"
+    assert any(
+        str(new_member_mail_info_sepa(member_with_sepa_profile, None)).startswith(s)
+        for s in ["Your SEPA", "Deine SEPA"]
     )
 
 
@@ -21,15 +22,19 @@ def test_new_member_info_sepa_without_mandate(member):
 
 @pytest.mark.django_db
 def test_new_member_office_mail_info_sepa(member_with_sepa_profile, membership):
-    assert str(
-        new_member_office_mail_info_sepa(member_with_sepa_profile, None)
-    ).startswith("The new member")
+    assert any(
+        str(
+            new_member_office_mail_info_sepa(member_with_sepa_profile, None)
+        ).startswith(s)
+        for s in ["The new member", "Das neue Mitglied"]
+    )
 
 
 @pytest.mark.django_db
 def test_leave_member_office_info_sepa(member_with_sepa_profile, membership):
-    assert str(leave_member_office_mail_info_sepa(membership, None)).startswith(
-        "Please terminate"
+    assert any(
+        str(leave_member_office_mail_info_sepa(membership, None)).startswith(s)
+        for s in ["Please terminate", "Bitte beende"]
     )
 
 

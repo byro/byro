@@ -3,8 +3,8 @@ from itertools import repeat
 
 
 def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
-    from byro.common.console import start_box, end_box, print_line
     from byro import __version__
+    from byro.common.console import end_box, print_line, start_box
 
     if hasattr(os, "geteuid") and os.geteuid() == 0:
         print_line("You are running byro as root, why?", bold=True)

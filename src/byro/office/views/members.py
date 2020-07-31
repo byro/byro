@@ -348,8 +348,10 @@ class MemberListExportView(
     def export_csv(self, header, data, csv_format="default"):
         class EchoBOM:
             """Dummy, based on the Django docs.
-            This one adds one feature: It outputs a Unicode BOM (Byte-Order Mark) as the first
-            character."""
+
+            This one adds one feature: It outputs a Unicode BOM (Byte-
+            Order Mark) as the first character.
+            """
 
             def write(self, value):
                 if not hasattr(self, "have_bom"):
@@ -873,7 +875,8 @@ class MultipleFormsMixin:
         return "submit_{}_{}".format(prefix, name)
 
     def get_forms(self):
-        """Instantiate forms, return a list of tuples like get_operations(), but with Form objects and expanded prefix values."""
+        """Instantiate forms, return a list of tuples like get_operations(),
+        but with Form objects and expanded prefix values."""
         retval = []
 
         for prefix, title, form_class, buttons, callback in self.get_operations():
@@ -926,11 +929,11 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
     def get_operations(self):
         """Return a list of tuples. Each one:
-            + internal name/prefix of the form
-            + Title of the form
-            + A callable returning a Form instance
-            + (Ordered)Dict of submit buttons {button_name: button_text}
-            + Callback function for successful submit of the form
+
+        + internal name/prefix of the form + Title of the form + A
+        callable returning a Form instance + (Ordered)Dict of submit
+        buttons {button_name: button_text} + Callback function for
+        successful submit of the form
         """
         member = self.get_object()
         now_ = now()

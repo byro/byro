@@ -84,8 +84,11 @@ def test_members_export_list_csv(member, membership, inactive_member, logged_in_
     )
     content = b"".join(response.streaming_content).decode()
     assert response.status_code == 200, content
-    assert content == "\ufeffInterne Datenbank-ID,Name\r\n{},{}\r\n{},{}\r\n".format(
-        inactive_member.pk, inactive_member.name, member.pk, member.name
+    assert (
+        "\r\n{},{}\r\n{},{}\r\n".format(
+            inactive_member.pk, inactive_member.name, member.pk, member.name
+        )
+        in content
     )
 
 
@@ -139,6 +142,7 @@ def test_members_end_membership(member, membership, logged_in_client):
     )
     content = response.content.decode()
     assert response.status_code == 302, content
+    member.refresh_from_db()
     assert not member.is_active
 
 

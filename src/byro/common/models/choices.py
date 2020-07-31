@@ -17,10 +17,9 @@ class ChoicesMeta(type):
 
 
 class Choices(object, metaclass=ChoicesMeta):
-    """
-    Helper class to make choices available as class variables, expose a list
-    with valid choices and at the same time generate the choices tuples for
-    the model class.
+    """Helper class to make choices available as class variables, expose a list
+    with valid choices and at the same time generate the choices tuples for the
+    model class.
 
     Usage:
         class MyChoices(Choices):

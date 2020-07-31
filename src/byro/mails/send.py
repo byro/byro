@@ -6,6 +6,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import override
 from i18nfield.strings import LazyI18nString
+from inlinestyler.utils import inline_css
 
 from byro.common.models import Configuration
 

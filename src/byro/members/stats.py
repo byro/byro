@@ -12,9 +12,7 @@ def get_member_statistics_for_month(month, year) -> Tuple[int, int]:
 
 
 def get_member_statistics():
-    """
-    Returns a list of tuples of the form ((year, month), joins, quits).
-    """
+    """Returns a list of tuples of the form ((year, month), joins, quits)."""
     first_member = Membership.objects.order_by("start").first()
     if not first_member:
         return []

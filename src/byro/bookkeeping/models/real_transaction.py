@@ -24,12 +24,12 @@ class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
 
     @transaction.atomic
     def process(self):
-        """
-        Collects responses to the signal `process_csv_upload`. Raises an
-        exception if multiple results were found, and re-raises received Exceptions.
+        """Collects responses to the signal `process_csv_upload`. Raises an
+        exception if multiple results were found, and re-raises received
+        Exceptions.
 
-        Returns a list of one or more Transaction objects if no Exception
-        was raised.
+        Returns a list of one or more Transaction objects if no
+        Exception was raised.
         """
         self.state = SourceState.PROCESSING
         self.save()
@@ -64,3 +64,8 @@ class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
         self.state = SourceState.PROCESSED
         self.save()
         return response
+
+    @property
+    def transactions(self):
+        """Get all transactions."""
+        return Transaction.objects.filter(bookings__source=self)

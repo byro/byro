@@ -84,12 +84,22 @@ class Transaction(models.Model, LogTargetMixin):
 
     @log_call(".debit.created", log_on="self")
     def debit(self, account, *args, **kwargs):
+        if self.credits.count() > 1 and self.debits.count() > 0:
+            raise Exception(
+                "Bug: Can't create debit. It should only be allowed to have either multiple debits or multiple credits."
+            )
+
         return Booking.objects.create(
             transaction=self, debit_account=account, *args, **kwargs
         )
 
     @log_call(".credit.created", log_on="self")
     def credit(self, account, *args, **kwargs):
+        if self.debits.count() > 1 and self.credits.count() > 0:
+            raise Exception(
+                "Bug: Can't create credit. It should only be allowed to have either multiple debits or multiple credits."
+            )
+
         return Booking.objects.create(
             transaction=self, credit_account=account, *args, **kwargs
         )
@@ -151,7 +161,7 @@ class Transaction(models.Model, LogTargetMixin):
 
     @property
     def is_read_only(self):
-        "Advisory property: don't modify this Transaction or its Bookings"
+        """Advisory property: don't modify this Transaction or its Bookings."""
         # Future proof: For now, don't modify balanced transactions
         return self.is_balanced
 
@@ -180,9 +190,8 @@ class Transaction(models.Model, LogTargetMixin):
 
     @transaction.atomic
     def process_transaction(self):
-        """
-        Collects responses to the signal `process_transaction`.
-        Re-raises received Exceptions.
+        """Collects responses to the signal `process_transaction`. Re-raises
+        received Exceptions.
 
         Returns the number of receivers that augmented the Transaction.
         """

@@ -12,7 +12,7 @@ Must return a dict::
         "url_name": "plugins:myplugin:foo_view",
     }
 
-Please use byro.office.views.members.MemberView as base class for these views.
+Please use ``byro.office.views.members.MemberView`` as base class for these views.
 """
 
 nav_event = django.dispatch.Signal()
@@ -20,7 +20,7 @@ nav_event = django.dispatch.Signal()
 This signal allows you to add additional views to the sidebar.
 Receives the request as sender. Must return a dictionary containing at least
 the keys ``label`` and ``url``. You can also return a ForkAwesome icon name
-iwth the key ``icon``. You should also return an ``active`` key with a boolean
+with the key ``icon``. You should also return an ``active`` key with a boolean
 set to ``True`` if this item should be marked as active.
 
 If you want your Plugin to appear in the "Finance" or "Settings" submenu in the
@@ -60,5 +60,5 @@ Receives None as argument, must return either None or a dict::
 
 All of the parts of this dict are optional. You cannot include HTML in the
 response, all strings will be escaped at render time. If "public" is set to
-True, the dasboard tile will also be shown on the member's personal page.
+True, the dashboard tile will also be shown on the member's personal page.
 """

@@ -41,8 +41,9 @@ class Field:
 
     @staticmethod
     def _follow_path(start, path):
-        """Follow a python.dot.path until its penultimate item, then return the current object and the name of the last descriptor.
-        Allows 'func()' syntax to call a method along the way without arguments.
+        """Follow a python.dot.path until its penultimate item, then return the
+        current object and the name of the last descriptor. Allows 'func()'
+        syntax to call a method along the way without arguments.
 
         Examples:
             _follow_path(m, 'pk')  ->  m, 'pk'
@@ -404,6 +405,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
         src_account = SpecialAccounts.fees
         dst_account = SpecialAccounts.fees_receivable
 
+        config = Configuration.get_solo()
+
         # Step 1: Identify all dates and amounts that should be due at those dates
         #  (in python, store as a list; hits database once to get list of memberships)
         # Step 2: Find all due amounts within the data ranges, ignore reversed liabilities
@@ -420,12 +423,15 @@ class Member(Auditable, models.Model, LogTargetMixin):
         dues = set()
         membership_ranges = []
         _now = now()
+        _from = config.accounting_start
 
         # Step 1
         for membership in self.memberships.all():
             if not membership.amount:
                 continue
-            membership_range, membership_dues = membership.get_dues(_now=_now)
+            membership_range, membership_dues = membership.get_dues(
+                _now=_now, _from=_from
+            )
             membership_ranges.append(membership_range)
             dues |= membership_dues
 
@@ -565,14 +571,20 @@ class Membership(Auditable, models.Model, LogTargetMixin):
     def get_absolute_url(self):
         return reverse("office:members.data", kwargs={"pk": self.member.pk})
 
-    def get_dues(self, _now=None):
+    def get_dues(self, _now=None, _from=None):
         _now = _now or now()
         dues = set()
         end = self.end
+        start = self.start
+        if _from is not None and start < _from:
+            start = _from
+
         if not end:
             try:
-                end = _now.replace(day=self.start.day).date()
-            except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
+                end = _now.replace(day=start.day).date()
+            except ValueError:
+                # membership.start.day is not a valid date in our month,
+                # we'll use the last date instead
                 end = (_now + relativedelta(day=1, months=1, days=-1)).date()
 
         # We do not calculate fees outside the liability interval.
@@ -580,7 +592,7 @@ class Membership(Auditable, models.Model, LogTargetMixin):
         liability_start = (
             _now - relativedelta(day=1, months=liability_interval)).date()
 
-        start = max(self.start, liability_start).replace(day=1)
+        start = max(start, liability_start).replace(day=1)
         date = start
         while date <= end:
             dues.add((date, self.amount))
@@ -603,8 +615,7 @@ SPECIAL_ORDER = [
 
 
 class MemberBalance(models.Model):
-    """
-    Member balance entries are similar in nature to invoices, describing the
+    """Member balance entries are similar in nature to invoices, describing the
     amount owed over a certain period in time.
 
     As they MUST NOT overlap per member, they should be created via the

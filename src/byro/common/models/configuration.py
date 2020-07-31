@@ -10,8 +10,8 @@ from byro.common.models.log import LogTargetMixin
 
 
 class ByroConfiguration(LogTargetMixin, SingletonModel):
-    """ Use this class to build a configuration set that will automatically
-    show up on the office settings interface. """
+    """Use this class to build a configuration set that will automatically show
+    up on the office settings interface."""
 
     class Meta:
         abstract = True
@@ -42,7 +42,14 @@ class Configuration(ByroConfiguration):
             "For which interval can you make members pay their outstanding fees?"
         ),
     )
-
+    accounting_start = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name=_("Start accounting Membership Fees from"),
+        help_text=_(
+            "This field is especially useful if the organization was later migrated to byro and the membership fees of members from the past are not to be billed. Leave the field empty if you do not have this requirement and you want to invoice all members from the beginning of their membership."
+        ),
+    )
     language = models.CharField(
         choices=LANGUAGES,
         null=True,

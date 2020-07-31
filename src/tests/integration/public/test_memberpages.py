@@ -12,8 +12,12 @@ def test_memberpage_access_dashboard(member, membership, client, configuration):
     )
     assert response.status_code == 200
     assert member.name in response.content.decode()
-    assert "Member page" in response.content.decode()
-    assert "Settings" not in response.content.decode()
+    assert any(
+        s in response.content.decode() for s in ["Member page", "Mitgliedsseite"]
+    )
+    assert all(
+        s not in response.content.decode() for s in ["Settings", "Einstellungen"]
+    )
 
 
 @pytest.mark.django_db
@@ -25,8 +29,12 @@ def test_memberpage_access_list(member, membership, client, configuration):
         )
     )
     assert response.status_code == 200
-    assert "Member page" in response.content.decode()
-    assert "Settings" not in response.content.decode()
+    assert any(
+        s in response.content.decode() for s in ["Member page", "Mitgliedsseite"]
+    )
+    assert all(
+        s not in response.content.decode() for s in ["Settings", "Einstellungen"]
+    )
 
 
 @pytest.mark.parametrize("page", ("list", "dashboard"))

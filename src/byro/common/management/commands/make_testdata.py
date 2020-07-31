@@ -249,7 +249,8 @@ class Command(BaseCommand):
         self.make_paid(pays_other, pays_for=is_payed_for)
 
     def create_bank_chaff(self):
-        "Create some dummy traffic, and a couple of unmatched transactions on the bank account"
+        """Create some dummy traffic, and a couple of unmatched transactions on
+        the bank account."""
         bank_account = SpecialAccounts.bank
 
         t = Transaction.objects.create(
