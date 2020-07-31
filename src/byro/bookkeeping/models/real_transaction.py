@@ -65,9 +65,7 @@ class RealTransactionSource(Auditable, models.Model, LogTargetMixin):
         self.save()
         return response
 
-
     @property
     def transactions(self):
-        """Get all transactions"""
+        """Get all transactions."""
         return Transaction.objects.filter(bookings__source=self)
-
