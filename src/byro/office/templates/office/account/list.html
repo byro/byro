@@ -10,6 +10,21 @@
     <span class="fa fa-plus"></span> {% trans "Add new account" %}
 </a>
 </p>
+<p>
+<div class="form-group">
+    <form method="get" class="form form-inline">
+        <select name="asset_id_filter" class="form-control">
+            <option value="all" {% if "all" == request.GET.asset_id_filter %}selected{% endif %}>{% trans "All asset accounts" %}</option>
+            {% for account in accounts %}
+            {% if account.account_category == "asset" %}
+            <option value="{{ account.id }}" {% if account.id == request.GET.asset_id_filter|add:"0" %}selected{% endif %}>{{ account.name }}</option>
+            {% endif %}
+            {% endfor %}´
+        </select>
+        <button type="submit" class="btn btn-success">{% trans "Filter" %}</button>
+    </form>
+</div>
+</p>
 <table class="table table-sm">
     <thead>
         <tr>
@@ -48,11 +63,9 @@
                         {{ account.get_account_category_display }}
                     {% endif %}
                 </a></td>
-                {% with balances=account.balances %}
-                <td class="text-md-right">{{ balances.debit|default:"" }}</td>
-                <td class="text-md-right">{{ balances.credit|default:"" }}</td>
-                <td class="text-md-right">{{ balances.net }}</td>
-                {% endwith %}
+                <td class="text-md-right">{{ account.debit_amount|default:"" }}</td>
+                <td class="text-md-right">{{ account.credit_amount|default:"" }}</td>
+                <td class="text-md-right">{{ account.net_amount|default:""}}</td>
             </tr>
         {% endfor %}
     </tbody>
