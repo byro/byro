@@ -10,7 +10,6 @@ import nacl.utils
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import F, Q
 from django.db.models.signals import pre_delete, pre_save
@@ -77,7 +76,7 @@ class LogEntry(models.Model):
     user = models.ForeignKey(get_user_model(), null=True, on_delete=models.SET_NULL)
 
     action_type = models.CharField(max_length=255)
-    data = JSONField(null=True)
+    data = models.JSONField(null=True)
 
     auth_hash = models.CharField(max_length=140, null=False, unique=True)
     auth_prev = models.ForeignKey(
@@ -88,7 +87,7 @@ class LogEntry(models.Model):
         null=False,
         blank=False,
     )
-    auth_data = JSONField(null=False)
+    auth_data = models.JSONField(null=False)
 
     objects = LogEntryManager()
 

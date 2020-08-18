@@ -3,11 +3,10 @@ from urllib.parse import urljoin
 
 from annoying.fields import AutoOneToOneField
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from byro.common.models.configuration import Configuration
 
@@ -39,7 +38,9 @@ class MemberpageProfile(models.Model):
         default=False, verbose_name=_("Consent: Visible to other members")
     )
     # publication_consent format: {"fields": {"profile_memberpage__secret_token": {"visibility": "share"}}}
-    publication_consent = JSONField(default=get_default_consent, null=True, blank=True)
+    publication_consent = models.JSONField(
+        default=get_default_consent, null=True, blank=True
+    )
 
     def get_url(self):
         config = Configuration.get_solo()

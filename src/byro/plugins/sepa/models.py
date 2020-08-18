@@ -3,7 +3,7 @@ from enum import Enum
 
 from annoying.fields import AutoOneToOneField
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from localflavor.generic.models import BICField, IBANField
 from schwifty import BIC, IBAN
 

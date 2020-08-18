@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from django.utils.decorators import classproperty
+from django.utils.functional import classproperty
 
 
 class ChoicesMeta(type):

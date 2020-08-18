@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from byro.bookkeeping.models import Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts

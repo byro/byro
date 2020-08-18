@@ -7,10 +7,10 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields.related import OneToOneRel
 from django.urls import reverse
-from django.utils.decorators import classproperty
+from django.utils.functional import classproperty
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from byro.bookkeeping.models import Booking, Transaction
 from byro.bookkeeping.special_accounts import SpecialAccounts

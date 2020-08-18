@@ -1,4 +1,5 @@
-from django.conf.urls import include, url
+from django.conf.urls import include
+from django.urls import re_path
 
 from .views import (
     accounts,
@@ -14,168 +15,186 @@ from .views import (
 
 app_name = "office"
 urlpatterns = [
-    url(
+    re_path(
         "^settings/initial$",
         settings.InitialSettings.as_view(),
         name="settings.initial",
     ),
-    url("^settings/log$", settings.LogView.as_view(), name="settings.log"),
-    url("^settings/about$", settings.AboutByroView.as_view(), name="settings.about"),
-    url(
+    re_path("^settings/log$", settings.LogView.as_view(), name="settings.log"),
+    re_path(
+        "^settings/about$", settings.AboutByroView.as_view(), name="settings.about"
+    ),
+    re_path(
         "^settings/registration$",
         settings.RegistrationConfigView.as_view(),
         name="settings.registration",
     ),
-    url("^settings/users/$", users.UserListView.as_view(), name="settings.users.list"),
-    url(
+    re_path(
+        "^settings/users/$", users.UserListView.as_view(), name="settings.users.list"
+    ),
+    re_path(
         "^settings/users/add$",
         users.UserCreateView.as_view(),
         name="settings.users.add",
     ),
-    url(
+    re_path(
         r"^settings/users/(?P<pk>\d+)/$",
         users.UserDetailView.as_view(),
         name="settings.users.detail",
     ),
-    url("^settings$", settings.ConfigurationView.as_view(), name="settings.base"),
-    url("^$", dashboard.DashboardView.as_view(), name="dashboard"),
-    url(
+    re_path("^settings$", settings.ConfigurationView.as_view(), name="settings.base"),
+    re_path("^$", dashboard.DashboardView.as_view(), name="dashboard"),
+    re_path(
         r"^members/typeahead$",
         members.MemberListTypeaheadView.as_view(),
         name="members.typeahead",
     ),
-    url(r"^members/list$", members.MemberListView.as_view(), name="members.list"),
-    url(
+    re_path(r"^members/list$", members.MemberListView.as_view(), name="members.list"),
+    re_path(
         r"^members/list/export$",
         members.MemberListExportView.as_view(),
         name="members.list.export",
     ),
-    url(
+    re_path(
         r"^members/list/import$",
         members.MemberListImportView.as_view(),
         name="members.list.import",
     ),
-    url(
+    re_path(
         r"^members/list/disclosure$",
         members.MemberDisclosureView.as_view(),
         name="members.disclosure",
     ),
-    url(
+    re_path(
         r"^members/list/balance$",
         members.MemberBalanceView.as_view(),
         name="members.balance",
     ),
-    url(r"^members/add$", members.MemberCreateView.as_view(), name="members.add"),
-    url(
+    re_path(r"^members/add$", members.MemberCreateView.as_view(), name="members.add"),
+    re_path(
         r"^members/view/(?P<pk>\d+)/",
         include(
             [
-                url("data$", members.MemberDataView.as_view(), name="members.data"),
-                url(
+                re_path("data$", members.MemberDataView.as_view(), name="members.data"),
+                re_path(
                     "timeline$",
                     members.MemberTimelineView.as_view(),
                     name="members.timeline",
                 ),
-                url(
+                re_path(
                     "finance$",
                     members.MemberFinanceView.as_view(),
                     name="members.finance",
                 ),
-                url(
+                re_path(
                     "operations$",
                     members.MemberOperationsView.as_view(),
                     name="members.operations",
                 ),
-                url(
+                re_path(
                     "record-disclosure$",
                     members.MemberRecordDisclosureView.as_view(),
                     name="members.record-disclosure",
                 ),
-                url("log$", members.MemberLogView.as_view(), name="members.log"),
-                url("mails$", members.MemberMailsView.as_view(), name="members.mails"),
-                url(
+                re_path("log$", members.MemberLogView.as_view(), name="members.log"),
+                re_path(
+                    "mails$", members.MemberMailsView.as_view(), name="members.mails"
+                ),
+                re_path(
                     "documents$",
                     members.MemberDocumentsView.as_view(),
                     name="members.documents",
                 ),
-                url(
+                re_path(
                     "$", members.MemberDashboardView.as_view(), name="members.dashboard"
                 ),
             ]
         ),
     ),
-    url(
+    re_path(
         r"^transactions/(?P<pk>\d+)/",
         transactions.TransactionDetailView.as_view(),
         name="finance.transactions.detail",
     ),
-    url("^upload/list", upload.UploadListView.as_view(), name="finance.uploads.list"),
-    url(
+    re_path(
+        "^upload/list", upload.UploadListView.as_view(), name="finance.uploads.list"
+    ),
+    re_path(
         r"^upload/process/(?P<pk>\d+)",
         upload.UploadProcessView.as_view(),
         name="finance.uploads.process",
     ),
-    url(
+    re_path(
         r"^upload/match/(?P<pk>\d+)",
         upload.UploadMatchView.as_view(),
         name="finance.uploads.match",
     ),
-    url("^upload/add", upload.CsvUploadView.as_view(), name="finance.uploads.add"),
-    url("^documents/add", documents.DocumentUploadView.as_view(), name="documents.add"),
-    url(
+    re_path("^upload/add", upload.CsvUploadView.as_view(), name="finance.uploads.add"),
+    re_path(
+        "^documents/add", documents.DocumentUploadView.as_view(), name="documents.add"
+    ),
+    re_path(
         r"^documents/(?P<pk>\d+)",
         documents.DocumentDetailView.as_view(),
         name="documents.detail",
     ),
-    url(
+    re_path(
         "^accounts/$", accounts.AccountListView.as_view(), name="finance.accounts.list"
     ),
-    url(
+    re_path(
         "^accounts/add$",
         accounts.AccountCreateView.as_view(),
         name="finance.accounts.add",
     ),
-    url(
+    re_path(
         r"^accounts/(?P<pk>\d+)/$",
         accounts.AccountDetailView.as_view(),
         name="finance.accounts.detail",
     ),
-    url(
+    re_path(
         r"^accounts/(?P<pk>\d+)/delete$",
         accounts.AccountDeleteView.as_view(),
         name="finance.accounts.delete",
     ),
-    url("^mails/(?P<pk>[0-9]+)$", mails.MailDetail.as_view(), name="mails.mail.view"),
-    url(
+    re_path(
+        "^mails/(?P<pk>[0-9]+)$", mails.MailDetail.as_view(), name="mails.mail.view"
+    ),
+    re_path(
         "^mails/(?P<pk>[0-9]+)/copy$", mails.MailCopy.as_view(), name="mails.mail.copy"
     ),
-    url(
+    re_path(
         "^mails/(?P<pk>[0-9]+)/delete$",
         mails.OutboxPurge.as_view(),
         name="mails.mail.delete",
     ),
-    url(
+    re_path(
         "^mails/(?P<pk>[0-9]+)/send$",
         mails.OutboxSend.as_view(),
         name="mails.mail.send",
     ),
-    url("^mails/compose$", mails.Compose.as_view(), name="mails.compose"),
-    url("^mails/sent$", mails.SentMail.as_view(), name="mails.sent"),
-    url("^mails/outbox$", mails.OutboxList.as_view(), name="mails.outbox.list"),
-    url("^mails/outbox/send$", mails.OutboxSend.as_view(), name="mails.outbox.send"),
-    url("^mails/outbox/purge$", mails.OutboxPurge.as_view(), name="mails.outbox.purge"),
-    url("^mails/templates$", mails.TemplateList.as_view(), name="mails.templates.list"),
-    url(
+    re_path("^mails/compose$", mails.Compose.as_view(), name="mails.compose"),
+    re_path("^mails/sent$", mails.SentMail.as_view(), name="mails.sent"),
+    re_path("^mails/outbox$", mails.OutboxList.as_view(), name="mails.outbox.list"),
+    re_path(
+        "^mails/outbox/send$", mails.OutboxSend.as_view(), name="mails.outbox.send"
+    ),
+    re_path(
+        "^mails/outbox/purge$", mails.OutboxPurge.as_view(), name="mails.outbox.purge"
+    ),
+    re_path(
+        "^mails/templates$", mails.TemplateList.as_view(), name="mails.templates.list"
+    ),
+    re_path(
         "^mails/templates/add$",
         mails.TemplateCreate.as_view(),
         name="mails.templates.add",
     ),
-    url(
+    re_path(
         "^mails/templates/(?P<pk>[0-9]+)$",
         mails.TemplateDetail.as_view(),
         name="mails.templates.view",
     ),
-    url(
+    re_path(
         "^templates/(?P<pk>[0-9]+)/delete$",
         mails.TemplateDelete.as_view(),
         name="mails.templates.delete",

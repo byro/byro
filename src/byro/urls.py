@@ -18,8 +18,9 @@ from contextlib import suppress
 
 from django.apps import apps
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.conf.urls.static import static
+from django.urls import re_path
 
 raw_plugin_patterns = []
 for app in apps.get_app_configs():
@@ -30,14 +31,14 @@ for app in apps.get_app_configs():
             if hasattr(urlmod, "urlpatterns"):
                 single_plugin_patterns += urlmod.urlpatterns
             raw_plugin_patterns.append(
-                url(r"", include((single_plugin_patterns, app.label)))
+                re_path(r"", include((single_plugin_patterns, app.label)))
             )
 
 urlpatterns = [
-    url(r"", include((raw_plugin_patterns, "plugins"))),
-    url(r"", include("byro.common.urls", namespace="common")),
-    url(r"", include("byro.office.urls", namespace="office")),
-    url(r"^p/", include("byro.public.urls", namespace="public")),
+    re_path(r"", include((raw_plugin_patterns, "plugins"))),
+    re_path(r"", include("byro.common.urls", namespace="common")),
+    re_path(r"", include("byro.office.urls", namespace="office")),
+    re_path(r"^p/", include("byro.public.urls", namespace="public")),
 ]
 
 if settings.DEBUG:
@@ -46,4 +47,4 @@ if settings.DEBUG:
     with suppress(ImportError):
         import debug_toolbar
 
-        urlpatterns.insert(0, url(r"^__debug__/", include(debug_toolbar.urls)))
+        urlpatterns.insert(0, re_path(r"^__debug__/", include(debug_toolbar.urls)))

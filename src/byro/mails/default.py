@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from i18nfield.strings import LazyI18nString
 
 WELCOME_MEMBER_SUBJECT = LazyI18nString.from_gettext(_("Welcome, latest member!"))

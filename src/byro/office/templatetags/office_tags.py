@@ -1,5 +1,5 @@
 from django.template.defaultfilters import register
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from byro.documents.models import get_document_category_names
 

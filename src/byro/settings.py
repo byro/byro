@@ -4,7 +4,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from django.utils.crypto import get_random_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from pkg_resources import iter_entry_points
 
 from byro.common.settings.config import build_config

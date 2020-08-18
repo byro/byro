@@ -1,7 +1,6 @@
 from collections import Counter
 
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models import Prefetch
 from django.urls import reverse
@@ -78,7 +77,7 @@ class Transaction(models.Model, LogTargetMixin):
         null=True,
     )
 
-    data = JSONField(null=True)
+    data = models.JSONField(null=True)
 
     documents = models.ManyToManyField(Document, through="DocumentTransactionLink")
 
@@ -318,7 +317,7 @@ class Booking(models.Model):
     )
 
     importer = models.CharField(null=True, max_length=500)
-    data = JSONField(null=True)
+    data = models.JSONField(null=True)
     source = models.ForeignKey(
         to="bookkeeping.RealTransactionSource",
         on_delete=models.SET_NULL,

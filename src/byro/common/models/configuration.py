@@ -1,8 +1,7 @@
 from django.conf.global_settings import LANGUAGES
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from solo.models import SingletonModel
 
 from byro.common.models.choices import Choices
@@ -54,7 +53,7 @@ class Configuration(ByroConfiguration):
         choices=LANGUAGES,
         null=True,
         blank=True,
-        max_length=5,
+        max_length=7,
         verbose_name=_("Language"),
     )
     currency = models.CharField(
@@ -65,7 +64,7 @@ class Configuration(ByroConfiguration):
         help_text=_("E.g. EUR"),
     )
     # Registration form configuration, contains settings for the fields to include when adding a new member
-    registration_form = JSONField(null=True, blank=True)
+    registration_form = models.JSONField(null=True, blank=True)
     public_base_url = models.URLField(  # Do we want this here or in the settings.py next to SITE_URL?
         max_length=512,
         null=True,
