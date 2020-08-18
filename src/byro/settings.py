@@ -112,7 +112,8 @@ else:
 db_name = config.get("database", "name", fallback=os.path.join(DATA_DIR, "db.sqlite3"))
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends."
+        + config.get("database", "engine", fallback="postgresql"),
         "NAME": db_name,
         "USER": config.get("database", "user"),
         "PASSWORD": config.get("database", "password"),

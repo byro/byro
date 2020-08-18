@@ -33,9 +33,12 @@ class Migration(migrations.Migration):
 
     operations = [
         # https://stackoverflow.com/questions/28429933/django-migrations-using-runpython-to-commit-changes/39541048#39541048
-        migrations.RunSQL(
-            "SET CONSTRAINTS ALL IMMEDIATE", reverse_sql=migrations.RunSQL.noop
-        ),
+        # UNCOMMENT this section if you are running a large byro upgrade that fails on migration
+        # ALSO uncomment the section at the end of the list of operations
+        # As an alternative, consider upgrading in smaller steps.
+        # migrations.RunSQL(
+        #     "SET CONSTRAINTS ALL IMMEDIATE", reverse_sql=migrations.RunSQL.noop
+        # ),
         migrations.AlterField(
             model_name="logentry",
             name="datetime",
@@ -88,7 +91,7 @@ class Migration(migrations.Migration):
                 fields=["action_type"], name="common_loge_action__1810d9_idx"
             ),
         ),
-        migrations.RunSQL(
-            migrations.RunSQL.noop, reverse_sql="SET CONSTRAINTS ALL IMMEDIATE"
-        ),
+        # migrations.RunSQL(
+        #     migrations.RunSQL.noop, reverse_sql="SET CONSTRAINTS ALL IMMEDIATE"
+        # ),
     ]

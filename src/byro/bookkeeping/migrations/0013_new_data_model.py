@@ -134,7 +134,10 @@ def migrate_bookkeeping_model(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("bookkeeping", "0012_auto_20180617_1926")]
+    dependencies = [
+        ("bookkeeping", "0012_auto_20180617_1926"),
+        ("common", "0013_logentry_logchain"),
+    ]
 
     operations = [
         migrations.RunPython(migrate_bookkeeping_model, migrations.RunPython.noop)

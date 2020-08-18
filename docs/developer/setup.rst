@@ -6,13 +6,31 @@ changes. First of all, you need install some packages on your operating system:
 
 If you want to install byro on a server for actual usage, go to the :ref:`administrator documentation <administrator-setup>` instead.
 
-* git
-* Python 3.x
-* A recent version of pip (Ubuntu package: ``python3-pip``)
-* gettext (Debian package: ``gettext``)
-* libjpeg or any other library supported in pillow_ (for qrcode_)
-* libmagic
-* A PostgreSQL server
+Please make sure you have the following dependencies installed:
+
++----------------------------------+------------------+
+| Tool                             | Debian package   |
++==================================+==================+
+| Python 3.6(!) or newer           |                  |
++----------------------------------+------------------+
+| pip for Python 3                 | ``python3-pip``  |
++----------------------------------+------------------+
+| ``python-dev`` for Python 3      | ``python3-dev``  |
++----------------------------------+------------------+
+| ``python-venv``, if not included | ``python3-venv`` |
++----------------------------------+------------------+
+| libffi                           | ``libffi-dev``   |
++----------------------------------+------------------+
+| gettext                          | ``gettext``      |
++----------------------------------+------------------+
+| git                              | ``git``          |
++----------------------------------+------------------+
+| libmagic                         |                  |
++----------------------------------+------------------+
+| libjpgeg                         |                  |
++----------------------------------+------------------+
+
+libjpgeg can be replaced by any other library supported in pillow_ (for qrcode_).
 
 Some Python dependencies might also need a compiler during installation, the Debian package
 ``build-essential`` or something similar should suffice.
@@ -24,18 +42,6 @@ You can clone our git repository::
 
     git clone https://github.com/byro/byro.git
     cd byro/
-
-
-Database setup
---------------
-
-Having the database server installed, we still need a database and a database user::
-
-  sudo -u postgres -i
-  postgres $ createuser <yourusername>
-  postgres $ createdb byro -O <yourusername>
-
-Substitute your system username for ``<yourusername>``.
 
 
 Your local python environment
@@ -66,8 +72,13 @@ The first thing you need are all the main application's dependencies::
 
 .. note:: Under Windows, if you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
 
-Next, if you have custom database settings or other settings you need, make a new
-file ``byro.cfg`` with contents like these::
+Create a file called ``byro.cfg`` with this content::
+
+    [database]
+    engine = sqlite3
+
+If you have custom database settings or other settings you need, you can provide them like
+this instead::
 
     [database]
     name = byro
@@ -76,10 +87,8 @@ file ``byro.cfg`` with contents like these::
     host = localhost
     port = 5432
 
-The default -- and recommended -- installation uses PostgreSQL "Peer Authentication", in which the
-Unix user is mapped to the PostgreSQL database user. This works only for local connections, and only
-on Linux, most BSDs, OS X, and Solaris, but provides the highest level of security and the least
-amount of configuration. In this mode the keys ``user``, ``password``, and ``host`` MUST be omitted.
+The default -- and recommended -- production installation uses PostgreSQL, but for local development, you
+can use SQLite instead.
 
 Then, create the local database::
 

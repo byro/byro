@@ -333,13 +333,12 @@ class Booking(models.Model):
             memo=self.memo,
         )
 
-    class Meta:
-        # This is defense in depth, per django-db-constraints module.
-        # FUTURE: Should also add a signal or save handler for the same
-        #   constraint in pure python
-        db_constraints = {
-            "exactly_either_debit_or_credit": "CHECK (NOT ((debit_account_id IS NULL) = (credit_account_id IS NULL)))"
-        }
+    def save(self, *args, **kwargs):
+        if self.debit_account_id and self.credit_account_id:
+            raise Exception("Must be either credit or debit transaction, not both!")
+        if not self.debit_account_id and not self.credit_account_id:
+            raise Exception("Must be either credit or debit transaction, not neither!")
+        return super().save(*args, **kwargs)
 
     def find_memo(self):
         if self.memo:

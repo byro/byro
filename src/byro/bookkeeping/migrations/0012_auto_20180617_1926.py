@@ -6,7 +6,6 @@ from django.conf import settings
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 import django.db.models.deletion
-import django_db_constraints.operations
 
 
 class Migration(migrations.Migration):
@@ -172,11 +171,5 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 related_name="accounts", to="bookkeeping.AccountTag"
             ),
-        ),
-        django_db_constraints.operations.AlterConstraints(
-            name="Booking",
-            db_constraints={
-                "exactly_either_debit_or_credit": "CHECK (NOT ((debit_account_id IS NULL) = (credit_account_id IS NULL)))"
-            },
         ),
     ]

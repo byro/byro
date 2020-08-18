@@ -15,7 +15,9 @@ external installation guides):
 * **Python 3.5+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
 * An SMTP server to send out mails
 * An HTTP reverse proxy, e.g. `nginx`_ or Apache to allow HTTPS connections
-* A `PostgreSQL`_ (9.4 or higher) database server.
+* A database server: `MySQL`_ 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
+  You can use SQLite, but we strongly recommend not to run SQLite in
+  production. Given the choice, we'd recommend to use PostgreSQL.
 
 We also recommend that you use a firewall, although this is not a byro-specific recommendation.
 If you're new to Linux and firewalls, we recommend that you start with `ufw`_.
@@ -40,17 +42,17 @@ Step 2: Database setup
 ----------------------
 
 Having the database server installed, we still need a database and a database
-user. As the ``postgres`` user, execute::
+user. We recommend using PostgreSQL. byro also works (and runs tests
+against) MariaDB and SQLite. If you do not use PostgreSQL, please refer to the
+appropriate documentation on how to set up a database. For PostgreSQL, run
+these commands::
 
   postgres $ createuser byro -P
-  Enter password for new role:
-  Enter it again:
-  postgres $ createdb byro
-  postgres $ psql
-  postgres=# GRANT ALL PRIVILEGES ON DATABASE byro to byro;
+  postgres $ createdb -O byro byro
 
-Replace the asterisks with a password of your own.
+When using MySQL, make sure you set the character set of the database to ``utf8mb4``, e.g. like this::
 
+    mysql > CREATE DATABASE pretalx DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci
 
 Step 3: Package dependencies
 ----------------------------
