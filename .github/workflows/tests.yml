@@ -34,7 +34,7 @@ jobs:
       - uses: getong/mariadb-action@v1.1
         with:
           mariadb version: '10.4'
-          mysql database: 'pretalx'
+          mysql database: 'byro'
           mysql root password: ''
         if: matrix.database == 'mysql'
       - uses: harmon758/postgresql-action@v1

@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     "byro.plugins.profile.ProfilePluginConfig",
     "byro.plugins.sepa.SepaPluginConfig",
     "annoying",
-    "django_db_constraints",
 ]
 
 PLUGINS = []
