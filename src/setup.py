@@ -102,7 +102,7 @@ setup(
             "freezegun",
             "isort",
             "ipython",
-            "pytest==3.9.3",
+            "pytest==6.0.1",
             "pytest-cov",
             "pytest-django",
             "pytest-sugar",
