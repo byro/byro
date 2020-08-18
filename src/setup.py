@@ -105,7 +105,9 @@ setup(
             "pytest-cov",
             "pytest-django",
             "pytest-sugar",
-        ]
+        ],
+        "mysql": ["mysqlclient"],
+        "postgres": ["psycopg2-binary"],
     },
     packages=find_packages(exclude=["tests", "tests.*"]),
     include_package_data=True,
