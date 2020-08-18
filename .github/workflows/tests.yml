@@ -74,7 +74,7 @@ jobs:
         working-directory: ./src
       - name: Run tests
         working-directory: ./src
-        run: BYRO_CONFIG_FILE=tests/byro.{{ matrix.database }}.cfg py.test --cov=./ --cov-report=xml tests --maxfail=100
+        run: BYRO_CONFIG_FILE=tests/byro.${{ matrix.database }}.cfg py.test --cov=./ --cov-report=xml tests --maxfail=100
       - name: Upload coverage
         uses: codecov/codecov-action@v1
         with:
