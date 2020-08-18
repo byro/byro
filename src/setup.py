@@ -79,7 +79,7 @@ setup(
         "django-formset-js-improved==0.5.0.2",  # no changelog, https://github.com/pretix/django-formset-js
         "django-i18nfield==1.7.*",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
         "django-libsass==0.8",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
-        "django-localflavor==2.1.*",
+        "django-localflavor>=2.1,<3.1",
         "django-select2==7.2.*",  # https://github.com/applegrew/django-select2/releases
         "django-solo==1.1.*",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
         "inlinestyler==0.2.*",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
