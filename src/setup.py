@@ -72,7 +72,7 @@ setup(
         "dateparser~=0.7",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         "Django~=3.1",  # https://docs.djangoproject.com/en/2.0/releases/
         "django-annoying~=0.10",  # https://github.com/skorokithakis/django-annoying/releases
-        "django-bootstrap4~=2.0.0",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
+        "django-bootstrap4>=2.0,<2.3",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor~=2.4",  # https://django-compressor.readthedocs.io/en/latest/changelog/
         "django-extensions~=2.2",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
         "django-formset-js-improved==0.5.0.2",  # no changelog, https://github.com/pretix/django-formset-js
