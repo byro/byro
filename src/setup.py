@@ -74,7 +74,7 @@ setup(
         "django-annoying~=0.10",  # https://github.com/skorokithakis/django-annoying/releases
         "django-bootstrap4~=2.0.0",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor~=2.4",  # https://django-compressor.readthedocs.io/en/latest/changelog/
-        "django-extensions~=2.2",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
+        "django-extensions>=2.2,<4.0",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
         "django-formset-js-improved==0.5.0.2",  # no changelog, https://github.com/pretix/django-formset-js
         "django-i18nfield~=1.7",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
         "django-libsass~=0.8",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
