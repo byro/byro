@@ -150,6 +150,12 @@ class Member(Auditable, models.Model, LogTargetMixin):
     name = models.CharField(
         max_length=100, verbose_name=_("Name"), null=True, blank=True
     )
+    direct_address_name = models.CharField(
+        max_length=100, verbose_name=_("Name for direct address"), null=True, blank=True
+    )
+    order_name = models.CharField(
+        max_length=100, verbose_name=_("Name (sort order)"), null=True, blank=True
+    )
     address = models.TextField(
         max_length=300, verbose_name=_("Address"), null=True, blank=True
     )
@@ -168,6 +174,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
     objects = MemberManager()
     all_objects = AllMemberManager()
 
+    class Meta:
+        ordering = (("direct_address_name", "name"),)
+
     @classproperty
     def profile_classes(cls) -> list:
         return [
@@ -183,6 +192,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
             for related in self._meta.related_objects
             if isinstance(related, OneToOneRel) and related.name.startswith("profile_")
         ]
+
+    @classmethod
+    def get_query_for_search(cls, search):
+        search_parts = search.strip().split()
+        query = models.Q()
+        for part in search_parts:
+            query |= models.Q(name__icontains=part)
+            query |= models.Q(profile_profile__nick__icontains=part)
+            query |= models.Q(number=search)
+        return query
 
     @classmethod
     def get_fields(cls):
@@ -556,6 +575,27 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
         return True
 
+    def update_name_fields(self, force=False, save=True):
+        name_parts = self.name.split()
+        changed = False
+        config = Configuration.get_solo()
+        if not self.order_name or force:
+            self.order_name = (
+                name_parts[0]
+                if config.default_order_name == "first"
+                else name_parts[-1]
+            )
+            changed = True
+        if not self.direct_address_name or force:
+            self.direct_address_name = (
+                name_parts[0]
+                if config.default_direct_address_name == "first"
+                else name_parts[-1]
+            )
+            changed = True
+        if changed and save:
+            self.save()
+
     def __str__(self):
         return "Member {self.number} ({self.name})".format(self=self)
 
@@ -645,7 +685,8 @@ SPECIAL_NAMES = {Member: "member", Membership: "membership"}
 
 SPECIAL_ORDER = [
     "member__number",
-    "member__name",
+    "member__last_name",
+    "member__first_name",
     "member__address",
     "member__email",
     "membership__start",

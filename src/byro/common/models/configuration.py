@@ -65,6 +65,30 @@ class Configuration(ByroConfiguration):
     )
     # Registration form configuration, contains settings for the fields to include when adding a new member
     registration_form = models.JSONField(null=True, blank=True)
+    default_order_name = models.CharField(
+        max_length=5,
+        verbose_name=_("Default sort order"),
+        help_text=_(
+            "You can always override the automatic sort order if a member has an unusual name."
+        ),
+        choices=(
+            ("first", _("First part of the name")),
+            ("last", _("Last part of the name")),
+        ),
+        default="last",
+    )
+    default_direct_address_name = models.CharField(
+        max_length=5,
+        verbose_name=_("Default name when addressing members"),
+        help_text=_(
+            "This is used in emails, for example. You can always override the automatically chosen name if a member has an unusual name."
+        ),
+        choices=(
+            ("first", _("First part of the name")),
+            ("last", _("Last part of the name")),
+        ),
+        default="first",
+    )
     public_base_url = models.URLField(  # Do we want this here or in the settings.py next to SITE_URL?
         max_length=512,
         null=True,
