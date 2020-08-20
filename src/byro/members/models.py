@@ -175,7 +175,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
     all_objects = AllMemberManager()
 
     class Meta:
-        ordering = (("direct_address_name", "name"),)
+        ordering = ("direct_address_name", "name")
 
     @classproperty
     def profile_classes(cls) -> list:
@@ -579,22 +579,34 @@ class Member(Auditable, models.Model, LogTargetMixin):
         name_parts = self.name.split()
         changed = False
         config = Configuration.get_solo()
+
+    def update_order_name(self, force=False, save=True):
         if not self.order_name or force:
+            name_parts = self.name.split()
+            config = Configuration.get_solo()
             self.order_name = (
                 name_parts[0]
                 if config.default_order_name == "first"
                 else name_parts[-1]
             )
-            changed = True
+            if save:
+                self.save()
+
+    def update_direct_address_name(self, force=False, save=True):
         if not self.direct_address_name or force:
+            name_parts = self.name.split()
+            config = Configuration.get_solo()
             self.direct_address_name = (
                 name_parts[0]
                 if config.default_direct_address_name == "first"
                 else name_parts[-1]
             )
-            changed = True
-        if changed and save:
-            self.save()
+            if save:
+                self.save()
+
+    def update_name_fields(self, force=False, save=True):
+        self.update_order_name(force=force, save=save)
+        self.update_direct_address_name(force=force, save=save)
 
     def __str__(self):
         return "Member {self.number} ({self.name})".format(self=self)

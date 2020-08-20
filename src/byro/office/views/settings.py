@@ -60,10 +60,17 @@ class ConfigurationView(FormView):
         ]
         data = self.request.POST if self.request.method == "POST" else None
         return [
-            forms.modelform_factory(
-                model, fields="__all__", exclude=("registration_form",)
-            )(prefix=model.__name__, instance=model.get_solo(), data=data)
+            ConfigurationForm(
+                prefix=Configuration.__name__,
+                instance=Configuration.get_solo(),
+                data=data,
+            )
+        ] + [
+            forms.modelform_factory(model, fields="__all__")(
+                prefix=model.__name__, instance=model.get_solo(), data=data
+            )
             for model in config_models
+            if not issubclass(model, Configuration)
         ]
 
     @transaction.atomic
@@ -86,7 +93,7 @@ class ConfigurationView(FormView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         self._original_values = {
-            f: {k: getattr(f.instance, k) for k in f.fields} for f in form
+            f: {k: getattr(f.instance, k, None) for k in f.fields} for f in form
         }
         if all(f.is_valid() for f in form):
             return self.form_valid(form)
