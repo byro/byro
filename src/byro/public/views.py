@@ -130,6 +130,4 @@ class MemberListView(ListView):
         if not member.is_active:
             raise Http404("Page does not exist")
 
-        return Member.objects.filter(
-            profile_memberpage__is_visible_to_members=True
-        ).order_by("name")
+        return Member.objects.filter(profile_memberpage__is_visible_to_members=True)

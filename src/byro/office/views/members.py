@@ -84,7 +84,8 @@ class MemberListMixin:
     def get_members_queryset(self, search=None, _filter="active"):
         qs = Member.objects.all()
         if search:
-            qs = qs.filter(Q(name__icontains=search) | Q(number=search))
+            qs = qs.filter(Member.get_query_for_search(search))
+
         # Logic:
         #  + Active members have membership with start <= today and (end is null or end >= today)
         active_q = Q(memberships__start__lte=now().date()) & (
@@ -300,9 +301,9 @@ class MemberListExportView(
     model = Member
     form_class = MemberListExportForm
 
-    def get(self, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):
         self.object_list = self.get_queryset()
-        return super().get(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     @transaction.atomic
     def form_valid(self, form):
@@ -1147,9 +1148,7 @@ class MemberListTypeaheadView(View):
         if not search or len(search) < 2:
             return JsonResponse({"count": 0, "results": []})
 
-        queryset = Member.objects.filter(
-            Q(name__icontains=search) | Q(profile_profile__nick__icontains=search)
-        )
+        queryset = Member.objects.filter(Member.get_query_for_search(search))
         return JsonResponse(
             {
                 "count": len(queryset),

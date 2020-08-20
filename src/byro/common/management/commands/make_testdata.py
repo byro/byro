@@ -247,6 +247,8 @@ class Command(BaseCommand):
         )
         pays_other.log(SOURCE_TEST_DATA, ".created")
         self.make_paid(pays_other, pays_for=is_payed_for)
+        for member in Member.objects.all():
+            member.update_name_fields()
 
     def create_bank_chaff(self):
         """Create some dummy traffic, and a couple of unmatched transactions on
