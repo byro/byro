@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from byro.common.models import Configuration
+from byro.members.models import Member
 
 
 class InitialForm(forms.ModelForm):
@@ -25,7 +26,12 @@ class ConfigurationForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # TODO update names
+        if self.cleaned_data.get("update_existing_order_names"):
+            for member in Member.objects.all():
+                member.update_order_name(force=True)
+        if self.cleaned_data.get("update_existing_direct_address_names"):
+            for member in Member.objects.all():
+                member.update_direct_address_name(force=True)
 
     class Meta:
         model = Configuration
@@ -35,9 +41,13 @@ class ConfigurationForm(forms.ModelForm):
             "url",
             "language",
             "currency",
-            "mail_from",
             "liability_interval",
+            "public_base_url",
+            "mail_from",
+            "backoffice_mail",
             "accounting_start",
             "default_order_name",
+            "update_existing_order_names",
             "default_direct_address_name",
+            "update_existing_direct_address_names",
         )
