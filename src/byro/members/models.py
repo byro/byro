@@ -218,6 +218,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 read_only=True,
             )
         )
+        result.append(
+            Field(
+                "_internal_last_transaction",
+                _("Last Member Fee Transaction Timestamp"),
+                "",
+                "last_membership_fee_transaction_timestamp",
+                computed=True,
+                read_only=True,
+            )
+        )
 
         reg_form = Configuration.get_solo().registration_form or []
         form_config = {entry["name"]: entry for entry in reg_form}
@@ -296,6 +306,20 @@ class Member(Auditable, models.Model, LogTargetMixin):
     @property
     def balance(self) -> Decimal:
         return self._calc_balance()
+
+    def _calc_last_membership_fee_transaction_timestamp(self):
+        _now = now()
+        fees_receivable_account = SpecialAccounts.fees_receivable
+        qs = Booking.objects.filter(
+            Q(debit_account=fees_receivable_account) | Q(credit_account=fees_receivable_account),
+            member=self,
+            transaction__value_datetime__lte=_now
+        )
+        return qs.aggregate(last_transaction=models.Max("transaction__value_datetime"))['last_transaction']
+
+    @property
+    def last_membership_fee_transaction_timestamp(self):
+        return self._calc_last_membership_fee_transaction_timestamp()
 
     def create_balance(self, start, end, commit=True, create_if_zero=True):
         if self.balances.exists():
@@ -504,6 +528,33 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 memo=_("Due amount outside of membership canceled"),
                 user_or_context="internal: update_liabilites, reverse stray liabilities",
             )
+
+    @transaction.atomic
+    def adjust_balance(self, user_or_context, memo, amount, from_, to_, value_datetime):
+        now_ = now()
+
+        if amount == 0:
+            return False
+
+        if amount < 0:
+            amount = -amount
+            from_, to_ = to_, from_
+
+        from_member = self if from_ == SpecialAccounts.fees_receivable else None
+        to_member = self if to_ == SpecialAccounts.fees_receivable else None
+
+        t = Transaction.objects.create(
+            value_datetime=value_datetime,
+            booking_datetime=now_,
+            user_or_context=user_or_context,
+            memo=memo,
+        )
+        t.debit(account=to_, member=to_member, amount=amount, user_or_context=user_or_context)
+        t.credit(
+            account=from_, member=from_member, amount=amount, user_or_context=user_or_context
+        )
+
+        return True
 
     def __str__(self):
         return "Member {self.number} ({self.name})".format(self=self)

@@ -486,6 +486,9 @@ def default_csv_form_valid(view, form, dialect="excel"):
 
             do_update = False
             have_changes = False
+            create_initial_balance = False
+            initial_balance = None
+            initial_balance_timestamp = None
             for verb_name, field in mapping.items():
                 if field.field_id == "_internal_id":
                     member = Member.all_objects.filter(
@@ -516,19 +519,53 @@ def default_csv_form_valid(view, form, dialect="excel"):
                             field.setter(member, v)
                             have_changes = True
                     else:
-                        field.setter(member, v)
+                        if field.field_id == "_internal_balance":
+                            if dialect == csv_excel_de:
+                                v = v.replace('.', '').replace(',', '.')
+                            initial_balance = Decimal(v)
+                            if initial_balance != 0:
+                                create_initial_balance = True
+                        elif field.field_id == "_internal_last_transaction":
+                            if v != '' and v is not None:
+                                initial_balance_timestamp = dateparser.parse(v, languages=[settings.LANGUAGE_CODE, "en"])
+                                create_initial_balance = True
+                        else:
+                            field.setter(member, v)
 
             if do_update:
                 if have_changes:
                     member.log(view, ".updated")
                     member.save()
             else:
+                if create_initial_balance and not initial_balance_timestamp:
+                    messages.error(
+                        view.request,
+                        _("Either both or none columns has to be given: '{}' and '{}'").format(
+                            fields["_internal_balance"].name, fields["_internal_last_transaction"].name
+                        ),
+                    )
+                    return redirect(view.request.get_full_path())
+
                 member.log(view, ".created")
                 member.save()
 
                 # FIXME Changing membership when do_update is not implemented
                 if membership_parms:
                     create_membership(membership_parms, member)
+
+                if create_initial_balance:
+
+                    balance_changed = member.adjust_balance(
+                        view,
+                        "Initial Balance created by CSV Import",
+                        initial_balance,
+                        SpecialAccounts.fees_receivable,
+                        SpecialAccounts.opening_balance,
+                        initial_balance_timestamp
+                    )
+
+                    if balance_changed:
+                        member.log(view, ".finance.initial_balance", balance=member.balance)
 
     return redirect(reverse("office:members.list"))
 
@@ -988,7 +1025,6 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
         )
 
         member = self.get_member()
-        now_ = now()
 
         if form.cleaned_data["adjustment_type"] == "relative":
             amount = form.cleaned_data["amount"]
@@ -1000,47 +1036,29 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
 
         amount_, from_, to_ = None, None, None
 
-        if amount != 0:
-            if form.cleaned_data["adjustment_reason"] == "initial":
-                amount_, from_, to_ = (
-                    amount,
-                    SpecialAccounts.opening_balance,
+        if form.cleaned_data["adjustment_reason"] == "initial":
+            from_, to_ = (
+                SpecialAccounts.opening_balance,
+                SpecialAccounts.fees_receivable,
+            )
+        elif form.cleaned_data["adjustment_reason"] == "waiver":
+            if amount < 0:
+                from_, to_ = (
                     SpecialAccounts.fees_receivable,
+                    SpecialAccounts.lost_income,
                 )
-            elif form.cleaned_data["adjustment_reason"] == "waiver":
-                if amount < 0:
-                    amount_, from_, to_ = (
-                        -amount,
-                        SpecialAccounts.fees_receivable,
-                        SpecialAccounts.lost_income,
-                    )
-                else:
-                    messages.error(
-                        self.request,
-                        _(
-                            "Fee waiving needs to decrease debts. Use a negative value in relative mode, or a value higher than the current one in absolute mode."
-                        ),
-                    )
-                    return
+            elif amount > 0:
+                messages.error(
+                    self.request,
+                    _(
+                        "Fee waiving needs to decrease debts. Use a negative value in relative mode, or a value higher than the current one in absolute mode."
+                    ),
+                )
+                return
 
-            if amount_ < 0:
-                amount_ = -amount_
-                from_, to_ = to_, from_
+        balance_changed = member.adjust_balance(self, memo, amount, from_, to_, form.cleaned_data["date"])
 
-            from_member = member if from_ == SpecialAccounts.fees_receivable else None
-            to_member = member if to_ == SpecialAccounts.fees_receivable else None
-
-            t = Transaction.objects.create(
-                value_datetime=form.cleaned_data["date"],
-                booking_datetime=now_,
-                user_or_context=self,
-                memo=memo,
-            )
-            t.debit(account=to_, member=to_member, amount=amount_, user_or_context=self)
-            t.credit(
-                account=from_, member=from_member, amount=amount_, user_or_context=self
-            )
-
+        if balance_changed:
             balance = member.balance
 
             if form.cleaned_data["adjustment_reason"] == "initial":
