@@ -343,11 +343,14 @@ class Member(Auditable, models.Model, LogTargetMixin):
         _now = now()
         fees_receivable_account = SpecialAccounts.fees_receivable
         qs = Booking.objects.filter(
-            Q(debit_account=fees_receivable_account) | Q(credit_account=fees_receivable_account),
+            Q(debit_account=fees_receivable_account)
+            | Q(credit_account=fees_receivable_account),
             member=self,
-            transaction__value_datetime__lte=_now
+            transaction__value_datetime__lte=_now,
         )
-        return qs.aggregate(last_transaction=models.Max("transaction__value_datetime"))['last_transaction']
+        return qs.aggregate(last_transaction=models.Max("transaction__value_datetime"))[
+            "last_transaction"
+        ]
 
     @property
     def last_membership_fee_transaction_timestamp(self):
@@ -581,9 +584,17 @@ class Member(Auditable, models.Model, LogTargetMixin):
             user_or_context=user_or_context,
             memo=memo,
         )
-        t.debit(account=to_, member=to_member, amount=amount, user_or_context=user_or_context)
+        t.debit(
+            account=to_,
+            member=to_member,
+            amount=amount,
+            user_or_context=user_or_context,
+        )
         t.credit(
-            account=from_, member=from_member, amount=amount, user_or_context=user_or_context
+            account=from_,
+            member=from_member,
+            amount=amount,
+            user_or_context=user_or_context,
         )
 
         return True
