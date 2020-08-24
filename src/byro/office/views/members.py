@@ -27,7 +27,7 @@ from django.views.generic.list import (
     MultipleObjectTemplateResponseMixin,
 )
 
-from byro.bookkeeping.models import Booking, Transaction
+from byro.bookkeeping.models import Booking
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry
 from byro.mails.models import EMail
@@ -522,13 +522,15 @@ def default_csv_form_valid(view, form, dialect="excel"):
                     else:
                         if field.field_id == "_internal_balance":
                             if dialect == csv_excel_de:
-                                v = v.replace('.', '').replace(',', '.')
+                                v = v.replace(".", "").replace(",", ".")
                             initial_balance = Decimal(v)
                             if initial_balance != 0:
                                 create_initial_balance = True
                         elif field.field_id == "_internal_last_transaction":
-                            if v != '' and v is not None:
-                                initial_balance_timestamp = dateparser.parse(v, languages=[settings.LANGUAGE_CODE, "en"])
+                            if v != "" and v is not None:
+                                initial_balance_timestamp = dateparser.parse(
+                                    v, languages=[settings.LANGUAGE_CODE, "en"]
+                                )
                                 create_initial_balance = True
                         else:
                             field.setter(member, v)
@@ -541,8 +543,11 @@ def default_csv_form_valid(view, form, dialect="excel"):
                 if create_initial_balance and not initial_balance_timestamp:
                     messages.error(
                         view.request,
-                        _("Either both or none columns has to be given: '{}' and '{}'").format(
-                            fields["_internal_balance"].name, fields["_internal_last_transaction"].name
+                        _(
+                            "Either both or none columns has to be given: '{}' and '{}'"
+                        ).format(
+                            fields["_internal_balance"].name,
+                            fields["_internal_last_transaction"].name,
                         ),
                     )
                     return redirect(view.request.get_full_path())
@@ -562,11 +567,13 @@ def default_csv_form_valid(view, form, dialect="excel"):
                         initial_balance,
                         SpecialAccounts.fees_receivable,
                         SpecialAccounts.opening_balance,
-                        initial_balance_timestamp
+                        initial_balance_timestamp,
                     )
 
                     if balance_changed:
-                        member.log(view, ".finance.initial_balance", balance=member.balance)
+                        member.log(
+                            view, ".finance.initial_balance", balance=member.balance
+                        )
 
     return redirect(reverse("office:members.list"))
 
@@ -1044,7 +1051,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
             )
             amount = old_balance - form.cleaned_data["amount"]
 
-        amount_, from_, to_ = None, None, None
+        from_, to_ = None, None
 
         if form.cleaned_data["adjustment_reason"] == "initial":
             from_, to_ = (
@@ -1066,7 +1073,9 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                 )
                 return
 
-        balance_changed = member.adjust_balance(self, memo, amount, from_, to_, form.cleaned_data["date"])
+        balance_changed = member.adjust_balance(
+            self, memo, amount, from_, to_, form.cleaned_data["date"]
+        )
 
         if balance_changed:
             balance = member.balance
