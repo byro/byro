@@ -28,6 +28,9 @@ class CreateMemberForm(forms.Form):
         }
         for field in config:
             self.build_field(field, profiles)
+            if field.get("name", "") == "member__name":
+                self.build_field({"name": "member__direct_address_name"}, [])
+                self.build_field({"name": "member__order_name"}, [])
 
         if "member__number" in self.fields:
             self.fields["member__number"].initial = get_next_member_number()

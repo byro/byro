@@ -125,7 +125,9 @@ class RegistrationConfigForm(forms.Form):
         for model in [Member, Membership] + Member.profile_classes:
             for field in model._meta.fields:
                 if field.name in ("id", "member") or (
-                    model is Member and field.name == "membership_type"
+                    model is Member
+                    and field.name
+                    in ["membership_type", "direct_address_name", "order_name"]
                 ):
                     continue
                 yield (model, field)

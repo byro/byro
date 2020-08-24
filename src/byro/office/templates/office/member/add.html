@@ -1,10 +1,13 @@
 {% extends "office/base_headline.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
+{% load static %}
 
 {% block headline %}{% trans "Add Member …" %}{% endblock %}
 
 {% block content %}
+
+{{ name_config|json_script:"name-config" }}
 
 {% if form.fields %}
     <form method="post">
@@ -20,4 +23,5 @@
         <a href="{% url "office:settings.registration" %}">{% trans "here!" %}</a>
     </div>
 {% endif %}
+<script type="text/javascript" src="{% static "office/registration.js" %}"></script>
 {% endblock %}
