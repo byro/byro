@@ -12,12 +12,12 @@
             <h5 class="card-header">{{ member.name }}</h5>
             <div class="card-body">
                 <table class="table table-condensed">
-                    {% for line in member.profile_memberpage.get_public_data %}
+                    {% for line in member.profile_memberpage.get_public_data %}{% if line.value %}
                     <tr>
                         <th>{{ line.label }}</th>
                         <td>{{ line.value }}</td>
                     </tr>
-                    {% endfor %}
+                    {% endif %}{% endfor %}
                 </table>
             </div>
         </div>
