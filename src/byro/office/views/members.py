@@ -1051,16 +1051,18 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
             )
             amount = old_balance - form.cleaned_data["amount"]
 
-        from_, to_ = None, None
+        amount_, from_, to_ = None, None, None
 
         if form.cleaned_data["adjustment_reason"] == "initial":
-            from_, to_ = (
+            amount_, from_, to_ = (
+                amount,
                 SpecialAccounts.opening_balance,
                 SpecialAccounts.fees_receivable,
             )
         elif form.cleaned_data["adjustment_reason"] == "waiver":
             if amount < 0:
-                from_, to_ = (
+                amount_, from_, to_ = (
+                    -amount,
                     SpecialAccounts.fees_receivable,
                     SpecialAccounts.lost_income,
                 )
@@ -1074,7 +1076,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                 return
 
         balance_changed = member.adjust_balance(
-            self, memo, amount, from_, to_, form.cleaned_data["date"]
+            self, memo, amount_, from_, to_, form.cleaned_data["date"]
         )
 
         if balance_changed:

@@ -568,7 +568,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def adjust_balance(self, user_or_context, memo, amount, from_, to_, value_datetime):
         now_ = now()
 
-        if amount == 0:
+        if not amount:
             return False
 
         if amount < 0:
