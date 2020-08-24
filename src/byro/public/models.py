@@ -62,5 +62,5 @@ class MemberpageProfile(models.Model):
             if not value.get("visibility") == "share" or key not in all_fields:
                 continue
             field = all_fields[key]
-            result.append({"label": field.name, "value": field.getter(self.member)})
+            result.append({"label": field.base_name, "value": field.getter(self.member)})
         return result

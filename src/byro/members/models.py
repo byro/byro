@@ -29,10 +29,14 @@ class Field:
     registration_form = dict
 
     def __init__(
-        self, field_id, name, description, path, registration_form=None, **kwargs
+        self, field_id, name, description, path, addition=None, registration_form=None, **kwargs
     ):
         self.field_id = field_id
-        self.name = name
+        self.base_name = name
+        if addition:
+            self.name = f"{name} ({addition})"
+        else:
+            self.name = name
         self.description = description
         self.path = path
         self.registration_form = registration_form or {}
@@ -268,15 +272,16 @@ class Member(Auditable, models.Model, LogTargetMixin):
                     SPECIAL_NAMES.get(model, model.__name__), field.name
                 )
                 f_name = field.verbose_name or field.name
+                f_addition = None
 
                 if issubclass(model, cls):
                     f_path = field.name
                 elif model is Membership:
                     f_path = "memberships.last().{}".format(field.name)
-                    f_name = "{} ({})".format(f_name, _("Current membership"))
+                    f_addition = _("Current membership")
                 else:
                     f_path = "{}.{}".format(profile_map[model], field.name)
-                    f_name = "{} ({})".format(f_name, model.__name__)
+                    f_addition = model.__name__
 
                 result.append(
                     Field(
@@ -284,6 +289,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
                         f_name,
                         "",
                         f_path,
+                        addition=f_addition,
                         registration_form=form_config.get(f_id, None),
                         computed=False,
                         read_only=False,
