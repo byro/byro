@@ -649,6 +649,15 @@ class MemberCreateView(FormView):
             )
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        result = super().get_context_data(**kwargs)
+        config = Configuration.get_solo()
+        result["name_config"] = {
+            "order": config.default_order_name,
+            "direct": config.default_direct_address_name,
+        }
+        return result
+
     def get_success_url(self):
         return reverse("office:members.data", kwargs={"pk": self.form.instance.pk})
 

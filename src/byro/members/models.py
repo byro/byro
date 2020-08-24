@@ -29,7 +29,14 @@ class Field:
     registration_form = dict
 
     def __init__(
-        self, field_id, name, description, path, addition=None, registration_form=None, **kwargs
+        self,
+        field_id,
+        name,
+        description,
+        path,
+        addition=None,
+        registration_form=None,
+        **kwargs,
     ):
         self.field_id = field_id
         self.base_name = name
@@ -582,9 +589,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
         return True
 
     def update_name_fields(self, force=False, save=True):
-        name_parts = self.name.split()
-        changed = False
-        config = Configuration.get_solo()
+        self.update_order_name(force=force, save=save)
+        self.update_direct_address_name(force=force, save=save)
 
     def update_order_name(self, force=False, save=True):
         if not self.order_name or force:
@@ -609,10 +615,6 @@ class Member(Auditable, models.Model, LogTargetMixin):
             )
             if save:
                 self.save()
-
-    def update_name_fields(self, force=False, save=True):
-        self.update_order_name(force=force, save=save)
-        self.update_direct_address_name(force=force, save=save)
 
     def __str__(self):
         return "Member {self.number} ({self.name})".format(self=self)
