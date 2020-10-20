@@ -10,6 +10,8 @@ def rename(apps, schema_editor):
     for member in Member.objects.all():
         if member.name:
             name_parts = member.name.rsplit(maxsplit=1)
+            if len(name_parts) == 1:
+                name_parts = name_parts + name_parts
             member.direct_address_name = name_parts[0]
             member.order_name = name_parts[1]
             member.save()
