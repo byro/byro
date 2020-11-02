@@ -89,7 +89,7 @@ setup(
         "pynacl~=1.4.0",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "qrcode[pil]==6.1",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
         "unicodecsv~=0.14.0",
-        "more-itertools~=8.4.0",
+        "more-itertools>=8.4,<8.7",
         "schwifty==2020.8",
     ],
     extras_require={
