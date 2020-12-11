@@ -66,6 +66,7 @@ start_migrate() {
 
 start_rebuild() {
     echo "Running rebuild..."
+    manage compress
     manage collectstatic --noinput
     touch "$COMPLETE_REBUILD"
 }
