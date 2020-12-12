@@ -42,6 +42,7 @@ for directory in (BASE_DIR, LOG_DIR, STATIC_ROOT, MEDIA_ROOT):
 
 ## APP SETTINGS
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     "django.contrib.contenttypes",
     "django.contrib.auth",
     "django.contrib.sessions",
@@ -226,6 +227,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ## MIDDLEWARE SETTINGS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -269,6 +271,7 @@ STATICFILES_FINDERS = (
     "compressor.finders.CompressorFinder",
 )
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "byro", "static")]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 ## EXTERNAL APP SETTINGS
@@ -281,13 +284,13 @@ with suppress(ImportError):
     import django_securebox
 
     INSTALLED_APPS.append("django_securebox")
-    MIDDLEWARE.insert(2, "django_securebox.middleware.SecureBoxMiddleware")
+    MIDDLEWARE.insert(3, "django_securebox.middleware.SecureBoxMiddleware")
 
 with suppress(ImportError):
     import debug_toolbar
 
     INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(2, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    MIDDLEWARE.insert(3, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 
 COMPRESS_ENABLED = COMPRESS_OFFLINE = not DEBUG

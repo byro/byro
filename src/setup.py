@@ -91,6 +91,7 @@ setup(
         "unicodecsv~=0.14.0",
         "more-itertools~=8.4.0",
         "schwifty==2020.8",
+        "whitenoise[brotli]~=5.2.0",
     ],
     extras_require={
         "dev": [
