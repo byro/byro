@@ -50,7 +50,7 @@ RUN sh -c 'pip install --no-warn-script-location --prefix=/install --no-deps .'
 #  Compile assets from source
 RUN cp -r /install/* /usr/local
 ADD byro.docker.cfg /byro/config/byro.cfg
-RUN sh -c 'python manage.py compress && python manage.py collectstatic --no-input'
+RUN sh -c 'python manage.py collectstatic --no-input && python manage.py compress && python manage.py collectstatic --no-input'
 
 
 # Stage 5: Install compiled static assets, support files, apache, and postgresql into clean image
