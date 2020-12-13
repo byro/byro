@@ -146,12 +146,18 @@ class Account(Auditable, models.Model, LogTargetMixin):
 
         result_2 = self.associated.balances(start, end)
 
-        result = {
-            "net": result_1['net'] - result_2['net'],
-            # TODO: is the following also correct for EXPENSES?
-            "debit": result_2['debit'] - result_1['credit'],
-            "credit": result_2['credit'] - result_1['debit']
-        }
+        if self.account_category == AccountCategory.INCOME:
+            result = {
+                "net": result_1['net'] - result_2['net'],
+                "debit": result_1['debit'],
+                "credit": result_1['credit'] - result_2['net']
+            }
+        else:
+            result = {
+                "net": result_1['net'] - result_2['net'],
+                "debit": result_1['debit'] - result_2['net'],
+                "credit": result_1['credit']
+            }
 
         return result
 
