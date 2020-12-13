@@ -5,6 +5,8 @@ services:
     build:
       context: ../src
       dockerfile: ../docker/Dockerfile
+      args:
+        language: de_DE.UTF-8
     command: byro
     environment:
         PYTHONUNBUFFERED: 0
@@ -25,11 +27,16 @@ services:
      - core-logs:/byro/data/logs
 
   db:
-    image: postgres:12
+    build:
+      context: .
+      dockerfile: ./Dockerfile-postgres
+      args:
+        language: de_DE
     environment:
         POSTGRES_PASSWORD: byro
         POSTGRES_DB: byro
         POSTGRES_USER: byro
+        LC_MESSAGES: C
     networks:
       intdb: {}
     restart: unless-stopped

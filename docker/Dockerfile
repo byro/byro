@@ -1,11 +1,13 @@
-FROM python:3.8-slim as common-base
+FROM python:3.9-slim as common-base
 MAINTAINER byro team
 
+ARG language=C
 ARG PLUGINS=""
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DJANGO_SETTINGS_MODULE byro.settings
 ENV BYRO_CONFIG_FILE /byro/config/byro.cfg
+ENV LANG $language
 
 RUN useradd uid1000 -d /home/uid1000 && \
     mkdir -p /home/uid1000 && \
@@ -29,35 +31,40 @@ RUN python setup.py egg_info
 
 # Stage 2: Install dependencies based on the information extracted from the previous step
 #  Caveat: Expects an empty line between base dependencies and extras, doesn't install extras
+#  Also copies all installed packages to /usr/local for subsequent commands to find
 FROM base-builder as builder
 RUN apt-get update && \
     apt-get install -y zsh gettext libjpeg-dev libmagic-dev build-essential python3-dev
 RUN mkdir -p /install
 COPY --from=dependencies /app/byro.egg-info/requires.txt /tmp/
-RUN sh -c 'pip install --no-warn-script-location --prefix=/install $(grep -e ^$ -m 1 -B 9999 /tmp/requires.txt) gunicorn psycopg2-binary'
+RUN sh -c 'pip install --no-warn-script-location --prefix=/install $(grep -e ^$ -m 1 -B 9999 /tmp/requires.txt) gunicorn psycopg2-binary && cp -r /install/* /usr/local/'
 
 
 ADD . /app
+ADD ./byro.docker.cfg /byro/config/byro.cfg
+ENV PYTHONPATH /install:/app
 
-# Stage 3: Install application (no-deps, since we already have the dependencies)
-RUN sh -c 'pip install --no-warn-script-location --prefix=/install --no-deps .'
+# Stage 3: Install application (no-deps, since we already have the dependencies),
+RUN pip install --no-warn-script-location --prefix=/install --no-deps .
 
 
 # FIXME Add plugins here
 
 
-# Stage 4: Install application into this temporary container, in order to have both source and compiled files
-#  Compile assets from source
-RUN cp -r /install/* /usr/local
-ADD ./byro.docker.cfg /byro/config/byro.cfg
-RUN sh -c 'python manage.py collectstatic --no-input && python manage.py compress && python manage.py collectstatic --no-input'
+# Stage 4: Compile assets from source
+RUN python manage.py compilemessages && \
+    python manage.py collectstatic --no-input && \
+    python manage.py compress && \
+    python manage.py collectstatic --no-input
 
 
 # Stage 5: Install compiled static assets, support files, apache, and postgresql into clean image
 FROM common-base
 
+# FIXME The locale logic is probably broken for the "C" case, and hard to debug
 RUN apt-get update && \
-    apt-get install -y libmagic1 && \
+    apt-get install -y libmagic1 locales && \
+    bash -c "(grep \"^${LANG} \" /usr/share/i18n/SUPPORTED | head -n 1 > /etc/locale.gen && /usr/sbin/locale-gen) || rm /etc/locale.gen" && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/static.dist /app/static.dist
