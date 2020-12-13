@@ -23,8 +23,8 @@ WORKDIR /app
 #  Allows docker caching until setup.py changes
 FROM base-builder as dependencies
 
-COPY setup.py .
-COPY byro/__init__.py ./byro/__init__.py
+COPY ./setup.py .
+COPY ./byro/__init__.py ./byro/__init__.py
 RUN python setup.py egg_info
 
 # Stage 2: Install dependencies based on the information extracted from the previous step
@@ -49,7 +49,7 @@ RUN sh -c 'pip install --no-warn-script-location --prefix=/install --no-deps .'
 # Stage 4: Install application into this temporary container, in order to have both source and compiled files
 #  Compile assets from source
 RUN cp -r /install/* /usr/local
-ADD byro.docker.cfg /byro/config/byro.cfg
+ADD ./byro.docker.cfg /byro/config/byro.cfg
 RUN sh -c 'python manage.py collectstatic --no-input && python manage.py compress && python manage.py collectstatic --no-input'
 
 
@@ -62,8 +62,8 @@ RUN apt-get update && \
 
 COPY --from=builder /app/static.dist /app/static.dist
 COPY --from=builder /install /usr/local
-ADD byro.docker.cfg /byro/config/byro.cfg
-ADD docker-entrypoint.sh /docker-entrypoint.sh
+COPY --from=builder /byro/config/byro.cfg /byro/config/byro.cfg
+ADD ./docker-entrypoint.sh /docker-entrypoint.sh
 
 WORKDIR /byro
 EXPOSE 80

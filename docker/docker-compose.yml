@@ -2,7 +2,9 @@ version: "3.0"
 
 services:
   core:
-    build: .
+    build:
+      context: ../src
+      dockerfile: ../docker/Dockerfile
     command: byro
     environment:
         PYTHONUNBUFFERED: 0
