@@ -125,3 +125,6 @@ data/
 *.sql*
 
 byro.cfg
+
+# Explicitly allow .env
+!/src/.env
