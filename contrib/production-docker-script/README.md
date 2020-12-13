@@ -1,0 +1,1 @@
+This directory contains a docker-compose file and helper script to quickly setup a mostly production ready byro deployment.

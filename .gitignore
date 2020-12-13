@@ -128,3 +128,4 @@ byro.cfg
 
 # Explicitly allow .env
 !/src/.env
+!/contrib/production-docker-script/.env
