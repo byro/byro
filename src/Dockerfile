@@ -10,7 +10,7 @@ ENV BYRO_CONFIG_FILE /byro/config/byro.cfg
 RUN useradd uid1000 -d /home/uid1000 && \
     mkdir -p /home/uid1000 && \
     chown uid1000: /home/uid1000 && \
-    mkdir -p /byro /byro/data /byro/data/media /byro/data/logs && \
+    mkdir -p /byro /byro/data /byro/data/media /byro/data/logs /byro/data/misc && \
     chown -R uid1000: /byro
 
 

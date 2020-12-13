@@ -1,18 +1,57 @@
-web:
-  build: .
-  command: byro
-  environment:
-      PYTHONUNBUFFERED: 0
-      DEVELOPMENT: 0
-  links:
-   - db
-     #  volumes:
-     #   - ..:/opt/code/
-  ports:
-   - "127.0.0.1:80:80"
-db:
-  image: postgres:12
-  environment:
-      POSTGRES_PASSWORD: byro
-      POSTGRES_DB: byro
-      POSTGRES_USER: byro
+version: "3.0"
+
+services:
+  core:
+    build: .
+    command: byro
+    environment:
+        PYTHONUNBUFFERED: 0
+        DEVELOPMENT: 0
+    networks:
+      intdb: {}
+      default: {}
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+     - "8345:80"
+    read_only: true
+    volumes:
+     - core-config:/byro/config:ro
+     - core-misc:/byro/data/misc
+     - core-media:/byro/data/media
+     - core-logs:/byro/data/logs
+
+  db:
+    image: postgres:12
+    environment:
+        POSTGRES_PASSWORD: byro
+        POSTGRES_DB: byro
+        POSTGRES_USER: byro
+    networks:
+      intdb: {}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U byro"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+networks:
+  intdb:
+    driver: bridge
+    internal: true
+  default: {}
+
+volumes:
+  core-config:
+  core-misc:
+  core-media:
+  core-logs:
+  db-data:
