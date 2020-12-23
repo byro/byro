@@ -2,12 +2,13 @@ FROM python:3.9-slim as common-base
 MAINTAINER byro team
 
 ARG language=C
-ARG PLUGINS=""
+ARG INSTALL_PLUGINS
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DJANGO_SETTINGS_MODULE byro.settings
 ENV BYRO_CONFIG_FILE /byro/config/byro.cfg
 ENV LANG $language
+ENV PLUGINS "$INSTALL_PLUGINS"
 
 RUN useradd uid1000 -d /home/uid1000 && \
     mkdir -p /home/uid1000 && \
@@ -34,7 +35,7 @@ RUN python setup.py egg_info
 #  Also copies all installed packages to /usr/local for subsequent commands to find
 FROM base-builder as builder
 RUN apt-get update && \
-    apt-get install -y zsh gettext libjpeg-dev libmagic-dev build-essential python3-dev
+    apt-get install -y zsh gettext libjpeg-dev libmagic-dev build-essential python3-dev git
 RUN mkdir -p /install
 COPY --from=dependencies /app/byro.egg-info/requires.txt /tmp/
 RUN sh -c 'pip install --no-warn-script-location --prefix=/install $(grep -e ^$ -m 1 -B 9999 /tmp/requires.txt) gunicorn psycopg2-binary && cp -r /install/* /usr/local/'
@@ -42,13 +43,12 @@ RUN sh -c 'pip install --no-warn-script-location --prefix=/install $(grep -e ^$ 
 
 ADD . /app
 ADD ./byro.docker.cfg /byro/config/byro.cfg
-ENV PYTHONPATH /install:/app
+ENV PYTHONPATH /install:/plugin_install:/app
 
 # Stage 3: Install application (no-deps, since we already have the dependencies),
 RUN pip install --no-warn-script-location --prefix=/install --no-deps .
 
-
-# FIXME Add plugins here
+RUN test -z "$PLUGINS" || (echo Installing $PLUGINS; pip install --no-warn-script-location --prefix=/install $PLUGINS && cp -r /install/* /usr/local/ )
 
 
 # Stage 4: Compile assets from source
