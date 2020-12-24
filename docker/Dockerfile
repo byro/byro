@@ -2,19 +2,24 @@ FROM python:3.9-slim as common-base
 MAINTAINER byro team
 
 ARG language=C
+ARG BYRO_USER=byro
+ARG BYRO_UID=23000
 ARG INSTALL_PLUGINS
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DJANGO_SETTINGS_MODULE byro.settings
 ENV BYRO_CONFIG_FILE /byro/config/byro.cfg
+ENV BYRO_USER "$BYRO_USER"
+ENV BYRO_UID "$BYRO_UID"
 ENV LANG $language
 ENV PLUGINS "$INSTALL_PLUGINS"
 
-RUN useradd uid1000 -d /home/uid1000 && \
-    mkdir -p /home/uid1000 && \
-    chown uid1000: /home/uid1000 && \
+RUN groupadd --gid "${BYRO_UID}" "${BYRO_USER}" && \
+    useradd --uid "${BYRO_UID}" --gid "${BYRO_UID}" ${BYRO_USER} -d /home/${BYRO_USER} && \
+    mkdir -p /home/${BYRO_USER} && \
+    chown ${BYRO_USER}:${BYRO_USER} /home/${BYRO_USER} && \
     mkdir -p /byro /byro/data /byro/data/media /byro/data/logs /byro/data/misc && \
-    chown -R uid1000: /byro
+    chown -R ${BYRO_USER}:${BYRO_USER} /byro
 
 
 FROM common-base as base-builder
@@ -52,10 +57,11 @@ RUN test -z "$PLUGINS" || (echo Installing $PLUGINS; pip install --no-warn-scrip
 
 
 # Stage 4: Compile assets from source
-RUN python manage.py compilemessages && \
-    python manage.py collectstatic --no-input && \
-    python manage.py compress && \
-    python manage.py collectstatic --no-input
+RUN chown -R "${BYRO_USER}:${BYRO_USER}" /byro /app && \
+    su -p ${BYRO_USER} -c "python manage.py compilemessages" && \
+    su -p ${BYRO_USER} -c "python manage.py collectstatic --no-input" && \
+    su -p ${BYRO_USER} -c "python manage.py compress" && \
+    su -p ${BYRO_USER} -c "python manage.py collectstatic --no-input"
 
 
 # Stage 5: Install compiled static assets, support files, apache, and postgresql into clean image
