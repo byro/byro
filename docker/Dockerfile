@@ -1,18 +1,22 @@
-FROM python:3.9-slim as common-base
-MAINTAINER byro team
-
 ARG language=C
 ARG BYRO_USER=byro
 ARG BYRO_UID=23000
 ARG INSTALL_PLUGINS
 
+FROM python:3.9-slim as common-base
+MAINTAINER byro team
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV DJANGO_SETTINGS_MODULE byro.settings
 ENV BYRO_CONFIG_FILE /byro/config/byro.cfg
+
+ARG language
+ARG BYRO_USER
+ARG BYRO_UID
+
+ENV LANG $language
 ENV BYRO_USER "$BYRO_USER"
 ENV BYRO_UID "$BYRO_UID"
-ENV LANG $language
-ENV PLUGINS "$INSTALL_PLUGINS"
 
 RUN groupadd --gid "${BYRO_UID}" "${BYRO_USER}" && \
     useradd --uid "${BYRO_UID}" --gid "${BYRO_UID}" ${BYRO_USER} -d /home/${BYRO_USER} && \
@@ -48,10 +52,13 @@ RUN sh -c 'pip install --no-warn-script-location --prefix=/install $(grep -e ^$ 
 
 ADD . /app
 ADD ./byro.docker.cfg /byro/config/byro.cfg
-ENV PYTHONPATH /install:/plugin_install:/app
+ENV PYTHONPATH /install:/app
 
 # Stage 3: Install application (no-deps, since we already have the dependencies),
 RUN pip install --no-warn-script-location --prefix=/install --no-deps .
+
+ARG INSTALL_PLUGINS
+ENV PLUGINS "$INSTALL_PLUGINS"
 
 RUN test -z "$PLUGINS" || (echo Installing $PLUGINS; pip install --no-warn-script-location --prefix=/install $PLUGINS && cp -r /install/* /usr/local/ )
 
