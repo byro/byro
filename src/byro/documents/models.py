@@ -130,6 +130,10 @@ Thank you,
     def get_object_icon(self):
         return mark_safe('<i class="fa fa-file-o"></i> ')
 
+    @property
+    def basename(self):
+        return self.document.name.split("/")[-1]
+
 
 @receiver(pre_delete, sender=Document, dispatch_uid="documents_models__log_deletion")
 def log_deletion(sender, instance, using, **kwargs):
