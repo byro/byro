@@ -1,6 +1,9 @@
+import os
+
 from django import forms
 from django.contrib import messages
 from django.db import transaction
+from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, FormView
 
@@ -62,3 +65,22 @@ class DocumentDetailView(DetailView):
     template_name = "office/documents/detail.html"
     model = Document
     context_object_name = "document"
+
+
+class DocumentDownloadView(DetailView):
+    model = Document
+    context_object_name = "document"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # HACK HACK
+        # FileResponse can work with a file stream, and do optimized sending with some WSGI servers
+        # but the FieldFile in a FileField will be closed upon return from this function, while
+        # the wsgi.file_wrapper will operate after returning from Django.
+        # dup() the open file, then return an fdopen()
+        # FIXME: Fallback to another mechanism for non-local media storage
+        response_file = os.fdopen(os.dup(self.object.document.fileno()), mode='rb')
+        response = FileResponse(response_file, content_type=self.object.mime_type_guessed, filename=self.object.basename)
+        # The actions above may have seeked the fd
+        response_file.seek(0)
+        return response

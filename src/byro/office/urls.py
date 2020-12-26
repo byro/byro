@@ -134,6 +134,11 @@ urlpatterns = [
         "^documents/add", documents.DocumentUploadView.as_view(), name="documents.add"
     ),
     re_path(
+        r"^documents/(?P<pk>\d+)/(?P<filename>[^/]+)",
+        documents.DocumentDownloadView.as_view(),
+        name="documents.download",
+    ),
+    re_path(
         r"^documents/(?P<pk>\d+)",
         documents.DocumentDetailView.as_view(),
         name="documents.detail",
