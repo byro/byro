@@ -2,6 +2,7 @@ ARG language=C
 ARG BYRO_USER=byro
 ARG BYRO_UID=23000
 ARG INSTALL_PLUGINS
+ARG DEVELOPMENT=0
 
 FROM python:3.9-slim as common-base
 MAINTAINER byro team
@@ -9,14 +10,17 @@ MAINTAINER byro team
 ENV DEBIAN_FRONTEND noninteractive
 ENV DJANGO_SETTINGS_MODULE byro.settings
 ENV BYRO_CONFIG_FILE /byro/config/byro.cfg
+ENV PYTHONUNBUFFERED 0
 
 ARG language
 ARG BYRO_USER
 ARG BYRO_UID
+ARG DEVELOPMENT
 
 ENV LANG $language
 ENV BYRO_USER "$BYRO_USER"
 ENV BYRO_UID "$BYRO_UID"
+ENV DEVELOPMENT "${DEVELOPMENT}"
 
 RUN groupadd --gid "${BYRO_UID}" "${BYRO_USER}" && \
     useradd --uid "${BYRO_UID}" --gid "${BYRO_UID}" ${BYRO_USER} -d /home/${BYRO_USER} && \
@@ -88,4 +92,5 @@ ADD ./docker-entrypoint.sh /docker-entrypoint.sh
 WORKDIR /byro
 EXPOSE 80
 ENTRYPOINT ["/docker-entrypoint.sh"]
+VOLUME ["/byro/config", "/byro/data/misc", "/byro/data/media", "/byro/data/logs"]
 CMD ["byro"]

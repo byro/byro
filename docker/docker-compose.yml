@@ -11,9 +11,6 @@ services:
           git+https://github.com/henryk/byro-fints
           git+https://github.com/henryk/byro-directdebit
     command: byro
-    environment:
-        PYTHONUNBUFFERED: 0
-        DEVELOPMENT: 0
     networks:
       intdb: {}
       default: {}
