@@ -76,7 +76,7 @@ setup(
         "django-compressor~=2.4.0",  # https://django-compressor.readthedocs.io/en/latest/changelog/
         "django-extensions~=3.0.0",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
         "django-formset-js-improved==0.5.0.2",  # no changelog, https://github.com/pretix/django-formset-js
-        "django-i18nfield~=1.8.0",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
+        "django-i18nfield>=1.8,<1.10",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
         "django-libsass~=0.8.0",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
         "django-localflavor~=3.0.0",
         "django-select2~=7.4.0",  # https://github.com/applegrew/django-select2/releases
