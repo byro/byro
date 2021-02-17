@@ -23,7 +23,7 @@ Step 1: Configuration
 Checkout the repository, and run the setup script::
 
     # git clone https://github.com/byro/byro
-    # byro/production/setup.shß
+    # byro/production/setup.sh
 
 This will create a folder `byro-data/` next to the byro folder, which will
 contain all your data.
