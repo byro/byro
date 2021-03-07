@@ -72,6 +72,8 @@ The first thing you need are all the main application's dependencies::
 
 .. note:: Under Windows, if you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
 
+.. note:: Under macOS, if you get the error message ``failed to find libmagic.  Check your installation``, do ``brew install libmagic`` to install the necessary magic library.
+
 Create a file called ``byro.cfg`` with this content::
 
     [database]
