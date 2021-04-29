@@ -1,0 +1,20 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/src"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: schwifty
+    versions:
+    - 2021.1.0
+  - dependency-name: django-select2
+    versions:
+    - 7.6.0
+  - dependency-name: more-itertools
+    versions:
+    - 8.6.0
+  - dependency-name: django-bootstrap4
+    versions:
+    - 2.3.0
