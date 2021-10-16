@@ -1,4 +1,4 @@
-import collections
+import collections.abc
 
 from django.conf import settings
 from django.http import Http404
@@ -48,7 +48,7 @@ def sidebar_information(request):
     for receiver, response in nav_event.send(request):
         if not response:
             continue
-        if isinstance(response, collections.Mapping):
+        if isinstance(response, collections.abc.Mapping):
             _nav_event.append(response)
         else:
             _nav_event.extend(response)

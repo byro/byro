@@ -1,4 +1,4 @@
-import collections
+import collections.abc
 from datetime import timedelta
 
 from django.db.models import Q
@@ -76,7 +76,7 @@ class MemberView(FormMixin, MemberBaseView):
         for __, response in member_dashboard_tile.send(self.request, member=obj):
             if not response:
                 continue
-            if isinstance(response, collections.Mapping) and response.get(
+            if isinstance(response, collections.abc.Mapping) and response.get(
                 "public", False
             ):
                 context["tiles"].append(response)
