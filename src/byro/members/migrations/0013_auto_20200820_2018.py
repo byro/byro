@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="member", options={"ordering": (("direct_address_name", "name"),)},
+            name="member",
+            options={"ordering": (("direct_address_name", "name"),)},
         ),
     ]
