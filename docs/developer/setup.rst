@@ -70,6 +70,10 @@ The first thing you need are all the main application's dependencies::
     (env)$ cd src/
     (env)$ pip3 install -e .
 
+To be able to run the code checks and unit tests you need to install the development dependencies as well::
+
+    (env)$ pip3 install -e ".[dev]"
+
 .. note:: Under Windows, if you get the error message ``failed to find libmagic.  Check your installation`` error, do ``pip install python-magic-bin`` in the virtual environment to install the necessary magic library for Windows.
 
 .. note:: Under macOS, if you get the error message ``failed to find libmagic.  Check your installation``, do ``brew install libmagic`` to install the necessary magic library.
