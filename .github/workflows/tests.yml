@@ -76,8 +76,8 @@ jobs:
         working-directory: ./src
         run: BYRO_CONFIG_FILE=tests/byro.${{ matrix.database }}.cfg py.test --cov=./ --cov-report=xml tests --maxfail=100
       - name: Upload coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
-          file: src/coverage.xml
+          files: src/coverage.xml
           fail_ci_if_error: true
         if: matrix.database == 'postgres' && matrix.python-version == '3.8'

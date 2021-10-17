@@ -1,9 +1,13 @@
 |byro|
 ======
 
-.. image:: https://travis-ci.org/byro/byro.svg?branch=master
-   :target: https://travis-ci.org/byro/byro
-   :alt: Travis build status
+.. image:: https://github.com/byro/byro/actions/workflows/tests.yml/badge.svg?branch=master
+   :target: https://github.com/byro/byro/actions/workflows/tests.yml?query=branch%3Amaster
+   :alt: CI tests
+
+.. image:: https://github.com/byro/byro/actions/workflows/style.yml/badge.svg?branch=master
+   :target: https://github.com/byro/byro/actions/workflows/style.yml?query=branch%3Amaster
+   :alt: CI code style
 
 .. image:: https://codecov.io/gh/byro/byro/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/byro/byro
