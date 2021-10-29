@@ -292,12 +292,14 @@ with suppress(ImportError):
 
 COMPRESS_ENABLED = COMPRESS_OFFLINE = not DEBUG
 COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
-COMPRESS_CSS_FILTERS = (
-    # CssAbsoluteFilter is incredibly slow, especially when dealing with our _flags.scss
-    # However, we don't need it if we consequently use the static() function in Sass
-    # 'compressor.filters.css_default.CssAbsoluteFilter',
-    "compressor.filters.cssmin.CSSCompressorFilter",
-)
+COMPRESS_FILTERS = {
+    "css": (
+        # CssAbsoluteFilter is incredibly slow, especially when dealing with our _flags.scss
+        # However, we don't need it if we consequently use the static() function in Sass
+        # 'compressor.filters.css_default.CssAbsoluteFilter',
+        "compressor.filters.cssmin.CSSCompressorFilter",
+    )
+}
 SELECT2_JS = ""
 SELECT2_CSS = ""
 SELECT2_I18N_PATH = "/static/vendored/select2/js/i18n"
