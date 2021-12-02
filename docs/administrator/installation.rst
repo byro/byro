@@ -85,10 +85,16 @@ Step 5: Installation
 --------------------
 
 Now we will install byro itself. Please execute the following steps as the ``byro`` user. We will
-install all Python packages, including byro, in the user's Python environment, so that your global Python
+update all relevant Python packages in the user's Python environment, so that your global Python
 installation will not know of them::
 
-    $ pip install --user -U pip setuptools wheel byro gunicorn psycopg2-binary
+    $ pip install --user -U pip setuptools wheel gunicorn psycopg2-binary
+
+Next, we will install byro – you can either install the latest PyPI release, or install a specific
+branch or commit::
+
+    $ pip install --user -U byro  # OR, alternatively
+    $ pip install --user -U "git+git://github.com/byro/byro.git@main#egg=byro&subdirectory=src"
 
 We also need to create a data directory::
 
