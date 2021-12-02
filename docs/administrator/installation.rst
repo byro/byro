@@ -52,7 +52,7 @@ these commands::
 
 When using MySQL, make sure you set the character set of the database to ``utf8mb4``, e.g. like this::
 
-    mysql > CREATE DATABASE pretalx DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci
+    mysql > CREATE DATABASE byro DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci
 
 Step 3: Package dependencies
 ----------------------------
