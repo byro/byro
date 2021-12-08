@@ -94,7 +94,7 @@ Next, we will install byro – you can either install the latest PyPI release, o
 branch or commit::
 
     $ pip install --user -U byro  # OR, alternatively
-    $ pip install --user -U "git+git://github.com/byro/byro.git@main#egg=byro&subdirectory=src"
+    $ pip install --user -U "git+git://github.com/byro/byro.git@master#egg=byro&subdirectory=src"
 
 We also need to create a data directory::
 
