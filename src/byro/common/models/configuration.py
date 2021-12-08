@@ -63,6 +63,22 @@ class Configuration(ByroConfiguration):
         verbose_name=_("Currency"),
         help_text=_("E.g. EUR"),
     )
+    currency_symbol = models.CharField(
+        default='€',
+        max_length=8,
+        verbose_name=_("Currency symbol"),
+        help_text=_("E.g. €"),
+    )
+    currency_postfix = models.BooleanField(
+        default=True,
+        verbose_name=_("Show currency symbol after value"),
+        help_text=_("Controls whether the currency symbol comes before or after the monetary value"),
+    )
+    display_cents = models.BooleanField(
+        default=True,
+        verbose_name=_("Display cents"),
+        help_text=_("When enabled, monetary values include two decimal fractional digits"),
+    )
     # Registration form configuration, contains settings for the fields to include when adding a new member
     registration_form = models.JSONField(null=True, blank=True)
     default_order_name = models.CharField(

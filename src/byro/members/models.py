@@ -17,6 +17,7 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry, LogTargetMixin
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
+from byro.common.templatetags.format_with_currency import format_with_currency
 
 
 class Field:
@@ -453,9 +454,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
             "association_name": config.name,
             "data": key_value_text,
             "number": self.number,
-            "balance": "{currency} {balance}".format(
-                currency=config.currency, balance=self.balance
-            ),
+            "balance": format_with_currency(self.balance, long_form=True),
         }
         return template.to_mail(self.email, context=context, save=False)
 
