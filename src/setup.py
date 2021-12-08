@@ -21,7 +21,7 @@ class CustomBuild(build):
         environ.setdefault("DJANGO_SETTINGS_MODULE", "byro.settings")
         try:
             import django
-        except ImportError:  # Move to ModuleNotFoundError once we drop Python 3.5
+        except ModuleNotFoundError:
             return
         django.setup()
         from django.conf import settings
