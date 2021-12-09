@@ -9,6 +9,9 @@
             "liability_interval": 36,
             "language": "de",
             "currency": "EUR",
+            "currency_symbol": "€",
+            "currency_postfix": true,
+            "display_cents": true,
             "registration_form": [
                 {
                     "name": "member__name",
