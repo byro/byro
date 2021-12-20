@@ -14,7 +14,7 @@ web:
   ports:
    - "127.0.0.1:8020:8020"
 db:
-  image: postgres:10
+  image: postgres:14
   environment:
       POSTGRES_PASSWORD: byro
       POSTGRES_DB: byro
