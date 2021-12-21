@@ -239,4 +239,4 @@ If you want to upgrade byro to a specific release, you can substitute
 .. _PostgreSQL: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-9-4-on-debian-8
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
 .. _strong encryption settings: https://mozilla.github.io/server-side-tls/ssl-config-generator/
-.. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose/
+.. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose.html
