@@ -8,6 +8,7 @@ services:
       args:
         language: de_DE.UTF-8
         INSTALL_PLUGINS: "${INSTALL_PLUGINS}"
+        PYTHON_VERSION: "${PYTHON_VERSION:-3.10.1}"
     command: byro
     networks:
       intdb: {}

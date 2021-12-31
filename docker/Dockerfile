@@ -1,9 +1,10 @@
 ARG language=C
+ARG PYTHON_VERSION=3.10.1
 ARG BYRO_USER=byro
 ARG BYRO_UID=23000
 ARG DEVELOPMENT=0
 
-FROM python:3.10.1-slim as common-base
+FROM python:${PYTHON_VERSION}-slim as common-base
 MAINTAINER byro team
 
 ENV DEBIAN_FRONTEND noninteractive
