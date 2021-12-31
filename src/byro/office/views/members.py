@@ -1,4 +1,5 @@
 import collections
+import collections.abc
 import csv
 import hashlib
 from datetime import datetime, time
@@ -698,7 +699,7 @@ class MemberDashboardView(MemberView):
         for __, response in member_dashboard_tile.send(self.request, member=obj):
             if not response:
                 continue
-            if isinstance(response, collections.Mapping):
+            if isinstance(response, collections.abc.Mapping):
                 context["tiles"].append(response)
 
         return context

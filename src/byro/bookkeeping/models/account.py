@@ -96,8 +96,12 @@ class Account(Auditable, models.Model, LogTargetMixin):
         qs = self._filter_by_date(self.transactions, start, end)
 
         result = qs.with_balances().aggregate(
-            debit=models.functions.Coalesce(models.Sum("balances_debit"), 0),
-            credit=models.functions.Coalesce(models.Sum("balances_credit"), 0),
+            debit=models.functions.Coalesce(
+                models.Sum("balances_debit"), 0, output_field=models.DecimalField()
+            ),
+            credit=models.functions.Coalesce(
+                models.Sum("balances_credit"), 0, output_field=models.DecimalField()
+            ),
         )
 
         # ASSET, EXPENSE:  Debit increases balance, credit decreases it

@@ -1,6 +1,7 @@
 {% extends "public/members/base.html" %}
 {% load i18n %}
 {% load bootstrap4 %}
+{% load format_with_currency %}
 
 
 {% block title %}{% blocktrans %}Member page{% endblocktrans %}{% endblock %}
@@ -15,7 +16,7 @@
 <div class="dashboard-list">
     <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
         <h1>
-            {{ member.balance }} €
+            {{ member.balance | format_with_currency }}
         </h1>
         <span class="dashboard-description">
             {% trans "current balance" %}
@@ -24,7 +25,7 @@
     {% if member.donation_balance %}
         <div class="dashboard-block">
             <h1>
-                {{ member.donation_balance }} €
+                {{ member.donation_balance | format_with_currency }}
             </h1>
             <span class="dashboard-description">
                 {% trans "donations" %}
@@ -56,7 +57,7 @@
     {% if is_active %}
     <div class="dashboard-block">
       <h1>
-        {{ current_membership.amount }} €
+        {{ current_membership.amount | format_with_currency }}
       </h1>
       <span class="dashboard-description">
         {% blocktrans %}membership fee{% endblocktrans %} <strong>{{ current_membership.get_interval_display }}</strong>
@@ -141,7 +142,7 @@
             <h5 class="card-title">{{ms.start.isoformat}} &mdash; {{ms.end.isoformat|default:"&hellip;"}}</h4>
         </div>
         <div class="card-body">
-            <p class="card-text">{{ms.amount}} € {{ms.get_interval_display}}</p>
+            <p class="card-text">{{ms.amount | format_with_currency}} {{ms.get_interval_display}}</p>
         </div>
     </div>
 {% endfor %}

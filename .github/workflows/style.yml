@@ -20,11 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
-      - uses: actions/cache@v1
+          python-version: "3.10"
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -40,11 +40,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
-      - uses: actions/cache@v1
+          python-version: "3.10"
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -60,11 +60,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
-      - uses: actions/cache@v1
+          python-version: "3.10"
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -80,11 +80,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
-      - uses: actions/cache@v1
+          python-version: "3.10"
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -100,11 +100,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
-      - uses: actions/cache@v1
+          python-version: "3.10"
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}

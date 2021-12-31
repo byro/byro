@@ -18,10 +18,14 @@ class InitialForm(forms.ModelForm):
 
 class ConfigurationForm(forms.ModelForm):
     update_existing_order_names = forms.BooleanField(
-        label=_("Update all order names"), initial=False, required=False,
+        label=_("Update all order names"),
+        initial=False,
+        required=False,
     )
     update_existing_direct_address_names = forms.BooleanField(
-        label=_("Update all address names"), initial=False, required=False,
+        label=_("Update all address names"),
+        initial=False,
+        required=False,
     )
 
     def save(self, *args, **kwargs):
@@ -41,6 +45,9 @@ class ConfigurationForm(forms.ModelForm):
             "url",
             "language",
             "currency",
+            "currency_symbol",
+            "currency_postfix",
+            "display_cents",
             "liability_interval",
             "public_base_url",
             "mail_from",

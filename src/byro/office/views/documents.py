@@ -79,8 +79,12 @@ class DocumentDownloadView(DetailView):
         # the wsgi.file_wrapper will operate after returning from Django.
         # dup() the open file, then return an fdopen()
         # FIXME: Fallback to another mechanism for non-local media storage
-        response_file = os.fdopen(os.dup(self.object.document.fileno()), mode='rb')
-        response = FileResponse(response_file, content_type=self.object.mime_type_guessed, filename=self.object.basename)
+        response_file = os.fdopen(os.dup(self.object.document.fileno()), mode="rb")
+        response = FileResponse(
+            response_file,
+            content_type=self.object.mime_type_guessed,
+            filename=self.object.basename,
+        )
         # The actions above may have seeked the fd
         response_file.seek(0)
         return response

@@ -1,5 +1,6 @@
 {% extends "office/member/base.html" %}
 {% load i18n %}
+{% load format_with_currency %}
 
 {% block title %}{{ block.super }} :: {% trans "Dashboard" %}{% endblock %}
 
@@ -18,7 +19,7 @@
     {% endwith %}
     <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
         <h1>
-            {{ member.balance }} €
+            {{ member.balance | format_with_currency }}
         </h1>
         <span class="dashboard-description">
             {% trans "current balance" %}
@@ -31,7 +32,7 @@
     {% if statute_barred_debt.in1year %}
         <div class="dashboard-block block-warning">
             <h1>
-                {{ statute_barred_debt.in1year }} €
+                {{ statute_barred_debt.in1year | format_with_currency }}
             </h1>
             <span class="dashboard-description">
                 {% trans "in liabilities will expire end of this year" %}
@@ -41,7 +42,7 @@
     {% if statute_barred_debt.now %}
         <div class="dashboard-block block-danger">
             <h1>
-                {{ statute_barred_debt.now }} €
+                {{ statute_barred_debt.now | format_with_currency }}
             </h1>
             <span class="dashboard-description">
                 {% trans "in expired liabilities" %}
@@ -51,7 +52,7 @@
     {% if member.donation_balance %}
         <div class="dashboard-block">
             <h1>
-                {{ member.donation_balance }} €
+                {{ member.donation_balance | format_with_currency }}
             </h1>
             <span class="dashboard-description">
                 {% trans "donations" %}
@@ -86,7 +87,7 @@
     </div>
     <div class="dashboard-block">
       <h1>
-        {{ current_membership.amount }} €
+        {{ current_membership.amount | format_with_currency }}
       </h1>
       <span class="dashboard-description">
         {% blocktrans %}membership fee{% endblocktrans %} <strong>{{ current_membership.interval }}</strong>
