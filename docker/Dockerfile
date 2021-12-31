@@ -4,7 +4,7 @@ ARG BYRO_UID=23000
 ARG INSTALL_PLUGINS
 ARG DEVELOPMENT=0
 
-FROM python:3.9-slim as common-base
+FROM python:3.10.1-slim as common-base
 MAINTAINER byro team
 
 ENV DEBIAN_FRONTEND noninteractive

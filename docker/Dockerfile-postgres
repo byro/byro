@@ -1,4 +1,4 @@
-FROM postgres:13
+FROM postgres:14
 ARG language=en_US
 RUN localedef -i ${language} -c -f UTF-8 -A /usr/share/locale/locale.alias ${language}.UTF-8
 ENV LANG ${language}.utf8
