@@ -64,7 +64,7 @@ GitHub. You can see all byro plugins on GitHub `here`_.
 .. |byro| image:: docs/img/logo/byro_128.png
    :alt: byro
 .. _developer documentation: http://byro.readthedocs.io/en/latest/
-.. _development: https://byro.readthedocs.io/en/latest/developer/setup/
+.. _development: https://byro.readthedocs.io/en/latest/developer/setup.html
 .. _byro: https://byro.cloud
 .. _here: https://github.com/topics/byro-plugin
 .. _byro-mailman: https://github.com/byro/byro-mailman
