@@ -87,7 +87,7 @@ setup(
         "psycopg2-binary",
         "python-dateutil",
         "python-magic~=0.4.0",
-        "pynacl~=1.4.0",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
+        "pynacl>=1.4,<1.6",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "qrcode[pil]>=7.3,<7.4",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
         "unicodecsv~=0.14.0",
         "more-itertools>=8.10,<8.12",
