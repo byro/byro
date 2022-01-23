@@ -164,7 +164,7 @@ def test_member_download_and_edit(member, membership, logged_in_client):
     assert member.name.encode("utf-8") in response_body
 
     new_body = response_body.replace(
-        f",{member.name},".encode("utf-8"),
+        f",{member.name},".encode(),
         ",{},{}".format("Fnord!", "DE11520513735120710131").encode("utf-8"),
     )
 
