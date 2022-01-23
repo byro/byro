@@ -44,7 +44,7 @@ def test_memberpage_access_dashboard_wrong_token(
 ):
     response = client.get(
         reverse(
-            "public:memberpage:member.{}".format(page),
+            f"public:memberpage:member.{page}",
             kwargs={"secret_token": member.profile_memberpage.secret_token + "lol"},
         )
     )

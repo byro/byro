@@ -284,7 +284,7 @@ class csv_excel_de(csv.excel):
 def filter_excel_de(data):
     if isinstance(data, (float, Decimal)):
         return (
-            "{:18,.2f}".format(data)
+            f"{data:18,.2f}"
             .replace(",", "_")
             .replace(".", ",")
             .replace("_", ".")
@@ -379,7 +379,7 @@ class MemberListExportView(
         )
         response[
             "Content-Disposition"
-        ] = 'attachment; filename="members_{}.csv"'.format(now().date())
+        ] = f'attachment; filename="members_{now().date()}.csv"'
         return response
 
     def get_data(self, form, field_mapping):
@@ -927,7 +927,7 @@ class MultipleFormsMixin:
         raise NotImplementedError
 
     def mangle_button(self, name, prefix):
-        return "submit_{}_{}".format(prefix, name)
+        return f"submit_{prefix}_{name}"
 
     def get_forms(self):
         """Instantiate forms, return a list of tuples like get_operations(),
@@ -1009,7 +1009,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
             if ms.start <= now_.date() and (not ms.end or ms.end > now_.date()):
                 retval.append(
                     (
-                        "ms_{}_leave".format(ms.pk),
+                        f"ms_{ms.pk}_leave",
                         _("End membership"),
                         _create_ms_leave_form,
                         {"end": _("End membership")},

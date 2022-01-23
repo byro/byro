@@ -31,7 +31,7 @@ def test_office_access_urls(client, user, login_user, url, logged_in):
     if logged_in:
         login_user(client, user)
 
-    response = client.get(reverse("office:{}".format(url)), follow=True)
+    response = client.get(reverse(f"office:{url}"), follow=True)
     assert response.status_code == 200
     assert (response.resolver_match.url_name == "login") is not logged_in
 

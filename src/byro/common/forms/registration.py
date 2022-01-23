@@ -59,7 +59,7 @@ class RegistrationConfigForm(forms.Form):
 
         for model, field in self.get_form_fields():
 
-            key = "{}__{}".format(SPECIAL_NAMES.get(model, model.__name__), field.name)
+            key = f"{SPECIAL_NAMES.get(model, model.__name__)}__{field.name}"
             entry = data.get(key, {})
 
             verbose_name = field.verbose_name or field.name
@@ -104,7 +104,7 @@ class RegistrationConfigForm(forms.Form):
                     verbose_name,
                     OrderedDict(
                         (
-                            "{key}__{name}".format(key=key, name=name),
+                            f"{key}__{name}",
                             value,
                         )  # TODO: make fields an ordered dict that prepends {key} to every key for more fanciness
                         for name, value in fields.items()

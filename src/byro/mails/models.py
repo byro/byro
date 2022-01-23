@@ -38,7 +38,7 @@ class MailTemplate(Auditable, models.Model):
     )
 
     def __str__(self):
-        return "{self.subject}".format(self=self)
+        return f"{self.subject}"
 
     def to_mail(
         self,
@@ -60,7 +60,7 @@ class MailTemplate(Auditable, models.Model):
                 text = str(self.text).format(**context)
             except KeyError as e:
                 raise SendMailException(
-                    "Experienced KeyError when rendering Text: {e}".format(e=e)
+                    f"Experienced KeyError when rendering Text: {e}"
                 )
 
             mail = EMail(

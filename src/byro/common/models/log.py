@@ -183,7 +183,7 @@ class LogEntry(models.Model):
 
         if (
             self.content_type is not None
-            and "{}.{}".format(self.content_type.app_label, self.content_type.model)
+            and f"{self.content_type.app_label}.{self.content_type.model}"
             != self.auth_data["orig_content_type"]
         ):
             return False
@@ -250,7 +250,7 @@ def flatten_objects(inobj, key_was=None):
     elif isinstance(inobj, decimal.Decimal) or (
         key_was == "amount" and isinstance(inobj, (int, float))
     ):
-        return "{:.2f}".format(inobj)
+        return f"{inobj:.2f}"
     else:
         try:
             content_type = ContentType.objects.get_for_model(type(inobj))

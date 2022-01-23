@@ -77,12 +77,12 @@ class Field:
     def setter(self, member, value):
         if self.read_only:
             raise NotImplementedError(
-                "Writing to {} is not supported".format(self.path)
+                f"Writing to {self.path} is not supported"
             )
         target, prop = self._follow_path(member, self.path)
         if target is None:
             raise AttributeError(
-                "Encountered 'None' while following {}".format(self.path)
+                f"Encountered 'None' while following {self.path}"
             )
         setattr(target, prop, value)
         if callable(getattr(target, "save", None)):
@@ -285,10 +285,10 @@ class Member(Auditable, models.Model, LogTargetMixin):
                 if issubclass(model, cls):
                     f_path = field.name
                 elif model is Membership:
-                    f_path = "memberships.last().{}".format(field.name)
+                    f_path = f"memberships.last().{field.name}"
                     f_addition = _("Current membership")
                 else:
-                    f_path = "{}.{}".format(profile_map[model], field.name)
+                    f_path = f"{profile_map[model]}.{field.name}"
                     f_addition = model.__name__
 
                 result.append(

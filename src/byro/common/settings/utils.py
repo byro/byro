@@ -20,7 +20,7 @@ def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
         ("", False),
         ("Settings:", True),
         ("Read from: " + ", ".join(config_files), False),
-        ("Logging:   {LOG_DIR}".format(LOG_DIR=LOG_DIR), False),
+        (f"Logging:   {LOG_DIR}", False),
     ]
     if plugins:
         lines += [("Plugins:   " + ",".join(plugins), False)]

@@ -43,7 +43,7 @@ def get_version():
 
 
 def get_installed_software():
-    retval = ["byro {}".format(get_version())]
+    retval = [f"byro {get_version()}"]
     for plugin in get_plugins():
         retval.append(
             "{} {}".format(

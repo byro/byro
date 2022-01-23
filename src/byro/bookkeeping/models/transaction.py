@@ -224,7 +224,7 @@ class Transaction(models.Model, LogTargetMixin):
             self.pk,
             self.find_memo(),
             self.value_datetime.isoformat(),
-            ", reverses={}".format(self.reverses) if self.reverses else "",
+            f", reverses={self.reverses}" if self.reverses else "",
         )
 
     def get_absolute_url(self):

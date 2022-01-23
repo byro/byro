@@ -61,7 +61,7 @@ the robo clerk"""
     )
 )
 RECORD_DISCLOSURE_SUBJECT = LazyI18nString.from_gettext(
-    (_("Your {association_name} data record (#{number})"))
+    _("Your {association_name} data record (#{number})")
 )
 RECORD_DISCLOSURE_TEXT = LazyI18nString.from_gettext(
     _(
