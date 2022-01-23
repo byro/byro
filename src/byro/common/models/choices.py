@@ -40,6 +40,6 @@ class Choices(object, metaclass=ChoicesMeta):
     @classproperty
     def max_length(cls):
         if hasattr(cls, "valid_choices"):
-            return max([len(val) for val in cls.valid_choices])
+            return max(len(val) for val in cls.valid_choices)
         else:
-            return max([len(val) for val, _ in cls.choices])
+            return max(len(val) for val, _ in cls.choices)

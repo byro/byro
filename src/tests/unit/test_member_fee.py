@@ -39,8 +39,8 @@ def test_liabilities_easy(member_membership):
         debit_account=SpecialAccounts.fees_receivable
     ).all()
     assert len(bookings) == 4
-    assert sum([i.amount for i in bookings]) == 80
-    assert sum([i.amount for i in credits]) == 40
+    assert sum(i.amount for i in bookings) == 80
+    assert sum(i.amount for i in credits) == 40
 
 
 @pytest.mark.django_db
@@ -55,7 +55,7 @@ def test_liabilities_future_transactions(member_membership):
         debit_account=SpecialAccounts.fees_receivable
     ).all()
     assert len(bookings) == 3
-    assert sum([i.amount for i in bookings]) == 60
+    assert sum(i.amount for i in bookings) == 60
 
     # set back to current month, this leaves a transaction in the future
     member_membership.end = end_this_month
@@ -66,13 +66,13 @@ def test_liabilities_future_transactions(member_membership):
         debit_account=SpecialAccounts.fees_receivable
     ).all()
     assert len(bookings) == 3
-    assert sum([i.amount for i in bookings]) == 60
+    assert sum(i.amount for i in bookings) == 60
 
     correction_bookings = member_membership.member.bookings.filter(
         credit_account=SpecialAccounts.fees_receivable
     ).all()
     assert len(correction_bookings) == 1
-    assert sum([i.amount for i in correction_bookings]) == 20
+    assert sum(i.amount for i in correction_bookings) == 20
 
 
 @pytest.mark.django_db
@@ -82,7 +82,7 @@ def test_liabilities_change(member_membership):
         debit_account=SpecialAccounts.fees_receivable
     ).all()
     assert len(bookings) == 2
-    assert sum([i.amount for i in bookings]) == 40
+    assert sum(i.amount for i in bookings) == 40
 
     member_membership.amount = 20 + 10
     member_membership.save()
@@ -97,8 +97,8 @@ def test_liabilities_change(member_membership):
     ).all()
     assert len(debits) == 4
     assert len(credits) == 2
-    assert sum([i.amount for i in credits]) == 40
-    assert sum([i.amount for i in debits]) == 40 + 60
+    assert sum(i.amount for i in credits) == 40
+    assert sum(i.amount for i in debits) == 40 + 60
 
 
 @pytest.fixture
@@ -122,7 +122,7 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
         debit_account=SpecialAccounts.fees_receivable
     ).all()
     assert len(virtual_transactions) == 4
-    assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20
+    assert sum(i.amount for i in virtual_transactions) == 8 + 8 + 20 + 20
 
     end_this_month = member_membership.end
     end_next_month = member_membership.end + relativedelta(months=+1)
@@ -134,7 +134,7 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
         debit_account=SpecialAccounts.fees_receivable
     ).all()
     assert len(virtual_transactions) == 5
-    assert sum([i.amount for i in virtual_transactions]) == 8 + 8 + 20 + 20 + 20
+    assert sum(i.amount for i in virtual_transactions) == 8 + 8 + 20 + 20 + 20
 
     member_membership.end = end_this_month
     member_membership.save()
@@ -146,13 +146,13 @@ def test_liabilities_complicated_example(member_membership, member_membership_se
             debit_account=SpecialAccounts.fees_receivable
         ).all()
         assert len(bookings) == 5
-        assert sum([i.amount for i in bookings]) == 8 + 8 + 20 + 20 + 20
+        assert sum(i.amount for i in bookings) == 8 + 8 + 20 + 20 + 20
 
         correction_bookings = member_membership.member.bookings.filter(
             credit_account=SpecialAccounts.fees_receivable
         ).all()
         assert len(correction_bookings) == 1
-        assert sum([i.amount for i in correction_bookings]) == 20
+        assert sum(i.amount for i in correction_bookings) == 20
 
 
 @pytest.mark.django_db

@@ -18,7 +18,7 @@ class CreateMemberForm(forms.Form):
 
         config = Configuration.get_solo().registration_form or []
         config = sorted(
-            [field for field in config if field["position"] is not None],
+            (field for field in config if field["position"] is not None),
             key=lambda field: field["position"],
         )
         profiles = {
