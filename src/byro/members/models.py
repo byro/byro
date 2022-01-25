@@ -76,14 +76,10 @@ class Field:
 
     def setter(self, member, value):
         if self.read_only:
-            raise NotImplementedError(
-                f"Writing to {self.path} is not supported"
-            )
+            raise NotImplementedError(f"Writing to {self.path} is not supported")
         target, prop = self._follow_path(member, self.path)
         if target is None:
-            raise AttributeError(
-                f"Encountered 'None' while following {self.path}"
-            )
+            raise AttributeError(f"Encountered 'None' while following {self.path}")
         setattr(target, prop, value)
         if callable(getattr(target, "save", None)):
             target.save()
