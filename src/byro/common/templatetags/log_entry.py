@@ -42,9 +42,7 @@ def default_formatter(entry):
     if data:
         extra_data = f" {escape(str(data))}"
 
-    return mark_safe(
-        f"{escape(str(entry.action_type))}{related_object}{extra_data}"
-    )
+    return mark_safe(f"{escape(str(entry.action_type))}{related_object}{extra_data}")
 
 
 @register.filter(name="format_log_entry")
@@ -61,15 +59,11 @@ def format_log_entry(entry):
 def format_log_source(entry):
     user = ""
     if entry.user:
-        user = mark_safe(
-            f'<span class="fa fa-user"></span> {escape(entry.user)}'
-        )
+        user = mark_safe(f'<span class="fa fa-user"></span> {escape(entry.user)}')
 
     source = entry.data.get("source", "")
     if source.startswith("internal: "):
-        source = mark_safe(
-            f'<span class="fa fa-gears"></span> {escape(source[10:])}'
-        )
+        source = mark_safe(f'<span class="fa fa-gears"></span> {escape(source[10:])}')
 
     if entry.user:
         if entry.data.get("source", None) == str(entry.user):
@@ -99,9 +93,7 @@ def format_log_object(obj, key=None):
                         icon = ""
 
                     if url:
-                        return mark_safe(
-                            f'{icon}<a href="{escape(url)}">{str_val}</a>'
-                        )
+                        return mark_safe(f'{icon}<a href="{escape(url)}">{str_val}</a>')
 
             return mark_safe(
                 "<i>{} object</i>: {!r}".format(

@@ -54,8 +54,6 @@ class PermissionMiddleware:
                         break
 
         if not allow:
-            return redirect(
-                reverse("common:login") + f"?next={request.path}"
-            )
+            return redirect(reverse("common:login") + f"?next={request.path}")
         else:
             return self.get_response(request)
