@@ -134,9 +134,7 @@ def test_members_end_membership(member, membership, logged_in_client):
     response = logged_in_client.post(
         reverse("office:members.operations", kwargs={"pk": member.pk}),
         {
-            f"ms_{membership.pk}_leave-end": (
-                now() + relativedelta(days=-1)
-            ).date(),
+            f"ms_{membership.pk}_leave-end": (now() + relativedelta(days=-1)).date(),
             f"submit_ms_{membership.pk}_leave_end": "end",
         },
     )

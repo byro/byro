@@ -284,8 +284,7 @@ class csv_excel_de(csv.excel):
 def filter_excel_de(data):
     if isinstance(data, (float, Decimal)):
         return (
-            f"{data:18,.2f}"
-            .replace(",", "_")
+            f"{data:18,.2f}".replace(",", "_")
             .replace(".", ",")
             .replace("_", ".")
             .strip()

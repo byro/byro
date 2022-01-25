@@ -95,7 +95,7 @@ Thank you,
             self.log(
                 "internal: automatic checkpoint",
                 ".stored",
-                **self._get_log_properties()
+                **self._get_log_properties(),
             )
 
         return retval
