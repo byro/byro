@@ -45,7 +45,7 @@ def byro_information(request):
 
 def sidebar_information(request):
     _nav_event = []
-    for receiver, response in nav_event.send(request):
+    for _receiver, response in nav_event.send(request):
         if not response:
             continue
         if isinstance(response, collections.abc.Mapping):

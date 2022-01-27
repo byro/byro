@@ -48,7 +48,7 @@ def default_formatter(entry):
 @register.filter(name="format_log_entry")
 def format_log_entry(entry):
     if not FORMATTER_REGISTRY:
-        for module, response in log_formatters.send_robust(sender=__name__):
+        for _receiver, response in log_formatters.send_robust(sender=__name__):
             if response and not isinstance(response, Exception):
                 FORMATTER_REGISTRY.update(response)
 

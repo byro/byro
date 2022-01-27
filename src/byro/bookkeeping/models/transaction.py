@@ -207,7 +207,7 @@ class Transaction(models.Model, LogTargetMixin):
                 receiver for receiver, response in responses if response
             )
 
-            for receiver, response in responses:
+            for _receiver, response in responses:
                 if isinstance(response, Exception):
                     raise response
 

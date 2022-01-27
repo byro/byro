@@ -381,7 +381,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
             balance.save()
         return balance
 
-    def statute_barred_debt(self, future_limit=relativedelta()) -> Decimal:
+    def statute_barred_debt(self, future_limit=None) -> Decimal:
+        future_limit = future_limit or relativedelta()
         limit = (
             relativedelta(months=Configuration.get_solo().liability_interval)
             - future_limit

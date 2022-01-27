@@ -616,7 +616,7 @@ class MemberCreateView(FormView):
         form.instance.log(self, ".created")
 
         responses = new_member.send_robust(sender=form.instance)
-        for module, response in responses:
+        for _receiver, response in responses:
             if isinstance(response, Exception):
                 messages.warning(
                     self.request,
@@ -744,7 +744,7 @@ class MemberDataView(MemberView):
             Membership, fields=["start", "end", "interval", "amount"]
         )
         for key in membership_create_form.base_fields:
-            setattr(membership_create_form.base_fields[key], "required", False)
+            membership_create_form.base_fields[key].required = False
         return (
             [
                 self._instantiate(
@@ -959,7 +959,7 @@ class MultipleFormsMixin:
     def post(self, *args, **kwargs):
         retval = None
 
-        for prefix, title, form, buttons, callback in self.get_forms():
+        for prefix, _title, form, buttons, callback in self.get_forms():
             active_buttons = [
                 name
                 for name in buttons
@@ -1116,7 +1116,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
             form.instance.member.update_liabilites()
 
             responses = leave_member.send_robust(sender=form.instance)
-            for module, response in responses:
+            for _receiver, response in responses:
                 if isinstance(response, Exception):
                     messages.warning(
                         self.request,

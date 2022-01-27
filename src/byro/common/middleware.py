@@ -40,7 +40,7 @@ class PermissionMiddleware:
 
         if not allow:
             unauthenticated_urls_matchers = []
-            for receiver, response in unauthenticated_urls.send(self):
+            for _receiver, response in unauthenticated_urls.send(self):
                 unauthenticated_urls_matchers.extend(response)
 
             for url_matcher in unauthenticated_urls_matchers:
