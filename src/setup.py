@@ -80,7 +80,7 @@ setup(
         "django-i18nfield>=1.9,<1.10",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
         "django-libsass>=0.8,<0.10",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
         "django-localflavor>=3.0,<3.2",
-        "django-select2>=7.7,<7.10",  # https://github.com/applegrew/django-select2/releases
+        "django-select2>=7.7,<7.11",  # https://github.com/applegrew/django-select2/releases
         "django-solo>=1.2.0,<1.3",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
