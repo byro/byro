@@ -132,6 +132,7 @@ if os.getenv("DEVELOPMENT"):
     DATABASES["default"]["HOST"] = "db"
     DATABASES["default"]["PASSWORD"] = "byro"
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 ## LOGGING SETTINGS
 loglevel = "DEBUG" if DEBUG else "INFO"
