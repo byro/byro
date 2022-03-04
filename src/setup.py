@@ -66,7 +66,7 @@ setup(
     ],
     keywords="members membership fees club group clubs associations association",
     install_requires=[
-        "canonicaljson==1.5.0",  # https://github.com/matrix-org/python-canonicaljson/blob/master/CHANGES.md
+        "canonicaljson==1.6.0",  # https://github.com/matrix-org/python-canonicaljson/blob/master/CHANGES.md
         "chardet>=4.0,<4.1",  # https://github.com/chardet/chardet/releases
         "celery>=5.1,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
