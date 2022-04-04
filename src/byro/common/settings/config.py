@@ -26,7 +26,7 @@ CONFIG = {
         "password": {"default": "", "env": os.getenv("BYRO_DB_PASS")},
         "host": {"default": "", "env": os.getenv("BYRO_DB_HOST")},
         "port": {"default": "", "env": os.getenv("BYRO_DB_PORT")},
-        "engine": {"default": "", "env": os.getenv("BYRO_DB_ENGINE")},
+        "engine": {"default": "postgresql", "env": os.getenv("BYRO_DB_ENGINE")},
     },
     "mail": {
         "from": {"default": "admin@localhost", "env": os.getenv("BYRO_MAIL_FROM")},

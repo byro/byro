@@ -130,7 +130,7 @@ The database section
 
 - The database engine.
 - **Environment variable:** ``BYRO_DB_ENGINE``
-- **Default:** ``''`` – by default it falls back to the PostgreSQL backend
+- **Default:** ``'postgresql'`` – by default it falls back to the PostgreSQL backend
 - **Possible values:** ``postgresql``, ``mysql``, ``sqlite3``, ``oracle``
 
 The mail section
