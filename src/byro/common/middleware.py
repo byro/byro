@@ -15,9 +15,9 @@ class SettingsMiddleware:
 
     def __call__(self, request):
         url = resolve(request.path_info)
-        translation.activate(settings.DEFAULT_LANGUAGE)
+        config = Configuration.get_solo()
+        translation.activate(getattr(config, "language", settings.DEFAULT_LANGUAGE))
         if not request.user.is_anonymous and url.url_name not in self.ALLOWED_URLS:
-            config = Configuration.get_solo()
             values = ("name", "backoffice_mail", "mail_from")
             if not all(getattr(config, value, None) for value in values):
                 return redirect("office:settings.initial")
