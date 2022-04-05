@@ -76,7 +76,7 @@ jobs:
         working-directory: ./src
         run: BYRO_CONFIG_FILE=tests/byro.${{ matrix.database }}.cfg py.test --cov=./ --cov-report=xml tests --maxfail=100
       - name: Upload coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: src/coverage.xml
           fail_ci_if_error: true
