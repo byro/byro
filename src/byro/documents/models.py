@@ -69,7 +69,7 @@ Thank you,
         with self.document.open(mode="rb") as f:
             for chunk in f.chunks():
                 h.update(chunk)
-        return self.content_hash == "sha512:{}".format(h.hexdigest())
+        return self.content_hash == f"sha512:{h.hexdigest()}"
 
     @cached_property
     def mime_type_guessed(self):
@@ -90,12 +90,12 @@ Thank you,
             with self.document.open(mode="rb") as f:
                 for chunk in f.chunks():
                     h.update(chunk)
-            self.content_hash = "sha512:{}".format(h.hexdigest())
+            self.content_hash = f"sha512:{h.hexdigest()}"
             super().save(update_fields=["content_hash"])
             self.log(
                 "internal: automatic checkpoint",
                 ".stored",
-                **self._get_log_properties()
+                **self._get_log_properties(),
             )
 
         return retval

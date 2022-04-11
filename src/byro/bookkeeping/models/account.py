@@ -92,7 +92,8 @@ class Account(Auditable, models.Model, LogTargetMixin):
             qs = qs.filter(value_datetime__lte=end)
         return qs
 
-    def balances(self, start=None, end=now()):
+    def balances(self, start=None, end=None):
+        end = end or now()
         qs = self._filter_by_date(self.transactions, start, end)
 
         result = qs.with_balances().aggregate(

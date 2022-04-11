@@ -15,7 +15,7 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 
 @pytest.mark.django_db
 def test_account_model_str(bank_account):
-    assert str(bank_account) == "asset account #{}".format(bank_account.id)
+    assert str(bank_account) == f"asset account #{bank_account.id}"
     bank_account.name = "foo"
     assert str(bank_account) == "foo"
 

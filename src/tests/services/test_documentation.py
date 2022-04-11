@@ -10,7 +10,7 @@ here = os.path.dirname(__file__)
 doc_dir = os.path.join(here, "../../../docs")
 base_dir = os.path.join(here, "../../byro")
 
-with open(os.path.join(doc_dir, "developer/plugins/general.rst"), "r") as doc_file:
+with open(os.path.join(doc_dir, "developer/plugins/general.rst")) as doc_file:
     plugin_docs = doc_file.read()
 
 

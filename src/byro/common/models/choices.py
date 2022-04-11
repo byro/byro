@@ -13,10 +13,10 @@ class ChoicesMeta(type):
             dct["valid_choices"] = [
                 dct[key] for key in dct if isinstance(key, str) and key.upper() == key
             ]
-        return super(ChoicesMeta, cls).__new__(cls, name, parents, dct)
+        return super().__new__(cls, name, parents, dct)
 
 
-class Choices(object, metaclass=ChoicesMeta):
+class Choices(metaclass=ChoicesMeta):
     """Helper class to make choices available as class variables, expose a list
     with valid choices and at the same time generate the choices tuples for the
     model class.
@@ -40,6 +40,6 @@ class Choices(object, metaclass=ChoicesMeta):
     @classproperty
     def max_length(cls):
         if hasattr(cls, "valid_choices"):
-            return max([len(val) for val in cls.valid_choices])
+            return max(len(val) for val in cls.valid_choices)
         else:
-            return max([len(val) for val, _ in cls.choices])
+            return max(len(val) for val, _ in cls.choices)

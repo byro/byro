@@ -97,4 +97,4 @@ def mail_send_task(
         backend.send_messages([email])
     except Exception:
         logger.exception("Error sending email")
-        raise SendMailException("Failed to send an email to {}.".format(to))
+        raise SendMailException(f"Failed to send an email to {to}.")

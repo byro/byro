@@ -29,7 +29,6 @@ class UserForm(forms.ModelForm):
             "email",
             "is_superuser",
             "is_staff",
-            "is_staff",
         ]
 
 

@@ -12,7 +12,7 @@ Step 0: Prerequisites
 Please set up the following systems beforehand, we'll not explain them here (but see these links for
 external installation guides):
 
-* **Python 3.5+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
+* **Python 3.7+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
 * An SMTP server to send out mails
 * An HTTP reverse proxy, e.g. `nginx`_ or Apache to allow HTTPS connections
 * A database server: `MySQL`_ 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
@@ -130,7 +130,7 @@ system, especially the local Python version's)::
     [Service]
     User=byro
     Group=byro
-    WorkingDirectory=/var/byro/.local/lib/python3.5/site-packages/byro
+    WorkingDirectory=/var/byro/.local/lib/python3.8/site-packages/byro
     ExecStart=/var/byro/.local/bin/gunicorn byro.wsgi \
                           --name byro --workers 4 \
                           --max-requests 1200  --max-requests-jitter 50 \

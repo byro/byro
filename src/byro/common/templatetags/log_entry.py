@@ -16,7 +16,7 @@ FORMATTER_REGISTRY = {}
 
 def default_formatter(entry):
     with suppress(TemplateDoesNotExist):
-        tmpl = get_template("log_entry/{}.html".format(entry.action_type))
+        tmpl = get_template(f"log_entry/{entry.action_type}.html")
         return tmpl.render({"log_entry": entry})
 
     data = dict(entry.data or {})
@@ -33,24 +33,22 @@ def default_formatter(entry):
 
         if url:
             related_object = mark_safe(
-                ' (<a href="{}">{}</a>)'.format(escape(url), escape(str(co)))
+                f' (<a href="{escape(url)}">{escape(str(co))}</a>)'
             )
         else:
-            related_object = mark_safe(" ({})".format(escape(co)))
+            related_object = mark_safe(f" ({escape(co)})")
 
     extra_data = ""
     if data:
-        extra_data = " {}".format(escape(str(data)))
+        extra_data = f" {escape(str(data))}"
 
-    return mark_safe(
-        "{}{}{}".format(escape(str(entry.action_type)), related_object, extra_data)
-    )
+    return mark_safe(f"{escape(str(entry.action_type))}{related_object}{extra_data}")
 
 
 @register.filter(name="format_log_entry")
 def format_log_entry(entry):
     if not FORMATTER_REGISTRY:
-        for module, response in log_formatters.send_robust(sender=__name__):
+        for _receiver, response in log_formatters.send_robust(sender=__name__):
             if response and not isinstance(response, Exception):
                 FORMATTER_REGISTRY.update(response)
 
@@ -61,21 +59,17 @@ def format_log_entry(entry):
 def format_log_source(entry):
     user = ""
     if entry.user:
-        user = mark_safe(
-            '<span class="fa fa-user"></span> {}'.format(escape(entry.user))
-        )
+        user = mark_safe(f'<span class="fa fa-user"></span> {escape(entry.user)}')
 
     source = entry.data.get("source", "")
     if source.startswith("internal: "):
-        source = mark_safe(
-            '<span class="fa fa-gears"></span> {}'.format(escape(source[10:]))
-        )
+        source = mark_safe(f'<span class="fa fa-gears"></span> {escape(source[10:])}')
 
     if entry.user:
         if entry.data.get("source", None) == str(entry.user):
             return user
         else:
-            return mark_safe("{} (via {})".format(source, user))
+            return mark_safe(f"{source} (via {user})")
     else:
         return source
 
@@ -99,9 +93,7 @@ def format_log_object(obj, key=None):
                         icon = ""
 
                     if url:
-                        return mark_safe(
-                            '{}<a href="{}">{}</a>'.format(icon, escape(url), str_val)
-                        )
+                        return mark_safe(f'{icon}<a href="{escape(url)}">{str_val}</a>')
 
             return mark_safe(
                 "<i>{} object</i>: {!r}".format(
@@ -112,7 +104,7 @@ def format_log_object(obj, key=None):
         if key == "category" and "." in obj:
             cats = get_document_category_names()
             if obj in cats:
-                return "{} ({})".format(cats[obj], obj)
+                return f"{cats[obj]} ({obj})"
 
         if key == "content_hash":
             parts = str(obj).split(":", 1)

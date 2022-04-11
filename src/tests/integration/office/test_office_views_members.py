@@ -134,10 +134,8 @@ def test_members_end_membership(member, membership, logged_in_client):
     response = logged_in_client.post(
         reverse("office:members.operations", kwargs={"pk": member.pk}),
         {
-            "ms_{}_leave-end".format(membership.pk): (
-                now() + relativedelta(days=-1)
-            ).date(),
-            "submit_ms_{}_leave_end".format(membership.pk): "end",
+            f"ms_{membership.pk}_leave-end": (now() + relativedelta(days=-1)).date(),
+            f"submit_ms_{membership.pk}_leave_end": "end",
         },
     )
     content = response.content.decode()
@@ -164,7 +162,7 @@ def test_member_download_and_edit(member, membership, logged_in_client):
     assert member.name.encode("utf-8") in response_body
 
     new_body = response_body.replace(
-        ",{},".format(member.name).encode("utf-8"),
+        f",{member.name},".encode(),
         ",{},{}".format("Fnord!", "DE11520513735120710131").encode("utf-8"),
     )
 

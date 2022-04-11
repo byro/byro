@@ -40,7 +40,7 @@ def new_member_office_mail_info_sepa(sender, signal, **kwargs):
         "name": sender.profile_sepa.fullname,
         "mandate_reference": sender.profile_sepa.mandate_reference,
         "mandate_reason": sender.profile_sepa.mandate_reason,
-        "amount": "{:2f}".format(membership.amount),
+        "amount": f"{membership.amount:2f}",
         "interval": membership.get_interval_display(),
         "start": membership.start.isoformat(),
     }

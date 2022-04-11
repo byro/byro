@@ -10,7 +10,7 @@ from uuid import uuid4
 def fill_hash(apps, schema_editor):
     LogEntry = apps.get_model("common", "LogEntry")
     for entry in LogEntry.objects.filter(auth_hash__isnull=True).all():
-        entry.auth_hash = "random:{}".format(uuid4().hex)
+        entry.auth_hash = f"random:{uuid4().hex}"
         entry.save(update_fields=["auth_hash"])
 
 

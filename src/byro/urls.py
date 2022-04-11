@@ -18,9 +18,8 @@ from contextlib import suppress
 
 from django.apps import apps
 from django.conf import settings
-from django.conf.urls import include
 from django.conf.urls.static import static
-from django.urls import re_path
+from django.urls import include, re_path
 
 raw_plugin_patterns = []
 for app in apps.get_app_configs():

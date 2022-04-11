@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
@@ -40,7 +40,7 @@ class LoginView(TemplateView):
             content_object=user, user=user, action_type="byro.common.login.success"
         )
         url = urllib.parse.unquote(request.GET.get("next", ""))
-        if url and is_safe_url(url, request.get_host()):
+        if url and url_has_allowed_host_and_scheme(url, request.get_host()):
             return redirect(url)
 
         return redirect("/")

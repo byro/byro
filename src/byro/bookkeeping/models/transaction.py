@@ -207,7 +207,7 @@ class Transaction(models.Model, LogTargetMixin):
                 receiver for receiver, response in responses if response
             )
 
-            for receiver, response in responses:
+            for _receiver, response in responses:
                 if isinstance(response, Exception):
                     raise response
 
@@ -224,7 +224,7 @@ class Transaction(models.Model, LogTargetMixin):
             self.pk,
             self.find_memo(),
             self.value_datetime.isoformat(),
-            ", reverses={}".format(self.reverses) if self.reverses else "",
+            f", reverses={self.reverses}" if self.reverses else "",
         )
 
     def get_absolute_url(self):

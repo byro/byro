@@ -40,7 +40,7 @@ class PermissionMiddleware:
 
         if not allow:
             unauthenticated_urls_matchers = []
-            for receiver, response in unauthenticated_urls.send(self):
+            for _receiver, response in unauthenticated_urls.send(self):
                 unauthenticated_urls_matchers.extend(response)
 
             for url_matcher in unauthenticated_urls_matchers:
@@ -54,8 +54,6 @@ class PermissionMiddleware:
                         break
 
         if not allow:
-            return redirect(
-                reverse("common:login") + "?next={request.path}".format(request=request)
-            )
+            return redirect(reverse("common:login") + f"?next={request.path}")
         else:
             return self.get_response(request)
