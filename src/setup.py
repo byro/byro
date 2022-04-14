@@ -93,6 +93,7 @@ setup(
         "more-itertools>=8.10,<8.13",
         "schwifty==2022.4.0",
         "whitenoise[brotli]~=5.2.0",
+        'python-magic-bin==0.4.*; platform_system == "Windows"',
     ],
     extras_require={
         "dev": [
