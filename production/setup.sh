@@ -43,7 +43,7 @@ EOF
     cp "$DIR/byro.example.cfg" "$CONFIG"
     
     start_db
-    IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' byro_db_1)"
+    IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' byro-db-1)"
     # BSD sed needs a suffix for -i, GNU doesn't care
     sed -i.bak "s/MAIL_HOST/$IP/" "$CONFIG"
     rm -f "$CONFIG.bak"
@@ -139,7 +139,7 @@ manage)
     manage "$@"
     ;;
 db)
-    docker exec -it byro_db_1 psql -U byro
+    docker exec -it byro-db-1 psql -U byro
     ;;
 help|--help|-h|h)
     cat <<EOF
