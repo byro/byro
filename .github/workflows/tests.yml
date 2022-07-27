@@ -57,7 +57,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install mariadb-server mariadb-server-10.4 mariadb-server-core-10.4
+          sudo apt-get install mariadb-server mariadb-server-10.3 mariadb-server-core-10.3 mariadb-client-10.3
       - name: Install Python dependencies
         run: pip3 install -Ue "src[dev]" --no-use-pep517
       - name: Install MySQL dependencies
