@@ -1013,7 +1013,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                         _create_ms_leave_form,
                         {"end": _("End membership")},
                         lambda *args, **kwargs: self.end_membership(
-                            ms, *args, **kwargs
+                            ms, *args, **kwargs  # noqa
                         ),
                     )
                 )
