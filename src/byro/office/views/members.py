@@ -95,6 +95,8 @@ class MemberListMixin:
         inactive_q = ~active_q
         if _filter == "all":
             pass
+        elif _filter == "negbalance":
+            return [m for m in qs.order_by("-id").distinct() if m.balance < 0]
         elif _filter == "inactive":
             qs = qs.filter(inactive_q)
         else:  # Default to 'active'
@@ -252,6 +254,7 @@ class MemberListExportForm(forms.Form):
     member_filter = forms.ChoiceField(
         choices=[
             ("active", _("Active members")),
+            ("negbalance", _("Members with negative balance")),
             ("inactive", _("Only inactive members")),
             ("all", _("All members")),
         ]
