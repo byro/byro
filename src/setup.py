@@ -71,7 +71,7 @@ setup(
         "celery>=5.1,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         "dateparser>=1.1,<1.2",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
-        "Django>=3.2,<3.3",  # https://docs.djangoproject.com/en/2.0/releases/
+        "Django>=3.2,<4.2",  # https://docs.djangoproject.com/en/2.0/releases/
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
         "django-bootstrap4>=3.0,<3.1",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor~=2.4",  # https://django-compressor.readthedocs.io/en/latest/changelog/
