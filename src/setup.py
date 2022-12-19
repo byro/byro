@@ -97,7 +97,6 @@ setup(
         "dev": [
             "black",
             "check-manifest",
-            "docformatter",
             "flake8",
             "flake8-bugbear",
             "freezegun",
