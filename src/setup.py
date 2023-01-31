@@ -88,7 +88,7 @@ setup(
         "python-dateutil",
         "python-magic~=0.4.0",
         "pynacl>=1.4,<1.6",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
-        "qrcode[pil]>=7.3,<7.4",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
+        "qrcode[pil]>=7.3,<7.5",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
         "unicodecsv~=0.14.0",
         "more-itertools>=8.10,<9.1",
         "schwifty==2022.9.0",
