@@ -18,7 +18,6 @@ def rename(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("members", "0011_auto_20200809_1916"),
     ]

@@ -23,7 +23,6 @@ def init_templates(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("common", "0006_auto_20180224_2114")]
 
     operations = [migrations.RunPython(init_templates, migrations.RunPython.noop)]

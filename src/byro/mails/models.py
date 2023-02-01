@@ -15,7 +15,6 @@ from byro.members.models import Member
 
 
 class MailTemplate(Auditable, models.Model):
-
     subject = I18nCharField(max_length=200, verbose_name=_("Subject"))
     text = I18nTextField(verbose_name=_("Text"))
     reply_to = models.EmailField(

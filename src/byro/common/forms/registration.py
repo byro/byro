@@ -58,7 +58,6 @@ class RegistrationConfigForm(forms.Form):
         data = {entry["name"]: entry for entry in config if "name" in entry}
 
         for model, field in self.get_form_fields():
-
             key = f"{SPECIAL_NAMES.get(model, model.__name__)}__{field.name}"
             entry = data.get(key, {})
 

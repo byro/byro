@@ -178,7 +178,6 @@ know if you think this email is incorrect."""
     )
 
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
         self.fields["start"].widget.attrs["class"] = " datepicker"
         self.fields["end"].widget.attrs["class"] = " datepicker"
@@ -563,7 +562,6 @@ def default_csv_form_valid(view, form, dialect="excel"):
                     create_membership(membership_parms, member)
 
                 if create_initial_balance:
-
                     balance_changed = member.adjust_balance(
                         view,
                         "Initial Balance created by CSV Import",

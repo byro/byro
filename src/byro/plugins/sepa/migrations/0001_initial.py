@@ -8,7 +8,6 @@ import localflavor.generic.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [("members", "0002_auto_20171012_1857")]

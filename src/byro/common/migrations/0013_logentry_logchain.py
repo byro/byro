@@ -28,7 +28,6 @@ def fill_prev(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("common", "0012_auto_20180929_1317")]
 
     operations = [

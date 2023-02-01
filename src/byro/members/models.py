@@ -524,7 +524,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
             )
 
         # Step 5:
-        for (date, amount) in sorted(missing_dues):
+        for date, amount in sorted(missing_dues):
             t = Transaction.objects.create(
                 value_datetime=date,
                 booking_datetime=_now,
@@ -699,7 +699,9 @@ class Membership(Auditable, models.Model, LogTargetMixin):
         if not end:
             try:
                 end = _now.replace(day=start.day).date()
-            except ValueError:  # membership.start.day is not a valid date in our month, we'll use the last date instead
+            except (
+                ValueError
+            ):  # membership.start.day is not a valid date in our month, we'll use the last date instead
                 end = (_now + relativedelta(day=1, months=1, days=-1)).date()
         date = start
         while date <= end:

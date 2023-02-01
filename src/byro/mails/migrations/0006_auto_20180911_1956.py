@@ -16,7 +16,6 @@ def add_members_to_emails(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("mails", "0005_email_members")]
 
     operations = [

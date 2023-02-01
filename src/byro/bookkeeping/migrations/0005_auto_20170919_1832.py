@@ -20,7 +20,6 @@ def delete_accounts(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("bookkeeping", "0004_auto_20170919_1832")]
 
     operations = [migrations.RunPython(create_accounts, delete_accounts)]
