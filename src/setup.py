@@ -67,11 +67,10 @@ setup(
     keywords="members membership fees club group clubs associations association",
     install_requires=[
         "canonicaljson==2.0.0",  # https://github.com/matrix-org/python-canonicaljson/blob/master/CHANGES.md
-        "chardet>=4.0,<5.2",  # https://github.com/chardet/chardet/releases
         "celery>=5.1,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
+        "chardet>=4.0,<5.2",  # https://github.com/chardet/chardet/releases
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         "dateparser>=1.1,<1.2",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
-        "Django>=3.2,<3.3",  # https://docs.djangoproject.com/en/2.0/releases/
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
         "django-bootstrap4>=3.0,<3.1",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor~=2.4",  # https://django-compressor.readthedocs.io/en/latest/changelog/
@@ -82,16 +81,17 @@ setup(
         "django-localflavor>=3.0,<3.2",
         "django-select2>=7.7,<7.12",  # https://github.com/applegrew/django-select2/releases
         "django-solo>=1.2.0,<2.1",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
+        "Django>=3.2,<3.3",  # https://docs.djangoproject.com/en/2.0/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
+        "more-itertools>=8.10,<9.2",
         "psycopg2-binary",
+        "pynacl>=1.4,<1.6",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "python-dateutil",
         "python-magic~=0.4.0",
-        "pynacl>=1.4,<1.6",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "qrcode[pil]>=7.3,<7.5",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
-        "unicodecsv~=0.14.0",
-        "more-itertools>=8.10,<9.2",
         "schwifty==2023.3.0",
+        "unicodecsv~=0.14.0",
     ],
     extras_require={
         "dev": [
