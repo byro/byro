@@ -182,13 +182,6 @@ The following snippet is an example on how to configure a nginx proxy for byro::
             expires 7d;
             access_log off;
         }
-
-        location /static/ {
-            alias /path/to/static.dist/;
-            access_log off;
-            expires 365d;
-            add_header Cache-Control "public";
-        }
     }
 
 We recommend reading about setting `strong encryption settings`_ for your web server.
