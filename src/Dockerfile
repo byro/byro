@@ -14,8 +14,9 @@ RUN mkdir -p /byro && chown uid1000: /byro
 
 ADD . /byro
 ADD byro.docker.cfg /byro/byro.cfg
-RUN cd /byro && pip3 install -e . && pip3 install gunicorn
-RUN cd /byro && /bin/zsh install_local_plugins.sh
+WORKDIR /byro 
+RUN  pip3 install -e . && pip3 install gunicorn
+RUN  /bin/zsh install_local_plugins.sh
 
 CMD ["runserver", "0.0.0.0:8020"]
 
