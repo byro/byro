@@ -204,8 +204,16 @@ else:
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-LANGUAGES = [("en", _("English")), ("de", _("German"))]
-LANGUAGES_NATURAL_NAMES = [("en", "English"), ("de", "Deutsch")]
+LANGUAGES = [
+    ("en", _("English")),
+    ("de", _("German")),
+    ("pt-br", _("Brazilian Portuguese")),
+]
+LANGUAGES_NATURAL_NAMES = [
+    ("en", "English"),
+    ("de", "Deutsch"),
+    ("pt-br", "Português Brasileiro"),
+]
 LOCALE_PATHS = (Path(__file__).resolve().parent / "locale",)
 FORMAT_MODULE_PATH = ["byro.common.formats"]
 TIME_ZONE = config.get("locale", "time_zone")
