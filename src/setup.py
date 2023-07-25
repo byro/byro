@@ -109,6 +109,7 @@ setup(
             "pytest-django",
             "pytest-rerunfailures",
             "pytest-sugar",
+            "pytest-xdist",
         ],
         "mysql": ["mysqlclient"],
         "postgres": ["psycopg2-binary"],
