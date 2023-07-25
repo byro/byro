@@ -125,7 +125,9 @@ jobs:
         run: check-manifest .
         working-directory: ./src
       - name: Build package
-        run: python -m build -n
+        run: |
+          python -m build -nw
+          python -m build -ns
         working-directory: ./src
       - name: Check package
         run: twine check dist/*
