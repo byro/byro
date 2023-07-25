@@ -78,7 +78,7 @@ jobs:
         working-directory: ./src
       - name: Run tests
         working-directory: ./src
-        run: python -m pytest --reruns=3 --nauto -p no:sugar --cov=./ --cov-report=xml --maxfail=100 tests
+        run: python -m pytest --reruns=3 -nauto -p no:sugar --cov=./ --cov-report=xml --maxfail=100 tests
         env:
           BYRO_CONFIG_FILE: 'tests/byro.${{ matrix.database }}.cfg'
       - name: Upload coverage
