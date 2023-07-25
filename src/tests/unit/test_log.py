@@ -89,7 +89,7 @@ def test_log_user(user, member):
 
     assert a in LogEntry.objects.filter(user=user)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         LogEntry.objects.create(content_object=member, action_type="test.test_log_user")
 
     assert LogEntry.objects.filter(user=user).first().data["source"] == str(user)
