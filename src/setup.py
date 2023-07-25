@@ -107,6 +107,7 @@ setup(
             "pytest",
             "pytest-cov",
             "pytest-django",
+            "pytest-rerunfailures",
             "pytest-sugar",
         ],
         "mysql": ["mysqlclient"],
