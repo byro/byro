@@ -29,7 +29,7 @@ def test_template_to_mail_fail(mail_template):
 
 @pytest.mark.django_db
 def test_mail_cannot_send_sent_mail(sent_email):
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         sent_email.send()
 
 

@@ -143,7 +143,7 @@ class EMail(Auditable, models.Model):
     @transaction.atomic
     def send(self):
         if self.sent:
-            raise Exception("This mail has been sent already. It cannot be sent again.")
+            raise TypeError("This mail has been sent already. It cannot be sent again.")
 
         self.process_special_to()
 

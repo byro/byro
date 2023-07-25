@@ -44,11 +44,11 @@ def test_log_immutable(member):
 
     a = LogEntry.objects.get(action_type="test.test_log_immutable")
 
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         a.action_type = "Fnord"
         a.save()
 
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         a.delete()
 
 
@@ -71,12 +71,12 @@ def test_log_immutable_2(member):
     a.save = monkey_patched_save
     a.delete = monkey_patched_delete
 
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         a.action_type = "Fnord"
         with transaction.atomic():
             a.save()
 
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         with transaction.atomic():
             a.delete()
 
@@ -89,7 +89,7 @@ def test_log_user(user, member):
 
     assert a in LogEntry.objects.filter(user=user)
 
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         LogEntry.objects.create(content_object=member, action_type="test.test_log_user")
 
     assert LogEntry.objects.filter(user=user).first().data["source"] == str(user)
