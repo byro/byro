@@ -1,15 +1,15 @@
 |byro|
 ======
 
-.. image:: https://github.com/byro/byro/actions/workflows/tests.yml/badge.svg?branch=master
-   :target: https://github.com/byro/byro/actions/workflows/tests.yml?query=branch%3Amaster
+.. image:: https://github.com/byro/byro/actions/workflows/tests.yml/badge.svg?branch=main
+   :target: https://github.com/byro/byro/actions/workflows/tests.yml?query=branch%3Amain
    :alt: CI tests
 
-.. image:: https://github.com/byro/byro/actions/workflows/style.yml/badge.svg?branch=master
-   :target: https://github.com/byro/byro/actions/workflows/style.yml?query=branch%3Amaster
+.. image:: https://github.com/byro/byro/actions/workflows/style.yml/badge.svg?branch=main
+   :target: https://github.com/byro/byro/actions/workflows/style.yml?query=branch%3Amain
    :alt: CI code style
 
-.. image:: https://codecov.io/gh/byro/byro/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/byro/byro
    :alt: Code coverage
 
