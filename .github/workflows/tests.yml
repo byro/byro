@@ -2,15 +2,16 @@ name: Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - 'docs/**'
       - 'src/byro/locale/**'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - 'docs/**'
       - 'src/byro/locale/**'
+  workflow_dispatch: {}
 
 jobs:
   test:

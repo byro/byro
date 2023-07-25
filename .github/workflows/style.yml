@@ -2,17 +2,18 @@ name: Code Style
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - 'src/byro/locale/**'
       - 'src/byro/static/**'
       - 'docs/**'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - 'src/byro/locale/**'
       - 'src/byro/static/**'
       - 'docs/**'
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
