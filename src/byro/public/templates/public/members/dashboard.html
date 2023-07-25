@@ -6,149 +6,149 @@
 
 {% block title %}{% blocktrans %}Member page{% endblocktrans %}{% endblock %}
 {% block headline %}
-{% blocktrans with name=member.name %}Personal member page of {{ name }}{% endblocktrans %}
+    {% blocktrans with name=member.name %}Personal member page of {{ name }}{% endblocktrans %}
 {% endblock %}
 
 {% block public_content %}
-{% with is_active=member.is_active %}
+    {% with is_active=member.is_active %}
 
-<form method="post">
-<div class="dashboard-list">
-    <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
-        <h1>
-            {{ member.balance | format_with_currency }}
-        </h1>
-        <span class="dashboard-description">
-            {% trans "current balance" %}
-        </span>
-    </div>
-    {% if member.donation_balance %}
-        <div class="dashboard-block">
-            <h1>
-                {{ member.donation_balance | format_with_currency }}
-            </h1>
-            <span class="dashboard-description">
-                {% trans "donations" %}
-            </span>
-        </div>
-    {% endif %}
-    <div class="dashboard-block">
-        <h1>
-            {% blocktrans with count=member_since.days trimmed %}
-            {{ count }} days
-            {% endblocktrans %}
-        </h1>
-        <span class="dashboard-description">
-            {% if member_since.days > 0 %}
-                {% blocktrans with count=member_since.years trimmed %}
-                or {{ count }} years of membership
-                {% endblocktrans %}
-            {% else %}
-                {% blocktrans trimmed %}
-                until this person becomes a member.
-                {% endblocktrans %}
-            {% endif %}
-            <br>
-            {% blocktrans with start=member_since.first.isoformat trimmed %}
-                First joined on {{ start }}.
-            {% endblocktrans %}
-        </span>
-    </div>
-    {% if is_active %}
-    <div class="dashboard-block">
-      <h1>
-        {{ current_membership.amount | format_with_currency }}
-      </h1>
-      <span class="dashboard-description">
-        {% blocktrans %}membership fee{% endblocktrans %} <strong>{{ current_membership.get_interval_display }}</strong>
-        </span>
-    </div>
-    {% endif %}
-    {% for tile in tiles %}
-        {% if tile.url %}<a href="{{ tile.url }}"{% else %}<div{% endif %} class="dashboard-block">
-          <h1>{{ tile.title }}</h1>
-          <span class="dashboard-description">
-            {{ tile.lines|join:'<br>' }}
-          </span>
-        {% if tile.url %}</a>{% else %}</div>{% endif %}
-    {% endfor %}
-</div>
-
-<div class="card mt-4 mb-4">
-    <div class="card-header member-name-container">
-        <div class="member-name">
-            <h4 class="card-title">{{member.name}}
-            </h4>
-            <h5 class="card-subtitle mb-2 text-muted">
-                {% if is_active %}
-                    {% blocktrans with start=current_membership.start.isoformat trimmed %}
-                        Joined {{ start }}
-                    {% endblocktrans %}
-                {% else %}
-                    <span class="text-danger">{% blocktrans %}No current active membership{% endblocktrans %}</span>
+        <form method="post">
+            <div class="dashboard-list">
+                <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
+                    <h1>
+                        {{ member.balance | format_with_currency }}
+                    </h1>
+                    <span class="dashboard-description">
+                        {% trans "current balance" %}
+                    </span>
+                </div>
+                {% if member.donation_balance %}
+                    <div class="dashboard-block">
+                        <h1>
+                            {{ member.donation_balance | format_with_currency }}
+                        </h1>
+                        <span class="dashboard-description">
+                            {% trans "donations" %}
+                        </span>
+                    </div>
                 {% endif %}
-            </h5>
-        </div>
-        {% if member.number %}
-            <div class="member-number">#
-                {{member.number}}
+                <div class="dashboard-block">
+                    <h1>
+                        {% blocktrans with count=member_since.days trimmed %}
+                            {{ count }} days
+                        {% endblocktrans %}
+                    </h1>
+                    <span class="dashboard-description">
+                        {% if member_since.days > 0 %}
+                            {% blocktrans with count=member_since.years trimmed %}
+                                or {{ count }} years of membership
+                            {% endblocktrans %}
+                        {% else %}
+                            {% blocktrans trimmed %}
+                                until this person becomes a member.
+                            {% endblocktrans %}
+                        {% endif %}
+                        <br>
+                        {% blocktrans with start=member_since.first.isoformat trimmed %}
+                            First joined on {{ start }}.
+                        {% endblocktrans %}
+                    </span>
+                </div>
+                {% if is_active %}
+                    <div class="dashboard-block">
+                        <h1>
+                            {{ current_membership.amount | format_with_currency }}
+                        </h1>
+                        <span class="dashboard-description">
+                            {% blocktrans %}membership fee{% endblocktrans %} <strong>{{ current_membership.get_interval_display }}</strong>
+                        </span>
+                    </div>
+                {% endif %}
+                {% for tile in tiles %}
+                    {% if tile.url %}<a href="{{ tile.url }}"{% else %}<div{% endif %} class="dashboard-block">
+                        <h1>{{ tile.title }}</h1>
+                        <span class="dashboard-description">
+                            {{ tile.lines|join:'<br>' }}
+                        </span>
+                        {% if tile.url %}</a>{% else %}</div>{% endif %}
+                {% endfor %}
             </div>
-        {% endif %}
-    </div>
-    <div class="card-body">
-        <p>{% blocktrans trimmed %}
-        This is where you can opt in to show some of your data to other members in the central member list.
-        Only information you explicitly mark as public will be shared.
-        {% endblocktrans %}</p>
-        <div class="ml-3">
-        <p>
-        {% bootstrap_field form.is_visible_to_members layout="inline" %}
-        </p>
-        </div>
-            {% csrf_token %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>{% trans "Data field" %}</th>
-                        <th>{% trans "Data" %}</th>
-                        <th>{% trans "Share data in member list" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for field in form %}{% if field.name != "is_visible_to_members" %}
-                    <tr>
-                        <td>{{ field.label }}</td>
-                        <td>{{ field.meta }}</td>
-                        <td>{{ field }}</td>
-                    </tr>
-                {% endif %}{% endfor %}
-                </tbody>
-            </table>
 
-    </div>
-    <div class="card-footer text-right">
-        <p class="d-flex">
-        <button type="submit" class="btn btn-lg btn-primary ml-auto">{% trans "Save" %}</button>
-        </p>
-    </div>
-</div>
-</form>
+            <div class="card mt-4 mb-4">
+                <div class="card-header member-name-container">
+                    <div class="member-name">
+                        <h4 class="card-title">{{member.name}}
+                        </h4>
+                        <h5 class="card-subtitle mb-2 text-muted">
+                            {% if is_active %}
+                                {% blocktrans with start=current_membership.start.isoformat trimmed %}
+                                    Joined {{ start }}
+                                {% endblocktrans %}
+                            {% else %}
+                                <span class="text-danger">{% blocktrans %}No current active membership{% endblocktrans %}</span>
+                            {% endif %}
+                        </h5>
+                    </div>
+                    {% if member.number %}
+                        <div class="member-number">#
+                            {{member.number}}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <p>{% blocktrans trimmed %}
+                        This is where you can opt in to show some of your data to other members in the central member list.
+                        Only information you explicitly mark as public will be shared.
+                    {% endblocktrans %}</p>
+                    <div class="ml-3">
+                        <p>
+                            {% bootstrap_field form.is_visible_to_members layout="inline" %}
+                        </p>
+                    </div>
+                    {% csrf_token %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Data field" %}</th>
+                                <th>{% trans "Data" %}</th>
+                                <th>{% trans "Share data in member list" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for field in form %}{% if field.name != "is_visible_to_members" %}
+                                <tr>
+                                    <td>{{ field.label }}</td>
+                                    <td>{{ field.meta }}</td>
+                                    <td>{{ field }}</td>
+                                </tr>
+                            {% endif %}{% endfor %}
+                        </tbody>
+                    </table>
 
-{% endwith %}
-<h4 class="mt-4">{% trans "Membership history" %}</h4>
-{% for ms in memberships %}
-    <div class="card mt-4" style="max-width: 20rem;">
-        <div class="card-header">
-            <h5 class="card-title">{{ms.start.isoformat}} &mdash; {{ms.end.isoformat|default:"&hellip;"}}</h4>
-        </div>
-        <div class="card-body">
-            <p class="card-text">{{ms.amount | format_with_currency}} {{ms.get_interval_display}}</p>
-        </div>
-    </div>
-{% endfor %}
+                </div>
+                <div class="card-footer text-right">
+                    <p class="d-flex">
+                        <button type="submit" class="btn btn-lg btn-primary ml-auto">{% trans "Save" %}</button>
+                    </p>
+                </div>
+            </div>
+        </form>
 
-<h4 class="mt-4">{% trans "Finance details" %}</h4>
-{% include "office/member/finance_table.html" %}
-{% include "office/pagination.html" %}
+    {% endwith %}
+    <h4 class="mt-4">{% trans "Membership history" %}</h4>
+    {% for ms in memberships %}
+        <div class="card mt-4" style="max-width: 20rem;">
+            <div class="card-header">
+                <h5 class="card-title">{{ms.start.isoformat}} &mdash; {{ms.end.isoformat|default:"&hellip;"}}</h4>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ms.amount | format_with_currency}} {{ms.get_interval_display}}</p>
+            </div>
+        </div>
+    {% endfor %}
+
+    <h4 class="mt-4">{% trans "Finance details" %}</h4>
+    {% include "office/member/finance_table.html" %}
+    {% include "office/pagination.html" %}
 
 {% endblock %}

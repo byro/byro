@@ -34,179 +34,179 @@
         {% for entry in timeline %}
             {% if entry.tl.year_first %}
                 <div class="tl-year">
-                <div class="tl-year-content">{{ entry.date.year }}</div>
-                <div class="tl-year-inner">
+                    <div class="tl-year-content">{{ entry.date.year }}</div>
+                    <div class="tl-year-inner">
             {% endif %}
-        {% if entry.tl.month_first %}
-            <div class="tl-month">
-            <div class="tl-month-content">{{ entry.date|date:'M' }}</div>
-            <div class="tl-month-inner">
-        {% endif %}
-        {% if entry.type != "dummy" %}
-            <div class="tl-entry tl-entry-{{ entry.type }} {% if entry.subtype %}tl-entry-{{ entry.type }}-{{ entry.subtype }}{% endif %} {% if entry.deleted %}tl-deleted{% endif %}">
-                <div class="tl-entry-date">
-                    <a name="{{ entry.tl.entry_id }}"></a>{{ entry.date|date:"d. F Y" }}{% if entry.date.time %},
-                    {{ entry.date.time|date:"H:i:s" }} {{ entry.date.time|date:"e" }}{% endif %}
-                </div>
-                <div class="tl-entry-inner">
-                    <div class="tl-entry-data">
-                        <div class="tl-entry-icon">
-                            <span class="fa-stack fa-2x">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-{{ entry.icon }} fa-stack-1x"></i>
-                                {% if entry.deleted %}
-                                    <i class="fa fa-ban fa-stack-2x"></i>
-                                {% endif %}
-                            </span>
-                        </div>
-                        {% if entry.type == "finance" and entry.instance.transaction %}
-                            <div class="tl-entry-content card">
-                                {% if entry.subtype == "membership-due" %}
-                                    <div class="card-header"><span class="tl-entry-value">{{ entry.value }}</span>
-                                        {% trans "Membership due" %}
-                                    </div>
-                                {% elif entry.subtype == "membership-paid" %}
-                                    <div class="card-header"><span class="tl-entry-value">{{ entry.value }}</span>
-                                        {% trans "Payment received" %}
-                                    </div>
-                                {% else %}
-                                {% endif %}
-                                {% with memo=entry.instance.find_memo %}
-                                    {% if memo and not entry.subtype == "membership-due" %}
-                                        <div class="card-body finance-memo">{{ memo }}</div>
+            {% if entry.tl.month_first %}
+                <div class="tl-month">
+                    <div class="tl-month-content">{{ entry.date|date:'M' }}</div>
+                    <div class="tl-month-inner">
+            {% endif %}
+            {% if entry.type != "dummy" %}
+                <div class="tl-entry tl-entry-{{ entry.type }} {% if entry.subtype %}tl-entry-{{ entry.type }}-{{ entry.subtype }}{% endif %} {% if entry.deleted %}tl-deleted{% endif %}">
+                    <div class="tl-entry-date">
+                        <a name="{{ entry.tl.entry_id }}"></a>{{ entry.date|date:"d. F Y" }}{% if entry.date.time %},
+                            {{ entry.date.time|date:"H:i:s" }} {{ entry.date.time|date:"e" }}{% endif %}
+                    </div>
+                    <div class="tl-entry-inner">
+                        <div class="tl-entry-data">
+                            <div class="tl-entry-icon">
+                                <span class="fa-stack fa-2x">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-{{ entry.icon }} fa-stack-1x"></i>
+                                    {% if entry.deleted %}
+                                        <i class="fa fa-ban fa-stack-2x"></i>
                                     {% endif %}
-                                {% endwith %}
-                                {% with booking_datetime=entry.instance.booking_datetime|default:entry.instance.transaction.booking_datetime %}
-                                    {% if booking_datetime and booking_datetime != entry.instance.transaction.value_datetime %}
+                                </span>
+                            </div>
+                            {% if entry.type == "finance" and entry.instance.transaction %}
+                                <div class="tl-entry-content card">
+                                    {% if entry.subtype == "membership-due" %}
+                                        <div class="card-header"><span class="tl-entry-value">{{ entry.value }}</span>
+                                            {% trans "Membership due" %}
+                                        </div>
+                                    {% elif entry.subtype == "membership-paid" %}
+                                        <div class="card-header"><span class="tl-entry-value">{{ entry.value }}</span>
+                                            {% trans "Payment received" %}
+                                        </div>
+                                    {% else %}
+                                    {% endif %}
+                                    {% with memo=entry.instance.find_memo %}
+                                        {% if memo and not entry.subtype == "membership-due" %}
+                                            <div class="card-body finance-memo">{{ memo }}</div>
+                                        {% endif %}
+                                    {% endwith %}
+                                    {% with booking_datetime=entry.instance.booking_datetime|default:entry.instance.transaction.booking_datetime %}
+                                        {% if booking_datetime and booking_datetime != entry.instance.transaction.value_datetime %}
+                                            <div class="card-footer">
+                                                {% blocktrans with datetime=booking_datetime|date:"d. F Y" trimmed %}
+                                                    Booked on {{ datetime }}
+                                                {% endblocktrans %}
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                    {% if entry.deleted %}
                                         <div class="card-footer">
-                                            {% blocktrans with datetime=booking_datetime|date:"d. F Y" trimmed %}
-                                                Booked on {{ datetime }}
+                                            {% blocktrans with datetime=entry.deleted.modified|date:"d. F Y" trimmed %}
+                                                Reversed on {{ datetime }}
                                             {% endblocktrans %}
                                         </div>
                                     {% endif %}
-                                {% endwith %}
-                                {% if entry.deleted %}
-                                    <div class="card-footer">
-                                        {% blocktrans with datetime=entry.deleted.modified|date:"d. F Y" trimmed %}
-                                            Reversed on {{ datetime }}
-                                        {% endblocktrans %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% elif entry.type == "mail" and entry.subtype == "mail-out" %}
-                            <div class="tl-entry-content card">
-                                <div class="card-header">
-                                    <table>
-                                        <tr>
-                                            <th>{% trans "To" context "mail header" %}:</th>
-                                            <td>{{ entry.instance.to }}</td>
-                                        </tr>
-                                        {# FIXME Format special names #}
-                                        <tr>
-                                            <th>{% trans "Subject" context "mail header" %}:</th>
-                                            <td class="tl-entry-value">{{ entry.instance.subject }}</td>
-                                        </tr>
-                                        {% if entry.instance.reply_to %}
-                                            <tr>
-                                                <th>{% trans "Reply-To" context "mail header" %}:</th>
-                                                <td>{{ entry.instance.reply_to }}</td>
-                                            </tr>
-                                        {% endif %}
-                                        {% if entry.instance.cc %}
-                                            <tr>
-                                                <th>{% trans "Cc" context "mail header" %}:</th>
-                                                <td>{{ entry.instance.cc }}</td>
-                                            </tr>
-                                        {% endif %}
-                                    </table>
                                 </div>
-                                {% if request.GET.expand == entry.tl.entry_id %}
-                                    <div class="card-body">
-                                        <pre>{{ entry.instance.text }}</pre>
+                            {% elif entry.type == "mail" and entry.subtype == "mail-out" %}
+                                <div class="tl-entry-content card">
+                                    <div class="card-header">
+                                        <table>
+                                            <tr>
+                                                <th>{% trans "To" context "mail header" %}:</th>
+                                                <td>{{ entry.instance.to }}</td>
+                                            </tr>
+                                        {# FIXME Format special names #}
+                                            <tr>
+                                                <th>{% trans "Subject" context "mail header" %}:</th>
+                                                <td class="tl-entry-value">{{ entry.instance.subject }}</td>
+                                            </tr>
+                                            {% if entry.instance.reply_to %}
+                                                <tr>
+                                                    <th>{% trans "Reply-To" context "mail header" %}:</th>
+                                                    <td>{{ entry.instance.reply_to }}</td>
+                                                </tr>
+                                            {% endif %}
+                                            {% if entry.instance.cc %}
+                                                <tr>
+                                                    <th>{% trans "Cc" context "mail header" %}:</th>
+                                                    <td>{{ entry.instance.cc }}</td>
+                                                </tr>
+                                            {% endif %}
+                                        </table>
                                     </div>
-                                {% else %}
-                                    <div class="card-body tl-collapsed">
+                                    {% if request.GET.expand == entry.tl.entry_id %}
+                                        <div class="card-body">
+                                        <pre>{{ entry.instance.text }}</pre>
+                                        </div>
+                                    {% else %}
+                                        <div class="card-body tl-collapsed">
                                                             <pre>{{ entry.instance.text|truncatewords_html:150 }}
 &hellip;</pre>
-                                        <a class="tl-read-more"
-                                           href="?expand={{ entry.tl.entry_id }}#{{ entry.tl.entry_id }}"><span
+                                            <a class="tl-read-more"
+                                               href="?expand={{ entry.tl.entry_id }}#{{ entry.tl.entry_id }}"><span
                                                 class="fa fa-chevron-down"></span></a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% elif entry.type == "ops" and entry.subtype == "membership-begin" %}
-                            <div class="tl-entry-content card">
-                                <div class="card-header"><span
-                                        class="tl-entry-value">{% trans "Membership start" %}</span></div>
-                            </div>
-                        {% elif entry.type == "ops" and entry.subtype == "membership-end" %}
-                            <div class="tl-entry-content card">
-                                <div class="card-header"><span
-                                        class="tl-entry-value">{% trans "Membership end" %}</span></div>
-                            </div>
-                        {% elif entry.type == "ops" %}
-                            <div class="tl-entry-content card">
-                                <div class="card-header"><span class="tl-entry-value">
-                                                            {% if entry.subtype == "member-created" %}
-                                                                {% trans "Membership entry created" %}
-                                                            {% elif entry.subtype == "member-updated" %}
-                                                                {% trans "Membership entry changed" %}
-                                                            {% elif entry.subtype == "document-created" %}
-                                                                {% trans "Document uploaded" %}
-                                                            {% else %}
-                                                                {{ entry.instance.action_type }}
-                                                            {% endif %}
-                                                        </span></div>
-                                {% if entry.instance.data.source %}
-                                    <div class="card-footer">
-                                        {% if entry.subtype == "member-created" %}
-                                            {% trans "Created by:" %}
-                                        {% elif entry.subtype == "member-updated" %}
-                                            {% trans "Changed by:" %}
-                                        {% else %}
-                                            {% trans "By:" %}
-                                        {% endif %}
-                                        {{ entry.instance | format_log_source }}</div>
-                                {% endif %}
-                            </div>
-                        {% elif entry.type == "document" %}
-                            <div class="tl-entry-content card">
-                                <div class="card-header"><span class="tl-entry-value">
-                                                            {% if entry.subtype == "registration_form" %}
-                                                                {% trans "Registration form" %}
-                                                            {% else %}
-                                                                {% trans "Document" %}
-                                                            {% endif %}
-                                                        </span></div>
-                                {% if entry.instance.title %}
-                                    <div class="card-body">{{ entry.instance.title }}</div>
-                                {% endif %}
-                            </div>
-                        {% elif entry.type == "finance" and entry.subtype == "sepadd-mandate-reference-assigned"%}
-                            <div class="tl-entry-content card">
-                                <div class="card-header">
-                                    {% trans "Direct Debit mandate reference assigned" %}:
-                                    <span class="tl-entry-value">{{ entry.instance.data.mandate_reference }}</span>
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            </div>
-                        {% else %}
-                            <div class="tl-entry-content card">
-                                <div class="card-header">{{ entry.type }}</div>
-                                <div class="card-body">{{ entry.subtype }}</div>
-                            </div>
-                        {% endif %}
+                            {% elif entry.type == "ops" and entry.subtype == "membership-begin" %}
+                                <div class="tl-entry-content card">
+                                    <div class="card-header"><span
+                                        class="tl-entry-value">{% trans "Membership start" %}</span></div>
+                                </div>
+                            {% elif entry.type == "ops" and entry.subtype == "membership-end" %}
+                                <div class="tl-entry-content card">
+                                    <div class="card-header"><span
+                                        class="tl-entry-value">{% trans "Membership end" %}</span></div>
+                                </div>
+                            {% elif entry.type == "ops" %}
+                                <div class="tl-entry-content card">
+                                    <div class="card-header"><span class="tl-entry-value">
+                                        {% if entry.subtype == "member-created" %}
+                                            {% trans "Membership entry created" %}
+                                        {% elif entry.subtype == "member-updated" %}
+                                            {% trans "Membership entry changed" %}
+                                        {% elif entry.subtype == "document-created" %}
+                                            {% trans "Document uploaded" %}
+                                        {% else %}
+                                            {{ entry.instance.action_type }}
+                                        {% endif %}
+                                    </span></div>
+                                    {% if entry.instance.data.source %}
+                                        <div class="card-footer">
+                                            {% if entry.subtype == "member-created" %}
+                                                {% trans "Created by:" %}
+                                            {% elif entry.subtype == "member-updated" %}
+                                                {% trans "Changed by:" %}
+                                            {% else %}
+                                                {% trans "By:" %}
+                                            {% endif %}
+                                            {{ entry.instance | format_log_source }}</div>
+                                    {% endif %}
+                                </div>
+                            {% elif entry.type == "document" %}
+                                <div class="tl-entry-content card">
+                                    <div class="card-header"><span class="tl-entry-value">
+                                        {% if entry.subtype == "registration_form" %}
+                                            {% trans "Registration form" %}
+                                        {% else %}
+                                            {% trans "Document" %}
+                                        {% endif %}
+                                    </span></div>
+                                    {% if entry.instance.title %}
+                                        <div class="card-body">{{ entry.instance.title }}</div>
+                                    {% endif %}
+                                </div>
+                            {% elif entry.type == "finance" and entry.subtype == "sepadd-mandate-reference-assigned"%}
+                                <div class="tl-entry-content card">
+                                    <div class="card-header">
+                                        {% trans "Direct Debit mandate reference assigned" %}:
+                                        <span class="tl-entry-value">{{ entry.instance.data.mandate_reference }}</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="tl-entry-content card">
+                                    <div class="card-header">{{ entry.type }}</div>
+                                    <div class="card-body">{{ entry.subtype }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endif %}
-        {% if entry.tl.month_last %}
-            </div>
-            </div>
-        {% endif %}
-        {% if entry.tl.year_last %}
-            </div>
-            </div>
-        {% endif %}
+            {% endif %}
+            {% if entry.tl.month_last %}
+                </div>
+                </div>
+            {% endif %}
+            {% if entry.tl.year_last %}
+                </div>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 

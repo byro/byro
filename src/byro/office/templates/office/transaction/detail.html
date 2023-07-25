@@ -7,71 +7,71 @@
 {% block headline %}{% trans "Edit transaction" %}{% endblock %}
 
 {% block content %}
-{{ form.media.css }}
+    {{ form.media.css }}
 {# FIXME Deduplicate with account/detail.html? #}
-<form method="POST">
-{% csrf_token %}
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th>{% trans "Date" %}</th>
-            <th>{% trans "Purpose" %}<br><i>{% trans "Originator/Recipient" %}</i></th>
-            <th>{% trans "Member" %}</th>
-            <th>{% trans "Account" %}</th>
-            <th class="text-md-right">{% trans "Incoming" %}</th>
-            <th class="text-md-right">{% trans "Outgoing" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for booking in bookings %}
-            <tr class="transaction-{% cycle 'row-odd' 'row-even' as account_row %}">
-                <td class="related-empty"></td>
-                <td>
-                    {{ booking.memo|default:"" }}
-                    {% if booking.data.other_party %}
-                        <br><i>{{ booking.data.other_party }}</i>
-                    {% endif %}
-                </td>
-                <td>{{ booking.member.name }}</td>
-                <td>{{ booking.debit_account|default:booking.credit_account }}</td>
-                <td class="text-md-right">
-                    {% if booking.debit_account %}
-                        {{ booking.amount }}
-                    {% endif %}
-                </td>
-                <td class="text-md-right">
-                    {% if booking.credit_account %}
-                        {{ booking.amount }}
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
+    <form method="POST">
+        {% csrf_token %}
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Purpose" %}<br><i>{% trans "Originator/Recipient" %}</i></th>
+                    <th>{% trans "Member" %}</th>
+                    <th>{% trans "Account" %}</th>
+                    <th class="text-md-right">{% trans "Incoming" %}</th>
+                    <th class="text-md-right">{% trans "Outgoing" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr class="transaction-{% cycle 'row-odd' 'row-even' as account_row %}">
+                        <td class="related-empty"></td>
+                        <td>
+                            {{ booking.memo|default:"" }}
+                            {% if booking.data.other_party %}
+                                <br><i>{{ booking.data.other_party }}</i>
+                            {% endif %}
+                        </td>
+                        <td>{{ booking.member.name }}</td>
+                        <td>{{ booking.debit_account|default:booking.credit_account }}</td>
+                        <td class="text-md-right">
+                            {% if booking.debit_account %}
+                                {{ booking.amount }}
+                            {% endif %}
+                        </td>
+                        <td class="text-md-right">
+                            {% if booking.credit_account %}
+                                {{ booking.amount }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                {% if transaction.balances_debit != transaction.balances_credit %}
+                    <tr>
+                        <td class="related-empty"></td>
+                        <td>{{form.memo}}</td>
+                        <td>{{form.member}}</td>
+                        <td>{{form.account}}</td>
+                        <td class="text-md-right">{{form.debit_value}}</td>
+                        <td class="text-md-right">{{form.credit_value}}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
         {% if transaction.balances_debit != transaction.balances_credit %}
-            <tr>
-                <td class="related-empty"></td>
-                <td>{{form.memo}}</td>
-                <td>{{form.member}}</td>
-                <td>{{form.account}}</td>
-                <td class="text-md-right">{{form.debit_value}}</td>
-                <td class="text-md-right">{{form.credit_value}}</td>
-            </tr>
+            <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
         {% endif %}
-    </tbody>
-</table>
-{% if transaction.balances_debit != transaction.balances_credit %}
-    <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
-{% endif %}
-</form>
+    </form>
 
     {% if transaction.documents.count %}
-    <div class="card mt-3">
-        <div class="card-header">
-            <h4 class="card-title">{% trans "Related documents" %}</h4>
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4 class="card-title">{% trans "Related documents" %}</h4>
+            </div>
+            <div class="card-body">
+                {% include "office/documents/snippet_documents_table.html" with documents=transaction.documents.all %}
+            </div>
         </div>
-        <div class="card-body">
-            {% include "office/documents/snippet_documents_table.html" with documents=transaction.documents.all %}
-        </div>
-    </div>
     {% endif %}
 
     <div class="card mt-3">
@@ -92,5 +92,5 @@
         </div>
     </div>
 
-{{ form.media.js }}
+    {{ form.media.js }}
 {% endblock %}

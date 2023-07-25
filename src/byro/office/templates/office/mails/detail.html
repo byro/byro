@@ -7,38 +7,38 @@
 {% block title %}{% trans "Mail" %} :: {{ block.super }}{% endblock %}
 
 {% block mail_content %}
-<form method='post'>
-    {% csrf_token %}
-    <div class="card member-form-card">
-        <div class="card-header">
-            {% if mail.sent %}
-            {% blocktrans with when=mail.sent trimmed %}
-                Mail, sent at {{ when }}
-            {% endblocktrans %}
-            {% else %}
-            {% blocktrans trimmed %}
-                Mail, unsent
-            {% endblocktrans %}
-            {% endif %}
-        </div>
-        <div class="card-body">
-            {% include "office/mails/special_to_part.html" %}
-            {% bootstrap_form form layout='horizontal' exclude='to,to_member,to_type' %}
-            <div class="card-body">
-                {% if not form.instance.sent %}
-                    <button class="btn btn-info" type="submit" name="action" value="save">Save</button>
-                    <button class="btn btn-success" type="submit" name="action" value="send">
-                        {% trans "Save and send" %}
-                    </button>
-                    <a href="{% url "office:mails.mail.delete" pk=form.instance.pk %}" class="btn btn-danger">
-                        {% trans "Discard" %}
-                    </a>
+    <form method='post'>
+        {% csrf_token %}
+        <div class="card member-form-card">
+            <div class="card-header">
+                {% if mail.sent %}
+                    {% blocktrans with when=mail.sent trimmed %}
+                        Mail, sent at {{ when }}
+                    {% endblocktrans %}
                 {% else %}
-                    <a href="{% url "office:mails.mail.copy" pk=form.instance.pk %}" class="btn btn-danger">
-                        {% trans "Copy to new mail" %}
-                    </a>
+                    {% blocktrans trimmed %}
+                        Mail, unsent
+                    {% endblocktrans %}
                 {% endif %}
             </div>
-        </div>
-</form>
+            <div class="card-body">
+                {% include "office/mails/special_to_part.html" %}
+                {% bootstrap_form form layout='horizontal' exclude='to,to_member,to_type' %}
+                <div class="card-body">
+                    {% if not form.instance.sent %}
+                        <button class="btn btn-info" type="submit" name="action" value="save">Save</button>
+                        <button class="btn btn-success" type="submit" name="action" value="send">
+                            {% trans "Save and send" %}
+                        </button>
+                        <a href="{% url "office:mails.mail.delete" pk=form.instance.pk %}" class="btn btn-danger">
+                            {% trans "Discard" %}
+                        </a>
+                    {% else %}
+                        <a href="{% url "office:mails.mail.copy" pk=form.instance.pk %}" class="btn btn-danger">
+                            {% trans "Copy to new mail" %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
 {% endblock %}

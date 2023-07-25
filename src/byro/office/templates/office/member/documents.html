@@ -15,15 +15,15 @@
     </div>
 
     {% if member.documents.count %}
-    <div class="card mt-3">
-        <div class="card-header">
-            <h4 class="card-title">{% trans "Related documents" %}</h4>
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4 class="card-title">{% trans "Related documents" %}</h4>
+            </div>
+            <div class="card-body">
+                {% include "office/documents/snippet_documents_table.html" with documents=member.documents.all %}
+            </div>
+            <div class="card-footer">{% include "office/pagination.html" %}</div>
         </div>
-        <div class="card-body">
-            {% include "office/documents/snippet_documents_table.html" with documents=member.documents.all %}
-        </div>
-        <div class="card-footer">{% include "office/pagination.html" %}</div>
-    </div>
     {% endif %}
 
 {% endblock %}

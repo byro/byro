@@ -98,6 +98,7 @@ setup(
         "dev": [
             "black",
             "check-manifest",
+            "djhtml",
             "flake8",
             "flake8-bugbear",
             "freezegun",

@@ -4,18 +4,18 @@
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block headline %}
-{% trans "Welcome to byro!" %}
+    {% trans "Welcome to byro!" %}
 {% endblock %}
 
 {% block content %}
-<div class="login-form">
-    <form action="" method="post" autocomplete="off" class="col-md-4">
-        {% csrf_token %}
-        <input type="text" placeholder="Nick" required autofocus id="username" autocomplete="off"
-               class="form-control" name="username">
-        <input type="password" placeholder="Password" required id="password" autocomplete="off"
-               class="form-control" name="password">
-        <button class="btn btn-lg btn-success form-control" type="submit">{% trans "Sign in" %}</button>
-    </form>
-</div>
+    <div class="login-form">
+        <form action="" method="post" autocomplete="off" class="col-md-4">
+            {% csrf_token %}
+            <input type="text" placeholder="Nick" required autofocus id="username" autocomplete="off"
+                   class="form-control" name="username">
+            <input type="password" placeholder="Password" required id="password" autocomplete="off"
+                   class="form-control" name="password">
+            <button class="btn btn-lg btn-success form-control" type="submit">{% trans "Sign in" %}</button>
+        </form>
+    </div>
 {% endblock %}

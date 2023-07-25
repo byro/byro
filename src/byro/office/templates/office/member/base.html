@@ -4,93 +4,93 @@
 {% block headline %}{{ member.name }} ({{ member.number }}){% endblock %}
 
 {% block content %}
-<ul class="nav nav-pills">
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "members.dashboard" in url_name %}active{% endif %}"
-      href="{% url "office:members.dashboard" pk=member.pk %}"
-    >
+  <ul class="nav nav-pills">
+    <li class="nav-item">
+      <a
+        class="nav-link {% if "members.dashboard" in url_name %}active{% endif %}"
+        href="{% url "office:members.dashboard" pk=member.pk %}"
+      >
         {% trans "Dashboard" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-            class="nav-link {% if "members.timeline" in url_name %}active{% endif %}"
-            href="{% url "office:members.timeline" pk=member.pk %}"
-    >
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link {% if "members.timeline" in url_name %}active{% endif %}"
+        href="{% url "office:members.timeline" pk=member.pk %}"
+      >
         {% trans "Timeline" %}
-    </a>
-  </li>
+      </a>
+    </li>
     <li class="nav-item">
-        <a
-      class="nav-link {% if "members.data" in url_name %}active{% endif %}"
-      href="{% url "office:members.data" pk=member.pk %}"
-    >
+      <a
+        class="nav-link {% if "members.data" in url_name %}active{% endif %}"
+        href="{% url "office:members.data" pk=member.pk %}"
+      >
         {% trans "Data" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "members.documents" in url_name %}active{% endif %}"
-      href="{% url "office:members.documents" pk=member.pk %}"
-    >
-        {% trans "Documents" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "members.log" in url_name %}active{% endif %}"
-      href="{% url "office:members.log" pk=member.pk %}"
-    >
-        {% trans "Log entries" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-            class="nav-link {% if "members.mails" in url_name %}active{% endif %}"
-            href="{% url "office:members.mails" pk=member.pk %}"
-    >
-        {% trans "Mail history" %}
-    </a>
-  </li>
+      </a>
+    </li>
     <li class="nav-item">
-        <a
-      class="nav-link {% if "members.finance" in url_name %}active{% endif %}"
-      href="{% url "office:members.finance" pk=member.pk %}"
-    >
+      <a
+        class="nav-link {% if "members.documents" in url_name %}active{% endif %}"
+        href="{% url "office:members.documents" pk=member.pk %}"
+      >
+        {% trans "Documents" %}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link {% if "members.log" in url_name %}active{% endif %}"
+        href="{% url "office:members.log" pk=member.pk %}"
+      >
+        {% trans "Log entries" %}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link {% if "members.mails" in url_name %}active{% endif %}"
+        href="{% url "office:members.mails" pk=member.pk %}"
+      >
+        {% trans "Mail history" %}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link {% if "members.finance" in url_name %}active{% endif %}"
+        href="{% url "office:members.finance" pk=member.pk %}"
+      >
         {% trans "Finance" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "members.operations" in url_name %}active{% endif %}"
-      href="{% url "office:members.operations" pk=member.pk %}"
-    >
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link {% if "members.operations" in url_name %}active{% endif %}"
+        href="{% url "office:members.operations" pk=member.pk %}"
+      >
         {% trans "Operations" %}
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      class="nav-link {% if "members.record-disclosure" in url_name %}active{% endif %}"
-      href="{% url "office:members.record-disclosure" pk=member.pk %}"
-    >
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link {% if "members.record-disclosure" in url_name %}active{% endif %}"
+        href="{% url "office:members.record-disclosure" pk=member.pk %}"
+      >
         {% trans "Record Disclosure" %}
-    </a>
-  </li>
-  {% for view in member_views %}
-  <li class="nav-item">
-    <a
-      class="nav-link {% if view.url_name in url_name %}active{% endif %}"
-      href="{{ view.url }}"
-    >
-        {{ view.label }}
-    </a>
-  </li>
-  {% endfor %}
-</ul>
+      </a>
+    </li>
+    {% for view in member_views %}
+      <li class="nav-item">
+        <a
+          class="nav-link {% if view.url_name in url_name %}active{% endif %}"
+          href="{{ view.url }}"
+        >
+          {{ view.label }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 
-{% block member_content %}
-{% endblock %}
+  {% block member_content %}
+  {% endblock %}
 
 {% endblock %}
 

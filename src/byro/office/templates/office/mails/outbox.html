@@ -6,47 +6,47 @@
 {% block title %}{% trans "Outbox" %} :: {{ block.super }}{% endblock %}
 
 {% block mail_content %}
-{% if mails %}
-<div class="form-group row float-right">
-    <form method="post" action="{% url "office:mails.outbox.send" %}" class="form form-inline">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success">{% trans "Send All" %}</button>
-    </form>
-    <form method="post" action="{% url "office:mails.outbox.purge" %}" class="form form-inline">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">{% trans "Discard all" %}</button>
-    </form>
-</div>
-{% endif %}
+    {% if mails %}
+        <div class="form-group row float-right">
+            <form method="post" action="{% url "office:mails.outbox.send" %}" class="form form-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">{% trans "Send All" %}</button>
+            </form>
+            <form method="post" action="{% url "office:mails.outbox.purge" %}" class="form form-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">{% trans "Discard all" %}</button>
+            </form>
+        </div>
+    {% endif %}
 
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th class="table-column-large">{% trans "Subject" %}</th>
-            <th class="table-column-small">{% trans "To" %}</th>
-            <th class="table-column-small"></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for mail in mails %}
-            <tr class="table-light">
-                <td>
-                    <a href="{% url "office:mails.mail.view" pk=mail.pk %}">
-                        {{ mail.subject }}
-                    </a>
-                </td>
-                <td>{{ mail.to }}</td>
-                <td>
-                    <a href="{% url "office:mails.mail.send" pk=mail.pk %}" class="btn btn-sm btn-success">
-                        {% trans "Send" %}
-                    </a>
-                    <a href="{% url "office:mails.mail.delete" pk=mail.pk %}" class="btn btn-sm btn-danger">
-                        {% trans "Discard" %}
-                    </a>
-                </td>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="table-column-large">{% trans "Subject" %}</th>
+                <th class="table-column-small">{% trans "To" %}</th>
+                <th class="table-column-small"></th>
             </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+            {% for mail in mails %}
+                <tr class="table-light">
+                    <td>
+                        <a href="{% url "office:mails.mail.view" pk=mail.pk %}">
+                            {{ mail.subject }}
+                        </a>
+                    </td>
+                    <td>{{ mail.to }}</td>
+                    <td>
+                        <a href="{% url "office:mails.mail.send" pk=mail.pk %}" class="btn btn-sm btn-success">
+                            {% trans "Send" %}
+                        </a>
+                        <a href="{% url "office:mails.mail.delete" pk=mail.pk %}" class="btn btn-sm btn-danger">
+                            {% trans "Discard" %}
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
-</table>
-{% include "office/pagination.html" %}
+    </table>
+    {% include "office/pagination.html" %}
 {% endblock %}

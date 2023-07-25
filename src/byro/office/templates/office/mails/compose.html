@@ -5,21 +5,21 @@
 {% load formset_tags %}
 
 {% block mail_content %}
-<form method='post'>
-    {% csrf_token %}
-    <div class="card member-form-card">
-        <div class="card-header">
-            {% trans "Send email" %}
-        </div>
-        <div class="card-body">
-            {% include "office/mails/special_to_part.html" %}
-            {% bootstrap_form form layout='horizontal' exclude='to,to_member,to_type' %}
-            <div class="card-body">
-                <button class="btn btn-info" type="submit" name="action" value="save">{% trans "Save to outbox" %}</button>
-                <button class="btn btn-success" type="submit" name="action" value="send">
-                    {% trans "Save and send" %}
-                </button>
+    <form method='post'>
+        {% csrf_token %}
+        <div class="card member-form-card">
+            <div class="card-header">
+                {% trans "Send email" %}
             </div>
-        </div>
-</form>
+            <div class="card-body">
+                {% include "office/mails/special_to_part.html" %}
+                {% bootstrap_form form layout='horizontal' exclude='to,to_member,to_type' %}
+                <div class="card-body">
+                    <button class="btn btn-info" type="submit" name="action" value="save">{% trans "Save to outbox" %}</button>
+                    <button class="btn btn-success" type="submit" name="action" value="send">
+                        {% trans "Save and send" %}
+                    </button>
+                </div>
+            </div>
+        </form>
 {% endblock %}

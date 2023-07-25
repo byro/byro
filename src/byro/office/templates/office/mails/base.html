@@ -3,32 +3,32 @@
 
 {% block headline %}{% trans "Mails" %}{% endblock %}
 {% block content %}
-<ul class="nav nav-pills">
-    <li class="nav-item">
-        <a
-          class="nav-link {% if "mails.outbox" in url_name %}active{% endif %}"
-          href="{% url "office:mails.outbox.list" %}"
-        >{% trans "Outbox" %}</a>
-    </li>
-    <li class="nav-item">
-        <a
-          class="nav-link {% if "mails.sent" in url_name %}active{% endif %}"
-          href="{% url "office:mails.sent" %}"
-        >{% trans "Sent Mails" %}</a>
-    </li>
-    <li class="nav-item">
-        <a
-          class="nav-link {% if "mails.templates" in url_name %}active{% endif %}"
-          href="{% url "office:mails.templates.list" %}"
-        >{% trans "Templates" %}</a>
-    </li>
-    <li class="nav-item">
-        <a
-          class="nav-link {% if "mails.compose" in url_name %}active{% endif %}"
-          href="{% url "office:mails.compose" %}"
-        >{% trans "Compose" %}</a>
-    </li>
-</ul>
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a
+                class="nav-link {% if "mails.outbox" in url_name %}active{% endif %}"
+                href="{% url "office:mails.outbox.list" %}"
+            >{% trans "Outbox" %}</a>
+        </li>
+        <li class="nav-item">
+            <a
+                class="nav-link {% if "mails.sent" in url_name %}active{% endif %}"
+                href="{% url "office:mails.sent" %}"
+            >{% trans "Sent Mails" %}</a>
+        </li>
+        <li class="nav-item">
+            <a
+                class="nav-link {% if "mails.templates" in url_name %}active{% endif %}"
+                href="{% url "office:mails.templates.list" %}"
+            >{% trans "Templates" %}</a>
+        </li>
+        <li class="nav-item">
+            <a
+                class="nav-link {% if "mails.compose" in url_name %}active{% endif %}"
+                href="{% url "office:mails.compose" %}"
+            >{% trans "Compose" %}</a>
+        </li>
+    </ul>
 
     {% block mail_content %}
     {% endblock %}

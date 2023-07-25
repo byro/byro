@@ -7,32 +7,32 @@
 {% block title %}{% trans "Mail Templates" %} :: {{ block.super }}{% endblock %}
 
 {% block mail_content %}
-<div class="alert alert-info">
-    {% blocktrans trimmed %}
-    There are a couple of default templates provided by byro, mostly
-    revolving around members coming and going.
-    {% endblocktrans %}
-</div>
-<a href="{% url "office:mails.templates.add" %}" class="btn btn-success">
-    <span class="fa fa-plus"></span> {% trans "Add new mail template" %}
-</a>
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th class="table-column-large">{% trans "Subject" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for template in templates %}
-            <tr class="table-light">
-                <td>
-                    <a href="{% url "office:mails.templates.view" pk=template.pk %}">
-                        {{ template.subject }}
-                    </a>
-                </td>
+    <div class="alert alert-info">
+        {% blocktrans trimmed %}
+            There are a couple of default templates provided by byro, mostly
+            revolving around members coming and going.
+        {% endblocktrans %}
+    </div>
+    <a href="{% url "office:mails.templates.add" %}" class="btn btn-success">
+        <span class="fa fa-plus"></span> {% trans "Add new mail template" %}
+    </a>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="table-column-large">{% trans "Subject" %}</th>
             </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+            {% for template in templates %}
+                <tr class="table-light">
+                    <td>
+                        <a href="{% url "office:mails.templates.view" pk=template.pk %}">
+                            {{ template.subject }}
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
-</table>
-{% include "office/pagination.html" %}
+    </table>
+    {% include "office/pagination.html" %}
 {% endblock %}

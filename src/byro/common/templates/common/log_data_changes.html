@@ -7,10 +7,10 @@
         <th class="col-sm-5">{% trans "New value" %}</th>
     </tr>
     {% for k,v in changes.items|items_sorted %}
-    <tr>
-        <th>{{k}}</th>
-        <td>{{v.0 | format_log_object }}</td>
-        <td>{{v.1 | format_log_object }}</td>
-    </tr>
+        <tr>
+            <th>{{k}}</th>
+            <td>{{v.0 | format_log_object }}</td>
+            <td>{{v.1 | format_log_object }}</td>
+        </tr>
     {% endfor %}
 </table>
