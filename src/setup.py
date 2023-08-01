@@ -68,7 +68,7 @@ setup(
     install_requires=[
         "canonicaljson==2.0.0",  # https://github.com/matrix-org/python-canonicaljson/blob/master/CHANGES.md
         "celery>=5.1,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
-        "chardet>=4.0,<5.2",  # https://github.com/chardet/chardet/releases
+        "chardet>=4.0,<5.3",  # https://github.com/chardet/chardet/releases
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         "dateparser>=1.1,<1.2",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
