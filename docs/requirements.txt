@@ -5,5 +5,4 @@ sphinx_rtd_theme
 selenium
 pytest-selenium
 sphinxcontrib-spelling
-
--e .
+-e src/
