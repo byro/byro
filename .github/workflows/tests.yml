@@ -37,7 +37,8 @@ jobs:
         with:
           mariadb version: '10.7'
           mysql database: 'byro'
-          mysql root password: ''
+          mysql user: 'byro'
+          mysql password: 'byro'
         if: matrix.database == 'mysql'
       - uses: harmon758/postgresql-action@v1
         with:
@@ -70,6 +71,7 @@ jobs:
         if: matrix.database == 'mysql'
       - name: Install Postgres dependencies
         run: python -m pip install -Ue "src[postgres]"
+        if: matrix.database == 'postgres'
       - name: Run checks
         run: python manage.py check --deploy
         working-directory: ./src
