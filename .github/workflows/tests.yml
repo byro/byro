@@ -37,8 +37,7 @@ jobs:
         with:
           mariadb version: '10.7'
           mysql database: 'byro'
-          mysql user: 'byro'
-          mysql password: 'byro'
+          mysql root password: ''
         if: matrix.database == 'mysql'
       - uses: harmon758/postgresql-action@v1
         with:
