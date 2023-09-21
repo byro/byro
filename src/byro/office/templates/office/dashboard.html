@@ -5,43 +5,43 @@
 
 {% block content %}
 
-<div class="dashboard-list">
-    <a class="dashboard-block" href="{% url "office:members.list" %}">
-        <h1>
-            {% blocktrans trimmed count n=active_count %}
-            {{ n }} active member
-            {% plural %}
-            {{ n }} active members
-            {% endblocktrans %}
-        </h1>
-        <span class="dashboard-description">
-            {% trans "(currently)" %}
-        </span>
-    </a>
-    <a class="dashboard-block" href="{% url "office:finance.accounts.list" %}">
-        <h1> {# FIXME Direct link to matching, maybe? #}
-            {% if pending_transactions > 0 %}
-                {% blocktrans trimmed count n=pending_transactions %}
-                1 unmapped transaction
+    <div class="dashboard-list">
+        <a class="dashboard-block" href="{% url "office:members.list" %}">
+            <h1>
+                {% blocktrans trimmed count n=active_count %}
+                    {{ n }} active member
                 {% plural %}
-                {{ n }} unmapped transactions
+                    {{ n }} active members
                 {% endblocktrans %}
-            {% else %}
-                {% trans "Transactions all processed!" %}
-            {% endif %}
-        </h1>
-    </a>
-    <a class="dashboard-block" href="{% url "office:members.list" %}?filter=all">
-        <h1>
-            {% blocktrans trimmed count n=member_count %}
-            {{ n }} member
-            {% plural %}
-            {{ n }} members
-            {% endblocktrans %}
-        </h1>
-        <span class="dashboard-description">
-            {% trans "(all time)" %}
-        </span>
-    </a>
-</div>
+            </h1>
+            <span class="dashboard-description">
+                {% trans "(currently)" %}
+            </span>
+        </a>
+        <a class="dashboard-block" href="{% url "office:finance.accounts.list" %}">
+            <h1> {# FIXME Direct link to matching, maybe? #}
+                {% if pending_transactions > 0 %}
+                    {% blocktrans trimmed count n=pending_transactions %}
+                        1 unmapped transaction
+                    {% plural %}
+                        {{ n }} unmapped transactions
+                    {% endblocktrans %}
+                {% else %}
+                    {% trans "Transactions all processed!" %}
+                {% endif %}
+            </h1>
+        </a>
+        <a class="dashboard-block" href="{% url "office:members.list" %}?filter=all">
+            <h1>
+                {% blocktrans trimmed count n=member_count %}
+                    {{ n }} member
+                {% plural %}
+                    {{ n }} members
+                {% endblocktrans %}
+            </h1>
+            <span class="dashboard-description">
+                {% trans "(all time)" %}
+            </span>
+        </a>
+    </div>
 {% endblock %}

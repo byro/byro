@@ -5,57 +5,57 @@
 {% block headline %}{% trans "Accounts" %}{% endblock %}
 
 {% block content %}
-<p>
-<a href="{% url "office:finance.accounts.add" %}" class="btn btn-success">
-    <span class="fa fa-plus"></span> {% trans "Add new account" %}
-</a>
-</p>
-<table class="table table-sm">
-    <thead>
-        <tr>
-            {% if pending_transactions %}
-            <th class="table-column-small text-md-right">{% trans "Unmatched transactions" %}</th>
-            {% endif %}
-            <th class="table-column-small">{% trans "Type" %}</th>
-            <th>{% trans "Name" %}</th>
-            <th class="table-column-small text-md-right">{% trans "Incoming" %}</th>
-            <th class="table-column-small text-md-right">{% trans "Outgoing" %}</th>
-            <th class="table-column-small text-md-right">{% trans "Balance" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for account in accounts %}
+    <p>
+        <a href="{% url "office:finance.accounts.add" %}" class="btn btn-success">
+            <span class="fa fa-plus"></span> {% trans "Add new account" %}
+        </a>
+    </p>
+    <table class="table table-sm">
+        <thead>
             <tr>
                 {% if pending_transactions %}
-                    {% with pending_count=account.unbalanced_transactions.count %}
-                    {% if pending_count %}
-                        <td class="table-warning">
-                            <a href="{% url "office:finance.accounts.detail" pk=account.pk %}?filter=unbalanced">
-                                {{ pending_count }}
-                            </a>
-                        </td>
-                    {% else %}
-                        <td></td>
-                    {% endif %}
-                    {% endwith %}
+                    <th class="table-column-small text-md-right">{% trans "Unmatched transactions" %}</th>
                 {% endif %}
-                <td>{{ account.get_account_category_display }}</td>
-                <td><a href="{% url "office:finance.accounts.detail" pk=account.pk %}">
-                    {% if account.name %}
-                        {{ account.name }}
-                    {% else %}
-                        {% trans "Default" %}
-                        {{ account.get_account_category_display }}
-                    {% endif %}
-                </a></td>
-                {% with balances=account.balances %}
-                <td class="text-md-right">{{ balances.debit|default:"" }}</td>
-                <td class="text-md-right">{{ balances.credit|default:"" }}</td>
-                <td class="text-md-right">{{ balances.net }}</td>
-                {% endwith %}
+                <th class="table-column-small">{% trans "Type" %}</th>
+                <th>{% trans "Name" %}</th>
+                <th class="table-column-small text-md-right">{% trans "Incoming" %}</th>
+                <th class="table-column-small text-md-right">{% trans "Outgoing" %}</th>
+                <th class="table-column-small text-md-right">{% trans "Balance" %}</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% include "office/pagination.html" %}
+        </thead>
+        <tbody>
+            {% for account in accounts %}
+                <tr>
+                    {% if pending_transactions %}
+                        {% with pending_count=account.unbalanced_transactions.count %}
+                            {% if pending_count %}
+                                <td class="table-warning">
+                                    <a href="{% url "office:finance.accounts.detail" pk=account.pk %}?filter=unbalanced">
+                                        {{ pending_count }}
+                                    </a>
+                                </td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                    <td>{{ account.get_account_category_display }}</td>
+                    <td><a href="{% url "office:finance.accounts.detail" pk=account.pk %}">
+                        {% if account.name %}
+                            {{ account.name }}
+                        {% else %}
+                            {% trans "Default" %}
+                            {{ account.get_account_category_display }}
+                        {% endif %}
+                    </a></td>
+                    {% with balances=account.balances %}
+                        <td class="text-md-right">{{ balances.debit|default:"" }}</td>
+                        <td class="text-md-right">{{ balances.credit|default:"" }}</td>
+                        <td class="text-md-right">{{ balances.net }}</td>
+                    {% endwith %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% include "office/pagination.html" %}
 {% endblock %}

@@ -1,192 +1,189 @@
 # byro translation file
-# Copyright (C) 2018 rixx
+# Copyright (C) 2023 Renne Rocha
 # This file is distributed under the same license as the byro package.
-# rixx <r@rixx.de> 2018.
-# Henryk Plötz <henryk@ploetzli.ch>, 2018.
+# Renne Rocha <renne@rocha.dev.br> 2023.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: byro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 15:00-0300\n"
-"PO-Revision-Date: 2022-03-08 02:52+0100\n"
-"Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
-"Language-Team: \n"
-"Language: de\n"
+"POT-Creation-Date: 2023-07-04 14:58-0300\n"
+"Language: pt-br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
 
 #: byro/bookkeeping/apps.py:10
 msgid "Receipt"
-msgstr "Beleg"
+msgstr "Recibo"
 
 #: byro/bookkeeping/apps.py:11
 msgid "Invoice"
-msgstr "Rechnung"
+msgstr "Fatura"
 
 #: byro/bookkeeping/apps.py:12
 msgid "Statement"
-msgstr "Kontoauszug"
+msgstr "Extrato"
 
 #: byro/bookkeeping/models/account.py:27
 msgid "Asset account"
-msgstr "Aktiva"
+msgstr "Conta de Ativos"
 
 #: byro/bookkeeping/models/account.py:28
 msgid "Liability account"
-msgstr "Passiva"
+msgstr "Conta de Passivos"
 
 #: byro/bookkeeping/models/account.py:29
 msgid "Income account"
-msgstr "Erträge"
+msgstr "Conta de Receitas"
 
 #: byro/bookkeeping/models/account.py:30
 msgid "Expense account"
-msgstr "Aufwendungen"
+msgstr "Conta de Despesas"
 
 #: byro/bookkeeping/models/account.py:31
 msgid "Equity account"
-msgstr "Eigenkapital"
+msgstr "Conta de Patrimônio"
 
 #: byro/bookkeeping/special_accounts.py:45
 msgid "Member fees"
-msgstr "Mitgliedsbeiträge"
+msgstr "Taxas de Associação"
 
 #: byro/bookkeeping/special_accounts.py:49
 msgid "Donations"
-msgstr "Spenden"
+msgstr "Doações"
 
 #: byro/bookkeeping/special_accounts.py:54
 msgid "Member fees receivable"
-msgstr "Ausstehende Mitgliedsbeiträge"
+msgstr "Taxas de Associação a receber"
 
 #: byro/bookkeeping/special_accounts.py:59
 msgid "Bank"
-msgstr "Bank"
+msgstr "Banco"
 
 #: byro/bookkeeping/special_accounts.py:64
 msgid "Opening balance"
-msgstr "Eröffnungsbestand"
+msgstr "Saldo inicial"
 
 #: byro/bookkeeping/special_accounts.py:70
 msgid "Lost income"
-msgstr "Verlust"
+msgstr "Receita perdida"
 
 #: byro/common/forms/configuration.py:21
 msgid "Update all order names"
-msgstr "Alle Namen updaten (Sortierreihenfolge)"
+msgstr "Atualize toda ordenação por nome"
 
 #: byro/common/forms/configuration.py:26
 msgid "Update all address names"
-msgstr "Alle Namen updaten (Ansprache)"
+msgstr "Atualize todos os nomes de endereço"
 
 #: byro/common/forms/registration.py:25
 msgid "Current day"
-msgstr "Aktueller Tag"
+msgstr "Dia atual"
 
 #: byro/common/forms/registration.py:26
 msgid "Beginning of current month"
-msgstr "Anfang des aktuellen Monats"
+msgstr "Início do mês atual"
 
 #: byro/common/forms/registration.py:27
 msgid "Beginning of next month"
-msgstr "Anfang nächsten Monats"
+msgstr "Início do próximo mês"
 
 #: byro/common/forms/registration.py:28
 msgid "Beginning of current year"
-msgstr "Anfang des aktuellen Jahres"
+msgstr "Início do ano atual"
 
 #: byro/common/forms/registration.py:29
 msgid "Beginning of next year"
-msgstr "Anfang nächsten Jahres"
+msgstr "Início do próximo ano"
 
 #: byro/common/forms/registration.py:30 byro/common/forms/registration.py:153
 msgid "Other/fixed date"
-msgstr "Anderes/Festes Datum"
+msgstr "Outra/data fixa"
 
 #: byro/common/forms/registration.py:37
 msgid "False"
-msgstr "Falsch"
+msgstr "Falso"
 
 #: byro/common/forms/registration.py:37
 msgid "True"
-msgstr "Wahr"
+msgstr "Verdadeiro"
 
 #: byro/common/forms/registration.py:72
 msgid "Position in form"
-msgstr "Position im Formular"
+msgstr "Posição no formulário"
 
 #: byro/common/forms/registration.py:77
 msgid "Default date"
-msgstr "Standarddatum"
+msgstr "Data padrão"
 
 #: byro/common/forms/registration.py:83 byro/common/forms/registration.py:139
 #: byro/common/forms/registration.py:144 byro/common/forms/registration.py:148
 msgid "Default value"
-msgstr "Standardwert"
+msgstr "Valor padrão"
 
 #: byro/common/management/commands/make_testdata.py:68
 #, python-brace-format
 msgid "Member fee for {number}"
-msgstr "Mitgliedsbeitrag für {number}"
+msgstr "Taxa de associação para {number}"
 
 #: byro/common/management/commands/make_testdata.py:72
 #, python-brace-format
 msgid "and for {number}"
-msgstr "und für {number}"
+msgstr "e para {number}"
 
 #: byro/common/management/commands/make_testdata.py:78
 #, python-brace-format
 msgid "EUR {amount} donation"
-msgstr "EUR {amount} Spende"
+msgstr "Doação de {amount} em Euros"
 
 #: byro/common/management/commands/make_testdata.py:263
 msgid "Belated member fee payment for Olga"
-msgstr "Verspäteter Mitgliedsbeitrag von Olga"
+msgstr "Pagamento de taxa de associação atrasada para Olga"
 
 #: byro/common/management/commands/make_testdata.py:275
 msgid "George lives to give, donation"
-msgstr "George spendet gerne, Spende"
+msgstr "George vive para dar, doação"
 
 #: byro/common/management/commands/make_testdata.py:288
 msgid "Bank fees"
-msgstr "Bankgebühren"
+msgstr "Taxas bancárias"
 
 #: byro/common/management/commands/make_testdata.py:300
 msgid "ACME Inc. thanks you for your patronage, sale of one halo kite"
-msgstr "Vielen Dank für Ihren Einkauf bei ACME Inc., Ein Atmosphärendrachen"
+msgstr "ACME Inc. agradece seu apoio"
 
 #: byro/common/management/commands/make_testdata.py:313
 msgid "ACME Inc. thanks you for your patronage, sale of one emergency medkit"
-msgstr "Vielen Dank für Ihren Einkauf bei ACME Inc., Ein Notfall-Medkit"
+msgstr "ACME Inc. agradece seu apoio, venda de um kit médico de emergência"
 
 #: byro/common/models/configuration.py:29
 msgid "Association name"
-msgstr "Vereinsname"
+msgstr "Nome da Associação"
 
 #: byro/common/models/configuration.py:32
 msgid "Association address"
-msgstr "Vereinsadresse"
+msgstr "Endereço da Associação"
 
 #: byro/common/models/configuration.py:35
 msgid "Association URL"
-msgstr "Vereinswebsite"
+msgstr "URL da Associação"
 
 #: byro/common/models/configuration.py:39
 msgid "Statute of limitations"
-msgstr "Verjährungsfrist"
+msgstr "Prazo de prescrição"
 
 #: byro/common/models/configuration.py:41
 msgid "For which interval can you make members pay their outstanding fees?"
 msgstr ""
-"Für welches Intervall müssen Mitglieder ausstehende Beiträge nachzahlen?"
+"Qual o intervalo permitido para as pessoas associadas pagarem suas taxas de "
+"associação pendentes?"
 
 #: byro/common/models/configuration.py:47
 msgid "Start accounting Membership Fees from"
-msgstr "Mitgliedsbeiträge werden berechnet beginnend am"
+msgstr "Contabilizar taxas de associação a partir de"
 
 #: byro/common/models/configuration.py:49
 msgid ""
@@ -195,138 +192,141 @@ msgid ""
 "Leave the field empty if you do not have this requirement and you want to "
 "invoice all members from the beginning of their membership."
 msgstr ""
-"Dieses Feld ist besonders nützlich, wenn der Verein byro nicht von Beginn "
-"genutzt hat, und die vergangenen Beiträge von Mitgliedern nicht berechnet "
-"werden sollen. Andernfalls kann dieses Feld leergelassen werden."
+"Este campo é especialmente útil se a associação foi posteriormente migrada "
+"para byro e as taxas de associação de pessoas associadas do passado não "
+"devem ser cobradas. Deixe o campo vazio se você não tiver esse requisito e "
+"quiser cobrar todas as associadas desde o início de seu cadastro."
 
 #: byro/common/models/configuration.py:57
 msgid "Language"
-msgstr "Sprache"
+msgstr "Idioma"
 
 #: byro/common/models/configuration.py:63
 msgid "Currency"
-msgstr "Währung"
+msgstr "Moeda"
 
 #: byro/common/models/configuration.py:64
 msgid "E.g. EUR"
-msgstr "Z.B. EUR"
+msgstr "E.g. BRL"
 
 #: byro/common/models/configuration.py:69
 msgid "Currency symbol"
-msgstr "Währungssymbol"
+msgstr "Símbolo da moeda"
 
 #: byro/common/models/configuration.py:70
 msgid "E.g. €"
-msgstr "Z.B. €"
+msgstr "E.g. R$"
 
 #: byro/common/models/configuration.py:74
 msgid "Show currency symbol after value"
-msgstr "Währungssymbol nach Betrag zeigen"
+msgstr "Mostrar o símbolo da moeda após o valor"
 
 #: byro/common/models/configuration.py:76
 msgid ""
 "Controls whether the currency symbol comes before or after the monetary value"
 msgstr ""
-"Stellt ein, ob das Währungssymbol vor oder nach dem Betrag angezeigt wird"
+"Controla se o símbolo da moeda aparece antes ou depois do valor monetário (e."
+"g. 20,50€ vs R$20,50)"
 
 #: byro/common/models/configuration.py:81
 msgid "Display cents"
-msgstr "Centbeträge anzeigen"
+msgstr "Exibir centavos"
 
 #: byro/common/models/configuration.py:83
 msgid "When enabled, monetary values include two decimal fractional digits"
-msgstr "Zeigt bei Geldbeträgen zwei Nachkommastellen, wenn angewählt"
+msgstr ""
+"Quando habilitado, valores monetários incluirão dois dígitos decimais "
+"fracionários"
 
 #: byro/common/models/configuration.py:90
 msgid "Default sort order"
-msgstr "Standardsortierung"
+msgstr "Padrão de ordenação"
 
 #: byro/common/models/configuration.py:92
 msgid ""
 "You can always override the automatic sort order if a member has an unusual "
 "name."
 msgstr ""
-"Die Sortierung kann bei Mitgliedern mit unüblichen Namen immer von Hand "
-"verändert werden."
+"Você sempre pode substituir o padrão de ordenação automático se uma pessoa "
+"associada tiver um nome incomum."
 
 #: byro/common/models/configuration.py:95
 #: byro/common/models/configuration.py:107
 msgid "First part of the name"
-msgstr "Erster Teil des Namens"
+msgstr "Nome"
 
 #: byro/common/models/configuration.py:96
 #: byro/common/models/configuration.py:108
 msgid "Last part of the name"
-msgstr "Letzter Teil des Namens"
+msgstr "Sobrenome"
 
 #: byro/common/models/configuration.py:102
 msgid "Default name when addressing members"
-msgstr "Name zur Ansprache"
+msgstr "Parte do nome utilizada ao abordar associadas"
 
 #: byro/common/models/configuration.py:104
 msgid ""
 "This is used in emails, for example. You can always override the "
 "automatically chosen name if a member has an unusual name."
 msgstr ""
-"Diese Einstellung wird z.B. für E-Mails genutzt. Der Name kann bei "
-"Mitgliedern mit unüblichen Namen immer von Hand verändert werden."
+"Isso é usado em e-mails, por exemplo. Você sempre pode substituir o nome "
+"escolhido automaticamente se uma associada tiver um nome incomum."
 
 #: byro/common/models/configuration.py:116
 msgid "External base URL of byro installation"
-msgstr "Externe Basis-URL der Byro-Installation"
+msgstr "URL base externa da instalação do byro"
 
 #: byro/common/models/configuration.py:118
 msgid ""
 "This field is used to generate the absolute URL for public pages. Leave it "
 "empty if it is the same as this page's base URL."
 msgstr ""
-"Dieses Feld wird verwendet, um die absolute URL für persönliche "
-"Mitgliederseiten zu generieren. Leergelassen ist es dieselbe URL, die für "
-"diese Seite genutzt wird."
+"Este campo é usado para gerar a URL absoluta para páginas públicas. Deixe em "
+"branco se for igual ao URL base desta página."
 
 #: byro/common/models/configuration.py:125
 msgid "E-mail address used as sender"
-msgstr "Absenderadresse"
+msgstr "E-mail padrão usado como remetente"
 
 #: byro/common/models/configuration.py:131
 msgid "E-mail address for notifications"
-msgstr "Adresse für Benachrichtigungen"
+msgstr "E-mail padrão para notificações"
 
 #: byro/common/models/configuration.py:169
 msgid "General settings"
-msgstr "Allgemeine Einstellungen"
+msgstr "Configurações gerais"
 
 #: byro/common/templates/common/auth/login.html:4
 msgid "Login"
-msgstr "Anmelden"
+msgstr "Autenticar"
 
 #: byro/common/templates/common/auth/login.html:7
 msgid "Welcome to byro!"
-msgstr "Willkommen zu byro!"
+msgstr "Boas-vindas ao byro!"
 
 #: byro/common/templates/common/auth/login.html:18
 msgid "Sign in"
-msgstr "Einloggen"
+msgstr "Entrar"
 
 #: byro/common/templates/common/log.html:7
 msgid "Date / Time"
-msgstr "Datum / Uhrzeit"
+msgstr "Data / Hora"
 
 #: byro/common/templates/common/log.html:8
 msgid "Source"
-msgstr "Quelle"
+msgstr "Fonte"
 
 #: byro/common/templates/common/log.html:9
 msgid "Operation"
-msgstr "Vorgang"
+msgstr "Operação"
 
 #: byro/common/templates/common/log/info.html:5
 msgid "Eternal log"
-msgstr "Ewiges Logfile"
+msgstr "Log eterno"
 
 #: byro/common/templates/common/log/info.html:10
 msgid "What is going on here?"
-msgstr "Was ist das hier?"
+msgstr "O que está acontecendo aqui?"
 
 #: byro/common/templates/common/log/info.html:13
 msgid ""
@@ -339,49 +339,49 @@ msgid ""
 "a publicly visible notary of the current hash value. It can be printed, "
 "downloaded, or saved in the web archive.</p>"
 msgstr ""
-"<p>Alle Änderungen in byro werden in einem internen Audit-Log aufgezeichnet. "
-"Jeder Eintrag wird durch seinen <a href=\"https://de.wikipedia.org/wiki/"
-"Kryptographische_Hashfunktion\">Hashwert</a> repräsentiert und ist mit dem "
-"vorherigen Eintrag zu einer <a href=\"https://de.wikipedia.org/wiki/"
-"Ewige_Logdatei\">Ewigen Logdatei</a> verknüpft. Der Nachweis des Hash-Wertes "
-"zu einem bestimmten Zeitpunkt trägt in sich den Nachweis aller Hash-Werte, "
-"und damit aller Log-Einträge, vor ihm.</p> <p>Diese Seite dient als "
-"öffentlich sichtbarer Nachweis des aktuellen Hash-Wertes. Sie kann gedruckt, "
-"heruntergeladen oder im <i>web archive</i> gespeichert werden. </p>"
+"<p>Todas as alterações no byro são registradas em um arquivo de log de "
+"auditoria interna. Cada entrada é representada por seu <a href=\"https://en."
+"wikipedia.org/wiki/Cryptographic_hash\">valor de hash</a> e está vinculada à "
+"entrada anterior em uma <a href=\"https:// en.wikipedia.org/wiki/"
+"Hash_chain\">cadeia de hash</a>. A prova do valor de hash em algum ponto no "
+"tempo contém a prova de todos os valores de hash, e com eles todas as "
+"entradas de log, antes dela.</p> <p>Esta página serve como um notário "
+"publicamente visível do valor de hash atual. Ele pode ser impresso, baixado "
+"ou salvo no arquivo da web.</p>"
 
 #: byro/common/templates/common/log/info.html:23
 #, python-format
 msgid "Most recent log entry as of %(now_datetime)s"
-msgstr "Jüngster Log-Eintrag zum Zeitpunkt %(now_datetime)s"
+msgstr "Entrada de log mais recente a partir de %(now_datetime)s"
 
 #: byro/common/templates/common/log_data_changes.html:6
 msgid "Old value"
-msgstr "Vorheriger Wert"
+msgstr "Valor antigo"
 
 #: byro/common/templates/common/log_data_changes.html:7
 msgid "New value"
-msgstr "Neuer Wert"
+msgstr "Novo valor"
 
 #: byro/common/templates/log_entry/byro.common.login.success.html:5
 msgid "User logged in"
-msgstr "Benutzer angemeldet"
+msgstr "Usuário autenticado"
 
 #: byro/common/views.py:25
 msgid "No user account matches the entered credentials."
-msgstr "Zu den Eingaben wurde kein Nutzer gefunden."
+msgstr "Nenhuma conta de usuária corresponde às credenciais fornecidas."
 
 #: byro/common/views.py:30
 msgid "User account is deactivated."
-msgstr "Account ist deaktiviert."
+msgstr "A conta da usuária está desativada."
 
 #: byro/documents/apps.py:10
 msgid "Miscellaneous document"
-msgstr "Sonstiges Dokument"
+msgstr "Documento diverso"
 
 #: byro/documents/apps.py:11 byro/office/templates/office/base.html:95
 #: byro/office/templates/office/member/timeline.html:176
 msgid "Registration form"
-msgstr "Beitrittsformular"
+msgstr "Formulário de registro"
 
 #: byro/documents/models.py:49
 #, python-brace-format
@@ -395,21 +395,22 @@ msgid ""
 "{association}\n"
 msgstr ""
 "\n"
-"Hi, {name},\n"
+"Olá, {name},\n"
 "\n"
-"Im Anhang befindet sich ein Dokument für dich.\n"
+"Em anexo encontra-se um documento que queríamos lhe enviar/que você "
+"solicitou.\n"
 "\n"
-"Danke\n"
+"Obrigado,\n"
 "{association}\n"
 
 #: byro/documents/models.py:113
 #, python-brace-format
 msgid "[{association}] Your document"
-msgstr "[{association}] Dein Dokument"
+msgstr "[{association}] Seu documento"
 
 #: byro/mails/default.py:4
 msgid "Welcome, latest member!"
-msgstr "Willkommen, neustes Mitglied!"
+msgstr "Boas-vindas, última associada!"
 
 #: byro/mails/default.py:7
 #, python-brace-format
@@ -425,20 +426,23 @@ msgid ""
 "Thanks,\n"
 "the robo clerk"
 msgstr ""
-"Hi,\n"
+"Oi,\n"
 "\n"
-"Willkommen bei uns im {name}! Du bist unser neustes Mitglied. Deine\n"
-"Mitgliedsnummer ist {number}. Wenn du Fragen zu deinem Beitrag hast\n"
-"oder deine Kontaktdaten sich ändern, melde dich bitte unter {contact}.\n"
+"boas-vindas a {name}! Agora você é oficialmente nossa pessoa associada mais "
+"recente.\n"
+"Seu ID de associação é {number}. Se você tiver alguma dúvida sobre as taxas "
+"de associação ou\n"
+"você deseja atualizar seus dados de associada entre em contato conosco em "
+"{contact}.\n"
 "\n"
 "{additional_information}\n"
 "\n"
-"Danke\n"
-"Das Helferlein"
+"Obrigado,\n"
+"o robo escriturário"
 
 #: byro/mails/default.py:20
 msgid "[byro] New member"
-msgstr "[byr] Neues Mitglied"
+msgstr "[byro] Nova pessoa associada"
 
 #: byro/mails/default.py:23
 #, python-brace-format
@@ -452,18 +456,18 @@ msgid ""
 "Thanks,\n"
 "the robo clerk"
 msgstr ""
-"Hi,\n"
+"Olá,\n"
 "\n"
-"wir haben ein neues Mitglied: {member_name}\n"
+"temos uma nova pessoa associada: {member_name}\n"
 "\n"
 "{additional_information}\n"
 "\n"
-"Danke\n"
-"Das Helferlein"
+"Obrigado,\n"
+"o robo escriturário"
 
 #: byro/mails/default.py:34
 msgid "Goodbye!"
-msgstr "Tschüß!"
+msgstr "Até logo!"
 
 #: byro/mails/default.py:37
 #, python-brace-format
@@ -477,18 +481,18 @@ msgid ""
 "Thanks,\n"
 "the robo clerk"
 msgstr ""
-"Hi,\n"
+"Olá,\n"
 "\n"
-"schade, dass du uns zu {end} verlässt.\n"
+"lamentamos que você nos deixe em {end}.\n"
 "\n"
 "{additional_information}\n"
 "\n"
-"Danke\n"
-"Das Helferlein"
+"Obrigado,\n"
+"o robo escriturário"
 
 #: byro/mails/default.py:49
 msgid "[byro] Membership termination"
-msgstr "[byro] Austritt"
+msgstr "[byro] Encerramento de associação"
 
 #: byro/mails/default.py:53
 #, python-brace-format
@@ -502,19 +506,19 @@ msgid ""
 "Thanks,\n"
 "the robo clerk"
 msgstr ""
-"Hi,\n"
+"Olá,\n"
 "\n"
-"{member_name} wird uns zu {end} verlassen.\n"
+"{member_name} nos deixará em {end}.\n"
 "\n"
 "{additional_information}\n"
 "\n"
-"Danke\n"
-"Das Helferlein"
+"Obrigado,\n"
+"o robo escriturário"
 
 #: byro/mails/default.py:64
 #, python-brace-format
 msgid "Your {association_name} data record (#{number})"
-msgstr "Dein {association_name} Datenbestand (#{number})"
+msgstr "Seu registro de dados para {association_name} (#{number})"
 
 #: byro/mails/default.py:68
 #, python-brace-format
@@ -536,21 +540,22 @@ msgid ""
 "Thanks,\n"
 "the robo clerk"
 msgstr ""
-"Hi,\n"
+"Olá,\n"
 "\n"
-"wir schreiben dir, um dir den aktuellen Datenbestand über dich in unserer\n"
-"Mitgliederdatenbank mitzuteilen.\n"
+"Estamos escrevendo para informá-lo sobre os dados que armazenamos atualmente "
+"sobre\n"
+"você e sua associação.\n"
 "\n"
-"Dein Guthaben (Rückstand falls negativ): {balance}\n"
+"Seu saldo atual é {balance}.\n"
 "\n"
 "{data}\n"
 "\n"
+"Se esses registros estiverem desatualizados ou incorretos, informe-nos em "
+"resposta a\n"
+"este e-mail.\n"
 "\n"
-"Wenn diese Daten veraltet oder falsch sind, lass es uns bitte als Antwort\n"
-"auf diese Mail wissen.\n"
-"\n"
-"Danke,\n"
-"Das Helferlein"
+"Obrigado,\n"
+"o robo escriturário"
 
 #: byro/mails/models.py:18 byro/mails/models.py:112
 #: byro/office/templates/office/mails/outbox.html:25
@@ -559,24 +564,24 @@ msgstr ""
 #: byro/office/templates/office/member/data_disclosure.html:10
 #: byro/office/views/members.py:163
 msgid "Subject"
-msgstr "Betreff"
+msgstr "Assunto"
 
 #: byro/mails/models.py:19 byro/mails/models.py:114
 #: byro/office/views/members.py:165
 msgid "Text"
-msgstr "Text"
+msgstr "Texto"
 
 #: byro/mails/models.py:24 byro/mails/models.py:96
 msgid "Reply-To"
-msgstr "Reply-To"
+msgstr "Responder para"
 
 #: byro/mails/models.py:26
 msgid ""
 "Change the Reply-To address if you do not want to use the default orga "
 "address"
 msgstr ""
-"Ändere das Reply-To-Feld, wenn du Antworten nicht an die allgemeine Adresse "
-"geschickt haben möchtest"
+"Altere o endereço de resposta se não quiser usar o endereço organizacional "
+"padrão"
 
 #: byro/mails/models.py:33 byro/mails/models.py:109
 msgid "BCC"
@@ -587,18 +592,18 @@ msgid ""
 "Enter comma separated addresses. Will receive a blind copy of every mail "
 "sent from this template. This may be a LOT!"
 msgstr ""
-"Gib durch Kommas getrennte Adressen ein. Diese Adressen bekommen einen BCC "
-"jeder Mail, die durch dieses Template verschickt wird. Das können viele "
-"werden!"
+"Digite os endereços separados por vírgula. Receberá uma cópia oculta de "
+"todos os e-mails enviados a partir deste modelo. Isso pode ser uma "
+"quantidade GRANDE de mensagens!"
 
 #: byro/mails/models.py:92 byro/office/templates/office/mails/outbox.html:26
 #: byro/office/templates/office/mails/sent_mails_part.html:6
 msgid "To"
-msgstr "To"
+msgstr "Para"
 
 #: byro/mails/models.py:93 byro/mails/models.py:103 byro/mails/models.py:110
 msgid "One email address or several addresses separated by commas."
-msgstr "Eine Adresse oder mehrere durch Kommas getrennte."
+msgstr "Um endereço de e-mail ou vários endereços separados por vírgulas."
 
 #: byro/mails/models.py:102
 msgid "CC"
@@ -606,49 +611,48 @@ msgstr "CC"
 
 #: byro/mails/models.py:115
 msgid "Sent at"
-msgstr "Verschickt"
+msgstr "Enviado em"
 
 #: byro/mails/models.py:195
 #, python-brace-format
 msgid "You are receiving this email due to your membership in {name}."
-msgstr ""
-"Du erhältst diese E-Mail aufgrund Deiner Mitgliedschaft im Verein {name}."
+msgstr "Você está recebendo este e-mail devido à sua associação em {name}."
 
 #: byro/mails/models.py:199
 #, python-brace-format
 msgid "You can see your member page at this URL: {url}"
-msgstr "Deine persönliche Mitgliedsseite ist hier: {url}"
+msgstr "Você pode ver sua página de associada nesta URL: {url}"
 
 #: byro/members/models.py:153
 msgid "Membership number/ID"
-msgstr "Mitgliedsnummer"
+msgstr "Número/ID de associação"
 
 #: byro/members/models.py:159 byro/office/templates/office/account/list.html:20
 #: byro/office/templates/office/member/list.html:46
 #: byro/office/templates/office/upload/list.html:16
 #: byro/office/templates/office/user/list.html:18 byro/office/views/users.py:15
 msgid "Name"
-msgstr "Name"
+msgstr "Nome"
 
 #: byro/members/models.py:162
 msgid "Name for direct address"
-msgstr "Name für direkte Ansprache"
+msgstr "Nome para endereço direto"
 
 #: byro/members/models.py:165
 msgid "Name (sort order)"
-msgstr "Name (Sortierreihenfolge)"
+msgstr "Nome (ordem de classificação)"
 
 #: byro/members/models.py:168
 msgid "Address"
-msgstr "Adresse"
+msgstr "Endereço"
 
 #: byro/members/models.py:171 byro/office/templates/office/user/list.html:19
 msgid "E-Mail"
-msgstr "E-Mail-Adresse"
+msgstr "E-Mail"
 
 #: byro/members/models.py:176
 msgid "Contact type"
-msgstr "Kontakt-Typ"
+msgstr "Tipo de Contato"
 
 #: byro/members/models.py:181
 #: byro/office/templates/office/account/detail.html:21
@@ -656,219 +660,221 @@ msgstr "Kontakt-Typ"
 #: byro/office/templates/office/transaction/detail.html:19
 #: byro/office/views/mails.py:33
 msgid "Member"
-msgstr "Mitglied"
+msgstr "Associada"
 
 #: byro/members/models.py:221
 msgid "Internal database ID"
-msgstr "Interne Datenbank-ID"
+msgstr "ID do banco de dados interno"
 
 #: byro/members/models.py:231
 msgid "Member active?"
-msgstr "Mitglied aktiv?"
+msgstr "Associada ativa?"
 
 #: byro/members/models.py:241
 msgid "Account balance"
-msgstr "Kontostand"
+msgstr "Saldo da conta"
 
 #: byro/members/models.py:251
 msgid "Last Member Fee Transaction Timestamp"
-msgstr "Letzter Zeitpunkt einer Beitragstransaktion"
+msgstr "Timestamp da transação da última taxa de associação"
 
 #: byro/members/models.py:285
 msgid "Current membership"
-msgstr "Aktuelle Mitgliedschaft"
+msgstr "Associação atual"
 
 #: byro/members/models.py:522
 msgid "Due amount canceled because of change in membership amount"
-msgstr "Ausstehender Betrag durch Änderung des Mitgliedsbeitrags storniert"
+msgstr ""
+"Valor devido cancelado devido a alteração no valor da taxa de associação"
 
 #: byro/members/models.py:531
 #: byro/office/templates/office/member/timeline.html:66
 msgid "Membership due"
-msgstr "Mitgliedsbeitrag fällig"
+msgstr "Associação vencida"
 
 #: byro/members/models.py:559
 msgid "Due amount outside of membership canceled"
-msgstr "Ausstehender Betrag außerhalb der Mitgliedschaft storniert"
+msgstr "Valor devido fora da taxa de associação cancelada"
 
 #: byro/members/models.py:650
 msgid "monthly"
-msgstr "monatlich"
+msgstr "mensal"
 
 #: byro/members/models.py:651
 msgid "quarterly"
-msgstr "pro Quartal"
+msgstr "trimestral"
 
 #: byro/members/models.py:652
 msgid "biannually"
-msgstr "halbjährlich"
+msgstr "semestral"
 
 #: byro/members/models.py:653
 msgid "annually"
-msgstr "jährlich"
+msgstr "anual"
 
 #: byro/members/models.py:658
 msgid "name"
-msgstr "Name"
+msgstr "nome"
 
 #: byro/members/models.py:662
 msgid "amount"
-msgstr "Betrag"
+msgstr "valor"
 
 #: byro/members/models.py:663
 msgid "Please enter the yearly fee for this membership type."
-msgstr "Bitte gib den Jahresbeitrag für diesen Beitragstyp ein."
+msgstr "Insira a taxa anual para este tipo de associação."
 
 #: byro/members/models.py:673
 msgid "start"
-msgstr "Beginn"
+msgstr "começo"
 
 #: byro/members/models.py:674
 msgid "end"
-msgstr "Ende"
+msgstr "fim"
 
 #: byro/members/models.py:678
 #: byro/office/templates/office/member/dashboard.html:93
 #: byro/public/templates/public/members/dashboard.html:63
 msgid "membership fee"
-msgstr "Beitrag"
+msgstr "taxa de associação"
 
 #: byro/members/models.py:679
 msgid "The amount to be paid in the chosen interval"
-msgstr "Der Beitrag, der im angegebenen Intervall gezahlt werden soll"
+msgstr "O valor a ser pago no intervalo escolhido"
 
 #: byro/members/models.py:683
 msgid "payment interval"
-msgstr "Intervall"
+msgstr "intervalo de pagamento"
 
 #: byro/members/models.py:684
 msgid "How often does the member pay their fees?"
-msgstr "Wie oft soll das Mitglied zahlen?"
+msgstr ""
+"Qual a freqüência que a pessoa associada paga suas taxas de associação?"
 
 #: byro/members/models.py:687
 #: byro/office/templates/office/member/timeline.html:15
 msgid "Membership"
-msgstr "Mitgliedschaft"
+msgstr "Associação"
 
 #: byro/members/models.py:741
 msgid "Reference"
-msgstr "Referenznummer"
+msgstr "Referência"
 
 #: byro/members/models.py:742
 msgid "For example an invoice number or a payment reference"
-msgstr "Beispielsweise eine Rechnungsnummer oder eine Zahlungsreferenz"
+msgstr "Por exemplo, um número de fatura ou uma referência de pagamento"
 
 #: byro/members/models.py:747
 #: byro/office/templates/office/member/finance_table.html:6
 #: byro/office/templates/office/realtransaction/list.html:29
 #: byro/office/templates/office/realtransaction/match.html:16
 msgid "Amount"
-msgstr "Betrag"
+msgstr "Valor"
 
 #: byro/members/models.py:749
 msgid "Start"
-msgstr "Beginn"
+msgstr "Início"
 
 #: byro/members/models.py:750
 msgid "End"
-msgstr "Ende"
+msgstr "Fim"
 
 #: byro/members/models.py:753
 msgid "paid"
-msgstr "bezahlt"
+msgstr "pago"
 
 #: byro/members/models.py:754
 msgid "partially paid"
-msgstr "teilweise bezahlt"
+msgstr "pago parcialmente"
 
 #: byro/members/models.py:755
 msgid "unpaid"
-msgstr "nicht bezahlt"
+msgstr "não pago"
 
 #: byro/office/templates/log_entry/byro.bookkeeping.transaction.created.html:5
 msgid "Transaction created"
-msgstr "Transaktion angelegt"
+msgstr "Transação criada"
 
 #: byro/office/templates/log_entry/byro.bookkeeping.transaction.credit.created.html:5
 #: byro/office/templates/log_entry/byro.settings.initial.html:14
 #: byro/office/views/accounts.py:82
 msgid "Credit"
-msgstr "Haben"
+msgstr "Crédito"
 
 #: byro/office/templates/log_entry/byro.bookkeeping.transaction.debit.created.html:5
 #: byro/office/templates/log_entry/byro.settings.initial.html:13
 #: byro/office/views/accounts.py:82
 msgid "Debit"
-msgstr "Soll"
+msgstr "Débito"
 
 #: byro/office/templates/log_entry/byro.bookkeeping.transaction.document.created.html:5
 #: byro/office/templates/log_entry/byro.members.document.created.html:5
 #: byro/office/templates/office/member/timeline.html:155
 msgid "Document uploaded"
-msgstr "Dokument hochgeladen"
+msgstr "Documento enviado"
 
 #: byro/office/templates/log_entry/byro.bookkeeping.transaction.reversed.html:5
 msgid "Transaction reversed"
-msgstr "Transaktion storniert"
+msgstr "Transação revertida"
 
 #: byro/office/templates/log_entry/byro.bookkeeping.transaction.updated.html:5
 msgid "Transaction updated"
-msgstr "Transaktion bearbeitet"
+msgstr "Transação atualizada"
 
 #: byro/office/templates/log_entry/byro.documents.document.deleted.html:5
 msgid "Document deleted"
-msgstr "Dokument gelöscht"
+msgstr "Documento excluído"
 
 #: byro/office/templates/log_entry/byro.documents.document.deleted.html:6
 msgid "Showing values before deletion"
-msgstr "Werte vor dem Löschen werden angezeigt"
+msgstr "Mostrando valores antes da exclusão"
 
 #: byro/office/templates/log_entry/byro.documents.document.stored.html:5
 msgid "Document stored"
-msgstr "Dokument gespeichert"
+msgstr "Documento armazenado"
 
 #: byro/office/templates/log_entry/byro.members.created.html:5
 msgid "Member created"
-msgstr "Mitglied angelegt"
+msgstr "Associada criada"
 
 #: byro/office/templates/log_entry/byro.members.membership.ended.html:5
 msgid "Membership ended"
-msgstr "Mitgliedschaft beendet"
+msgstr "Associação encerrada"
 
 #: byro/office/templates/log_entry/byro.members.updated.html:5
 msgid "Member updated"
-msgstr "Mitglied bearbeitet"
+msgstr "Associada atualizada"
 
 #: byro/office/templates/log_entry/byro.settings.changed.html:5
 msgid "Settings changed"
-msgstr "Einstellungen geändert"
+msgstr "Configurações alteradas"
 
 #: byro/office/templates/log_entry/byro.settings.initial.html:5
 #: byro/office/templates/office/settings/initial.html:9
 msgid "Initial settings"
-msgstr "Initiale Einstellungen"
+msgstr "Configurações iniciais"
 
 #: byro/office/templates/log_entry/byro.settings.initial.html:8
 msgid "Initial State: Accounts"
-msgstr "Anfangszustand: Konten"
+msgstr "Estado Inicial: Contas"
 
 #: byro/office/templates/log_entry/byro.settings.initial.html:12
 #: byro/office/templates/office/account/detail.html:22
 #: byro/office/templates/office/transaction/detail.html:20
 msgid "Account"
-msgstr "Konto"
+msgstr "Conta"
 
 #: byro/office/templates/log_entry/byro.settings.initial.html:15
 msgid "Net"
-msgstr "Netto"
+msgstr "Líquido"
 
 #: byro/office/templates/log_entry/byro.settings.registration.changed.html:5
 msgid "Registration form changed"
-msgstr "Beitrittsformular geändert"
+msgstr "Formulário de inscrição alterado"
 
 #: byro/office/templates/office/account/add.html:5
 msgid "Add Account …"
-msgstr "Konto hinzufügen …"
+msgstr "Adicionar Conta …"
 
 #: byro/office/templates/office/account/add.html:12
 #: byro/office/templates/office/account/detail.html:11
@@ -885,11 +891,11 @@ msgstr "Konto hinzufügen …"
 #: byro/office/templates/office/user/detail.html:14
 #: byro/public/templates/public/members/dashboard.html:131
 msgid "Save"
-msgstr "Speichern"
+msgstr "Salvar"
 
 #: byro/office/templates/office/account/base.html:4
 msgid "Default "
-msgstr "Standard "
+msgstr "Padrão "
 
 #: byro/office/templates/office/account/detail.html:19
 #: byro/office/templates/office/documents/detail.html:13
@@ -897,7 +903,7 @@ msgstr "Standard "
 #: byro/office/templates/office/member/finance_table.html:5
 #: byro/office/templates/office/transaction/detail.html:17
 msgid "Date"
-msgstr "Datum"
+msgstr "Data"
 
 #: byro/office/templates/office/account/detail.html:20
 #: byro/office/templates/office/member/finance_table.html:7
@@ -905,414 +911,414 @@ msgstr "Datum"
 #: byro/office/templates/office/realtransaction/match.html:17
 #: byro/office/templates/office/transaction/detail.html:18
 msgid "Purpose"
-msgstr "Zweck"
+msgstr "Propósito"
 
 #: byro/office/templates/office/account/detail.html:20
 #: byro/office/templates/office/transaction/detail.html:18
 msgid "Originator/Recipient"
-msgstr "Urheber/Empfänger"
+msgstr "Origem/Destino"
 
 #: byro/office/templates/office/account/list.html:5
 #: byro/office/templates/office/base.html:145
 msgid "Accounts"
-msgstr "Konten"
+msgstr "Contas"
 
 #: byro/office/templates/office/account/list.html:10
 msgid "Add new account"
-msgstr "Konto hinzufügen"
+msgstr "Adicionar nova conta"
 
 #: byro/office/templates/office/account/list.html:17
 msgid "Unmatched transactions"
-msgstr "Unzugeordnete Buchungen"
+msgstr "Transações não correspondidas"
 
 #: byro/office/templates/office/account/list.html:19
 #: byro/office/templates/office/user/list.html:16
 msgid "Type"
-msgstr "Art"
+msgstr "Tipo"
 
 #: byro/office/templates/office/account/list.html:21
 #: byro/office/templates/office/transaction/detail.html:21
 msgid "Incoming"
-msgstr "Eingehend"
+msgstr "Entrada"
 
 #: byro/office/templates/office/account/list.html:22
 #: byro/office/templates/office/transaction/detail.html:22
 msgid "Outgoing"
-msgstr "Ausgehend"
+msgstr "Saída"
 
 #: byro/office/templates/office/account/list.html:23
 #: byro/office/templates/office/member/list.html:47
 msgid "Balance"
-msgstr "Kontostand"
+msgstr "Saldo"
 
 #: byro/office/templates/office/account/list.html:47
 msgid "Default"
-msgstr "Standard"
+msgstr "Padrão"
 
 #: byro/office/templates/office/base.html:71
 msgid "Log in"
-msgstr "Anmelden"
+msgstr "Conecte-se"
 
 #: byro/office/templates/office/base.html:75
 #: byro/office/templates/office/dashboard.html:4
 #: byro/office/templates/office/member/base.html:13
 #: byro/office/templates/office/member/dashboard.html:5
 msgid "Dashboard"
-msgstr "Überblick"
+msgstr "Painel de Controle"
 
 #: byro/office/templates/office/base.html:81
 #: byro/office/templates/office/settings/base.html:4
 msgid "Settings"
-msgstr "Einstellungen"
+msgstr "Configurações"
 
 #: byro/office/templates/office/base.html:89
 msgid "General"
-msgstr "Allgemeine Einstellungen"
+msgstr "Geral"
 
 #: byro/office/templates/office/base.html:98
 #: byro/office/templates/office/user/list.html:5
 msgid "Users"
-msgstr "Benutzer"
+msgstr "Usuárias"
 
 #: byro/office/templates/office/base.html:116
 msgid "Log"
-msgstr "Logbuch"
+msgstr "Log"
 
 #: byro/office/templates/office/base.html:122
 msgid "About"
-msgstr "Über"
+msgstr "Sobre"
 
 #: byro/office/templates/office/base.html:127
 msgid "Members"
-msgstr "Mitglieder"
+msgstr "Associadas"
 
 #: byro/office/templates/office/base.html:137
 #: byro/office/templates/office/member/base.html:61
 #: byro/office/templates/office/member/finance.html:4
 #: byro/office/templates/office/member/timeline.html:19
 msgid "Finance"
-msgstr "Finanzen"
+msgstr "Finanças"
 
 #: byro/office/templates/office/base.html:148
 msgid "Transaction Upload"
-msgstr "Transaktions-Import"
+msgstr "Envio de transações"
 
 #: byro/office/templates/office/base.html:170
 #: byro/office/templates/office/mails/base.html:4
 msgid "Mails"
-msgstr "E-Mails"
+msgstr "E-mails"
 
 #: byro/office/templates/office/base.html:206
 #, python-format
 msgid "powered by <a %(a_attr)s>byro</a>"
-msgstr "powered by <a %(a_attr)s>byro</a>"
+msgstr "fornecido por <a %(a_attr)s>byro</a>"
 
 #: byro/office/templates/office/base.html:211
 msgid "running in development mode"
-msgstr "Entwicklungsmodus"
+msgstr "executando em modo de desenvolvimento"
 
 #: byro/office/templates/office/dashboard.html:11
 #, python-format
 msgid "%(n)s active member"
 msgid_plural "%(n)s active members"
-msgstr[0] "%(n)s aktives Mitglied"
-msgstr[1] "%(n)s aktive Mitglieder"
+msgstr[0] "%(n)s associada ativa"
+msgstr[1] "%(n)s associadas ativas"
 
 #: byro/office/templates/office/dashboard.html:18
 msgid "(currently)"
-msgstr "(aktuell)"
+msgstr "(neste momento)"
 
 #: byro/office/templates/office/dashboard.html:24
 #, python-format
 msgid "1 unmapped transaction"
 msgid_plural "%(n)s unmapped transactions"
-msgstr[0] "%(n)s nicht zugeordnete Buchung"
-msgstr[1] "%(n)s nicht zugeordnete Buchungen"
+msgstr[0] "1 transação não mapeada"
+msgstr[1] "%(n)s transações não mapeadas"
 
 #: byro/office/templates/office/dashboard.html:30
 msgid "Transactions all processed!"
-msgstr "Alle Transaktionen verarbeitet!"
+msgstr "Todas as transações foram processadas!"
 
-# python-format
 #: byro/office/templates/office/dashboard.html:36
 #, python-format
 msgid "%(n)s member"
 msgid_plural "%(n)s members"
-msgstr[0] "%(n)s Mitglied"
-msgstr[1] "%(n)s Mitglieder"
+msgstr[0] "%(n)s associada"
+msgstr[1] "%(n)s associadas"
 
 #: byro/office/templates/office/dashboard.html:43
 msgid "(all time)"
-msgstr "(insgesamt)"
+msgstr "(todo o tempo)"
 
 #: byro/office/templates/office/documents/add.html:7
 msgid "Upload Document …"
-msgstr "Dokument hochladen …"
+msgstr "Enviar Documento …"
 
 #: byro/office/templates/office/documents/detail.html:5
 msgid "Document details"
-msgstr "Dokumentendetails"
+msgstr "Detalhes do Documento"
 
 #: byro/office/templates/office/documents/detail.html:14
 #: byro/office/templates/office/documents/snippet_documents_table.html:8
 msgid "Direction"
-msgstr "Richtung"
+msgstr "Direção"
 
 #: byro/office/templates/office/documents/detail.html:15
 #: byro/office/templates/office/documents/snippet_documents_table.html:9
 #: byro/office/templates/office/member/finance_table.html:8
 msgid "Category"
-msgstr "Kategorie"
+msgstr "Categoria"
 
 #: byro/office/templates/office/documents/detail.html:16
 #: byro/office/templates/office/documents/snippet_documents_table.html:10
 msgid "Title / Information"
-msgstr "Titel/Informationen"
+msgstr "Título / Informação"
 
 #: byro/office/templates/office/documents/detail.html:26
 #: byro/office/templates/office/documents/snippet_documents_table.html:21
 msgid "Integrity verified"
-msgstr "Integrität überprüft"
+msgstr "Integridade verificada"
 
 #: byro/office/templates/office/documents/detail.html:28
 #: byro/office/templates/office/documents/snippet_documents_table.html:23
 msgid "File corrupted or modified"
-msgstr "Datei beschädigt oder modifiziert"
+msgstr "Arquivo corrompido ou modificado"
 
 #: byro/office/templates/office/documents/detail.html:30
 #: byro/office/templates/office/documents/snippet_documents_table.html:25
 msgid "bytes"
-msgstr "Bytes"
+msgstr "bytes"
 
 #: byro/office/templates/office/documents/snippet_upload_document.html:35
 msgid "Upload"
-msgstr "Hochladen"
+msgstr "Envio"
 
 #: byro/office/templates/office/mails/base.html:11
 #: byro/office/templates/office/mails/outbox.html:6
 msgid "Outbox"
-msgstr "Postausgang"
+msgstr "Caixa de saída"
 
 #: byro/office/templates/office/mails/base.html:17
 #: byro/office/templates/office/mails/sent.html:7
 msgid "Sent Mails"
-msgstr "Verschickte Mails"
+msgstr "E-mails enviados"
 
 #: byro/office/templates/office/mails/base.html:23
 msgid "Templates"
-msgstr "Vorlagen"
+msgstr "Modelos"
 
 #: byro/office/templates/office/mails/base.html:29
 msgid "Compose"
-msgstr "Mail verfassen"
+msgstr "Compor"
 
 #: byro/office/templates/office/mails/compose.html:12
 msgid "Send email"
-msgstr "Mail verschicken"
+msgstr "Enviar e-mail"
 
 #: byro/office/templates/office/mails/compose.html:18
 msgid "Save to outbox"
-msgstr "In Postausgang legen"
+msgstr "Salvar na caixa de saída"
 
 #: byro/office/templates/office/mails/compose.html:20
 #: byro/office/templates/office/mails/detail.html:31
 msgid "Save and send"
-msgstr "Speichern und verschicken"
+msgstr "Salvar e enviar"
 
 #: byro/office/templates/office/mails/detail.html:7
 msgid "Mail"
-msgstr "E-Mail"
+msgstr "E-mail"
 
 #: byro/office/templates/office/mails/detail.html:15
 #, python-format
 msgid "Mail, sent at %(when)s"
-msgstr "E-Mail, verschickt am %(when)s"
+msgstr "E-mail, enviado em %(when)s"
 
 #: byro/office/templates/office/mails/detail.html:19
 msgid "Mail, unsent"
-msgstr "E-Mail, noch nicht verschickt"
+msgstr "E-mail, não enviado"
 
 #: byro/office/templates/office/mails/detail.html:34
 #: byro/office/templates/office/mails/outbox.html:44
 msgid "Discard"
-msgstr "Verwerfen"
+msgstr "Descartar"
 
 #: byro/office/templates/office/mails/detail.html:38
 msgid "Copy to new mail"
-msgstr "Zu neuer Mail kopieren"
+msgstr "Copiar para um novo mail"
 
 #: byro/office/templates/office/mails/outbox.html:13
 msgid "Send All"
-msgstr "Alle verschicken"
+msgstr "Enviar todos"
 
 #: byro/office/templates/office/mails/outbox.html:17
 msgid "Discard all"
-msgstr "Alle verwerfen"
+msgstr "Descartar todos"
 
 #: byro/office/templates/office/mails/outbox.html:41
 #: byro/office/templates/office/member/data_disclosure.html:14
 msgid "Send"
-msgstr "Verschicken"
+msgstr "Enviar"
 
 #: byro/office/templates/office/mails/sent_mails_part.html:7
 msgid "Sent"
-msgstr "Verschickt"
+msgstr "Enviado"
 
 #: byro/office/templates/office/mails/sent_mails_part.html:18
 #: byro/office/templates/office/mails/special_to_part.html:20
 #: byro/office/templates/office/member/list.html:32
 #: byro/office/views/mails.py:34 byro/office/views/members.py:258
 msgid "All members"
-msgstr "Alle Mitglieder"
+msgstr "Todas associadas"
 
 #: byro/office/templates/office/mails/template_detail.html:7
 msgid "Mail Template"
-msgstr "Vorlage"
+msgstr "Modelo de e-mail"
 
 #: byro/office/templates/office/mails/template_detail.html:14
 msgid "New template"
-msgstr "Neue Vorlage"
+msgstr "Novo modelo"
 
 #: byro/office/templates/office/mails/templates.html:7
 msgid "Mail Templates"
-msgstr "Vorlagen"
+msgstr "Modelos de e-mail"
 
 #: byro/office/templates/office/mails/templates.html:11
 msgid ""
 "There are a couple of default templates provided by byro, mostly revolving "
 "around members coming and going."
 msgstr ""
-"Es gibt eine Reihe Standardvorlagen von byro, vor allem für den Beginn und "
-"das Ende einer Mitgliedschaft."
+"Existem alguns modelos padrão fornecidos pelo byro, principalmente girando "
+"em torno de associadas indo e vindo."
 
 #: byro/office/templates/office/mails/templates.html:17
 msgid "Add new mail template"
-msgstr "Neue Mail-Vorlage hinzufügen"
+msgstr "Adicionar um novo modelo de e-mail"
 
 #: byro/office/templates/office/member/add.html:6
 msgid "Add Member …"
-msgstr "Mitglied hinzufügen …"
+msgstr "Adicionar Associada …"
 
 #: byro/office/templates/office/member/add.html:20
 msgid ""
 "Please configure the fields you want to display in your member registration "
 "form."
 msgstr ""
-"Bitte konfiguriere die Felder, die du im Beitrittsformular stehen hast."
+"Por favor, configure os campos que deseja exibir em seu formulário de "
+"registro de pessoa associada."
 
 #: byro/office/templates/office/member/add.html:23
 msgid "here!"
-msgstr "hier!"
+msgstr "aqui!"
 
 #: byro/office/templates/office/member/balance.html:6
 #: byro/office/templates/office/member/list.html:22
 #: byro/office/templates/office/member/list_import.html:6
 msgid "Import members"
-msgstr "Mitglieder importieren"
+msgstr "Importar associadas"
 
 #: byro/office/templates/office/member/balance.html:12
 msgid "Generate"
-msgstr "Erstellen"
+msgstr "Gerar"
 
 #: byro/office/templates/office/member/base.html:21
 #: byro/office/templates/office/member/timeline.html:6
 msgid "Timeline"
-msgstr "Zeitleiste"
+msgstr "Linha do tempo"
 
 #: byro/office/templates/office/member/base.html:29
 #: byro/office/templates/office/member/data.html:5
 #: byro/public/templates/public/members/dashboard.html:113
 msgid "Data"
-msgstr "Daten"
+msgstr "Data"
 
 #: byro/office/templates/office/member/base.html:37
 #: byro/office/templates/office/member/documents.html:5
 #: byro/office/templates/office/member/timeline.html:27
 msgid "Documents"
-msgstr "Dokumente"
+msgstr "Documentos"
 
 #: byro/office/templates/office/member/base.html:45
 #: byro/office/templates/office/member/log.html:5
 msgid "Log entries"
-msgstr "Log-Einträge"
+msgstr "Entradas de log"
 
 #: byro/office/templates/office/member/base.html:53
 #: byro/office/templates/office/member/mails.html:5
 msgid "Mail history"
-msgstr "E-Mail-Verlauf"
+msgstr "Histórico de e-mail"
 
 #: byro/office/templates/office/member/base.html:69
 msgid "Operations"
-msgstr "Vorgänge"
+msgstr "Operações"
 
 #: byro/office/templates/office/member/base.html:77
 msgid "Record Disclosure"
-msgstr "Datenbrief"
+msgstr "Divulgação de registro"
 
 #: byro/office/templates/office/member/booking_row.html:7
 #, python-format
 msgid "Booked on %(date)s"
-msgstr "Gebucht am %(date)s"
+msgstr "Agendado em %(date)s"
 
 #: byro/office/templates/office/member/dashboard.html:13
 msgid "active"
-msgstr "aktiv"
+msgstr "ativa"
 
 #: byro/office/templates/office/member/dashboard.html:15
 msgid "<strong>not</strong> active"
-msgstr "<strong>nicht</strong> aktiv"
+msgstr "<strong>inativa</strong>"
 
 #: byro/office/templates/office/member/dashboard.html:25
 #: byro/public/templates/public/members/dashboard.html:22
 msgid "current balance"
-msgstr "aktueller Kontostand"
+msgstr "saldo atual"
 
 #: byro/office/templates/office/member/dashboard.html:27
 #, python-format
 msgid "Last transaction on %(start)s."
-msgstr "Letzte Transaktion am %(start)s."
+msgstr "Última transação em %(start)s."
 
 #: byro/office/templates/office/member/dashboard.html:38
 msgid "in liabilities will expire end of this year"
-msgstr "ausstehende Beiträge die Ende diesen Jahres verjähren"
+msgstr "no passivo expirará no final deste ano"
 
 #: byro/office/templates/office/member/dashboard.html:48
 msgid "in expired liabilities"
-msgstr "verjährte Beiträge"
+msgstr "em obrigações vencidas"
 
 #: byro/office/templates/office/member/dashboard.html:58
 #: byro/public/templates/public/members/dashboard.html:31
 msgid "donations"
-msgstr "Spenden"
+msgstr "doações"
 
 #: byro/office/templates/office/member/dashboard.html:64
 #, python-format
 msgid "%(n)s day"
 msgid_plural "%(n)s days"
-msgstr[0] "%(n)s Tag"
-msgstr[1] "%(n)s Tage"
+msgstr[0] "%(n)s dia"
+msgstr[1] "%(n)s dias"
 
 #: byro/office/templates/office/member/dashboard.html:72
 #, python-format
 msgid "or %(n)s year of membership"
 msgid_plural "or %(n)s years of membership"
-msgstr[0] "oder %(n)s Jahr Mitglied"
-msgstr[1] "oder %(n)s Jahre Mitglied"
+msgstr[0] "ou %(n)s ano de associação"
+msgstr[1] "ou %(n)s anos de associação"
 
 #: byro/office/templates/office/member/dashboard.html:78
 #: byro/public/templates/public/members/dashboard.html:47
 msgid "until this person becomes a member."
-msgstr "bis diese Person Mitglied wird."
+msgstr "até que essa pessoa se torne uma associada."
 
 #: byro/office/templates/office/member/dashboard.html:83
 #, python-format
 msgid "Joined on %(start)s."
-msgstr "Beigetreten am %(start)s."
+msgstr "Entrou em %(start)s."
 
 #: byro/office/templates/office/member/disclosure.html:5
 #: byro/office/templates/office/member/disclosure.html:9
 msgid "Data Disclosure Mail"
-msgstr "Datenbrief"
+msgstr "E-mail de divulgação de dados"
 
 #: byro/office/templates/office/member/disclosure.html:10
 #, python-format
@@ -1320,139 +1326,139 @@ msgid ""
 "Do you want to send data disclosure mails to all %(count)s active members? "
 "The mails will be generated and placed in the outbox for your review."
 msgstr ""
-"Möchtest Du allen %(count)s aktiven Mitgliedern ihren Datenbrief schicken? "
-"Die Mails werden dann generiert und zur Durchsicht in den Postausgang gelegt."
+"Você deseja enviar e-mails de divulgação de dados para todas as %(count)s "
+"pessoas associadas ativas? Os e-mails serão gerados e colocados na caixa de "
+"saída para sua revisão."
 
 #: byro/office/templates/office/member/disclosure.html:15
 msgid "Generate mails"
-msgstr "Mails erstellen"
+msgstr "Gerar e-mails"
 
 #: byro/office/templates/office/member/documents.html:10
 #: byro/office/templates/office/transaction/detail.html:88
 msgid "Upload document"
-msgstr "Dokument hochladen"
+msgstr "Enviar documento"
 
 #: byro/office/templates/office/member/documents.html:20
 #: byro/office/templates/office/transaction/detail.html:69
 msgid "Related documents"
-msgstr "Zugehörige Dokumente"
+msgstr "Documentos relacionados"
 
 #: byro/office/templates/office/member/finance_table.html:16
 #, python-format
 msgid ""
 "<div class=\"empty\">No transactions from %(start)s until %(end)s.</div>"
-msgstr ""
-"<div class=\"empty\">Keine Transaktionen von %(start)s bis %(end)s.</div>"
+msgstr "<div class=\"empty\">Nenhuma transação de %(start)s até %(end)s.</div>"
 
 #: byro/office/templates/office/member/list.html:5
 msgid "Member List"
-msgstr "Mitglieder"
+msgstr "Lista de associadas"
 
 #: byro/office/templates/office/member/list.html:8
 msgid "Member list operations"
-msgstr "Operationen auf der Mitgliederliste"
+msgstr "Operações da lista de associadas"
 
 #: byro/office/templates/office/member/list.html:10
 msgid "Add new member"
-msgstr "Mitglied hinzufügen"
+msgstr "Nova associada"
 
 #: byro/office/templates/office/member/list.html:13
 msgid "Balances/Reminders"
-msgstr "Zahlungsaufforderungen"
+msgstr "Saldos/Lembretes"
 
 #: byro/office/templates/office/member/list.html:16
 msgid "Send disclosure mail"
-msgstr "Datenbrief verschicken"
+msgstr "Enviar e-mail de divulgação"
 
 #: byro/office/templates/office/member/list.html:19
 #: byro/office/templates/office/member/list_export.html:6
 msgid "Export member list"
-msgstr "Mitgliederliste exportieren"
+msgstr "Exportar lista de associadas"
 
 #: byro/office/templates/office/member/list.html:29
 #: byro/office/views/members.py:255
 msgid "Active members"
-msgstr "Aktive Mitglieder"
+msgstr "Associadas ativas"
 
 #: byro/office/templates/office/member/list.html:30
 #: byro/office/views/members.py:256
 msgid "Members with negative balance"
-msgstr ""
+msgstr "Associadas com saldo negativo"
 
 #: byro/office/templates/office/member/list.html:31
 #: byro/office/views/members.py:257
 msgid "Only inactive members"
-msgstr "Inaktive Mitglieder"
+msgstr "Apenas associadas inativas"
 
 #: byro/office/templates/office/member/list.html:34
 #: byro/office/templates/office/realtransaction/list.html:19
 msgid "Search"
-msgstr "Suchen"
+msgstr "Buscar"
 
 #: byro/office/templates/office/member/list.html:35
 #: byro/office/templates/office/realtransaction/list.html:20
 msgid "Filter"
-msgstr "Filtern"
+msgstr "Filtro"
 
 #: byro/office/templates/office/member/list.html:45
 msgid "Number"
-msgstr "Zahl"
+msgstr "Número"
 
 #: byro/office/templates/office/member/list.html:49
 msgid "Refresh"
-msgstr "Aktualisieren"
+msgstr "Atualizar"
 
 #: byro/office/templates/office/member/list_export.html:9
 msgid ""
 "Select the export format and fields to be exported, then press 'Export'."
 msgstr ""
-"Wählen Sie das Exportformat und die Felder aus, die exportiert werden "
-"sollen, und drücken Sie dann 'Export'."
+"Selecione o formato de exportação e os campos a serem exportados e pressione "
+"'Exportar'."
 
 #: byro/office/templates/office/member/list_export.html:15
 msgid "Export"
-msgstr "Exportieren"
+msgstr "Exportar"
 
 #: byro/office/templates/office/member/list_import.html:12
 msgid "Import"
-msgstr "Importieren"
+msgstr "Importar"
 
 #: byro/office/templates/office/member/mails.html:10
 msgid "Compose new message …"
-msgstr "Neue Nachricht schreiben …"
+msgstr "Compor nova mensagem …"
 
 #: byro/office/templates/office/member/timeline.html:23
 msgid "News"
-msgstr "Nachrichten"
+msgstr "Notícias"
 
 #: byro/office/templates/office/member/timeline.html:70
 msgid "Payment received"
-msgstr "Zahlungseingang"
+msgstr "Pagamento recebido"
 
 #: byro/office/templates/office/member/timeline.html:82
 #, python-format
 msgid "Booked on %(datetime)s"
-msgstr "Gebucht am %(datetime)s"
+msgstr "Reservado em %(datetime)s"
 
 #: byro/office/templates/office/member/timeline.html:90
 #, python-format
 msgid "Reversed on %(datetime)s"
-msgstr "Storniert am %(datetime)s"
+msgstr "Revertido em %(datetime)s"
 
 #: byro/office/templates/office/member/timeline.html:101
 msgctxt "mail header"
 msgid "To"
-msgstr "An"
+msgstr "Para"
 
 #: byro/office/templates/office/member/timeline.html:106
 msgctxt "mail header"
 msgid "Subject"
-msgstr "Betreff"
+msgstr "Assunto"
 
 #: byro/office/templates/office/member/timeline.html:111
 msgctxt "mail header"
 msgid "Reply-To"
-msgstr "Reply-To"
+msgstr "Responder para"
 
 #: byro/office/templates/office/member/timeline.html:117
 msgctxt "mail header"
@@ -1461,84 +1467,84 @@ msgstr "Cc"
 
 #: byro/office/templates/office/member/timeline.html:140
 msgid "Membership start"
-msgstr "Mitgliedschaftsbeginn"
+msgstr "Início da assinatura"
 
 #: byro/office/templates/office/member/timeline.html:145
 msgid "Membership end"
-msgstr "Mitgliedschaftsende"
+msgstr "Fim da assinatura"
 
 #: byro/office/templates/office/member/timeline.html:151
 msgid "Membership entry created"
-msgstr "Mitgliedseintrag erstellt"
+msgstr "Entrada de associação criada"
 
 #: byro/office/templates/office/member/timeline.html:153
 msgid "Membership entry changed"
-msgstr "Mitgliedseintrag geändert"
+msgstr "Entrada de associação alterada"
 
 #: byro/office/templates/office/member/timeline.html:163
 msgid "Created by:"
-msgstr "Erstellt durch:"
+msgstr "Criado por:"
 
 #: byro/office/templates/office/member/timeline.html:165
 msgid "Changed by:"
-msgstr "Geändert durch:"
+msgstr "Alterado por:"
 
 #: byro/office/templates/office/member/timeline.html:167
 msgid "By:"
-msgstr "Durch:"
+msgstr "Por:"
 
 #: byro/office/templates/office/member/timeline.html:178
 msgid "Document"
-msgstr "Dokument"
+msgstr "Documento"
 
 #: byro/office/templates/office/member/timeline.html:188
 msgid "Direct Debit mandate reference assigned"
-msgstr "SEPA-Mandatsreferenz zugeteilt"
+msgstr "Referência de mandato de débito direto atribuída"
 
 #: byro/office/templates/office/pagination.html:17
 #, python-format
 msgid "Page %(page)s of %(of)s (%(count)s elements)"
-msgstr "Seite %(page)s von %(of)s (%(count)s Treffer)"
+msgstr "Página %(page)s de %(of)s (%(count)s elementos)"
 
 #: byro/office/templates/office/pagination.html:41
 #, python-format
 msgid "%(count)s elements"
-msgstr "%(count)s Treffer"
+msgstr "%(count)s elementos"
 
 #: byro/office/templates/office/realtransaction/list.html:8
 msgid "Real Transactions"
-msgstr "Bank-Transaktionen"
+msgstr "Transações Reais"
 
 #: byro/office/templates/office/realtransaction/list.html:15
 msgid "All transactions"
-msgstr "Alle Buchungen"
+msgstr "Todas as transações"
 
 #: byro/office/templates/office/realtransaction/list.html:16
 msgid "Only matched transactions"
-msgstr "Nur zugeordnete Buchungen"
+msgstr "Apenas transações correspondentes"
 
 #: byro/office/templates/office/realtransaction/list.html:17
 msgid "Only unmatched transactions"
-msgstr "Nur unzugeordnete Buchungen"
+msgstr "Somente transações não correspondidas"
 
 #: byro/office/templates/office/realtransaction/list.html:27
 #: byro/office/templates/office/upload/list.html:33
 msgid "match"
-msgstr "zuordnen"
+msgstr "corresponder"
 
 #: byro/office/templates/office/realtransaction/list.html:28
 #: byro/office/templates/office/realtransaction/match.html:15
 msgid "Value Date"
-msgstr "Wertstellungstag"
+msgstr "Data de validade"
 
 #: byro/office/templates/office/realtransaction/list.html:31
 #: byro/office/templates/office/realtransaction/match.html:18
 msgid "Originator"
-msgstr "Urheber"
+msgstr "Originador"
 
 #: byro/office/templates/office/realtransaction/list.html:32
 msgid "Virtual Transactions"
-msgstr "Virtuelle Buchungen"
+msgstr "Transações Virtuais"
 
 #: byro/office/templates/office/realtransaction/list.html:46
 #: byro/office/templates/office/realtransaction/match.html:32
@@ -1546,32 +1552,32 @@ msgstr "Virtuelle Buchungen"
 msgid ""
 "%(amount | format_with_currency)s from %(source)s to %(dest)s (%(member)s)"
 msgstr ""
-"%(amount | format_with_currency)s € von %(source)s nach %(dest)s (%(member)s)"
+"%(amount | format_with_currency)s de %(source)s para %(dest)s (%(member)s)"
 
 #: byro/office/templates/office/realtransaction/list.html:50
 msgid "Match transaction"
-msgstr "Buchung zuordnen"
+msgstr "Transação correspondente"
 
 #: byro/office/templates/office/realtransaction/match.html:8
 msgid "Match transactions"
-msgstr "Buchungen zuordnen"
+msgstr "Transações correspondentes"
 
 #: byro/office/templates/office/realtransaction/match.html:19
 msgid "Matches"
-msgstr "Zuordnungen"
+msgstr "Partidas"
 
 #: byro/office/templates/office/realtransaction/match.html:87
 msgid "Add a new VT"
-msgstr "Weitere Buchung"
+msgstr "Adicionar um novo VT"
 
 #: byro/office/templates/office/settings/about.html:5
 msgid "About byro"
-msgstr "Über byro"
+msgstr "Sobre byro"
 
 #: byro/office/templates/office/settings/about.html:17
 #, python-format
 msgid "version %(byro_version)s"
-msgstr "version %(byro_version)s"
+msgstr "versão %(byro_version)s"
 
 #: byro/office/templates/office/settings/about.html:20
 msgid ""
@@ -1586,234 +1592,229 @@ msgid ""
 "</p> <p>The byro logo was graciously provided by Markus Kempken (<a "
 "href=\"http://enigmation.de\">enigmation.de</a>).</p>"
 msgstr ""
-"<p>byro ist freie Software, die gemäß der Apache-Lizenz veröffentlicht wird."
-"</p> <p>Ursprünglich geschrieben von Tobias Kunze (<a href=\"https://github."
-"com/rixx\"><i class=\"fa fa-github\"></i> rixx</a>), mit Beiträgen von "
-"Henryk Plötz (<a href=\"https://github.com/henryk\"><i class=\"fa fa-"
-"github\"></i> henryk</a>), luto (<a href=\"https://github.com/luto\"><i "
-"class=\"fa fa-github\"></i> luto</a>), Andreas Madsack (<a href=\"https://"
-"github.com/mfa\"><i class=\"fa fa-github\"></i> mfa</a>), und <a "
-"href=\"https://github.com/byro/byro/graphs/contributors\">weiteren</a>.</p> "
-"<p>Das byro-Logo wurde von Markus Kempken (<a href=\"http://enigmation."
-"de\">enigmation.de</a>) erstellt.</p>"
+"<p>byro é um software livre lançado sob a licença Apache.</p> "
+"<p>Originalmente escrito por Tobias Kunze (<a href=\"https://github.com/"
+"rixx\"><i class=\"fa fa-github\"></i> rixx</a>), com contribuições de Henryk "
+"Plötz (<a href=\"https://github.com/henryk\"><i class=\"fa fa-github\"></i> "
+"henryk</a>), luto (<a href=\"https://github.com/luto\"><i class=\"fa fa-"
+"github\"></i> luto</a>), Andreas Madsack (<a href=\"https://github.com/"
+"mfa\"><i class=\"fa fa-github\"></i> mfa</a>), e  <a href=\"https://github."
+"com/byro/byro/graphs/contributors\">muitas outras pessoas</a>.</p> <p>O logo "
+"do byro foi graciosamente fornecido por Markus Kempken (<a href=\"http://"
+"enigmation.de\">enigmation.de</a>).</p>"
 
 #: byro/office/templates/office/settings/about.html:40
 msgid "Installed plugins"
-msgstr "Installierte Plugins"
+msgstr "Plugins instalados"
 
 #: byro/office/templates/office/settings/about.html:55
 msgid "Find more plugins online …"
-msgstr "Weitere Plugins online suchen …"
+msgstr "Encontre mais plugins online…"
 
 #: byro/office/templates/office/settings/about.html:57
 msgid "Find plugins online …"
-msgstr "Plugins online suchen …"
+msgstr "Encontre plug-ins on-line…"
 
 #: byro/office/templates/office/settings/log.html:5
 msgid "Audit Log"
-msgstr "Logbuch"
+msgstr "Registro de Auditoria"
 
 #: byro/office/templates/office/settings/registration_form.html:63
 msgid "Fields currently in the registration form"
-msgstr "Felder die im Beitrittsformular sind"
+msgstr "Campos atualmente no formulário de registro"
 
 #: byro/office/templates/office/settings/registration_form.html:63
 msgid "Fields not in the registration form"
-msgstr "Felder die nicht im Beitrittsformular sind"
+msgstr "Campos que não constam no formulário de inscrição"
 
 #: byro/office/templates/office/settings/registration_form.html:77
 msgid "Add"
-msgstr "Hinzufügen"
+msgstr "Adicionar"
 
 #: byro/office/templates/office/settings/registration_form.html:78
 msgid "Remove"
-msgstr "Entfernen"
+msgstr "Remover"
 
 #: byro/office/templates/office/transaction/detail.html:7
 msgid "Edit transaction"
-msgstr "Buchungssatz bearbeiten"
+msgstr "Editar transação"
 
 #: byro/office/templates/office/transaction/detail.html:79
 msgid "Related log entries"
-msgstr "Zugehörige Logbuch-Einträge"
+msgstr "Entradas de registro relacionadas"
 
 #: byro/office/templates/office/upload/add.html:7
 msgid "Upload Transaction …"
-msgstr "Transaktionsdatei hochladen …"
+msgstr "Carregar transação…"
 
 #: byro/office/templates/office/upload/list.html:5
 msgid "Transaction Imports"
-msgstr "Buchungsimport"
+msgstr "Importações de transação"
 
 #: byro/office/templates/office/upload/list.html:10
 msgid "Add new import"
-msgstr "Neuer Import"
+msgstr "Adicionar nova importação"
 
 #: byro/office/templates/office/upload/list.html:17
 msgid "State"
-msgstr "Status"
+msgstr "Estado"
 
 #: byro/office/templates/office/upload/list.html:29
 msgid "process"
-msgstr "Verarbeiten"
+msgstr "processar"
 
 #: byro/office/templates/office/upload/list.html:29
 msgid "reprocess"
-msgstr "Noch mal verarbeiten"
+msgstr "reprocessar"
 
 #: byro/office/templates/office/user/add.html:5
 msgid "Add user …"
-msgstr "Benutzer hinzufügen …"
+msgstr "Adicionar usuária …"
 
 #: byro/office/templates/office/user/detail.html:5
 msgid "User"
-msgstr "Benutzer"
+msgstr "Usuária"
 
 #: byro/office/templates/office/user/list.html:10
 msgid "Add new user"
-msgstr "Neuen Benutzer hinzufügen"
+msgstr "Adicionar nova usuária"
 
 #: byro/office/templates/office/user/list.html:17
 msgid "Username"
-msgstr "Benutzername"
+msgstr "Nome de usuária"
 
 #: byro/office/templates/office/user/list.html:27
 msgid "User deactivated"
-msgstr "Benutzer deaktiviert"
+msgstr "Usuária desativada"
 
 #: byro/office/templates/office/user/list.html:30
 msgid "Superuser"
-msgstr "Administrator"
+msgstr "Superusuária"
 
 #: byro/office/templates/office/user/list.html:33
 msgid "Backend user"
-msgstr "Backend-Benutzer"
+msgstr "Usuária Backend"
 
 #: byro/office/templates/office/user/list.html:35
 msgid "Frontend user"
-msgstr "Frontend-Benutzer"
+msgstr "Usuária Frontend"
 
 #: byro/office/templatetags/office_tags.py:9
 msgid "Unknown document type"
-msgstr "Unbekannter Dokumententyp"
+msgstr "Tipo de documento desconhecido"
 
 #: byro/office/views/accounts.py:16
 msgid "Charge"
-msgstr "Einahmenminderung"
+msgstr "Cobrar"
 
 #: byro/office/views/accounts.py:16
 msgid "Revenue"
-msgstr "Einnahme"
+msgstr "Receita"
 
 #: byro/office/views/accounts.py:17 byro/office/views/accounts.py:18
 #: byro/office/views/accounts.py:19
 msgid "Increase"
-msgstr "Zugang"
+msgstr "Aumentar"
 
 #: byro/office/views/accounts.py:17 byro/office/views/accounts.py:18
 #: byro/office/views/accounts.py:19
 msgid "Decrease"
-msgstr "Abgang"
+msgstr "Diminuir"
 
 #: byro/office/views/accounts.py:20
 msgid "Expense"
-msgstr "Ausgabe"
+msgstr "Despesa"
 
 #: byro/office/views/accounts.py:20
 msgid "Rebate"
-msgstr "Ausgabenminderung"
+msgstr "Desconto"
 
 #: byro/office/views/accounts.py:39
 msgid "The account was added, please edit additional details if applicable."
-msgstr ""
-"Das Mitglied wurde gespeichert, bitte füge zusätzliche Informationen hinzu, "
-"wenn nötig."
+msgstr "A conta foi adicionada, edite os detalhes adicionais, se aplicável."
 
 #: byro/office/views/accounts.py:90 byro/office/views/mails.py:108
 #: byro/office/views/members.py:811
 msgid "Your changes have been saved."
-msgstr "Deine Änderungen wurden gespeichert."
+msgstr "Suas alterações foram salvas."
 
 #: byro/office/views/documents.py:50 byro/office/views/upload.py:31
 #: byro/office/views/upload.py:52
 msgid "The upload was processed successfully."
-msgstr "Der Import wurde erfolgreich verarbeitet."
+msgstr "O upload foi processado com sucesso."
 
 #: byro/office/views/documents.py:54 byro/office/views/upload.py:35
 msgid "The upload was added successfully, but could not be processed: "
-msgstr ""
-"Der Import wurde erfolgreich hochgeladen, konnte aber nicht verarbeitet "
-"werden: "
+msgstr "O upload foi adicionado com sucesso, mas não pôde ser processado: "
 
 #: byro/office/views/mails.py:32
 msgid "Specific address"
-msgstr "Angebene Adresse"
+msgstr "endereço específico"
 
 #: byro/office/views/mails.py:85
 msgid "Field cannot be empty"
-msgstr "Feld kann nicht leer sein"
+msgstr "Campo não pode ser vazio"
 
 #: byro/office/views/mails.py:98
 msgid ""
 "This mail has been sent already, and cannot be modified. Copy it to a draft "
 "instead!"
 msgstr ""
-"Diese E-Mail wurde schon verschickt und kann nicht mehr verändert werden. "
-"Kopiere sie stattdessen in einen Entwurf!"
+"Este e-mail já foi enviado e não pode ser modificado. Em vez disso, copie-o "
+"para um rascunho!"
 
 #: byro/office/views/mails.py:105
 msgid "Your changes have been saved and the email was sent."
-msgstr "Deine Änderungen wurden gespeichert und die Mail wurde verschickt."
+msgstr "Suas alterações foram salvas e o e-mail foi enviado."
 
 #: byro/office/views/mails.py:133
 msgid "Here is your new mail draft!"
-msgstr "Hier ist der neue Entwurf!"
+msgstr "Aqui está o seu novo rascunho de e-mail!"
 
 #: byro/office/views/mails.py:156
 #, python-brace-format
 msgid "{count} mails have been deleted."
-msgstr "{count} E-Mails wurden verworfen."
+msgstr "{count} e-mails foram excluídos."
 
 #: byro/office/views/mails.py:172
 #, python-brace-format
 msgid "{count} mails have been sent."
-msgstr "{count} E-Mails wurden verschickt."
+msgstr "{count} e-mails foram enviados."
 
 #: byro/office/views/mails.py:174
 msgid "The mail has been sent."
-msgstr "Die Mail wurde verschickt."
+msgstr "O correio foi enviado."
 
 #: byro/office/views/mails.py:176
 msgid "No mail has been sent."
-msgstr "Keine Mail wurde verschickt."
+msgstr "Nenhum e-mail foi enviado."
 
 #: byro/office/views/members.py:141
 #, python-brace-format
 msgid "Generated {count} data disclosure emails and placed them in the outbox."
-msgstr "{count} Datenbriefe wurden erstellt und in den Postausgang gelegt."
+msgstr ""
+"Gerou {count} e-mails de divulgação de dados e os colocou na caixa de saída."
 
 #: byro/office/views/members.py:148
 msgid "Start of balance timeframe"
-msgstr "Beginn des Bilanzzeitraums"
+msgstr "Período de início do saldo"
 
 #: byro/office/views/members.py:149
 msgid "End of balance timeframe"
-msgstr "Ende des Bilanzzeitraums"
+msgstr "Fim do prazo de saldo"
 
 #: byro/office/views/members.py:151
 msgid "Create balances even if there was no payment due in the time chosen?"
 msgstr ""
-"Abschluss erstellen, auch wenn in dem Zeitfenster keine Zahlung fällig wurde?"
+"Criar saldos mesmo que não houvesse pagamento devido no prazo escolhido?"
 
 #: byro/office/views/members.py:157
 msgid "Balance cutoff"
-msgstr "Erinnerungs-Minimum"
+msgstr "corte de saldo"
 
 #: byro/office/views/members.py:159
 msgid "Only members with a deficit greater than this will receive an email."
-msgstr ""
-"Nur Mitglieder mit einem ausstehenden Beitrag oberhalb dieser Grenze werden "
-"eine Mail erhalten."
+msgstr "Apenas os membros com um défice superior a este receberão um e-mail."
 
 #: byro/office/views/members.py:167
 #, python-brace-format
@@ -1828,23 +1829,23 @@ msgid ""
 "Please settle this amount as soon as possible, or let us\n"
 "know if you think this email is incorrect."
 msgstr ""
-"Hallo {name},\n"
+"Olá {name},\n"
 "\n"
-"wir wollten Dich wissen lassen, dass Du in der Zeit von {start}\n"
-"bis {end} versäumt hast, Mitgliedsbeiträge in Höhe von\n"
+"gostaríamos de informar que dentro de {start}\n"
+"para {end} você incorreu em responsabilidades não pagas no valor de\n"
 "\n"
-"    EUR {amount}\n"
+"   {amount}\n"
 "\n"
-"zu zahlen. Bitte hole dies so bald wie möglich nach, oder lass\n"
-"uns wissen, wenn diese Erinnerung irrtümlich versandt wurde."
+"Por favor, liquide este valor o mais rápido possível, ou deixe-nos\n"
+"saber se você acha que este e-mail está incorreto."
 
 #: byro/office/views/members.py:191
 msgid "End must be in the past!"
-msgstr "Das Ende muss in der Vergangenheit liegen!"
+msgstr "Fim deve estar no passado!"
 
 #: byro/office/views/members.py:193
 msgid "Start must be before end!"
-msgstr "Der Start muss vor dem Ende liegen!"
+msgstr "Início deve ser antes do fim!"
 
 #: byro/office/views/members.py:234
 #, python-brace-format
@@ -1852,8 +1853,8 @@ msgid ""
 "{balance_count} balances were created and {mail_count} reminder emails were "
 "placed in the outbox."
 msgstr ""
-"{balance_count} Abschlüsse wurden erstellt und {mail_count} "
-"Zahlungserinnerungen wurden in den Postausgang gelegt."
+"{balance_count} saldos foram criados e {mail_count} e-mails de lembrete "
+"foram colocados na caixa de saída."
 
 #: byro/office/views/members.py:240
 #, python-brace-format
@@ -1861,153 +1862,145 @@ msgid ""
 "{errors} balances could not be created due to errors. Presumably, these "
 "members already have balances overlapping this timeframe."
 msgstr ""
-"{errors} Abschlüsse konnten wegen Fehlern nicht erstellt werden – Vermutlich "
-"lagen für diese Mitglieder bereits Zahlungsaufforderungen in einem "
-"überlappenden Zeitraum vor."
+"{errors} saldos não puderam ser criados devido a erros. Presumivelmente, "
+"essas pessoas associadas já possuem saldos que se sobrepõem a esse período."
 
 #: byro/office/views/members.py:263
 msgid "CSV (Comma Separated Values)"
-msgstr "CSV (Komma-Separierte Werte)"
+msgstr "CSV (valores separados por vírgula)"
 
 #: byro/office/views/members.py:264
 msgid "CSV (Semicolon Separated Values, German Windows versions)"
-msgstr "CSV (Semikolon-Separierte Werte, deutsche Windows-Versionen)"
+msgstr "CSV (valores separados por ponto e vírgula, versões alemãs do Windows)"
 
 #: byro/office/views/members.py:484
 msgid "Couldn't map input column '{}' to field"
-msgstr "Konnte die Eingangsspalte '{}' keinem Datenbank-Feld zuordnen"
+msgstr "Não foi possível mapear a coluna de entrada '{}' para o campo"
 
 #: byro/office/views/members.py:549
 msgid "Either both or none columns has to be given: '{}' and '{}'"
-msgstr ""
-"Entweder beide oder keine dieser Spalten muss angegeben werden: '{}' und '{}'"
+msgstr "Ambas ou nenhuma coluna deve ser fornecida: '{}' e '{}'"
 
 #: byro/office/views/members.py:586
 msgid "Generic CSV import (Comma Separated Values)"
-msgstr "Generischer CSV-Import (Komma-Separierte Werte)"
+msgstr "Importação de CSV genérico (valores separados por vírgula)"
 
 #: byro/office/views/members.py:596
 msgid ""
 "Generic CSV import (Semicolon Separated Values, German Windows versions)"
 msgstr ""
-"Generischer CSV-Import (Semikolon-Separierte Werte, deutsche Windows-"
-"Versionen)"
+"Importação de CSV genérico (valores separados por ponto e vírgula, versões "
+"alemãs do Windows)"
 
 #: byro/office/views/members.py:615
 msgid "The member was added, please edit additional details if applicable."
 msgstr ""
-"Das Mitglied wurde gespeichert, bitte füge zusätzliche Informationen hinzu, "
-"wenn nötig."
+"A pessoa associada foi adicionada, edite detalhes adicionais, se aplicável."
 
 #: byro/office/views/members.py:624 byro/office/views/members.py:1124
 msgid "Some post processing steps could not be completed: "
-msgstr ""
-"Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht durchgeführt "
-"werden: "
+msgstr "Algumas etapas de pós-processamento não puderam ser concluídas: "
 
 #: byro/office/views/members.py:905 byro/office/views/members.py:1026
 msgid "Adjust member account balance"
-msgstr "Mitgliedskontostand korrigieren"
+msgstr "Ajustar o saldo da conta da pessoa associada"
 
 #: byro/office/views/members.py:909
 msgid "Initial balance"
-msgstr "Anfangssaldo"
+msgstr "Balanço inicial"
 
 #: byro/office/views/members.py:909
 msgid "Fees waived"
-msgstr "Mitgliedsbeiträge erlassen"
+msgstr "Taxas isentas"
 
 #: byro/office/views/members.py:915
 msgid "Relative (Add or subtract amount to/from balance)"
-msgstr "Relativ (Betrag abziehen oder aufaddieren)"
+msgstr "Relativo (adicionar ou subtrair valor de/para o saldo)"
 
 #: byro/office/views/members.py:916
 msgid "Absolute (Balance should be)"
-msgstr "Absolut (Sollbetrag eingeben)"
+msgstr "Absoluto (o equilíbrio deve ser)"
 
 #: byro/office/views/members.py:1013 byro/office/views/members.py:1015
 msgid "End membership"
-msgstr "Mitgliedschaft beenden"
+msgstr "Encerrar assinatura"
 
 #: byro/office/views/members.py:1028
 msgid "Adjust balance"
-msgstr "Saldo korrigieren"
+msgstr "Ajustar equilíbrio"
 
 #: byro/office/views/members.py:1042
 msgid "Account adjustment"
-msgstr "Kontenkorrektur"
+msgstr "Ajuste de conta"
 
 #: byro/office/views/members.py:1074
 msgid ""
 "Fee waiving needs to decrease debts. Use a negative value in relative mode, "
 "or a value higher than the current one in absolute mode."
 msgstr ""
-"Gebührenerlass muss Schulden verringern. Verwenden Sie einen negativen Wert "
-"im relativen Modus oder einen Wert, der höher ist als der aktuelle, im "
-"absoluten Modus."
+"A isenção de taxas precisa diminuir as dívidas. Use um valor negativo no "
+"modo relativo ou um valor maior que o atual no modo absoluto."
 
 #: byro/office/views/members.py:1098
 #, python-brace-format
 msgid "Membership account adjusted by {amount}, current balance is {balance}"
-msgstr ""
-"Mitgliedskonto korrigiert um {amount}, Aktueller Kontostand ist {balance}"
+msgstr "Conta de associação ajustada em {amount}, saldo atual é {balance}"
 
 #: byro/office/views/members.py:1113
 msgid ""
 "The membership has been terminated. Please check the outbox for the "
 "notifications."
 msgstr ""
-"Die Mitgliedschaft wurde beendet. Bitte sieh dir die Benachrichtigungsmails "
-"im Postausgang an."
+"A associação foi encerrada. Por favor, verifique a caixa de saída para as "
+"notificações."
 
 #: byro/office/views/members.py:1200
 msgid "The email was generated and can be sent in the outbox."
-msgstr ""
-"Die E-Mail wurde erstellt und kann jetzt im Postausgang versendet werden."
+msgstr "O e-mail foi gerado e pode ser enviado na caixa de saída."
 
 #: byro/office/views/settings.py:39
 msgid ""
 "You're nearly ready to go – configure how you want to add new members, and "
 "you're done."
 msgstr ""
-"Du bist fast fertig – konfiguriere noch, wie du neue Mitglieder hinzufügen "
-"willst, und du bist fertig."
+"Você está quase pronto - configure como deseja adicionar novos membros e "
+"pronto."
 
 #: byro/office/views/settings.py:90 byro/office/views/settings.py:113
 msgid "The config was saved successfully."
-msgstr "Die Einstellungen wurden gespeichert."
+msgstr "A configuração foi salva com sucesso."
 
 #: byro/office/views/transactions.py:21
 msgid "Memo"
-msgstr "Betreff"
+msgstr "Memorando"
 
 #: byro/office/views/transactions.py:127
 msgid "The transaction was updated."
-msgstr "The Transaktion wurde aktualisiert."
+msgstr "A transação foi atualizada."
 
 #: byro/office/views/upload.py:55
 msgid "The upload could not be processed: "
-msgstr "Der Import konnte nicht verarbeitet werden: "
+msgstr "O upload não pôde ser processado: "
 
 #: byro/office/views/users.py:11
 msgid "Password"
-msgstr "Passwort"
+msgstr "Senha"
 
 #: byro/plugins/profile/models.py:13
 msgid "Nick"
-msgstr "Nick"
+msgstr "usuario"
 
 #: byro/plugins/profile/models.py:15
 msgid "Birth date"
-msgstr "Geburtsdatum"
+msgstr "Data de Nascimento"
 
 #: byro/plugins/profile/models.py:17
 msgid "Phone number"
-msgstr "Telefonnummer"
+msgstr "Número de Telefone"
 
 #: byro/plugins/profile/models.py:20
 msgid "General information"
-msgstr "Allgemeine Informationen"
+msgstr "Informações gerais"
 
 #: byro/plugins/sepa/models.py:14
 msgid "OK"
@@ -2015,119 +2008,119 @@ msgstr "OK"
 
 #: byro/plugins/sepa/models.py:15
 msgid "No IBAN"
-msgstr "Keine IBAN"
+msgstr "Sem IBAN"
 
 #: byro/plugins/sepa/models.py:16
 msgid "Invalid IBAN"
-msgstr "Ungültige IBAN"
+msgstr "IBAN inválido"
 
 #: byro/plugins/sepa/models.py:17
 msgid "No BIC"
-msgstr "Kein BIC"
+msgstr "Sem BIC"
 
 #: byro/plugins/sepa/models.py:18
 msgid "Invalid BIC"
-msgstr "Ungültige BIC"
+msgstr "BIC inválido"
 
 #: byro/plugins/sepa/models.py:19
 msgid "Debit bounced"
-msgstr "Lastschrift zurückgegangen"
+msgstr "Débito devolvido"
 
 #: byro/plugins/sepa/models.py:20
 msgid "Mandate rescinded"
-msgstr "Mandat zurückgezogen"
+msgstr "Mandato rescindido"
 
 #: byro/plugins/sepa/models.py:21
 msgid "Direct debit deactivated"
-msgstr "Lastschrift deaktiviert"
+msgstr "Débito direto desativado"
 
 #: byro/plugins/sepa/models.py:22
 msgid "No mandate reference"
-msgstr "Keine Mandatsreferenz"
+msgstr "Nenhuma referência de mandato"
 
 #: byro/plugins/sepa/models.py:35
 msgid "Inactive"
-msgstr "Inaktiv"
+msgstr "Inativo"
 
 #: byro/plugins/sepa/models.py:36
 msgid "Active"
-msgstr "Aktiv"
+msgstr "Ativo"
 
 #: byro/plugins/sepa/models.py:37
 msgid "Bounced"
-msgstr "Zurückgegangen"
+msgstr "Saltou"
 
 #: byro/plugins/sepa/models.py:38
 msgid "Rescinded"
-msgstr "Zurückgezogen"
+msgstr "Rescindido"
 
 #: byro/plugins/sepa/models.py:44
 msgid "Mandate state"
-msgstr "Mandatszustand"
+msgstr "Estado de mandato"
 
 #: byro/plugins/sepa/models.py:48
 msgid "IBAN Institute"
-msgstr "IBAN-Institut"
+msgstr "Instituto IBAN"
 
 #: byro/plugins/sepa/models.py:54
 msgid "IBAN Issue Date"
-msgstr "IBAN-Ausstellungsdatum"
+msgstr "Data de Emissão do IBAN"
 
 #: byro/plugins/sepa/models.py:56
 msgid ""
 "The issue date of the direct debit mandate. (1970-01-01 means there is no "
 "issue date in the database )"
 msgstr ""
-"Das Ausstellungsdatum des Lastschriftmandats. (1970-01-01 bedeutet, dass es "
-"kein Ausstellungsdatum in der Datenbank gibt)"
+"A data de emissão do mandato de débito direto. (1970-01-01 significa que não "
+"há data de emissão no banco de dados)"
 
 #: byro/plugins/sepa/models.py:64
 msgid "IBAN full name"
-msgstr "Vollständiger Name zur IBAN"
+msgstr "IBAN nome completo"
 
 #: byro/plugins/sepa/models.py:65
 msgid "Full name for IBAN account owner"
-msgstr "Voller Name für den IBAN-Kontoinhaber"
+msgstr "Nome completo do proprietário da conta IBAN"
 
 #: byro/plugins/sepa/models.py:72
 msgid "IBAN address"
-msgstr "IBAN-Adresse"
+msgstr "Endereço IBAN"
 
 #: byro/plugins/sepa/models.py:73
 msgid "Address line (e.g. Street / House Number)"
-msgstr "Adresszeile (z.B. Straße/Hausnummer)"
+msgstr "Linha de endereço (e.g. Rua / Número da casa)"
 
 #: byro/plugins/sepa/models.py:80
 msgid "IBAN zip code"
-msgstr "IBAN-PLZ"
+msgstr "Código postal IBAN"
 
 #: byro/plugins/sepa/models.py:81
 msgid "ZIP Code"
-msgstr "Postleitzahl"
+msgstr "CEP"
 
 #: byro/plugins/sepa/models.py:85
 msgid "IBAN City"
-msgstr "IBAN-Stadt"
+msgstr "IBAN Cidade"
 
 #: byro/plugins/sepa/models.py:93
 msgid "IBAN Country"
-msgstr "IBAN-Land"
+msgstr "País IBAN"
 
 #: byro/plugins/sepa/models.py:97
 msgid "IBAN Mandate Reference"
-msgstr "IBAN-Mandatsreferenz"
+msgstr "Referência do Mandato IBAN"
 
 #: byro/plugins/sepa/models.py:101
 msgid "IBAN Mandate Reason"
-msgstr "IBAN-Mandatsgrund"
+msgstr "Motivo do Mandato do IBAN"
 
 #: byro/plugins/sepa/models.py:104
 msgid "SEPA information"
-msgstr "SEPA-Informationen"
+msgstr "Informação SEPA"
 
 #: byro/plugins/sepa/signals.py:19
 msgid "Your SEPA mandate reference is {}."
-msgstr "Deine SEPA-Mandatsreferenz ist {}."
+msgstr "A referência do seu mandato SEPA é {}."
 
 #: byro/plugins/sepa/signals.py:48
 #, python-brace-format
@@ -2143,15 +2136,15 @@ msgid ""
 "Mandate reason: {mandate_reason}\n"
 "\n"
 msgstr ""
-"Das neue Mitglied hat uns ein SEPA-Mandat über {amount}€ ({interval}) "
-"erteilt, beginnend am {start}:\n"
+"O novo membro nos deu um mandato SEPA para {amount} ({interval}), começando "
+"em {start}:\n"
 "\n"
-"Name: {name}\n"
+"Nome: {name}\n"
 "IBAN: {iban}\n"
 "BIC: {bic} ({institute})\n"
-"Mandatsdatum: {issue_date}\n"
-"Mandatsreferenz: {mandate_reference}\n"
-"Mandatsgrund: {mandate_reason}\n"
+"Data do mandato: {issue_date}\n"
+"Referência do mandato: {mandate_reference}\n"
+"Motivo do mandato: {mandate_reason}\n"
 "\n"
 
 #: byro/plugins/sepa/signals.py:84
@@ -2167,14 +2160,14 @@ msgid ""
 "Mandate reason: {mandate_reason}\n"
 "\n"
 msgstr ""
-"Bitte beende das SEPA-Lastschriftmandat {number} zu {end}:\n"
+"Rescinda o número de membro do mandato SEPA: {number} to {end}:\n"
 "\n"
-"Name: {name}\n"
+"Nome: {name}\n"
 "IBAN: {iban}\n"
 "BIC: {bic} ({institute})\n"
-"Mandatsdatum: {issue_date}\n"
-"Mandatsreferenz: {mandate_reference}\n"
-"Mandatsgrund: {mandate_reason}\n"
+"Data do mandato: {issue_date}\n"
+"Referência do mandato: {mandate_reference}\n"
+"Motivo do mandato: {mandate_reason}\n"
 "\n"
 
 #: byro/public/forms.py:8
@@ -2182,83 +2175,83 @@ msgid ""
 "Yes, my data may be shown in the member list, where it will be visible to "
 "other members."
 msgstr ""
-"Ja, meine Stammdaten dürfen in der Mitgliedsliste anderen Mitgliedern "
-"gezeigt werden."
+"Sim, meus dados podem ser mostrados na lista de membros, onde ficarão "
+"visíveis para outros membros."
 
 #: byro/public/models.py:25
 msgid "Memberpage settings"
-msgstr "Einstellungen zu Mitgliederseiten"
+msgstr "Configurações da página de associadas"
 
 #: byro/public/models.py:38
 msgid "Consent: Visible to other members"
-msgstr "Zustimmung: Sichtbar für andere Mitglieder"
+msgstr "Consentimento: Visível para outras pessoas associadas"
 
 #: byro/public/signals.py:30 byro/public/templates/public/members/base.html:6
 #: byro/public/templates/public/members/dashboard.html:7
 msgid "Member page"
-msgstr "Mitgliedsseite"
+msgstr "Página de associada"
 
 #: byro/public/signals.py:42
 #: byro/public/templates/public/members/memberlist.html:4
 #: byro/public/templates/public/members/memberlist.html:5
 msgid "Member list"
-msgstr "Mitgliederliste"
+msgstr "Lista de associadas"
 
 #: byro/public/signals.py:56
 #, python-brace-format
 msgid "Your personal member page is at {link}"
-msgstr "Deine persönliche Mitgliedsseite ist hier: {link}"
+msgstr "Sua página pessoal está em {link}"
 
 #: byro/public/signals.py:65
 #, python-brace-format
 msgid "Their personal member page is at {link}"
-msgstr "Die persönliche Mitgliedsseite ist hier: {link}"
+msgstr "Página pessoal de associada está em {link}"
 
 #: byro/public/signals.py:76
 msgid "Public profile"
-msgstr "Öffentliches Profil"
+msgstr "Perfil público"
 
 #: byro/public/templates/public/members/base.html:7
 msgid "Personal member page"
-msgstr "Persönliche Mitgliedsseite"
+msgstr "Página pessoal de associada"
 
 #: byro/public/templates/public/members/base.html:17
 msgid ""
 "Please do not share this page with others – you are seeing it via your "
 "personal access token, and sharing it will allow others to act in your name."
 msgstr ""
-"Bitte gib den Link zu dieser Seite nicht weiter – Du siehst diese Seite dank "
-"deines persönlichen Links, und wenn andere diesen haben, können sie in "
-"deinem Namen auftreten."
+"Por favor, não compartilhe esta página com outras pessoas – você a está "
+"vendo por meio de seu token de acesso pessoal, e compartilhá-la permitirá "
+"que outras pessoas ajam em seu nome."
 
 #: byro/public/templates/public/members/dashboard.html:9
 #, python-format
 msgid "Personal member page of %(name)s"
-msgstr "Persönliche Mitgliedsseite von %(name)s"
+msgstr "Página pessoal de %(name)s"
 
 #: byro/public/templates/public/members/dashboard.html:37
 #, python-format
 msgid "%(count)s days"
-msgstr "%(count)s Tage"
+msgstr "%(count)s dias"
 
 #: byro/public/templates/public/members/dashboard.html:43
 #, python-format
 msgid "or %(count)s years of membership"
-msgstr "oder %(count)s Jahre Mitgliedschaft"
+msgstr "ou %(count)s anos de associação"
 
 #: byro/public/templates/public/members/dashboard.html:52
 #, python-format
 msgid "First joined on %(start)s."
-msgstr "Beigetreten am %(start)s."
+msgstr "Ingressou inicialmente em %(start)s."
 
 #: byro/public/templates/public/members/dashboard.html:84
 #, python-format
 msgid "Joined %(start)s"
-msgstr "Beigetreten am %(start)s"
+msgstr "Ingressou em %(start)s"
 
 #: byro/public/templates/public/members/dashboard.html:88
 msgid "No current active membership"
-msgstr "Keine aktive Mitgliedschaft"
+msgstr "Nenhuma associação ativa"
 
 #: byro/public/templates/public/members/dashboard.html:99
 msgid ""
@@ -2266,118 +2259,48 @@ msgid ""
 "the central member list. Only information you explicitly mark as public will "
 "be shared."
 msgstr ""
-"Hier können Sie einwilligen, dass Teile Ihrer Stammdaten anderen Mitgliedern "
-"in der Mitgliedsliste zugänglich werden. Nur Daten, die Sie auch explizit "
-"anhaken werden anderen Mitgliedern gezeigt."
+"É aqui que você pode optar por mostrar alguns de seus dados a outras pessoas "
+"associadas na lista central de associadas. Somente as informações que você "
+"marcar explicitamente como públicas serão compartilhadas."
 
 #: byro/public/templates/public/members/dashboard.html:112
 msgid "Data field"
-msgstr "Datenfeld"
+msgstr "Campo de dados"
 
 #: byro/public/templates/public/members/dashboard.html:114
 msgid "Share data in member list"
-msgstr "Einwilligung zur Veröffentlichung"
+msgstr "Compartilhar dados na lista de associadas"
 
 #: byro/public/templates/public/members/dashboard.html:138
 msgid "Membership history"
-msgstr "Mitgliedschaftsverlauf"
+msgstr "Histórico de Associação"
 
 #: byro/public/templates/public/members/dashboard.html:150
 msgid "Finance details"
-msgstr "Finanzdetails"
+msgstr "Detalhes financeiros"
 
 #: byro/public/templates/public/members/memberlist.html:26
 msgid "Currently no members have consented to their information being shared."
-msgstr "Derzeit haben keine Mitglieder ihre Stammdaten freigegeben."
+msgstr ""
+"Atualmente, nenhuma pessoa associada consentiu que suas informações fossem "
+"compartilhadas."
 
 #: byro/public/templates/public/members/memberlist.html:34
 msgid ""
 "This list is not complete, as some members have not consented to their "
 "information being shared."
 msgstr ""
-"Diese Liste ist nicht vollständig, da manche Mitglieder der Anzeige ihrer "
-"Daten nicht zugestimmt haben."
+"Esta lista não está completa, pois algumas pessoas associadas não "
+"consentiram que suas informações fossem compartilhadas."
 
 #: byro/settings.py:208
 msgid "English"
-msgstr "Englisch"
+msgstr "Inglês"
 
 #: byro/settings.py:209
 msgid "German"
-msgstr "Deutsch"
+msgstr "Alemão"
 
 #: byro/settings.py:210
 msgid "Brazilian Portuguese"
-msgstr "Brasilianisches Portugiesisch"
-
-#~ msgid "Your profile is visible to other members."
-#~ msgstr "Deine Stammdaten sind für andere Mitglieder sichtbar."
-
-#~ msgid "Revoke consent"
-#~ msgstr "Zustimmung widerrufen"
-
-#~ msgid ""
-#~ "I hereby consent that other members may see my information in the member "
-#~ "list"
-#~ msgstr ""
-#~ "Ich erlaube hiermit, dass andere Mitglieder meine freigegebenen Daten in "
-#~ "der Mitgliederliste sehen dürfen"
-
-#~ msgid "E-mail"
-#~ msgstr "E-Mail"
-
-#~ msgid "Members can see other members"
-#~ msgstr "Mitglieder können andere Mitglieder sehen"
-
-#~ msgid "The email was created successfully. Go to our outbox to send it."
-#~ msgstr ""
-#~ "Die Mail wurde gespeichert. Im Postausgang kannst du sie verschicken."
-
-#~ msgid "Export member list …"
-#~ msgstr "Mitgliederliste exportieren …"
-
-#~ msgid "Import members …"
-#~ msgstr "Mitglieder importieren …"
-
-#~ msgid "Current membership active since %(start)s."
-#~ msgstr "Aktuelle Mitgliedschaft seit %(start)s"
-
-#~ msgid "Plugins"
-#~ msgstr "Plugins"
-
-#~ msgid "Rebuild"
-#~ msgstr "Neu berechnen"
-
-#~ msgid "Membership debts waived"
-#~ msgstr "Mitgliedsbeiträge erlassen"
-
-#~ msgid "Leave"
-#~ msgstr "Austritt"
-
-#~ msgid "Title"
-#~ msgstr "Titel"
-
-#~ msgid "Key"
-#~ msgstr "Schlüssel/Einstellung"
-
-#~ msgid "User "
-#~ msgstr "Benutzer"
-
-#~ msgid "url"
-#~ msgstr "URL"
-
-#~ msgid "Liability interval"
-#~ msgstr "Forderungsintervall"
-
-#~ msgid "For which interval should remaining fees be calculated?"
-#~ msgstr ""
-#~ "Für welches Intervall sollen die ausstehenden Beiträge berechnet werden?"
-
-#~ msgid "registration form configuration"
-#~ msgstr "Konfiguration des Beitrittsforumulars"
-
-#~ msgid "e-mail sender address"
-#~ msgstr "Absender-Mailadresse"
-
-#~ msgid "e-mail of backoffice"
-#~ msgstr "Verwaltungs-Mailadresse"
+msgstr "Português Brasileiro"

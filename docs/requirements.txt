@@ -1,4 +1,4 @@
-sphinx
+sphinx<7
 sphinx-autobuild
 sphinx-intl
 sphinx_rtd_theme

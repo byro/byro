@@ -5,37 +5,37 @@
 {% block headline %}{% trans "Transaction Imports" %}{% endblock %}
 
 {% block content %}
-<p>
-<a href="{% url "office:finance.uploads.add" %}" class="btn btn-success">
-    <span class="fa fa-plus"></span> {% trans "Add new import" %}
-</a>
-</p>
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th>{% trans "Name" %}</th>
-            <th>{% trans "State" %}</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for upload in uploads %}
+    <p>
+        <a href="{% url "office:finance.uploads.add" %}" class="btn btn-success">
+            <span class="fa fa-plus"></span> {% trans "Add new import" %}
+        </a>
+    </p>
+    <table class="table table-sm">
+        <thead>
             <tr>
-                <td class="text-md-left">{{ upload.source_file }}</td>
-                <td class="text-md-left">{{ upload.state }}</td>
-                <td class="row">
-                    <form method="post" action="{% url "office:finance.uploads.process" pk=upload.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-warning">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button>
-                    </form>
-                    <form method="post" action="{% url "office:finance.uploads.match" pk=upload.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger">{% trans "match" %}</button>
-                    </form>
-                </td>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "State" %}</th>
+                <th></th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% include "office/pagination.html" %}
+        </thead>
+        <tbody>
+            {% for upload in uploads %}
+                <tr>
+                    <td class="text-md-left">{{ upload.source_file }}</td>
+                    <td class="text-md-left">{{ upload.state }}</td>
+                    <td class="row">
+                        <form method="post" action="{% url "office:finance.uploads.process" pk=upload.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-warning">{% if upload.state == 'new' %}{% trans "process" %}{% else %}{% trans "reprocess" %}{% endif %}</button>
+                        </form>
+                        <form method="post" action="{% url "office:finance.uploads.match" pk=upload.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">{% trans "match" %}</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% include "office/pagination.html" %}
 {% endblock %}

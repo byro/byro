@@ -4,16 +4,16 @@
 
 {% block member_content %}
 
-<form method='post'>
-    <div class="card">
-        <div class="card-header">
-            <b>{% trans "Subject" %}:</b> {{ mail.subject }}
-        </div>
+    <form method='post'>
+        <div class="card">
+            <div class="card-header">
+                <b>{% trans "Subject" %}:</b> {{ mail.subject }}
+            </div>
         <pre class="card-body">{{ mail.text }}</pre>
-        {% csrf_token %}
-        <button class="btn btn-success" type="submit">{% trans "Send" %}</button>
-    </div>
-</form>
+            {% csrf_token %}
+            <button class="btn btn-success" type="submit">{% trans "Send" %}</button>
+        </div>
+    </form>
 
 
 {% endblock %}

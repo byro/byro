@@ -13,10 +13,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="alert alert-info">
-    {% blocktrans trimmed %}
-    Please do not share this page with others – you are seeing it via your personal access token, and sharing it will allow others to act in your name.
-    {% endblocktrans %}
-</div>
-{% block public_content %}{% endblock %}
+    <div class="alert alert-info">
+        {% blocktrans trimmed %}
+            Please do not share this page with others – you are seeing it via your personal access token, and sharing it will allow others to act in your name.
+        {% endblocktrans %}
+    </div>
+    {% block public_content %}{% endblock %}
 {% endblock %}

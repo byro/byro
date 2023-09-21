@@ -8,101 +8,101 @@
 {% block headline %}{% trans "Match transactions" %}{% endblock %}
 
 {% block content %}
-<script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th class="table-column-small">{% trans "Value Date" %}</th>
-            <th class="table-column-small">{% trans "Amount" %}</th>
-            <th class="table-column-medium">{% trans "Purpose" %}</th>
-            <th class="table-column-small">{% trans "Originator" %}</th>
-            <th class="table-column-medium">{% trans "Matches" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for rtrans in transactions %}
-        <tr>
-                <td>{{ rtrans.value_datetime.date.isoformat }}</td>
-                <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
-                <td>{{ rtrans.purpose }}</td>
-                <td>{{ rtrans.originator }}</td>
-                <td>
-                    <ul>
-                    {% for transaction in rtrans.virtual_transactions.all %}
-                    <li> {% blocktrans with amount=transaction.amount source=transaction.source_account dest=transaction.destination_account member=transaction.member trimmed %}
-                        {{ amount | format_with_currency }} from {{ source }} to {{ dest }} ({{ member }})
-                    {% endblocktrans %}</li>
+    <script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="table-column-small">{% trans "Value Date" %}</th>
+                <th class="table-column-small">{% trans "Amount" %}</th>
+                <th class="table-column-medium">{% trans "Purpose" %}</th>
+                <th class="table-column-small">{% trans "Originator" %}</th>
+                <th class="table-column-medium">{% trans "Matches" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rtrans in transactions %}
+                <tr>
+                    <td>{{ rtrans.value_datetime.date.isoformat }}</td>
+                    <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
+                    <td>{{ rtrans.purpose }}</td>
+                    <td>{{ rtrans.originator }}</td>
+                    <td>
+                        <ul>
+                            {% for transaction in rtrans.virtual_transactions.all %}
+                                <li> {% blocktrans with amount=transaction.amount source=transaction.source_account dest=transaction.destination_account member=transaction.member trimmed %}
+                                    {{ amount | format_with_currency }} from {{ source }} to {{ dest }} ({{ member }})
+                                {% endblocktrans %}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="POST" action="" class="form form-group">
+        <input type="hidden" name="realtransaction_id" value="{{ rtrans.id }}">
+        {% csrf_token %}
+        <fieldset id="answer-options">
+            <div class="formset" data-formset data-formset-prefix="{{ formset.prefix }}">
+                {{ formset.management_form }}
+                {% bootstrap_formset_errors formset %}
+                <div data-formset-body>
+                    {% for form in formset %}
+                        <div data-formset-form>
+                            <div class="sr-only">
+                                {{ form.id }}
+                            </div>
+                            <div class="question-option-row">
+                                <div class="question-option-input{% if action == 'view' %} disabled{% endif %}">
+                                    {% bootstrap_form_errors form %}
+                                    {% bootstrap_form form layout='inline' form_group_class="" %}
+                                </div>
+                                {% if action != 'view' %}
+                                    <div class="question-option-delete">
+                                        <button type="button" class="btn btn-danger" data-formset-delete-button>
+                                            <i class="fa fa-trash"></i></button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     {% endfor %}
-                    </ul>
-                </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<form method="POST" action="" class="form form-group">
-    <input type="hidden" name="realtransaction_id" value="{{ rtrans.id }}">
-    {% csrf_token %}
-    <fieldset id="answer-options">
-        <div class="formset" data-formset data-formset-prefix="{{ formset.prefix }}">
-            {{ formset.management_form }}
-            {% bootstrap_formset_errors formset %}
-            <div data-formset-body>
-                {% for form in formset %}
-                    <div data-formset-form>
+                </div>
+                <script type="form-template" data-formset-empty-form>
+                    {% escapescript %}
+                        <div data-formset-form>
                         <div class="sr-only">
-                            {{ form.id }}
+                        {{ formset.empty_form.id }}
                         </div>
                         <div class="question-option-row">
-                            <div class="question-option-input{% if action == 'view' %} disabled{% endif %}">
-                                {% bootstrap_form_errors form %}
-                                {% bootstrap_form form layout='inline' form_group_class="" %}
-                            </div>
-                            {% if action != 'view' %}
-                            <div class="question-option-delete">
-                                <button type="button" class="btn btn-danger" data-formset-delete-button>
-                                    <i class="fa fa-trash"></i></button>
-                            </div>
-                            {% endif %}
+                        <div class="question-option-input">
+                        {% bootstrap_form formset.empty_form %}
                         </div>
-                    </div>
-                {% endfor %}
+                        </div>
+                        </div>
+                    {% endescapescript %}
+                </script>
+                {% if action != 'view' %}
+                    <p>
+                        <button type="button" class="btn btn-info" data-formset-add>
+                            <i class="fa fa-plus"></i> {% trans "Add a new VT" %}
+                        </button>
+                        <button type="submit" class="btn btn-success" data-formset-add>
+                            {% trans "Save" %}
+                        </button>
+                    </p>
+                {% endif %}
             </div>
-            <script type="form-template" data-formset-empty-form>
-                {% escapescript %}
-                    <div data-formset-form>
-                        <div class="sr-only">
-                            {{ formset.empty_form.id }}
-                        </div>
-                        <div class="question-option-row">
-                            <div class="question-option-input">
-                                {% bootstrap_form formset.empty_form %}
-                            </div>
-                        </div>
-                    </div>
-                {% endescapescript %}
-            </script>
-            {% if action != 'view' %}
-            <p>
-                <button type="button" class="btn btn-info" data-formset-add>
-                    <i class="fa fa-plus"></i> {% trans "Add a new VT" %}
-                </button>
-                <button type="submit" class="btn btn-success" data-formset-add>
-                    {% trans "Save" %}
-                </button>
-            </p>
-            {% endif %}
-        </div>
-    </fieldset>
-</form>
-{% include "office/pagination.html" %}
-<script>
-jQuery(function($) {
-    $(".formset").formset({
-        animateForms: true
-    });
-});
-</script>
-<span id="vars" remoteUrl="/members/typeahead/?search=%QUERY"></span>
-<script type="text/javascript" src="{% static "vendored/typeahead.bundle.min.js" %}"></script>
-<script type="text/javascript" src="{% static "office/members.js" %}"></script>
+        </fieldset>
+    </form>
+    {% include "office/pagination.html" %}
+    <script>
+        jQuery(function($) {
+            $(".formset").formset({
+                animateForms: true
+            });
+        });
+    </script>
+    <span id="vars" remoteUrl="/members/typeahead/?search=%QUERY"></span>
+    <script type="text/javascript" src="{% static "vendored/typeahead.bundle.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "office/members.js" %}"></script>
 {% endblock %}

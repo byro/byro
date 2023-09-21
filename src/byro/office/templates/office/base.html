@@ -4,27 +4,27 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-<head>
-    <title>{% block title %}{% endblock %} :: byro</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{% static "office/img/byro_32.png" %}">
-    <link rel="icon" type="image/png" href="{% static "office/img/byro_16.png" %}" sizes="16x16">
-    <link rel="icon" type="image/png" href="{% static "office/img/byro_32.png" %}" sizes="32x32">
-    <link rel="icon" type="image/png" href="{% static "office/img/byro_128.png" %}" sizes="128x128">
-    {% compress css %}
-        <link rel="stylesheet" type="text/x-scss" href="{% static "office/scss/main.scss" %}"/>
-        <link rel="stylesheet" type="text/css" href="{% static "vendored/select2/css/select2.min.css" %}"/>
-        <link rel="stylesheet" type="text/css" href="{% static "vendored/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" %}"/>
-    {% endcompress %}
-    {% block stylesheets %}
-    {% endblock %}
-    {% compress js %}
-        <script type="text/javascript" src="{% static "vendored/jquery-3.1.1.js" %}"></script>
-        <script type="text/javascript" src="{% static "vendored/tether/tether.min.js" %}"></script>
-        <script type="text/javascript" src="{% static "vendored/bootstrap/js/bootstrap.min.js" %}"></script>
-        <script type="text/javascript" src="{% static "vendored/select2/js/select2.full.min.js" %}"></script>
-        <script type="text/javascript" src="{% static "vendored/bootstrap-datepicker/js/bootstrap-datepicker.min.js" %}"></script>
-    {% endcompress %}
+    <head>
+        <title>{% block title %}{% endblock %} :: byro</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="{% static "office/img/byro_32.png" %}">
+        <link rel="icon" type="image/png" href="{% static "office/img/byro_16.png" %}" sizes="16x16">
+        <link rel="icon" type="image/png" href="{% static "office/img/byro_32.png" %}" sizes="32x32">
+        <link rel="icon" type="image/png" href="{% static "office/img/byro_128.png" %}" sizes="128x128">
+        {% compress css %}
+            <link rel="stylesheet" type="text/x-scss" href="{% static "office/scss/main.scss" %}"/>
+            <link rel="stylesheet" type="text/css" href="{% static "vendored/select2/css/select2.min.css" %}"/>
+            <link rel="stylesheet" type="text/css" href="{% static "vendored/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" %}"/>
+        {% endcompress %}
+        {% block stylesheets %}
+        {% endblock %}
+        {% compress js %}
+            <script type="text/javascript" src="{% static "vendored/jquery-3.1.1.js" %}"></script>
+            <script type="text/javascript" src="{% static "vendored/tether/tether.min.js" %}"></script>
+            <script type="text/javascript" src="{% static "vendored/bootstrap/js/bootstrap.min.js" %}"></script>
+            <script type="text/javascript" src="{% static "vendored/select2/js/select2.full.min.js" %}"></script>
+            <script type="text/javascript" src="{% static "vendored/bootstrap-datepicker/js/bootstrap-datepicker.min.js" %}"></script>
+        {% endcompress %}
         <script type="text/javascript">
             $(function(){
                 $('.datepicker').datepicker({
@@ -36,190 +36,190 @@
                 });
             });
         </script>
-    {% block scripts %}
-    {% endblock %}
-</head>
+        {% block scripts %}
+        {% endblock %}
+    </head>
 
-<body>
-    <nav class="navbar navbar-static-top bg-primary">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-            <img src="{% static "office/img/byro.svg" %}" width="40" height="40" class="d-inline-block align-top">
-            <span class="ml-2">
-            {{ config.name }}
-            </span>
-        </a>
-        {% if not request.user.is_anonymous %}
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url "office:settings.users.detail" pk=request.user.pk %}">
-                    <i class="fa fa-user"></i>
-                    {{ request.user.username }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url "common:logout" %}">
-                    <span class="fa fa-sign-out"></span>
-                </a>
-            </li>
-        </ul>
-        {% endif %}
-    </nav>
-    <div id="page-wrapper">
-        <nav class="nav flex-column sidebar">
-            {% if request.user.is_anonymous %}
-            <a class="nav-link {% if url_name == "login" %}active{% endif %}" href="{% url 'common:login' %}">
-                <span class="fa fa-sign-in"></span> {% trans "Log in" %}
-            </a>
-            {% else %}
-            <a class="nav-link {% if url_name == "dashboard" %}active{% endif %}" href="/">
-                <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
-            </a>
-            <li class="nav-fold">
-                <span class="has-children">
-                    <a class="nav-link nav-link-inner" href="{% url 'office:settings.base' %}">
-                        <i class="fa fa-wrench"></i>
-                        <span class="sidebar-text">{% trans "Settings" %}</span>
-                    </a>
-                    <a class="arrow nav-link" data-toggle="collapse" href="#collapseSettings" aria-controls="collapseSettings">
-                        <i class="fa fa-angle-down"></i>
-                    </a>
+    <body>
+        <nav class="navbar navbar-static-top bg-primary">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{% static "office/img/byro.svg" %}" width="40" height="40" class="d-inline-block align-top">
+                <span class="ml-2">
+                    {{ config.name }}
                 </span>
-                <div class="collapse in{% if "settings." in url_name %} show{% endif %}" aria-expand="true" id="collapseSettings">
-                    <a class="nav-link nav-link-second-level {% if "settings.base" in url_name %}active{% endif %}" href="{% url 'office:settings.base' %}">
-                        {% trans "General" %}
-                    </a>
-                    <a
-                      class="nav-link nav-link-second-level {% if "settings.registration" in url_name %}active{% endif %}"
-                      href="{% url "office:settings.registration" %}"
-                    >
-                        {% trans "Registration form" %}
-                    </a>
-                    <a class="nav-link nav-link-second-level {% if "settings.users" in url_name %}active{% endif %}" href="{% url 'office:settings.users.list' %}">
-                        {% trans "Users" %}
-                    </a>
-                    {% for nav_element in nav_event %}
-                        {% if nav_element.section == 'settings' %}
-                            <a class="nav-link nav-link-second-level {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
-                                {% if nav_element.icon and "." in nav_element.icon %}
-                                    <img src="{% static nav_element.icon %}" class="fa-img">
-                                {% elif nav_element.icon %}
-                                    <i class="fa fa-{{ nav_element.icon }}"></i>
-                                {% endif %}
-                                <span class="sidebar-text">{{ nav_element.label }}</span>
-                            </a>
-                        {% endif %}
-                    {% endfor %}
-                    <a
-                      class="nav-link nav-link-second-level {% if "settings.log" in url_name %}active{% endif %}"
-                      href="{% url "office:settings.log" %}"
-                    >
-                        {% trans "Log" %}
-                    </a>
-                    <a
-                            class="nav-link nav-link-second-level {% if "settings.about" in url_name %}active{% endif %}"
-                            href="{% url "office:settings.about" %}"
-                    >
-                        {% trans "About" %}
-                    </a>
-                </div>
-            </li>
-            <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">
-                <span class="fa fa-address-book"></span> {% trans "Members" %}
             </a>
-            <li class="nav-fold">
-                <span class="has-children">
-                    <a class="nav-link nav-link-inner" href="{% url 'office:finance.accounts.list' %}">
-                        {% if pending_transactions %}
-                        <span class="pending-mails">{{ pending_transactions }}</span>
-                        {% else %}
-                        <span class="fa fa-money"></span>
-                        {% endif %}
-                        <span class="sidebar-text">{% trans "Finance" %}</span>
-                    </a>
-                    <a class="arrow nav-link" data-toggle="collapse" href="#collapseFinance" aria-controls="collapseFinance">
-                        <i class="fa fa-angle-down"></i>
-                    </a>
-                </span>
-                <div class="collapse in{% if "finance." in url_name %} show{% endif %}" aria-expand="true" id="collapseFinance">
-                    <a class="nav-link nav-link-second-level {% if "finance.accounts" in url_name %}active{% endif %}" href="{% url 'office:finance.accounts.list' %}">
-                        {% trans "Accounts" %}
-                    </a>
-                    <a class="nav-link nav-link-second-level {% if "finance.uploads" in url_name %}active{% endif %}" href="{% url 'office:finance.uploads.list' %}">
-                        {% trans "Transaction Upload" %}
-                    </a>
-                    {% for nav_element in nav_event %}
-                        {% if nav_element.section == 'finance' %}
-                            <a class="nav-link nav-link-second-level {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
-                                {% if nav_element.icon and "." in nav_element.icon %}
-                                    <img src="{% static nav_element.icon %}" class="fa-img">
-                                {% elif nav_element.icon %}
-                                    <i class="fa fa-{{ nav_element.icon }}"></i>
-                                {% endif %}
-                                <span class="sidebar-text">{{ nav_element.label }}</span>
-                            </a>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </li>
-            <a class="nav-link {% if url_name == "mails.outbox.list" %}active{% endif %}" href="{% url 'office:mails.outbox.list' %}">
-                {% if pending_mails %}
-                <span class="pending-mails">{{ pending_mails }}</span>
-                {% else %}
-                <span class="fa fa-envelope-o"></span>
-                {% endif %}
-                {% trans "Mails" %}
-            </a>
+            {% if not request.user.is_anonymous %}
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "office:settings.users.detail" pk=request.user.pk %}">
+                            <i class="fa fa-user"></i>
+                            {{ request.user.username }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "common:logout" %}">
+                            <span class="fa fa-sign-out"></span>
+                        </a>
+                    </li>
+                </ul>
             {% endif %}
-            {% for nav_element in nav_event %}
-                {% if not nav_element.section %}
-                    <a class="nav-link {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
-                        {% if nav_element.icon and "." in nav_element.icon %}
-                            <img src="{% static nav_element.icon %}" class="fa-img">
-                        {% elif nav_element.icon %}
-                            <i class="fa fa-{{ nav_element.icon }}"></i>
+        </nav>
+        <div id="page-wrapper">
+            <nav class="nav flex-column sidebar">
+                {% if request.user.is_anonymous %}
+                    <a class="nav-link {% if url_name == "login" %}active{% endif %}" href="{% url 'common:login' %}">
+                        <span class="fa fa-sign-in"></span> {% trans "Log in" %}
+                    </a>
+                {% else %}
+                    <a class="nav-link {% if url_name == "dashboard" %}active{% endif %}" href="/">
+                        <span class="fa fa-dashboard"></span> {% trans "Dashboard" %}
+                    </a>
+                    <li class="nav-fold">
+                        <span class="has-children">
+                            <a class="nav-link nav-link-inner" href="{% url 'office:settings.base' %}">
+                                <i class="fa fa-wrench"></i>
+                                <span class="sidebar-text">{% trans "Settings" %}</span>
+                            </a>
+                            <a class="arrow nav-link" data-toggle="collapse" href="#collapseSettings" aria-controls="collapseSettings">
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                        </span>
+                        <div class="collapse in{% if "settings." in url_name %} show{% endif %}" aria-expand="true" id="collapseSettings">
+                            <a class="nav-link nav-link-second-level {% if "settings.base" in url_name %}active{% endif %}" href="{% url 'office:settings.base' %}">
+                                {% trans "General" %}
+                            </a>
+                            <a
+                                class="nav-link nav-link-second-level {% if "settings.registration" in url_name %}active{% endif %}"
+                                href="{% url "office:settings.registration" %}"
+                            >
+                                {% trans "Registration form" %}
+                            </a>
+                            <a class="nav-link nav-link-second-level {% if "settings.users" in url_name %}active{% endif %}" href="{% url 'office:settings.users.list' %}">
+                                {% trans "Users" %}
+                            </a>
+                            {% for nav_element in nav_event %}
+                                {% if nav_element.section == 'settings' %}
+                                    <a class="nav-link nav-link-second-level {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
+                                        {% if nav_element.icon and "." in nav_element.icon %}
+                                            <img src="{% static nav_element.icon %}" class="fa-img">
+                                        {% elif nav_element.icon %}
+                                            <i class="fa fa-{{ nav_element.icon }}"></i>
+                                        {% endif %}
+                                        <span class="sidebar-text">{{ nav_element.label }}</span>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                            <a
+                                class="nav-link nav-link-second-level {% if "settings.log" in url_name %}active{% endif %}"
+                                href="{% url "office:settings.log" %}"
+                            >
+                                {% trans "Log" %}
+                            </a>
+                            <a
+                                class="nav-link nav-link-second-level {% if "settings.about" in url_name %}active{% endif %}"
+                                href="{% url "office:settings.about" %}"
+                            >
+                                {% trans "About" %}
+                            </a>
+                        </div>
+                    </li>
+                    <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">
+                        <span class="fa fa-address-book"></span> {% trans "Members" %}
+                    </a>
+                    <li class="nav-fold">
+                        <span class="has-children">
+                            <a class="nav-link nav-link-inner" href="{% url 'office:finance.accounts.list' %}">
+                                {% if pending_transactions %}
+                                    <span class="pending-mails">{{ pending_transactions }}</span>
+                                {% else %}
+                                    <span class="fa fa-money"></span>
+                                {% endif %}
+                                <span class="sidebar-text">{% trans "Finance" %}</span>
+                            </a>
+                            <a class="arrow nav-link" data-toggle="collapse" href="#collapseFinance" aria-controls="collapseFinance">
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                        </span>
+                        <div class="collapse in{% if "finance." in url_name %} show{% endif %}" aria-expand="true" id="collapseFinance">
+                            <a class="nav-link nav-link-second-level {% if "finance.accounts" in url_name %}active{% endif %}" href="{% url 'office:finance.accounts.list' %}">
+                                {% trans "Accounts" %}
+                            </a>
+                            <a class="nav-link nav-link-second-level {% if "finance.uploads" in url_name %}active{% endif %}" href="{% url 'office:finance.uploads.list' %}">
+                                {% trans "Transaction Upload" %}
+                            </a>
+                            {% for nav_element in nav_event %}
+                                {% if nav_element.section == 'finance' %}
+                                    <a class="nav-link nav-link-second-level {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
+                                        {% if nav_element.icon and "." in nav_element.icon %}
+                                            <img src="{% static nav_element.icon %}" class="fa-img">
+                                        {% elif nav_element.icon %}
+                                            <i class="fa fa-{{ nav_element.icon }}"></i>
+                                        {% endif %}
+                                        <span class="sidebar-text">{{ nav_element.label }}</span>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </li>
+                    <a class="nav-link {% if url_name == "mails.outbox.list" %}active{% endif %}" href="{% url 'office:mails.outbox.list' %}">
+                        {% if pending_mails %}
+                            <span class="pending-mails">{{ pending_mails }}</span>
+                        {% else %}
+                            <span class="fa fa-envelope-o"></span>
                         {% endif %}
-                        <span class="sidebar-text">{{ nav_element.label }}</span>
+                        {% trans "Mails" %}
                     </a>
                 {% endif %}
-            {% endfor %}
-        </nav>
-        <div id="page-content" class="flex-column">
-            <div class="container-fluid">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
+                {% for nav_element in nav_event %}
+                    {% if not nav_element.section %}
+                        <a class="nav-link {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
+                            {% if nav_element.icon and "." in nav_element.icon %}
+                                <img src="{% static nav_element.icon %}" class="fa-img">
+                            {% elif nav_element.icon %}
+                                <i class="fa fa-{{ nav_element.icon }}"></i>
+                            {% endif %}
+                            <span class="sidebar-text">{{ nav_element.label }}</span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </nav>
+            <div id="page-content" class="flex-column">
+                <div class="container-fluid">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
 
-                <h3 class="byro-headline text-primary">
-                    {% block headline %}
+                    <h3 class="byro-headline text-primary">
+                        {% block headline %}
+                        {% endblock %}
+                    </h3>
+
+                    {% block content %}
                     {% endblock %}
-                </h3>
-
-                {% block content %}
-                {% endblock %}
+                </div>
+                <footer>
+                    {% with "href='https://byro.readthedocs.io/'" as a_attr %}
+                        {% blocktrans trimmed %}
+                            powered by <a {{ a_attr }}>byro</a>
+                        {% endblocktrans %}
+                    {% endwith %}
+                    {% if development_warning %}
+                        &middot; <span class="text-warning">{% trans "running in development mode" %}</span>
+                    {% endif %}
+                    {% if byro_version %}
+                        <span>&middot; <a href="https://github.com/byro/byro/tree/{{ byro_version | slice:':40' }}/">{{ byro_version }}</a></span>
+                    {% endif %}
+                    {% if log_end %}<br>
+                        <a class="log-link" href="{% url 'common:log.info' %}">{{log_end.auth_hash}}</a>
+                    {% endif %}
+                </footer>
             </div>
-            <footer>
-                {% with "href='https://byro.readthedocs.io/'" as a_attr %}
-                    {% blocktrans trimmed %}
-                        powered by <a {{ a_attr }}>byro</a>
-                    {% endblocktrans %}
-                {% endwith %}
-                {% if development_warning %}
-                    &middot; <span class="text-warning">{% trans "running in development mode" %}</span>
-                {% endif %}
-                {% if byro_version %}
-                    <span>&middot; <a href="https://github.com/byro/byro/tree/{{ byro_version | slice:':40' }}/">{{ byro_version }}</a></span>
-                {% endif %}
-                {% if log_end %}<br>
-                    <a class="log-link" href="{% url 'common:log.info' %}">{{log_end.auth_hash}}</a>
-                {% endif %}
-            </footer>
         </div>
     </div>
-</div>
 </body>
 
 </html>

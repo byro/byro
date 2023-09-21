@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
   manage:
-    image: ghcr.io/byro/byro:master
+    image: ghcr.io/byro/byro:main
     user: uid1000
     environment:
         PYTHONUNBUFFERED: 1
@@ -17,7 +17,7 @@ services:
     restart: "no"
 
   gunicorn:
-    image: ghcr.io/byro/byro:master
+    image: ghcr.io/byro/byro:main
     user: uid1000
     environment:
         PYTHONUNBUFFERED: 1

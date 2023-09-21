@@ -204,8 +204,16 @@ else:
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-LANGUAGES = [("en", _("English")), ("de", _("German"))]
-LANGUAGES_NATURAL_NAMES = [("en", "English"), ("de", "Deutsch")]
+LANGUAGES = [
+    ("en", _("English")),
+    ("de", _("German")),
+    ("pt-br", _("Brazilian Portuguese")),
+]
+LANGUAGES_NATURAL_NAMES = [
+    ("en", "English"),
+    ("de", "Deutsch"),
+    ("pt-br", "Português Brasileiro"),
+]
 LOCALE_PATHS = (Path(__file__).resolve().parent / "locale",)
 FORMAT_MODULE_PATH = ["byro.common.formats"]
 TIME_ZONE = config.get("locale", "time_zone")
@@ -227,6 +235,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ## MIDDLEWARE SETTINGS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -270,6 +279,7 @@ STATICFILES_FINDERS = (
     "compressor.finders.CompressorFinder",
 )
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "byro", "static")]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 ## EXTERNAL APP SETTINGS

@@ -8,62 +8,62 @@
 {% block headline %}{% trans "Real Transactions" %}{% endblock %}
 
 {% block content %}
-<script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
-<div class="form-group">
-    <form method="get" class="form form-inline">
-        <select name="filter" class="form-control">
-            <option value="">{% trans "All transactions" %}</option>
-            <option value="matched"{% if "matched" == request.GET.filter %}selected{% endif %}>{% trans "Only matched transactions" %}</option>
-            <option value="unmatched" {% if "unmatched" == request.GET.filter %}selected{% endif %}>{% trans "Only unmatched transactions" %}</option>
-        </select>
-        <input name="q" class="form-control" type="text" placeholder="{% trans "Search" %}"/>
-        <button type="submit" class="btn btn-success">{% trans "Filter" %}</button>
-    </form>
-</div>
-<form action="match">
-<table class="table table-sm table-bordered">
-    <thead>
-        <tr>
-            <th><button type="submit" class="btn btn-sm btn-success">{% trans "match" %}</button></th>
-            <th class="table-column-small">{% trans "Value Date" %}</th>
-            <th class="table-column-small">{% trans "Amount" %}</th>
-            <th class="table-column-medium">{% trans "Purpose" %}</th>
-            <th class="table-column-small">{% trans "Originator" %}</th>
-            <th class="table-column-large">{% trans "Virtual Transactions" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for rtrans in transactions %}
-        <tr class="{% if not rtrans.virtual_transactions.exists %}table-warning{% else %}table-light{% endif %}">
-            <td><input type="checkbox" name="ids" value="{{ rtrans.id }}"></td>
-                <td>{{ rtrans.value_datetime.date.isoformat }}</td>
-                <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
-                <td>{{ rtrans.purpose }}</td>
-                <td>{{ rtrans.originator }}</td>
-                <td>
-                    <ul>
-                    {% for transaction in rtrans.virtual_transactions.all %}
-                    <li> {% blocktrans with amount=transaction.amount source=transaction.source_account dest=transaction.destination_account member=transaction.member trimmed %}
-                        {{ amount | format_with_currency }} from {{ source }} to {{ dest }} ({{ member }})
-                    {% endblocktrans %}</li>
-                    {% empty %}
-                        <a href="match?ids={{ rtrans.id }}" class="btn btn-sm btn-success">{% trans "Match transaction" %}</a>
-                    {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-</table></form>
-{% include "office/pagination.html" %}
-<script>
-jQuery(function($) {
-    $(".formset").formset({
-        animateForms: true
-    });
-});
-</script>
-<span id="vars" remoteUrl="/members/typeahead/?search=%QUERY"></span>
-<script type="text/javascript" src="{% static "vendored/typeahead.bundle.min.js" %}"></script>
-<script type="text/javascript" src="{% static "office/members.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.formset.js" %}"></script>
+    <div class="form-group">
+        <form method="get" class="form form-inline">
+            <select name="filter" class="form-control">
+                <option value="">{% trans "All transactions" %}</option>
+                <option value="matched"{% if "matched" == request.GET.filter %}selected{% endif %}>{% trans "Only matched transactions" %}</option>
+                <option value="unmatched" {% if "unmatched" == request.GET.filter %}selected{% endif %}>{% trans "Only unmatched transactions" %}</option>
+            </select>
+            <input name="q" class="form-control" type="text" placeholder="{% trans "Search" %}"/>
+            <button type="submit" class="btn btn-success">{% trans "Filter" %}</button>
+        </form>
+    </div>
+    <form action="match">
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th><button type="submit" class="btn btn-sm btn-success">{% trans "match" %}</button></th>
+                    <th class="table-column-small">{% trans "Value Date" %}</th>
+                    <th class="table-column-small">{% trans "Amount" %}</th>
+                    <th class="table-column-medium">{% trans "Purpose" %}</th>
+                    <th class="table-column-small">{% trans "Originator" %}</th>
+                    <th class="table-column-large">{% trans "Virtual Transactions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rtrans in transactions %}
+                    <tr class="{% if not rtrans.virtual_transactions.exists %}table-warning{% else %}table-light{% endif %}">
+                        <td><input type="checkbox" name="ids" value="{{ rtrans.id }}"></td>
+                        <td>{{ rtrans.value_datetime.date.isoformat }}</td>
+                        <td {% if rtrans.amount < 0 %}class="text-danger"{% endif %}>{{ rtrans.amount }}</td>
+                        <td>{{ rtrans.purpose }}</td>
+                        <td>{{ rtrans.originator }}</td>
+                        <td>
+                            <ul>
+                                {% for transaction in rtrans.virtual_transactions.all %}
+                                    <li> {% blocktrans with amount=transaction.amount source=transaction.source_account dest=transaction.destination_account member=transaction.member trimmed %}
+                                        {{ amount | format_with_currency }} from {{ source }} to {{ dest }} ({{ member }})
+                                    {% endblocktrans %}</li>
+                                {% empty %}
+                                    <a href="match?ids={{ rtrans.id }}" class="btn btn-sm btn-success">{% trans "Match transaction" %}</a>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table></form>
+    {% include "office/pagination.html" %}
+    <script>
+        jQuery(function($) {
+            $(".formset").formset({
+                animateForms: true
+            });
+        });
+    </script>
+    <span id="vars" remoteUrl="/members/typeahead/?search=%QUERY"></span>
+    <script type="text/javascript" src="{% static "vendored/typeahead.bundle.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "office/members.js" %}"></script>
 {% endblock %}
