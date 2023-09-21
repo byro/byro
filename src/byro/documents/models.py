@@ -79,7 +79,6 @@ Thank you,
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-
         retval = super().save(*args, **kwargs)
 
         # Only store the hash the first *time* that a file is added

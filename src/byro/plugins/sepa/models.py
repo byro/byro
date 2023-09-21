@@ -23,7 +23,6 @@ class SepaDirectDebitState(Enum):
 
 
 class MemberSepa(Auditable, models.Model):
-
     member = AutoOneToOneField(
         to="members.Member", related_name="profile_sepa", on_delete=models.PROTECT
     )

@@ -95,6 +95,8 @@ class MemberListMixin:
         inactive_q = ~active_q
         if _filter == "all":
             pass
+        elif _filter == "negbalance":
+            return [m for m in qs.order_by("-id").distinct() if m.balance < 0]
         elif _filter == "inactive":
             qs = qs.filter(inactive_q)
         else:  # Default to 'active'
@@ -176,7 +178,6 @@ know if you think this email is incorrect."""
     )
 
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
         self.fields["start"].widget.attrs["class"] = " datepicker"
         self.fields["end"].widget.attrs["class"] = " datepicker"
@@ -252,6 +253,7 @@ class MemberListExportForm(forms.Form):
     member_filter = forms.ChoiceField(
         choices=[
             ("active", _("Active members")),
+            ("negbalance", _("Members with negative balance")),
             ("inactive", _("Only inactive members")),
             ("all", _("All members")),
         ]
@@ -560,7 +562,6 @@ def default_csv_form_valid(view, form, dialect="excel"):
                     create_membership(membership_parms, member)
 
                 if create_initial_balance:
-
                     balance_changed = member.adjust_balance(
                         view,
                         "Initial Balance created by CSV Import",
@@ -1013,7 +1014,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                         _create_ms_leave_form,
                         {"end": _("End membership")},
                         lambda *args, **kwargs: self.end_membership(
-                            ms, *args, **kwargs
+                            ms, *args, **kwargs  # noqa
                         ),
                     )
                 )

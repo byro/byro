@@ -13,7 +13,6 @@ MAPPING = {"member": Member, "membership": Membership}
 
 class CreateMemberForm(forms.Form):
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         config = Configuration.get_solo().registration_form or []

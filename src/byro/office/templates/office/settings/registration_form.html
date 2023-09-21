@@ -6,140 +6,140 @@
 
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress css %}
-<style type="text/css">
-    .field-placeholder { height: 5em; background-color: #ffa;}
-    .available-fields, .current-fields { min-height: 2em; }
-    .add-button, .remove-button { font-size: 90%; }
-    .available-fields .remove-button { display: none; }
-    .current-fields .add-button { display: none; }
-    #fancy-registration-form > .card {
-        width: 50%;
-        min-width: 34em;
-        display: inline-block;
-        vertical-align: top;
-        background-color: white;
-    }
-    .ui-sortable .card { cursor: move; }
-    div.grab-parent {
-        display: table;
-        height: 100%;
-        position: absolute;
-        width: 1.8em;
-        margin-right: -1.8em;
-    }
-    div.grab-child {
-        width: 1.8em;
-        display: table-cell;
-        vertical-align: middle;
-        overflow: hidden;
-        line-height: 5px;
-        padding: 3px 4px;
-        cursor: move;
-        vertical-align: middle;
-        font-size: 12px;
-        font-family: sans-serif;
-        letter-spacing: 2px;
-        color: #cccccc;
-        text-shadow: 1px 0 1px black;
-    }
-    div.grab-child::after {
-        content: '.. .. .. .. .. .. .. .. .. ..';
-    }
-</style>
-<link rel="stylesheet" type="text/css" href="{% static "vendored/jquery-ui/jquery-ui.min.css" %}"/>
-{% endcompress %}
+    {{ block.super }}
+    {% compress css %}
+        <style type="text/css">
+            .field-placeholder { height: 5em; background-color: #ffa;}
+            .available-fields, .current-fields { min-height: 2em; }
+            .add-button, .remove-button { font-size: 90%; }
+            .available-fields .remove-button { display: none; }
+            .current-fields .add-button { display: none; }
+            #fancy-registration-form > .card {
+                width: 50%;
+                min-width: 34em;
+                display: inline-block;
+                vertical-align: top;
+                background-color: white;
+            }
+            .ui-sortable .card { cursor: move; }
+            div.grab-parent {
+                display: table;
+                height: 100%;
+                position: absolute;
+                width: 1.8em;
+                margin-right: -1.8em;
+            }
+            div.grab-child {
+                width: 1.8em;
+                display: table-cell;
+                vertical-align: middle;
+                overflow: hidden;
+                line-height: 5px;
+                padding: 3px 4px;
+                cursor: move;
+                vertical-align: middle;
+                font-size: 12px;
+                font-family: sans-serif;
+                letter-spacing: 2px;
+                color: #cccccc;
+                text-shadow: 1px 0 1px black;
+            }
+            div.grab-child::after {
+                content: '.. .. .. .. .. .. .. .. .. ..';
+            }
+        </style>
+        <link rel="stylesheet" type="text/css" href="{% static "vendored/jquery-ui/jquery-ui.min.css" %}"/>
+    {% endcompress %}
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-{% compress js %}
-    <script type="text/javascript" src="{% static "vendored/jquery-ui/jquery-ui.min.js" %}"></script>
-{% endcompress %}
-<script type="text/javascript">
-    $(function(){
-        var form = $('#fancy-registration-form');
-        form.prepend($.parseHTML('<div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div>'));
-        var current = form.find('.current-fields');
-        var avail = form.find('.available-fields');
-        var form_sortable;
-        var update_states = function() {
-            current.find('input[name$=__position]').each(function(i, elem){
-                $(elem).val(i+1);
-            });
-            avail.find('input[name$=__position]').val('');
-        };
-        form.find('div.fancy-entry').each(function(i, elem){
-            var elem = $(elem);
-            var number_input = elem.find('input[name$=__position]');
-            var button_area = $($.parseHTML('<div class="col-md-3"></div>'));
-            var add_button = $($.parseHTML('<button type="button" class="btn add-button"><i class="fa fa-arrow-left"></i>&nbsp;{% trans "Add" %}</button>'));
-            var remove_button = $($.parseHTML('<button type="button" class="btn remove-button">{% trans "Remove" %}&nbsp;<i class="fa fa-arrow-right"></i></button>'));
-            button_area.append(add_button);
-            button_area.append(remove_button);
-            add_button.click(function(){
+    {{ block.super }}
+    {% compress js %}
+        <script type="text/javascript" src="{% static "vendored/jquery-ui/jquery-ui.min.js" %}"></script>
+    {% endcompress %}
+    <script type="text/javascript">
+        $(function(){
+            var form = $('#fancy-registration-form');
+            form.prepend($.parseHTML('<div class="card my-4"><div class="card-header"><h4>{% trans "Fields currently in the registration form" %}</h4></div><div class="current-fields card-body"></div></div><div class="card my-4"><div class="card-header"><h4>{% trans "Fields not in the registration form" %}</h4></div><div class="available-fields card-body"></div></div>'));
+            var current = form.find('.current-fields');
+            var avail = form.find('.available-fields');
+            var form_sortable;
+            var update_states = function() {
+                current.find('input[name$=__position]').each(function(i, elem){
+                    $(elem).val(i+1);
+                });
+                avail.find('input[name$=__position]').val('');
+            };
+            form.find('div.fancy-entry').each(function(i, elem){
+                var elem = $(elem);
+                var number_input = elem.find('input[name$=__position]');
+                var button_area = $($.parseHTML('<div class="col-md-3"></div>'));
+                var add_button = $($.parseHTML('<button type="button" class="btn add-button"><i class="fa fa-arrow-left"></i>&nbsp;{% trans "Add" %}</button>'));
+                var remove_button = $($.parseHTML('<button type="button" class="btn remove-button">{% trans "Remove" %}&nbsp;<i class="fa fa-arrow-right"></i></button>'));
+                button_area.append(add_button);
+                button_area.append(remove_button);
+                add_button.click(function(){
+                    elem.detach();
+                    current.append(elem);
+                    update_states();
+                    form_sortable.sortable("refresh");
+                });
+                remove_button.click(function(){
+                    elem.detach();
+                    avail.prepend(elem);
+                    update_states();
+                    form_sortable.sortable("refresh");
+                });
                 elem.detach();
-                current.append(elem);
-                update_states();
-                form_sortable.sortable("refresh");
-            });
-            remove_button.click(function(){
-                elem.detach();
-                avail.prepend(elem);
-                update_states();
-                form_sortable.sortable("refresh");
-            });
-            elem.detach();
-            elem.find(".card-title").parent().prepend(button_area);
-            elem.prepend($('<div class="grab-parent"><div class="grab-child"></div></div>'));
-            if(number_input.val()) {
-                current.append(elem);
-            } else {
-                avail.append(elem);
-            }
-            number_input.closest('.form-group').hide();
-
-            var default_date = elem.find('select[name$=__default_date]');
-
-            if (default_date.length) {
-                var other = elem.find('input[name$=__default]');
-                var update_func = function() {
-                    console.log( $(default_date).val() );
-                    if(default_date.val() == 'fixed_date') {
-                        other.closest('.form-group').show();
-                    } else {
-                        other.closest('.form-group').hide();
-                    }
+                elem.find(".card-title").parent().prepend(button_area);
+                elem.prepend($('<div class="grab-parent"><div class="grab-child"></div></div>'));
+                if(number_input.val()) {
+                    current.append(elem);
+                } else {
+                    avail.append(elem);
                 }
-                update_func();
-                $(default_date).on('change', update_func);
-            }
+                number_input.closest('.form-group').hide();
 
+                var default_date = elem.find('select[name$=__default_date]');
+
+                if (default_date.length) {
+                    var other = elem.find('input[name$=__default]');
+                    var update_func = function() {
+                        console.log( $(default_date).val() );
+                        if(default_date.val() == 'fixed_date') {
+                            other.closest('.form-group').show();
+                        } else {
+                            other.closest('.form-group').hide();
+                        }
+                    }
+                    update_func();
+                    $(default_date).on('change', update_func);
+                }
+
+            });
+            form_sortable = form.find('.current-fields, .available-fields').sortable({
+                connectWith: ".current-fields, .available-fields",
+                update: update_states,
+                placeholder: 'field-placeholder',
+            });
         });
-        form_sortable = form.find('.current-fields, .available-fields').sortable({
-            connectWith: ".current-fields, .available-fields",
-            update: update_states,
-            placeholder: 'field-placeholder',
-        });
-    });
-</script>
+    </script>
 {% endblock %}
 
 {% block settings_content %}
-<form method="post" id='fancy-registration-form'>
-    {% csrf_token %}
-    {% for key, field_info in form.fields_extra.items %}
-    <div class="card fancy-entry my-2">
-        <div class="card-body">
-            <div class="row"><h5 class="card-title col-md-9">{{field_info.0}}</h5></div>
-            {% for field in field_info.1 %}
-                {% bootstrap_field field layout='horizontal' %}
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
-    <div class="clearfix"></div>
-    <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
-</form>
+    <form method="post" id='fancy-registration-form'>
+        {% csrf_token %}
+        {% for key, field_info in form.fields_extra.items %}
+            <div class="card fancy-entry my-2">
+                <div class="card-body">
+                    <div class="row"><h5 class="card-title col-md-9">{{field_info.0}}</h5></div>
+                    {% for field in field_info.1 %}
+                        {% bootstrap_field field layout='horizontal' %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="clearfix"></div>
+        <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
+    </form>
 {% endblock %}

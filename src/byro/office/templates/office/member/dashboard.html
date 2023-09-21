@@ -5,101 +5,101 @@
 {% block title %}{{ block.super }} :: {% trans "Dashboard" %}{% endblock %}
 
 {% block member_content %}
-<div class="dashboard-list">
-    {% with is_active=member.is_active %}
-    <div class="dashboard-block {% if not is_active %}block-danger{% endif %}">
-        <h1>
-            {% if is_active %}
-                {% blocktrans %}active{% endblocktrans %}
-            {% else %}
-                {% blocktrans %}<strong>not</strong> active{% endblocktrans %}
-            {% endif %}
-        </h1>
-    </div>
-    {% endwith %}
-    <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
-        <h1>
-            {{ member.balance | format_with_currency }}
-        </h1>
-        <span class="dashboard-description">
-            {% trans "current balance" %}
-            <br>
-            {% blocktrans with start=member.last_membership_fee_transaction_timestamp|date trimmed %}
-                Last transaction on {{ start }}.
-            {% endblocktrans %}
-        </span>
-    </div>
-    {% if statute_barred_debt.in1year %}
-        <div class="dashboard-block block-warning">
+    <div class="dashboard-list">
+        {% with is_active=member.is_active %}
+            <div class="dashboard-block {% if not is_active %}block-danger{% endif %}">
+                <h1>
+                    {% if is_active %}
+                        {% blocktrans %}active{% endblocktrans %}
+                    {% else %}
+                        {% blocktrans %}<strong>not</strong> active{% endblocktrans %}
+                    {% endif %}
+                </h1>
+            </div>
+        {% endwith %}
+        <div class="dashboard-block {% if member.balance < -20 %}block-danger{% endif %}">
             <h1>
-                {{ statute_barred_debt.in1year | format_with_currency }}
+                {{ member.balance | format_with_currency }}
             </h1>
             <span class="dashboard-description">
-                {% trans "in liabilities will expire end of this year" %}
+                {% trans "current balance" %}
+                <br>
+                {% blocktrans with start=member.last_membership_fee_transaction_timestamp|date trimmed %}
+                    Last transaction on {{ start }}.
+                {% endblocktrans %}
             </span>
         </div>
-    {% endif %}
-    {% if statute_barred_debt.now %}
-        <div class="dashboard-block block-danger">
-            <h1>
-                {{ statute_barred_debt.now | format_with_currency }}
-            </h1>
-            <span class="dashboard-description">
-                {% trans "in expired liabilities" %}
-            </span>
-        </div>
-    {% endif %}
-    {% if member.donation_balance %}
+        {% if statute_barred_debt.in1year %}
+            <div class="dashboard-block block-warning">
+                <h1>
+                    {{ statute_barred_debt.in1year | format_with_currency }}
+                </h1>
+                <span class="dashboard-description">
+                    {% trans "in liabilities will expire end of this year" %}
+                </span>
+            </div>
+        {% endif %}
+        {% if statute_barred_debt.now %}
+            <div class="dashboard-block block-danger">
+                <h1>
+                    {{ statute_barred_debt.now | format_with_currency }}
+                </h1>
+                <span class="dashboard-description">
+                    {% trans "in expired liabilities" %}
+                </span>
+            </div>
+        {% endif %}
+        {% if member.donation_balance %}
+            <div class="dashboard-block">
+                <h1>
+                    {{ member.donation_balance | format_with_currency }}
+                </h1>
+                <span class="dashboard-description">
+                    {% trans "donations" %}
+                </span>
+            </div>
+        {% endif %}
         <div class="dashboard-block">
             <h1>
-                {{ member.donation_balance | format_with_currency }}
+                {% blocktrans trimmed count n=member_since.days %}
+                    {{ n }} day
+                {% plural %}
+                    {{ n }} days
+                {% endblocktrans %}
             </h1>
             <span class="dashboard-description">
-                {% trans "donations" %}
+                {% if member_since.days > 0 %}
+                    {% blocktrans trimmed count n=member_since.years %}
+                        or {{ n }} year of membership
+                    {% plural %}
+                        or {{ n }} years of membership
+                    {% endblocktrans %}
+                {% else %}
+                    {% blocktrans trimmed %}
+                        until this person becomes a member.
+                    {% endblocktrans %}
+                {% endif %}
+                <br>
+                {% blocktrans with start=member_since.first|date trimmed %}
+                    Joined on {{ start }}.
+                {% endblocktrans %}
             </span>
         </div>
-    {% endif %}
-    <div class="dashboard-block">
-        <h1>
-            {% blocktrans trimmed count n=member_since.days %}
-            {{ n }} day
-            {% plural %}
-            {{ n }} days
-            {% endblocktrans %}
-        </h1>
-        <span class="dashboard-description">
-            {% if member_since.days > 0 %}
-                {% blocktrans trimmed count n=member_since.years %}
-                or {{ n }} year of membership
-                {% plural %}
-                or {{ n }} years of membership
-                {% endblocktrans %}
-            {% else %}
-                {% blocktrans trimmed %}
-                until this person becomes a member.
-                {% endblocktrans %}
-            {% endif %}
-            <br>
-            {% blocktrans with start=member_since.first|date trimmed %}
-                Joined on {{ start }}.
-            {% endblocktrans %}
-        </span>
+        <div class="dashboard-block">
+            <h1>
+                {{ current_membership.amount | format_with_currency }}
+            </h1>
+            <span class="dashboard-description">
+                {% blocktrans %}membership fee{% endblocktrans %} <strong>{{ current_membership.interval }}</strong>
+            </span>
+        </div>
+        {% for tile in tiles %}
+            {% if tile.url %}<a href="{{ tile.url }}"{% else %}<div{% endif %} class="dashboard-block">
+                <h1>{{ tile.title }}</h1>
+                <span class="dashboard-description">
+                    {{ tile.lines|join:'<br>' }}
+                </span>
+                {% if tile.url %}</a>{% else %}</div>{% endif %}
+        {% endfor %}
     </div>
-    <div class="dashboard-block">
-      <h1>
-        {{ current_membership.amount | format_with_currency }}
-      </h1>
-      <span class="dashboard-description">
-        {% blocktrans %}membership fee{% endblocktrans %} <strong>{{ current_membership.interval }}</strong>
-        </span>
-    </div>
-    {% for tile in tiles %}
-        {% if tile.url %}<a href="{{ tile.url }}"{% else %}<div{% endif %} class="dashboard-block">
-          <h1>{{ tile.title }}</h1>
-          <span class="dashboard-description">
-            {{ tile.lines|join:'<br>' }}
-          </span>
-        {% if tile.url %}</a>{% else %}</div>{% endif %}
-    {% endfor %}
-</div>
 {% endblock %}

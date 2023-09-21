@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block headline %}{% trans "User" %}
-	{% if user.last_name %}{{user.last_name}} ({{user.username}}){% else %}{{user.username}}{% endif %}
+    {% if user.last_name %}{{user.last_name}} ({{user.username}}){% else %}{{user.username}}{% endif %}
 {% endblock %}
 
 {% block content %}

@@ -6,7 +6,6 @@ from byro.common.models.auditable import Auditable
 
 
 class MemberProfile(Auditable, models.Model):
-
     member = AutoOneToOneField(
         to="members.Member", related_name="profile_profile", on_delete=models.PROTECT
     )

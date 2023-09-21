@@ -6,34 +6,34 @@
 
 {% block public_content %}
 
-{% if members %}
-    {% for member in members %}
-        <div class="card">
-            <h5 class="card-header">{{ member.name }}</h5>
-            <div class="card-body">
-                <table class="table table-condensed">
-                    {% for line in member.profile_memberpage.get_public_data %}{% if line.value %}
-                    <tr>
-                        <th>{{ line.label }}</th>
-                        <td>{{ line.value }}</td>
-                    </tr>
-                    {% endif %}{% endfor %}
-                </table>
+    {% if members %}
+        {% for member in members %}
+            <div class="card">
+                <h5 class="card-header">{{ member.name }}</h5>
+                <div class="card-body">
+                    <table class="table table-condensed">
+                        {% for line in member.profile_memberpage.get_public_data %}{% if line.value %}
+                            <tr>
+                                <th>{{ line.label }}</th>
+                                <td>{{ line.value }}</td>
+                            </tr>
+                        {% endif %}{% endfor %}
+                    </table>
+                </div>
             </div>
-        </div>
-    {% endfor %}
-{% else %}
-<div class="alert alert-primary">{% blocktrans trimmed %}
-Currently no members have consented to their information being shared.
-{% endblocktrans %}</div>
-{% endif %}
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-primary">{% blocktrans trimmed %}
+            Currently no members have consented to their information being shared.
+        {% endblocktrans %}</div>
+    {% endif %}
 
-{% include "office/pagination.html" %}
+    {% include "office/pagination.html" %}
 
-{% if member_undisclosed and members %}
-<div class="alert alert-secondary">{% blocktrans trimmed %}
-This list is not complete, as some members have not consented to their information being shared.
-{% endblocktrans %}</div>
-{% endif %}
+    {% if member_undisclosed and members %}
+        <div class="alert alert-secondary">{% blocktrans trimmed %}
+            This list is not complete, as some members have not consented to their information being shared.
+        {% endblocktrans %}</div>
+    {% endif %}
 
 {% endblock %}

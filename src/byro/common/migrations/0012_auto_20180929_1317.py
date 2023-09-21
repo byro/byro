@@ -19,7 +19,6 @@ def init_templates(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("common", "0011_configuration_record_disclosure_template")]
 
     operations = [migrations.RunPython(init_templates, migrations.RunPython.noop)]

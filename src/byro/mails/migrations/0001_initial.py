@@ -6,7 +6,6 @@ import i18nfield.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []

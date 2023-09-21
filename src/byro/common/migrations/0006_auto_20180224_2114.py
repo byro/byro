@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("mails", "0003_mailtemplate_reply_to"),
         ("common", "0005_configuration_liability_interval"),

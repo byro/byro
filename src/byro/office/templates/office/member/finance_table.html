@@ -7,19 +7,19 @@
         <div class="purpose">{% trans "Purpose" %}</div>
         <div class="category">{% trans "Category" %}</div>
     </div>
-        {% for booking in bookings %}
+    {% for booking in bookings %}
         {% if booking.bookings is not None %}
-        <div data-amount="→ EUR {{ booking.amount }}" data-start="{{ booking.start }}" data-end="{{ booking.end }}" id="{{ booking.id }}" class="balance{% if booking.amount < 0 %} negative{% endif %}">
-            {% for inner_booking in booking.bookings %}
-            {% include 'office/member/booking_row.html' with booking=inner_booking %}
-            {% empty %}
-            {% blocktrans with start=booking.start end=booking.end trimmed %}
-            <div class="empty">No transactions from {{ start }} until {{ end }}.</div>
-            {% endblocktrans %}
-            {% endfor %}
-        </div>
+            <div data-amount="→ EUR {{ booking.amount }}" data-start="{{ booking.start }}" data-end="{{ booking.end }}" id="{{ booking.id }}" class="balance{% if booking.amount < 0 %} negative{% endif %}">
+                {% for inner_booking in booking.bookings %}
+                    {% include 'office/member/booking_row.html' with booking=inner_booking %}
+                {% empty %}
+                    {% blocktrans with start=booking.start end=booking.end trimmed %}
+                        <div class="empty">No transactions from {{ start }} until {{ end }}.</div>
+                    {% endblocktrans %}
+                {% endfor %}
+            </div>
         {% else %}
             {% include 'office/member/booking_row.html' with booking=booking %}
         {% endif %}
-        {% endfor %}
+    {% endfor %}
 </div>

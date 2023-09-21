@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("members", "0002_auto_20171012_1857")]
 
     operations = [

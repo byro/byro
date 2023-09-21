@@ -24,7 +24,6 @@ def init_templates(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("common", "0008_configuration_backoffice_mail")]
 
     operations = [migrations.RunPython(init_templates, migrations.RunPython.noop)]

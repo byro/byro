@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("bookkeeping", "0009_realtransactionsource_state")]
 
     operations = [

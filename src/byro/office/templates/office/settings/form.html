@@ -3,16 +3,16 @@
 {% load i18n %}
 
 {% block settings_content %}
-<form method="post">
-    {% csrf_token %}
-    {% for f in form %}
-        <div class="card member-form-card">
-            <div class="card-header">{{ f.instance.form_title }}</div>
-            <div class="card-body">
-                {% bootstrap_form f layout='horizontal' %}
+    <form method="post">
+        {% csrf_token %}
+        {% for f in form %}
+            <div class="card member-form-card">
+                <div class="card-header">{{ f.instance.form_title }}</div>
+                <div class="card-body">
+                    {% bootstrap_form f layout='horizontal' %}
+                </div>
             </div>
-        </div>
-    {% endfor %}
-    <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
-</form>
+        {% endfor %}
+        <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
+    </form>
 {% endblock %}
