@@ -10,7 +10,7 @@ Start out in a shell in the repository. We'll start by generating a virtualenv a
 the required Python packages::
 
   python3 -m venv .venv
-  source venv/bin/activate
+  source .venv/bin/activate
   pip install -Ur docs/requirements.txt
 
 
