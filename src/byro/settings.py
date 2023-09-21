@@ -310,7 +310,7 @@ COMPRESS_FILTERS = {
         # However, we don't need it if we consequently use the static() function in Sass
         # 'compressor.filters.css_default.CssAbsoluteFilter',
         "compressor.filters.cssmin.CSSCompressorFilter",
-    )
+    ),
 }
 SELECT2_JS = ""
 SELECT2_CSS = ""
