@@ -2,9 +2,11 @@
 ======
 
 .. image:: https://img.shields.io/github/v/release/byro/byro
+   :target: https://github.com/byro/byro/releases/latest
    :alt: GitHub release (with filter)
 
 .. image:: https://img.shields.io/pypi/v/byro
+   :target: https://pypi.org/project/byro/
    :alt: PyPI - Version
 
 .. image:: https://github.com/byro/byro/actions/workflows/ci-cd.yml/badge.svg?branch=main
