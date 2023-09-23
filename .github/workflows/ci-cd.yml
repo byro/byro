@@ -209,6 +209,7 @@ jobs:
         run: python -m pip install twine wheel -Ue "src[dev]"
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
+        if: github.event_name == 'release' && github.event.action == 'published'
         working-directory: ./src
       - name: 🔎 Check manifest
         run: check-manifest .
@@ -256,6 +257,7 @@ jobs:
         uses: actions/checkout@v4
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
+        if: github.event_name == 'release' && github.event.action == 'published'
       - name: 🏗 Setup QEMU
         uses: docker/setup-qemu-action@v3
       - name: 🏗 Setup Docker buildx
@@ -292,6 +294,7 @@ jobs:
         uses: actions/checkout@v4
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
+        if: github.event_name == 'release' && github.event.action == 'published'
       - name: 🏗 Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
