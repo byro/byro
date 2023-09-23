@@ -43,7 +43,7 @@ jobs:
         working-directory: ./src
 
   style-flake8:
-    name: [Style] flake8
+    name: "[Style] flake8"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
         working-directory: ./src
 
   style-black:
-    name: [Style] black
+    name: "[Style] black"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +85,7 @@ jobs:
         working-directory: ./src
 
   style-djhtml:
-    name: [Style] DjHTML
+    name: "[Style] DjHTML"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
