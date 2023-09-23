@@ -12,7 +12,7 @@ def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
     mode = "development" if debug else "production"
     lines = [
         (
-            "This is byro v{__version__} calling, running in {mode} mode.".format(
+            "This is byro {__version__} calling, running in {mode} mode.".format(
                 __version__=__version__, mode=mode
             ),
             True,

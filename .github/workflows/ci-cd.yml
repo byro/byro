@@ -48,7 +48,6 @@ jobs:
           path: src/dist
 
   pypi-publish:
-    if: false
     name: ⬆ Upload release to PyPI
     needs: build-python-package
     runs-on: ubuntu-latest
