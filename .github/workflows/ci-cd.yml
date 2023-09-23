@@ -229,9 +229,9 @@ jobs:
           path: src/dist
 
   pypi-publish:
-    if: false # if: github.event_name == 'release' && github.event.action == 'published'
     name: ⬆ Upload release to PyPI
     needs: build-python-package
+    if: github.event_name == 'release' && github.event.action == 'published'
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -278,10 +278,9 @@ jobs:
         run: docker image inspect ${{ steps.meta.outputs.tags }}
 
   push-docker-image:
-    if: false
     name: 🔨 Push Docker image to GitHub Packages
     needs: build-docker-image
-    # if: github.event_name == 'push' || (github.event_name == 'release' && github.event.action == 'published')
+    if: github.event_name == 'push' || (github.event_name == 'release' && github.event.action == 'published')
     runs-on: ubuntu-latest
     permissions:
       packages: write
