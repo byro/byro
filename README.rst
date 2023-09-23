@@ -1,13 +1,15 @@
 |byro|
 ======
 
-.. image:: https://github.com/byro/byro/actions/workflows/tests.yml/badge.svg?branch=main
-   :target: https://github.com/byro/byro/actions/workflows/tests.yml?query=branch%3Amain
-   :alt: CI tests
+.. image:: https://img.shields.io/github/v/release/byro/byro
+   :alt: GitHub release (with filter)
 
-.. image:: https://github.com/byro/byro/actions/workflows/style.yml/badge.svg?branch=main
-   :target: https://github.com/byro/byro/actions/workflows/style.yml?query=branch%3Amain
-   :alt: CI code style
+.. image:: https://img.shields.io/pypi/v/byro
+   :alt: PyPI - Version
+
+.. image:: https://github.com/byro/byro/actions/workflows/ci-cd.yml/badge.svg?branch=main
+   :target: https://github.com/byro/byro/actions/workflows/ci-cd.yml?query=branch%3Amain
+   :alt: CI/CD
 
 .. image:: https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/byro/byro
@@ -21,11 +23,13 @@
    :target: http://byro.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation
 
+
+
 byro_ is a membership administration tool for small and medium sized
 clubs/NGOs/associations of all kinds, with a focus on the DACH region. While it
 is still a work in progress, it is already usable and in active use.
 
-.. image:: docs/img/screenshots/office_dashboard.png
+.. image:: https://raw.githubusercontent.com/byro/byro/main/docs/img/screenshots/office_dashboard.png
 
 Development and Production Setup
 --------------------------------
@@ -61,7 +65,7 @@ GitHub. You can see all byro plugins on GitHub `here`_.
 - `byro-shackspace`_ is an example for how a group can extend or modify byro to
   fit their purpose, e.g. add custom mechanisms and save additional data.
 
-.. |byro| image:: docs/img/logo/byro_128.png
+.. |byro| image:: https://raw.githubusercontent.com/byro/byro/main/docs/img/logo/byro_128.png
    :alt: byro
 .. _developer documentation: http://byro.readthedocs.io/en/latest/
 .. _development: https://byro.readthedocs.io/en/latest/developer/setup.html
