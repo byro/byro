@@ -316,7 +316,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: src
-          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
