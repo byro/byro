@@ -3,12 +3,12 @@ name: CI/CD
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - 'docs/**'
+    paths:
+      - 'src/**'
   pull_request:
     branches: [ main ]
-    paths-ignore:
-      - 'docs/**'
+    paths:
+      - 'src/**'
   release:
     types: [published]
 
@@ -254,6 +254,8 @@ jobs:
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v4
+      - name: 🏗 Set byro version
+        run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
       - name: 🏗 Setup QEMU
         uses: docker/setup-qemu-action@v3
       - name: 🏗 Setup Docker buildx
@@ -288,6 +290,8 @@ jobs:
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v4
+      - name: 🏗 Set byro version
+        run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
       - name: 🏗 Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
