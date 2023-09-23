@@ -1,4 +1,4 @@
-name: Publish release to PyPI
+name: CI/CD
 
 on:
   release:
@@ -27,6 +27,9 @@ jobs:
           sudo apt-get install gettext
       - name: 🏗 Install Dependencies
         run: python -m pip install twine wheel -Ue "src[dev]"
+      - name: 🏗 Set byro version
+        run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
+        working-directory: ./src
       - name: 🔎 Check manifest
         run: check-manifest .
         working-directory: ./src
@@ -45,7 +48,8 @@ jobs:
           path: src/dist
 
   pypi-publish:
-    name: Upload release to PyPI
+    if: false
+    name: ⬆ Upload release to PyPI
     needs: build-python-package
     runs-on: ubuntu-latest
     environment:
