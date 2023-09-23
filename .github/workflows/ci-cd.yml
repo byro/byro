@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   style-isort:
-    name: [Style] isort
+    name: "[Style] isort"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
