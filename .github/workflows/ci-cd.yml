@@ -16,10 +16,102 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
+  style-isort:
+    name: [Style] isort
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: python -m pip install -Ue "src[dev]"
+      - name: Run isort
+        run: isort -c .
+        working-directory: ./src
+
+  style-flake8:
+    name: [Style] flake8
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: python -m pip install -Ue "src[dev]"
+      - name: Run flake8
+        run: flake8 .
+        working-directory: ./src
+
+  style-black:
+    name: [Style] black
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: python -m pip install -Ue "src[dev]"
+      - name: Run black
+        run: black --check .
+        working-directory: ./src
+
+  style-djhtml:
+    name: [Style] DjHTML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: python -m pip install -Ue "src[dev]"
+      - name: Run djhtml
+        run: djhtml byro/
+        working-directory: ./src
+
   build-python-package:
-    if: false
     name: 🔨 Build python package
+    needs:
+      - style-isort
+      - style-flake8
+      - style-black
+      - style-djhtml
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -81,6 +173,7 @@ jobs:
 
   build-docker-image:
     name: 🔨 Build docker image
+    needs: build-python-package
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Checkout
@@ -109,9 +202,10 @@ jobs:
         run: docker image inspect ${{ steps.meta.outputs.tags }}
 
   push-docker-image:
-    name: 🔨Push Docker image to GitHub Packages
+    if: false
+    name: 🔨 Push Docker image to GitHub Packages
     needs: build-docker-image
-    if: github.event_name == 'push' || (github.event_name == 'release' && github.event.action == 'published')
+    # if: github.event_name == 'push' || (github.event_name == 'release' && github.event.action == 'published')
     runs-on: ubuntu-latest
     permissions:
       packages: write
