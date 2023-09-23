@@ -253,7 +253,7 @@ jobs:
     needs: build-python-package
     runs-on: ubuntu-latest
     steps:
-      - name: 🏗 Checkout
+      - name: 🏗🏗 Checkout
         uses: actions/checkout@v4
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
