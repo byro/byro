@@ -1,0 +1,63 @@
+name: Publish release to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+
+  build-python-package:
+    name: 🔨 Build distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🏗 Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: 🏗 Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install gettext
+      - name: 🏗 Install Dependencies
+        run: python -m pip install twine wheel -Ue "src[dev]"
+      - name: 🔎 Check manifest
+        run: check-manifest .
+        working-directory: ./src
+      - name: 🔨Build package
+        run: |
+          python -m build -nw
+          python -m build -ns
+        working-directory: ./src
+      - name: 🔎 Check package
+        run: twine check dist/*
+        working-directory: ./src
+      - name: ⬆ Upload build result
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: src/dist
+
+  pypi-publish:
+    name: Upload release to PyPI
+    needs: build-python-package
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/byro
+    permissions:
+      id-token: write
+    steps:
+      - name: ⬇ Download build result
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+      - name: 📦 Publish to index
+        uses: pypa/gh-action-pypi-publish@release/v1
