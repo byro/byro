@@ -22,7 +22,7 @@
    :alt: Code maintainability
 
 .. image:: https://readthedocs.org/projects/byro/badge/?version=latest
-   :target: http://byro.readthedocs.io/en/latest/?badge=latest
+   :target: http://byro.readthedocs.io/
    :alt: Documentation
 
 
