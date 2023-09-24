@@ -258,6 +258,7 @@ jobs:
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
         if: github.event_name == 'release' && github.event.action == 'published'
+        working-directory: ./src
       - name: 🏗 Setup QEMU
         uses: docker/setup-qemu-action@v3
       - name: 🏗 Setup Docker buildx
@@ -295,6 +296,7 @@ jobs:
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.ref_name }}"/' byro/__init__.py
         if: github.event_name == 'release' && github.event.action == 'published'
+        working-directory: ./src
       - name: 🏗 Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
