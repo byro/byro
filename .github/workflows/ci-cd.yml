@@ -282,6 +282,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: 🔎 Inspect Docker image
+        if: false
         run: docker image inspect ${{ steps.meta.outputs.tags }}
 
   push-docker-image:
