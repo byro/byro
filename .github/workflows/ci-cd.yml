@@ -224,7 +224,7 @@ jobs:
         working-directory: ./src
       - name: ⬆ Upload build result
         if: github.event_name == 'release' && github.event.action == 'published'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: src/dist
