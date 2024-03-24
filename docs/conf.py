@@ -30,6 +30,7 @@ except:
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "sphinx_rtd_theme",
 ]
 if HAS_PYENCHANT:
     extensions.append("sphinxcontrib.spelling")
@@ -47,7 +48,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "byro"
-copyright = "2017"
+copyright = "2024"
 author = ""
 
 # The version info for the project you're documenting, acts as replacement for
