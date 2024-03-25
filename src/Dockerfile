@@ -1,4 +1,4 @@
-FROM python:3.10.13
+FROM python:3.12.2
 MAINTAINER byro team
 
 EXPOSE 8020
