@@ -70,7 +70,7 @@ setup(
         "celery>=5.1,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
         "chardet>=4.0,<5.3",  # https://github.com/chardet/chardet/releases
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
-        "dateparser>=1.1,<1.2",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
+        "dateparser>=1.1,<1.3",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
         "django-bootstrap4>=3.0,<23.3",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor>=2.4,<5.0",  # https://django-compressor.readthedocs.io/en/latest/changelog/
