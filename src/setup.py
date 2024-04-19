@@ -81,7 +81,7 @@ setup(
         "django-localflavor>=3.0,<4.1",
         "django-select2>=7.7,<8.2",  # https://github.com/applegrew/django-select2/releases
         "django-solo==2.1.*",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
-        "Django>=3.2,<3.3",  # https://docs.djangoproject.com/en/2.0/releases/
+        "Django>=3.2,<5.1",  # https://docs.djangoproject.com/en/2.0/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
         "more-itertools>=8.10,<10.2",
