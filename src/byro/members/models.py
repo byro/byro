@@ -418,9 +418,11 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def is_active(self):
         if not self.memberships.count():
             return False
-        result = self.memberships.last().start <= now().date()
-        if self.memberships.last().end:
-            result = result and not (self.memberships.last().end < now().date())
+        result = False
+        for membership in self.memberships.all():
+            if membership.start <= now().date() and (membership.end is None or membership.end > now().date):
+                result = True
+                break
         return result
 
     @property
