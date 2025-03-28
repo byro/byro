@@ -6,18 +6,9 @@ updates:
       interval: daily
     open-pull-requests-limit: 10
     ignore:
-    - dependency-name: schwifty
+    - dependency-name: Django
       versions:
-        - 2021.1.0
-    - dependency-name: django-select2
-      versions:
-        - 7.6.0
-    - dependency-name: more-itertools
-      versions:
-        - 8.6.0
-    - dependency-name: django-bootstrap4
-      versions:
-         - 2.3.0
+        - "> 4.2"
   - package-ecosystem: pip
     directory: "/docs"
     schedule:
