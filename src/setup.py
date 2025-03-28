@@ -84,7 +84,7 @@ setup(
         "Django>=4.2,<4.3",  # https://docs.djangoproject.com/en/2.0/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
-        "more-itertools>=8.10,<10.2",
+        "more-itertools>=8.10,<10.7",
         "psycopg2-binary",
         "pynacl>=1.4,<1.6",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "python-dateutil",
