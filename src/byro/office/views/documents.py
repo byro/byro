@@ -1,5 +1,4 @@
 import os
-import logging
 
 from django import forms
 from django.contrib import messages
@@ -10,7 +9,6 @@ from django.views.generic import DetailView, FormView
 
 from byro.documents.models import Document, get_document_category_names
 
-logger = logging.getLogger(__name__)
 
 class DocumentUploadForm(forms.ModelForm):
     class Meta:
@@ -84,11 +82,9 @@ class DocumentDownloadView(DetailView):
         response_file = os.fdopen(os.dup(self.object.document.fileno()), mode="rb")
         response = FileResponse(
             response_file,
-            #content_type=self.object.mime_type_guessed, # FIXME: Bug with content-length after upgrading to Django 4.2
+            # content_type=self.object.mime_type_guessed, # FIXME: Bug with content-length after upgrading to Django 4.2
             filename=self.object.basename,
         )
-
-        logger.critical(self.object.mime_type_guessed)
 
         # The actions above may have seeked the fd
         response_file.seek(0)

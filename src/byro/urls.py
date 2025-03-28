@@ -19,8 +19,7 @@ from contextlib import suppress
 from django.apps import apps
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
-from django.urls import include
+from django.urls import include, path
 
 raw_plugin_patterns = []
 for app in apps.get_app_configs():

@@ -123,13 +123,9 @@ class Migration(migrations.Migration):
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="logentry",
-            name="auth_data",
-            field=models.JSONField(),
+            model_name="logentry", name="auth_data", field=models.JSONField(),
         ),
         migrations.AlterField(
-            model_name="logentry",
-            name="data",
-            field=models.JSONField(null=True),
+            model_name="logentry", name="data", field=models.JSONField(null=True),
         ),
     ]
