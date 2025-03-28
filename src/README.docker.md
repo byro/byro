@@ -18,3 +18,4 @@ You should not be able to go to `http://localhost:8020` and log in.
 ## Security
 Do not run this setup as-is on an exposed machine!
 This is for testing purposes only and byro will run in debug mode to allow access from localhost and associated IP addresses.
+ 
