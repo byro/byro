@@ -10,7 +10,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(
-            model_name="configuration", name="can_see_other_members",
+            model_name="configuration",
+            name="can_see_other_members",
         ),
         migrations.AlterField(
             model_name="configuration",

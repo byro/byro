@@ -142,11 +142,11 @@ class LogEntry(models.Model):
             "hash_ver": 2,
             "nonce": base64.b64encode(hdd_nonce).decode("us-ascii"),
             "data_mac": "blake2b:{}".format(hdd_mac.decode("us-ascii")),
-            "orig_content_type": "{}.{}".format(
-                self.content_type.app_label, self.content_type.model
-            )
-            if self.content_type
-            else None,
+            "orig_content_type": (
+                "{}.{}".format(self.content_type.app_label, self.content_type.model)
+                if self.content_type
+                else None
+            ),
             "orig_user_id": self.user_id if self.user_id else None,
             "software_version": ", ".join(get_installed_software()),
         }
@@ -165,14 +165,18 @@ class LogEntry(models.Model):
 
     def get_authenticated_dict(self):
         return {
-            "object_id": str(self.object_id)
-            if not isinstance(self.object_id, (int, str))
-            else self.object_id,
+            "object_id": (
+                str(self.object_id)
+                if not isinstance(self.object_id, (int, str))
+                else self.object_id
+            ),
             "datetime": self.datetime.isoformat(),
             "action_type": self.action_type,
-            "prev_hash": self.auth_prev_id
-            if self.auth_prev_id and self.auth_prev_id != self.auth_hash
-            else "initial:0",
+            "prev_hash": (
+                self.auth_prev_id
+                if self.auth_prev_id and self.auth_prev_id != self.auth_hash
+                else "initial:0"
+            ),
             "auth_data": self.auth_data,
             "source": self.data["source"],
         }

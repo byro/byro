@@ -204,11 +204,11 @@ def augment_timeline(entries):
             "year_last": False,
             "month_first": False,
             "month_last": False,
-            "entry_id": "{}:{}:{}".format(
-                entry["type"], entry["subtype"], entry["instance"].pk
-            )
-            if entry["instance"]
-            else None,
+            "entry_id": (
+                "{}:{}:{}".format(entry["type"], entry["subtype"], entry["instance"].pk)
+                if entry["instance"]
+                else None
+            ),
         }
         if last_year != entry["date"].year:
             tl["year_first"] = True

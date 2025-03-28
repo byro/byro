@@ -94,9 +94,9 @@ class RegistrationConfigForm(forms.Form):
                     (  # This part is responsible for sorting the model fields:
                         data.get(key, {}).get("position", None)
                         or 998,  # Position in form, if set (or 998)
-                        SPECIAL_ORDER.index(key)
-                        if key in SPECIAL_ORDER
-                        else 66,  # SPECIAL_ORDER first
+                        (
+                            SPECIAL_ORDER.index(key) if key in SPECIAL_ORDER else 66
+                        ),  # SPECIAL_ORDER first
                         0 if model in SPECIAL_NAMES else 1,  # SPECIAL_NAMES first
                     ),
                     key,  # Fall back to sorting by key, otherwise

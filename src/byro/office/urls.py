@@ -15,7 +15,9 @@ from .views import (
 app_name = "office"
 urlpatterns = [
     path(
-        "settings/initial", settings.InitialSettings.as_view(), name="settings.initial",
+        "settings/initial",
+        settings.InitialSettings.as_view(),
+        name="settings.initial",
     ),
     path("settings/log", settings.LogView.as_view(), name="settings.log"),
     path("settings/about", settings.AboutByroView.as_view(), name="settings.about"),
@@ -26,7 +28,9 @@ urlpatterns = [
     ),
     path("settings/users/", users.UserListView.as_view(), name="settings.users.list"),
     path(
-        "settings/users/add", users.UserCreateView.as_view(), name="settings.users.add",
+        "settings/users/add",
+        users.UserCreateView.as_view(),
+        name="settings.users.add",
     ),
     path(
         "settings/users/<int:pk>/",
@@ -151,9 +155,15 @@ urlpatterns = [
     path("mails/<int:pk>", mails.MailDetail.as_view(), name="mails.mail.view"),
     path("mails/<int:pk>/copy", mails.MailCopy.as_view(), name="mails.mail.copy"),
     path(
-        "mails/<int:pk>/delete", mails.OutboxPurge.as_view(), name="mails.mail.delete",
+        "mails/<int:pk>/delete",
+        mails.OutboxPurge.as_view(),
+        name="mails.mail.delete",
     ),
-    path("mails/<int:pk>/send", mails.OutboxSend.as_view(), name="mails.mail.send",),
+    path(
+        "mails/<int:pk>/send",
+        mails.OutboxSend.as_view(),
+        name="mails.mail.send",
+    ),
     path("mails/compose", mails.Compose.as_view(), name="mails.compose"),
     path("mails/sent", mails.SentMail.as_view(), name="mails.sent"),
     path("mails/outbox", mails.OutboxList.as_view(), name="mails.outbox.list"),
