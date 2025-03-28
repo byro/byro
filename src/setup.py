@@ -80,7 +80,7 @@ setup(
         "django-libsass>=0.8,<0.10",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
         "django-localflavor>=3.0,<4.1",
         "django-select2>=7.7,<8.2",  # https://github.com/applegrew/django-select2/releases
-        "django-solo==2.1.*",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
+        "django-solo>=2.1,<2.5",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
         "Django>=4.2,<4.3",  # https://docs.djangoproject.com/en/2.0/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
