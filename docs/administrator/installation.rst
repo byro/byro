@@ -15,7 +15,7 @@ external installation guides):
 * **Python 3.7+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
 * An SMTP server to send out mails
 * An HTTP reverse proxy, e.g. `nginx`_ or Apache to allow HTTPS connections
-* A database server: `MySQL`_ 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
+* A database server: MySQL 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
   You can use SQLite, but we strongly recommend not to run SQLite in
   production. Given the choice, we'd recommend to use PostgreSQL.
 
