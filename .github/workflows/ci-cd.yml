@@ -173,12 +173,12 @@ jobs:
         run: python -m pytest --reruns=3 -nauto -p no:sugar --cov=./ --cov-report=xml --maxfail=100 tests
         env:
           BYRO_CONFIG_FILE: 'tests/byro.${{ matrix.database }}.cfg'
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: src/coverage.xml
-          fail_ci_if_error: true
-        if: matrix.database == 'postgres' && matrix.python-version == '3.10'
+      #- name: Upload coverage
+      #  uses: codecov/codecov-action@v3
+      #  with:
+      #    files: src/coverage.xml
+      #    fail_ci_if_error: true
+      #  if: matrix.database == 'postgres' && matrix.python-version == '3.10'
 
   build-python-package:
     name: 🔨 Build python package

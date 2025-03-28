@@ -1,13 +1,13 @@
-from django.urls import include, re_path
+from django.urls import include, path
 
 from . import views
 
 member_pages = [
-    re_path(r"^$", views.MemberView.as_view(), name="member.dashboard"),
-    re_path(r"^list$", views.MemberListView.as_view(), name="member.list"),
+    path("", views.MemberView.as_view(), name="member.dashboard"),
+    path("list", views.MemberListView.as_view(), name="member.list"),
 ]
 
 urlpatterns = [
-    re_path(r"^member/(?P<secret_token>[^/]+)/", include((member_pages, "memberpage")))
+    path("member/<str:secret_token>/", include((member_pages, "memberpage")))
 ]
 app_name = "public"

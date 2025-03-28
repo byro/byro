@@ -10,13 +10,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="booking",
-            name="data",
-            field=models.JSONField(null=True),
+            model_name="booking", name="data", field=models.JSONField(null=True),
         ),
         migrations.AlterField(
-            model_name="transaction",
-            name="data",
-            field=models.JSONField(null=True),
+            model_name="transaction", name="data", field=models.JSONField(null=True),
         ),
     ]

@@ -25,7 +25,12 @@ EMAIL_BACKEND = "django.core.mail.outbox"
 MAIL_FROM = "orga@orga.org"
 
 COMPRESS_ENABLED = COMPRESS_OFFLINE = False
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STORAGES = {
+    **STORAGES,
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 GET_SOLO_TEMPLATE_TAG_NAME = "get_solo"
 
 DEBUG = True

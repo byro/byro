@@ -82,9 +82,10 @@ class DocumentDownloadView(DetailView):
         response_file = os.fdopen(os.dup(self.object.document.fileno()), mode="rb")
         response = FileResponse(
             response_file,
-            content_type=self.object.mime_type_guessed,
+            # content_type=self.object.mime_type_guessed, # FIXME: Bug with content-length after upgrading to Django 4.2
             filename=self.object.basename,
         )
+
         # The actions above may have seeked the fd
         response_file.seek(0)
         return response

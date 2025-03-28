@@ -67,12 +67,12 @@ setup(
     keywords="members membership fees club group clubs associations association",
     install_requires=[
         "canonicaljson==2.0.0",  # https://github.com/matrix-org/python-canonicaljson/blob/master/CHANGES.md
-        "celery>=5.1,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
-        "chardet>=4.0,<5.3",  # https://github.com/chardet/chardet/releases
+        "celery>=5.4,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
+        "chardet>=5.2,<5.3",  # https://github.com/chardet/chardet/releases
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         "dateparser>=1.1,<1.3",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
-        "django-bootstrap4>=3.0,<23.3",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
+        "django-bootstrap4>=23.1,<23.3",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor>=2.4,<5.0",  # https://django-compressor.readthedocs.io/en/latest/changelog/
         "django-extensions>=3.1,<3.3",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
         "django-formset-js-improved==0.5.0.3",  # no changelog, https://github.com/pretix/django-formset-js
@@ -81,7 +81,7 @@ setup(
         "django-localflavor>=3.0,<4.1",
         "django-select2>=7.7,<8.2",  # https://github.com/applegrew/django-select2/releases
         "django-solo==2.1.*",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
-        "Django>=3.2,<3.3",  # https://docs.djangoproject.com/en/2.0/releases/
+        "Django>=4.2,<4.3",  # https://docs.djangoproject.com/en/2.0/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
         "more-itertools>=8.10,<10.2",
@@ -100,7 +100,6 @@ setup(
             "check-manifest",
             "djhtml",
             "flake8",
-            "flake8-bugbear",
             "freezegun",
             "isort",
             "ipython",
