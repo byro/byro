@@ -1,9 +1,9 @@
-FROM python:3.10.13
-MAINTAINER byro team
+FROM python:3.10.16
+LABEL org.opencontainers.image.authors="byro team"
 
 EXPOSE 8020
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y zsh gettext libjpeg-dev libmagic-dev && \
     rm -rf /var/lib/apt/lists/*
