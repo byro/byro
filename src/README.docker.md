@@ -1,7 +1,7 @@
 # Testing byro with Docker
 
 ## First light
-Start the show using `docker-compose up -d`.
+Start the show using `docker compose up -d`.
 
 It should complain about outstanding migrations that need to run.
 This is fine, let's fix this by running the following in a second terminal window:
