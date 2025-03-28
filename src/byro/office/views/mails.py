@@ -46,9 +46,7 @@ class MailSpecialToFormClass(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._decode_special(self.initial)
-        self.fields[
-            "to"
-        ].required = (
+        self.fields["to"].required = (
             False  # FIXME Needs to be re-added in case no special mode is active
         )
         self.order_fields(["to_type", "to_member"])

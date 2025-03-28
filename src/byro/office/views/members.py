@@ -378,9 +378,9 @@ class MemberListExportView(
             content_type="text/csv; charset=utf-8",
             charset="utf-8",
         )
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="members_{now().date()}.csv"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="members_{now().date()}.csv"'
+        )
         return response
 
     def get_data(self, form, field_mapping):
@@ -719,21 +719,22 @@ class MemberDataView(MemberView):
     ):
         params = {
             "instance": (
-                getattr(
-                    member, profile_class._meta.get_field("member").related_query_name()
+                (
+                    getattr(
+                        member,
+                        profile_class._meta.get_field("member").related_query_name(),
+                    )
+                    if profile_class
+                    else instance
                 )
-                if profile_class
-                else instance
-            )
-            if not empty
-            else None,
+                if not empty
+                else None
+            ),
             "prefix": prefix
             or (
                 profile_class.__name__
                 if profile_class
-                else instance.__class__.__name__ + "_"
-                if instance
-                else "member_"
+                else instance.__class__.__name__ + "_" if instance else "member_"
             ),
             "data": self.request.POST if self.request.method == "POST" else None,
         }
@@ -941,9 +942,9 @@ class MultipleFormsMixin:
                     title,
                     form_class(
                         prefix=prefix,
-                        data=self.request.POST
-                        if self.request.method == "POST"
-                        else None,
+                        data=(
+                            self.request.POST if self.request.method == "POST" else None
+                        ),
                     ),
                     buttons,
                     callback,

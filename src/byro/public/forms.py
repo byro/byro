@@ -12,9 +12,9 @@ class PrivacyConsentForm(forms.Form):
 
     def __init__(self, *args, member=None, **kwargs):
         initial = kwargs.pop("initial", {})
-        initial[
-            "is_visible_to_members"
-        ] = member.profile_memberpage.is_visible_to_members
+        initial["is_visible_to_members"] = (
+            member.profile_memberpage.is_visible_to_members
+        )
         super().__init__(*args, initial=initial, **kwargs)
         self.member = member
 
