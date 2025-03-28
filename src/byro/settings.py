@@ -85,7 +85,7 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 CSRF_COOKIE_NAME = "byro_csrftoken"
-CSRF_TRUSTED_ORIGINS = [urlparse(SITE_URL).hostname]
+CSRF_TRUSTED_ORIGINS = [urlparse(SITE_URL).scheme + "://" + urlparse(SITE_URL).hostname]
 SESSION_COOKIE_NAME = "byro_session"
 SESSION_COOKIE_SECURE = config.getboolean(
     "site", "https", fallback=SITE_URL.startswith("https:")
@@ -202,7 +202,6 @@ else:
 
 ## I18N SETTINGS
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 LANGUAGES = [
     ("en", _("English")),
@@ -279,8 +278,14 @@ STATICFILES_FINDERS = (
     "compressor.finders.CompressorFinder",
 )
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "byro", "static")]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage"
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 ## EXTERNAL APP SETTINGS
 with suppress(ImportError):
