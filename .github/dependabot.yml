@@ -9,6 +9,8 @@ updates:
     - dependency-name: Django
       versions:
         - "> 4.2"
+    - dependency-name: python
+      update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: pip
     directory: "/docs"
     schedule:
