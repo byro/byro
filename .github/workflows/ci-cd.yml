@@ -23,7 +23,7 @@ concurrency:
 jobs:
   style-isort:
     name: "[Style] isort"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
@@ -44,7 +44,7 @@ jobs:
 
   style-flake8:
     name: "[Style] flake8"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
@@ -65,7 +65,7 @@ jobs:
 
   style-black:
     name: "[Style] black"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
@@ -86,7 +86,7 @@ jobs:
 
   style-djhtml:
     name: "[Style] DjHTML"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
@@ -106,7 +106,7 @@ jobs:
         working-directory: ./src
 
   testing:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Tests
     strategy:
       fail-fast: false
@@ -188,7 +188,7 @@ jobs:
       - style-black
       - style-djhtml
       - testing
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: 🏗 Set up Python 3.10
@@ -233,7 +233,7 @@ jobs:
     name: ⬆ Upload release to PyPI
     needs: build-python-package
     if: github.event_name == 'release' && github.event.action == 'published'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     environment:
       name: pypi
       url: https://pypi.org/p/byro
@@ -253,7 +253,7 @@ jobs:
   build-docker-image:
     name: 🔨 Build docker image
     needs: build-python-package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v4
@@ -289,7 +289,7 @@ jobs:
     name: 🔨 Push Docker image to GitHub Packages
     needs: build-docker-image
     if: github.event_name == 'push' || (github.event_name == 'release' && github.event.action == 'published')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
