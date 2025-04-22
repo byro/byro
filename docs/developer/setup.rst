@@ -169,4 +169,4 @@ Head over to the :doc:`documentation patching section </developer/documentation>
 If you want to work on plugins, please go to the :doc:`plugin guides </developer/plugins/index>`.
 
 .. _qrcode: https://pypi.org/project/qrcode/
-.. _pillow: https://pillow.readthedocs.io/en/latest/installation.html#external-libraries
+.. _pillow: https://pillow.readthedocs.io/en/latest/installation/basic-installation.html#basic-installation
