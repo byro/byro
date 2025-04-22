@@ -46,6 +46,26 @@ class Account(Auditable, models.Model, LogTargetMixin):
     )
     name = models.CharField(max_length=300, null=True)  # e.g. 'Laser donations'
     tags = models.ManyToManyField(AccountTag, related_name="accounts")
+    associated = models.ForeignKey("Account", null=True, on_delete=models.SET_NULL)
+
+    def associate(self, other):
+        # allowed associations are only:
+        #   income <--> asset
+        #   expense <--> liability
+        allowed_association_categories = [
+            {AccountCategory.INCOME, AccountCategory.ASSET},
+            {AccountCategory.EXPENSE, AccountCategory.LIABILITY}
+        ]
+
+        if other is not None and {self.account_category, other.account_category} not in allowed_association_categories:
+            raise Exception("Associating categories " + self.account_category + " and " + other.account_category + " is not allowed.")
+
+        if self.associated is not None:
+            self.associated.associated = None
+
+        self.associated = other
+        if other is not None:
+            other.associated = self
 
     class Meta:
         unique_together = (("account_category", "name"),)
@@ -118,6 +138,31 @@ class Account(Auditable, models.Model, LogTargetMixin):
             result["net"] = result["debit"] - result["credit"]
 
         result = {k: Decimal(v).quantize(Decimal("0.01")) for k, v in result.items()}
+
+        return result
+
+    def balances_with_associated(self, start=None, end=now()):
+        if self.account_category not in [AccountCategory.INCOME, AccountCategory.EXPENSE]:
+            raise Exception("This is only allowed for income or expense accounts.")
+
+        result_1 = self.balances(start, end)
+        if self.associated is None:
+            return result_1
+
+        result_2 = self.associated.balances(start, end)
+
+        if self.account_category == AccountCategory.INCOME:
+            result = {
+                "net": result_1['net'] - result_2['net'],
+                "debit": result_1['debit'],
+                "credit": result_1['credit'] - result_2['net']
+            }
+        else:
+            result = {
+                "net": result_1['net'] - result_2['net'],
+                "debit": result_1['debit'] - result_2['net'],
+                "credit": result_1['credit']
+            }
 
         return result
 
