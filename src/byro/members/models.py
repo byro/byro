@@ -418,10 +418,12 @@ class Member(Auditable, models.Model, LogTargetMixin):
     def is_active(self):
         if not self.memberships.count():
             return False
-        result = self.memberships.last().start <= now().date()
-        if self.memberships.last().end:
-            result = result and not (self.memberships.last().end < now().date())
-        return result
+        for membership in self.memberships.all():
+            if membership.start <= now().date() and (
+                membership.end is None or membership.end >= now().date()
+            ):
+                return True
+        return False
 
     @property
     def record_disclosure_email(self):
