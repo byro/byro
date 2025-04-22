@@ -57,7 +57,7 @@ and register it in your ``signals.py``::
 
    from django.dispatch import receiver
    from django.urls import reverse
-   from django.utils.translation import ugettext_lazy as _
+   from django.utils.translation import text_lazy as _
 
    from byro.office.signals import member_view
 
@@ -76,7 +76,7 @@ add a general newsletter view to the sidebar::
 
    from django.dispatch import receiver
    from django.urls import reverse
-   from django.utils.translation import ugettext_lazy as _
+   from django.utils.translation import gettext_lazy as _
 
    from byro.office.signals import nav_event
 
@@ -100,7 +100,7 @@ related model. If the model class inherits from ``ByroConfiguration`` and ends
 in ``Configuration``, it will be automatically added to the settings page::
 
    from django.db import models
-   from django.utils.translation import ugettext_lazy as _
+   from django.utils.translation import gettext_lazy as _
 
    from byro.common.models.configuration import ByroConfiguration
 

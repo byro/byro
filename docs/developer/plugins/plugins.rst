@@ -49,7 +49,7 @@ description        string               A more verbose description of what your 
 A working example would be::
 
     from django.apps import AppConfig
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
 
     class IRCApp(AppConfig):
