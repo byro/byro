@@ -419,7 +419,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
         if not self.memberships.count():
             return False
         for membership in self.memberships.all():
-            if membership.start <= now().date() and (membership.end is None or membership.end >= now().date()):
+            if membership.start <= now().date() and (
+                membership.end is None or membership.end >= now().date()
+            ):
                 return True
         return False
 
