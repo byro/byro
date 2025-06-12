@@ -90,7 +90,7 @@ setup(
         "python-dateutil",
         "python-magic~=0.4.0",
         "qrcode[pil]>=7.3,<8.2",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
-        "schwifty==2025.1.0",
+        "schwifty==2025.6.0",
         "unicodecsv~=0.14.0",
         "whitenoise>=6.4,<6.10",
     ],
