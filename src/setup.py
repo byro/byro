@@ -72,7 +72,7 @@ setup(
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         "dateparser>=1.1,<1.3",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
-        "django-bootstrap4>=23.1,<25.2",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
+        "django-bootstrap4>=23.1,<25.3",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor>=2.4,<5.0",  # https://django-compressor.readthedocs.io/en/latest/changelog/
         "django-extensions>=3.1,<4.2",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
         "django-formset-js-improved==0.5.0.3",  # no changelog, https://github.com/pretix/django-formset-js
