@@ -86,7 +86,7 @@ setup(
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
         "more-itertools>=8.10,<10.7",
         "psycopg2-binary",
-        "pynacl>=1.4,<1.6",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
+        "pynacl>=1.4,<1.7",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "python-dateutil",
         "python-magic~=0.4.0",
         "qrcode[pil]>=7.3,<8.2",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
