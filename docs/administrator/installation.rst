@@ -14,7 +14,7 @@ external installation guides):
 
 * **Python 3.12+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
 * An SMTP server to send out mails
-* An HTTP reverse proxy, e.g. `nginx`_ or Apache to allow HTTPS connections
+* An HTTP reverse proxy, e.g. `nginx` or Apache to allow HTTPS connections
 * A database server: `MySQL` 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
   You can use SQLite, but we strongly recommend not to run SQLite in
   production. Given the choice, we'd recommend to use PostgreSQL.
@@ -227,7 +227,6 @@ If you want to upgrade byro to a specific release, you can substitute
     # systemctl restart byro-web
 
 
-.. _nginx: https://botleg.com/stories/https-with-lets-encrypt-and-nginx/
 .. _Let's Encrypt: https://letsencrypt.org/
 .. _PostgreSQL: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-9-4-on-debian-8
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
