@@ -113,7 +113,9 @@ jobs:
       matrix:
         python-version: [ '3.12', '3.13' ]
         database: [ sqlite, postgres, mysql ]
-        exclude: []
+        exclude:
+          - database: mysql
+            python-version: '3.13'
     steps:
       - uses: actions/checkout@v4
       - uses: getong/mariadb-action@v1.1

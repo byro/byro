@@ -233,3 +233,5 @@ If you want to upgrade byro to a specific release, you can substitute
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
 .. _strong encryption settings: https://mozilla.github.io/server-side-tls/ssl-config-generator/
 .. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose.html
+.. _MySQL: https://dev.mysql.com/doc/
+.. _mysql: https://dev.mysql.com/doc/

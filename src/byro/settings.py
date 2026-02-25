@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
+
 try:
     from importlib.metadata import entry_points as _entry_points
 except ImportError:  # pragma: no cover - fallback for very old Pythons
