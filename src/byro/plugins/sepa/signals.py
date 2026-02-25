@@ -80,8 +80,7 @@ def leave_member_office_mail_info_sepa(sender, signal, **kwargs):
         "mandate_reason": member.profile_sepa.mandate_reason,
         "end": membership.end.isoformat(),
     }
-    return _(
-        """Please terminate SEPA mandate member number: {number} to {end}:
+    return _("""Please terminate SEPA mandate member number: {number} to {end}:
 
 Name: {name}
 IBAN: {iban}
@@ -90,5 +89,4 @@ Mandate date: {issue_date}
 Mandate reference: {mandate_reference}
 Mandate reason: {mandate_reason}
 
-"""
-    ).format(**data)
+""").format(**data)

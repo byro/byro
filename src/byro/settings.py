@@ -5,7 +5,10 @@ from urllib.parse import urlparse
 
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
-from pkg_resources import iter_entry_points
+try:
+    from importlib.metadata import entry_points as _entry_points
+except ImportError:  # pragma: no cover - fallback for very old Pythons
+    from importlib_metadata import entry_points as _entry_points  # type: ignore
 
 from byro.common.settings.config import build_config
 from byro.common.settings.utils import log_initial
@@ -65,9 +68,10 @@ INSTALLED_APPS = [
 ]
 
 PLUGINS = []
-for entry_point in iter_entry_points(group="byro.plugin", name=None):
-    PLUGINS.append(entry_point.module_name)
-    INSTALLED_APPS.append(entry_point.module_name)
+for ep in _entry_points(group="byro.plugin"):
+    module_name = ep.value.split(":")[0]
+    PLUGINS.append(module_name)
+    INSTALLED_APPS.append(module_name)
 
 ## URL SETTINGS
 SITE_URL = config.get("site", "url", fallback="http://localhost")
@@ -218,6 +222,9 @@ FORMAT_MODULE_PATH = ["byro.common.formats"]
 TIME_ZONE = config.get("locale", "time_zone")
 LANGUAGE_CODE = "en"
 DEFAULT_LANGUAGE = config.get("locale", "language_code") or "de"
+
+# Default to https scheme in URLField forms to align with Django 6.0 behavior
+FORMS_URLFIELD_ASSUME_HTTPS = True
 
 
 ## AUTHENTICATION SETTINGS
