@@ -32,9 +32,7 @@ def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
 ┣━━━━━━━━━━┫
 ┃   byro   ┃
 ┗━━━━━━━━━━┛
-    """.strip().split(
-        "\n"
-    )
+    """.strip().split("\n")
     img_width = len(image[0])
     image[-1] += " " * (img_width - len(image[-1]))
     image += [" " * img_width for _ in repeat(None, (len(lines) - len(image)))]

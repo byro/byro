@@ -10,9 +10,11 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration
 from byro.members.models import FeeIntervals, Member, Membership
 
+# Apply django_db to all tests in this module (pytest>=9 compatibility)
+pytestmark = pytest.mark.django_db
+
 
 @pytest.fixture
-@pytest.mark.django_db
 def new_member():
     return Member.objects.create(number="007")
 

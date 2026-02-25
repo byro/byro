@@ -19,14 +19,14 @@ class CustomSMTPBackend(EmailBackend):
             self.open()
             self.connection.ehlo_or_helo_if_needed()
             self.connection.rcpt("test@example.org")
-            (code, resp) = self.connection.mail(from_addr, [])
+            code, resp = self.connection.mail(from_addr, [])
             if code != 250:
                 logger.warning(
                     "Error testing mail settings, code %d, resp: %s" % (code, resp)
                 )
                 raise SMTPSenderRefused(code, resp, from_addr)
             senderrs = {}
-            (code, resp) = self.connection.rcpt("test@example.com")
+            code, resp = self.connection.rcpt("test@example.com")
             if (code != 250) and (code != 251):
                 logger.warning(
                     "Error testing mail settings, code %d, resp: %s" % (code, resp)

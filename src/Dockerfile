@@ -1,4 +1,4 @@
-FROM python:3.10.16
+FROM python:3.12
 LABEL org.opencontainers.image.authors="byro team"
 
 EXPOSE 8020

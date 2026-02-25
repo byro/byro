@@ -12,10 +12,10 @@ Step 0: Prerequisites
 Please set up the following systems beforehand, we'll not explain them here (but see these links for
 external installation guides):
 
-* **Python 3.7+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
+* **Python 3.12+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
 * An SMTP server to send out mails
-* An HTTP reverse proxy, e.g. `nginx`_ or Apache to allow HTTPS connections
-* A database server: `MySQL`_ 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
+* An HTTP reverse proxy, e.g. `nginx` or Apache to allow HTTPS connections
+* A database server: `MySQL` 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
   You can use SQLite, but we strongly recommend not to run SQLite in
   production. Given the choice, we'd recommend to use PostgreSQL.
 
@@ -130,7 +130,7 @@ system, especially the local Python version's)::
     [Service]
     User=byro
     Group=byro
-    WorkingDirectory=/var/byro/.local/lib/python3.8/site-packages/byro
+    WorkingDirectory=/var/byro/.local/lib/python3.12/site-packages/byro
     ExecStart=/var/byro/.local/bin/gunicorn byro.wsgi \
                           --name byro --workers 4 \
                           --max-requests 1200  --max-requests-jitter 50 \
@@ -227,9 +227,9 @@ If you want to upgrade byro to a specific release, you can substitute
     # systemctl restart byro-web
 
 
-.. _nginx: https://botleg.com/stories/https-with-lets-encrypt-and-nginx/
 .. _Let's Encrypt: https://letsencrypt.org/
 .. _PostgreSQL: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-9-4-on-debian-8
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
 .. _strong encryption settings: https://mozilla.github.io/server-side-tls/ssl-config-generator/
 .. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose.html
+

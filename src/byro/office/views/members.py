@@ -163,8 +163,7 @@ class MemberBalanceForm(forms.Form):
     subject = forms.CharField(label=_("Subject"))
     text = forms.CharField(
         label=_("Text"),
-        initial=_(
-            """Hello {name},
+        initial=_("""Hello {name},
 
 we wanted to let you know that within the time from {start}
 to {end} you incurred unpaid liabilities in the amount of
@@ -172,8 +171,7 @@ to {end} you incurred unpaid liabilities in the amount of
    EUR {amount}
 
 Please settle this amount as soon as possible, or let us
-know if you think this email is incorrect."""
-        ),
+know if you think this email is incorrect."""),
         widget=forms.Textarea,
     )
 

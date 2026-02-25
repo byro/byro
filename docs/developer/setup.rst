@@ -11,7 +11,7 @@ Please make sure you have the following dependencies installed:
 +----------------------------------+------------------+
 | Tool                             | Debian package   |
 +==================================+==================+
-| Python 3.8(!) or newer           |                  |
+| Python 3.12 or newer             |                  |
 +----------------------------------+------------------+
 | pip for Python 3                 | ``python3-pip``  |
 +----------------------------------+------------------+

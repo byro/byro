@@ -1,8 +1,8 @@
 from codecs import open
-from distutils.command.build import build
 from os import environ, path
 
 from setuptools import find_packages, setup
+from setuptools.command.build_py import build_py
 
 from byro import __version__ as byro_version
 
@@ -16,7 +16,7 @@ except:  # noqa
     long_description = ""
 
 
-class CustomBuild(build):
+class CustomBuild(build_py):
     def run(self):
         environ.setdefault("DJANGO_SETTINGS_MODULE", "byro.settings")
         try:
@@ -33,17 +33,17 @@ class CustomBuild(build):
         management.call_command("compilemessages", verbosity=1)
         management.call_command("collectstatic", verbosity=1, interactive=False)
         management.call_command("compress", verbosity=1)
-        build.run(self)
+        super().run()
 
 
-cmdclass = {"build": CustomBuild}
+cmdclass = {"build_py": CustomBuild}
 
 
 setup(
     name="byro",
     version=byro_version,
     license="Apache License 2.0",
-    python_requires=">=3.8",
+    python_requires=">=3.12",
     description="Membership and fees management for associations, clubs and groups",
     long_description=long_description,
     url="https://byro.cloud",
@@ -53,15 +53,14 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Django",
-        "Framework :: Django :: 4.2",
+        "Framework :: Django :: 5.2",
         "Intended Audience :: Developers",
         "Intended Audience :: Other Audience",
         "License :: OSI Approved",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
     keywords="members membership fees club group clubs associations association",
@@ -81,7 +80,7 @@ setup(
         "django-localflavor>=3.0,<4.1",
         "django-select2>=7.7,<8.3",  # https://github.com/applegrew/django-select2/releases
         "django-solo>=2.1,<2.5",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
-        "Django>=4.2,<4.3",  # https://docs.djangoproject.com/en/2.0/releases/
+        "Django>=5.2,<5.3",  # https://docs.djangoproject.com/en/5.2/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
         "more-itertools>=8.10,<10.7",
@@ -103,7 +102,7 @@ setup(
             "freezegun",
             "isort",
             "ipython",
-            "pytest",
+            "pytest<9",
             "pytest-cov",
             "pytest-django",
             "pytest-rerunfailures",
