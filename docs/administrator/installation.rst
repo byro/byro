@@ -15,7 +15,7 @@ external installation guides):
 * **Python 3.12+** and ``pip`` for Python 3. You can use ``python -V`` and ``pip3 -V`` to check.
 * An SMTP server to send out mails
 * An HTTP reverse proxy, e.g. `nginx`_ or Apache to allow HTTPS connections
-* A database server: `MySQL`_ 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
+* A database server: `MySQL` 5.7+ or MariaDB 10.2+ or `PostgreSQL`_ 9.6+.
   You can use SQLite, but we strongly recommend not to run SQLite in
   production. Given the choice, we'd recommend to use PostgreSQL.
 
@@ -233,5 +233,4 @@ If you want to upgrade byro to a specific release, you can substitute
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
 .. _strong encryption settings: https://mozilla.github.io/server-side-tls/ssl-config-generator/
 .. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose.html
-.. _MySQL: https://dev.mysql.com/doc/
-.. _mysql: https://dev.mysql.com/doc/
+
