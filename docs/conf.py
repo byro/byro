@@ -11,8 +11,24 @@ import sys
 sys.path.insert(0, os.path.abspath("../src"))
 
 import django
+import types
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "byro.settings")
+
+# On Read the Docs, system package libmagic is not available. Importing
+# Django models triggers `import magic`, which then fails during
+# `django.setup()`. To keep docs builds working without altering runtime
+# behavior, provide a minimal stub for `magic` when building on RTD.
+if os.environ.get("READTHEDOCS"):
+    magic_stub = types.ModuleType("magic")
+
+    def _from_buffer(*args, **kwargs):
+        # Return a generic MIME type — sufficient for docs introspection.
+        return "application/octet-stream"
+
+    magic_stub.from_buffer = _from_buffer
+    sys.modules.setdefault("magic", magic_stub)
+
 django.setup()
 
 # PyEnchant is required for spellchecking only, and somewhat bothersome
