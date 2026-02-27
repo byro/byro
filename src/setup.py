@@ -77,7 +77,7 @@ setup(
         "django-formset-js-improved==0.5.0.3",  # no changelog, https://github.com/pretix/django-formset-js
         "django-i18nfield>=1.9,<1.11",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
         "django-libsass>=0.8,<0.10",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
-        "django-localflavor>=3.0,<4.1",
+        "django-localflavor>=3.0,<5.1",
         "django-select2>=7.7,<8.3",  # https://github.com/applegrew/django-select2/releases
         "django-solo>=2.1,<2.5",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
         "Django>=5.2,<5.3",  # https://docs.djangoproject.com/en/5.2/releases/
