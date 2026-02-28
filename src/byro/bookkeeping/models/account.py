@@ -78,6 +78,28 @@ class Account(Auditable, models.Model, LogTargetMixin):
         )
 
     @property
+    def credit_accounts(self):
+        from byro.bookkeeping.models import Booking
+
+        return Account.objects.filter(
+            id__in=Booking.objects.filter(
+                transaction__bookings__debit_account=self,
+                credit_account__isnull=False)
+            .values_list('credit_account',flat=True).distinct()
+        )
+
+    @property
+    def debit_accounts(self):
+        from byro.bookkeeping.models import Booking
+
+        return Account.objects.filter(
+            id__in=Booking.objects.filter(
+                transaction__bookings__credit_account=self,
+                debit_account__isnull=False)
+            .values_list('debit_account',flat=True).distinct()
+        )
+
+    @property
     def unbalanced_transactions(self):
         from byro.bookkeeping.models import Transaction
 
