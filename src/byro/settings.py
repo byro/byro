@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "annoying",
     "rest_framework",
     "rest_framework.authtoken",
+    "drf_spectacular",
     "byro.api",
 ]
 
@@ -324,6 +325,14 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 50,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "byro API",
+    "DESCRIPTION": "REST API for byro membership administration",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 COMPRESS_ENABLED = COMPRESS_OFFLINE = not DEBUG

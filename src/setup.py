@@ -93,6 +93,7 @@ setup(
         "unicodecsv~=0.14.0",
         "whitenoise>=6.4,<6.10",
         "djangorestframework>=3.14,<4.0",
+        "drf-spectacular>=0.27,<1.0",
     ],
     extras_require={
         "dev": [
