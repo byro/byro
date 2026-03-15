@@ -85,6 +85,7 @@ setup(
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
         "more-itertools>=8.10,<10.7",
         "psycopg2-binary",
+        "PyJWT[crypto]>=2.8,<3",
         "pynacl>=1.4,<1.6",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "python-dateutil",
         "python-magic~=0.4.0",
