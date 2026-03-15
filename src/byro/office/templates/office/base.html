@@ -97,6 +97,9 @@
                             <a class="nav-link nav-link-second-level {% if "settings.users" in url_name %}active{% endif %}" href="{% url 'office:settings.users.list' %}">
                                 {% trans "Users" %}
                             </a>
+                            <a class="nav-link nav-link-second-level {% if "settings.api-token" in url_name %}active{% endif %}" href="{% url 'office:settings.api-token' %}">
+                                {% trans "API Token" %}
+                            </a>
                             {% for nav_element in nav_event %}
                                 {% if nav_element.section == 'settings' %}
                                     <a class="nav-link nav-link-second-level {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">

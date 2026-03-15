@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 15:00-0300\n"
+"POT-Creation-Date: 2026-03-15 22:53+0000\n"
 "PO-Revision-Date: 2022-03-08 02:52+0100\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
@@ -974,7 +974,12 @@ msgstr "Allgemeine Einstellungen"
 msgid "Users"
 msgstr "Benutzer"
 
-#: byro/office/templates/office/base.html:116
+#: byro/office/templates/office/base.html:101
+#: byro/office/templates/office/settings/api_token.html:6
+msgid "API Token"
+msgstr "API-Token"
+
+#: byro/office/templates/office/base.html:119
 msgid "Log"
 msgstr "Logbuch"
 
@@ -1608,6 +1613,22 @@ msgstr "Weitere Plugins online suchen …"
 #: byro/office/templates/office/settings/about.html:57
 msgid "Find plugins online …"
 msgstr "Plugins online suchen …"
+
+#: byro/office/templates/office/settings/api_token.html:8
+msgid "Use this token to authenticate API requests:"
+msgstr "Verwende diesen Token zur Authentifizierung von API-Anfragen:"
+
+#: byro/office/templates/office/settings/api_token.html:13
+msgid "Include it in requests as:"
+msgstr "In Anfragen einbinden als:"
+
+#: byro/office/templates/office/settings/api_token.html:18
+msgid "Regenerate token? The old token will stop working immediately."
+msgstr "Token neu generieren? Der alte Token funktioniert danach nicht mehr."
+
+#: byro/office/templates/office/settings/api_token.html:19
+msgid "Regenerate token"
+msgstr "Token neu generieren"
 
 #: byro/office/templates/office/settings/log.html:5
 msgid "Audit Log"
