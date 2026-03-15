@@ -112,8 +112,11 @@ def validate_id_token(id_token, nonce):
     except Exception as exc:
         raise OIDCError(f"ID token validation failed: {exc}") from exc
 
-    if claims.get("iss") != settings.OIDC_ISSUER_URL.rstrip("/"):
-        raise OIDCError("ID token issuer mismatch")
+    if claims.get("iss", "").rstrip("/") != settings.OIDC_ISSUER_URL.rstrip("/"):
+        raise OIDCError(
+            f"ID token issuer mismatch: got '{claims.get('iss')}', "
+            f"expected '{settings.OIDC_ISSUER_URL}'"
+        )
     if claims.get("nonce") != nonce:
         raise OIDCError("ID token nonce mismatch")
     return claims
