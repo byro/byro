@@ -12,7 +12,14 @@ from django.utils.translation import gettext as _
 from django.views.generic import TemplateView, View
 
 from byro.common.models import LogEntry
-from byro.common.oidc import OIDCError, build_auth_url, exchange_code, get_or_create_user, is_oidc_configured, validate_id_token
+from byro.common.oidc import (
+    OIDCError,
+    build_auth_url,
+    exchange_code,
+    get_or_create_user,
+    is_oidc_configured,
+    validate_id_token,
+)
 
 
 class LoginView(TemplateView):
@@ -100,7 +107,9 @@ class OIDCCallbackView(View):
         error = request.GET.get("error")
         if error:
             error_description = request.GET.get("error_description", error)
-            messages.error(request, _("SSO login failed: %(error)s") % {"error": error_description})
+            messages.error(
+                request, _("SSO login failed: %(error)s") % {"error": error_description}
+            )
             return redirect("common:login")
 
         try:

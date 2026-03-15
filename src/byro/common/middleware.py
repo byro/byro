@@ -25,7 +25,13 @@ class SettingsMiddleware:
 
 
 class PermissionMiddleware:
-    UNAUTHENTICATED_URLS = ("login", "logout", "log.info", "oidc-login", "oidc-callback")
+    UNAUTHENTICATED_URLS = (
+        "login",
+        "logout",
+        "log.info",
+        "oidc-login",
+        "oidc-callback",
+    )
 
     def __init__(self, get_response):
         self.get_response = get_response
