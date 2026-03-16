@@ -1,8 +1,8 @@
 from decimal import Decimal
 
+import django_filters
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,6 +12,32 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.members.models import Member, Membership
 
 from .serializers import MemberSerializer, MembershipSerializer
+
+
+class MemberFilter(django_filters.FilterSet):
+    email = django_filters.CharFilter(field_name="email", lookup_expr="iexact")
+    email__contains = django_filters.CharFilter(field_name="email", lookup_expr="icontains")
+    number = django_filters.CharFilter(field_name="number", lookup_expr="exact")
+    name__contains = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    is_active = django_filters.BooleanFilter(method="filter_is_active")
+    secret_token = django_filters.CharFilter(
+        field_name="profile_memberpage__secret_token", lookup_expr="exact"
+    )
+
+    def filter_is_active(self, queryset, name, value):
+        from django.db.models import Q
+        from django.utils.timezone import now as tz_now
+        today = tz_now().date()
+        active_q = Q(memberships__start__lte=today) & (
+            Q(memberships__end__isnull=True) | Q(memberships__end__gte=today)
+        )
+        if value:
+            return queryset.filter(active_q).distinct()
+        return queryset.exclude(active_q).distinct()
+
+    class Meta:
+        model = Member
+        fields = []
 
 
 BALANCE_TYPE_MAP = {
@@ -24,6 +50,7 @@ BALANCE_TYPE_MAP = {
 class MemberViewSet(ModelViewSet):
     queryset = Member.all_objects.all()
     serializer_class = MemberSerializer
+    filterset_class = MemberFilter
     http_method_names = ["get", "post", "put", "patch", "head", "options"]
 
     def perform_create(self, serializer):
