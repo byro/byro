@@ -16,9 +16,13 @@ from .serializers import MemberSerializer, MembershipSerializer
 
 class MemberFilter(django_filters.FilterSet):
     email = django_filters.CharFilter(field_name="email", lookup_expr="iexact")
-    email__contains = django_filters.CharFilter(field_name="email", lookup_expr="icontains")
+    email__contains = django_filters.CharFilter(
+        field_name="email", lookup_expr="icontains"
+    )
     number = django_filters.CharFilter(field_name="number", lookup_expr="exact")
-    name__contains = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    name__contains = django_filters.CharFilter(
+        field_name="name", lookup_expr="icontains"
+    )
     is_active = django_filters.BooleanFilter(method="filter_is_active")
     secret_token = django_filters.CharFilter(
         field_name="profile_memberpage__secret_token", lookup_expr="exact"
@@ -27,6 +31,7 @@ class MemberFilter(django_filters.FilterSet):
     def filter_is_active(self, queryset, name, value):
         from django.db.models import Q
         from django.utils.timezone import now as tz_now
+
         today = tz_now().date()
         active_q = Q(memberships__start__lte=today) & (
             Q(memberships__end__isnull=True) | Q(memberships__end__gte=today)
@@ -42,7 +47,10 @@ class MemberFilter(django_filters.FilterSet):
 
 BALANCE_TYPE_MAP = {
     "payment": lambda: (SpecialAccounts.fees_receivable, SpecialAccounts.bank),
-    "initial": lambda: (SpecialAccounts.opening_balance, SpecialAccounts.fees_receivable),
+    "initial": lambda: (
+        SpecialAccounts.opening_balance,
+        SpecialAccounts.fees_receivable,
+    ),
     "waiver": lambda: (SpecialAccounts.fees_receivable, SpecialAccounts.lost_income),
 }
 
@@ -102,7 +110,8 @@ class MemberViewSet(ModelViewSet):
             )
             if value_datetime is None:
                 return Response(
-                    {"error": "invalid value_datetime"}, status=status.HTTP_400_BAD_REQUEST
+                    {"error": "invalid value_datetime"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
         else:
             value_datetime = now()
@@ -122,7 +131,9 @@ class MemberViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        member.log(request, ".finance.balance_adjusted", amount=str(amount), type=balance_type)
+        member.log(
+            request, ".finance.balance_adjusted", amount=str(amount), type=balance_type
+        )
         return Response({"balance": member.balance})
 
 

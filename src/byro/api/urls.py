@@ -9,9 +9,7 @@ app_name = "api"
 router = DefaultRouter()
 router.register("members", MemberViewSet, basename="members")
 
-membership_list = MembershipViewSet.as_view(
-    {"get": "list", "post": "create"}
-)
+membership_list = MembershipViewSet.as_view({"get": "list", "post": "create"})
 membership_detail = MembershipViewSet.as_view(
     {"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}
 )
@@ -28,5 +26,9 @@ urlpatterns = router.urls + [
         name="member-memberships-detail",
     ),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("docs/", SpectacularSwaggerView.as_view(url_name="api:schema"), name="swagger-ui"),
+    path(
+        "docs/",
+        SpectacularSwaggerView.as_view(url_name="api:schema"),
+        name="swagger-ui",
+    ),
 ]
