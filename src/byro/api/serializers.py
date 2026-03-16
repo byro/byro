@@ -1,7 +1,6 @@
-from django.utils.timezone import now
 from rest_framework import serializers
 
-from byro.members.models import FeeIntervals, Member, Membership
+from byro.members.models import Member, Membership
 
 AUDIT_FIELDS = {"id", "member", "created", "modified", "created_by", "modified_by"}
 

@@ -2,7 +2,6 @@ from decimal import Decimal
 
 import django_filters
 from django.shortcuts import get_object_or_404
-from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -103,7 +102,7 @@ class MemberViewSet(ModelViewSet):
         from_, to_ = BALANCE_TYPE_MAP[balance_type]()
 
         if value_datetime_str:
-            from django.utils.dateparse import parse_datetime, parse_date
+            from django.utils.dateparse import parse_date, parse_datetime
 
             value_datetime = parse_datetime(value_datetime_str) or parse_date(
                 value_datetime_str
@@ -114,6 +113,8 @@ class MemberViewSet(ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         else:
+            from django.utils.timezone import now
+
             value_datetime = now()
 
         changed = member.adjust_balance(
