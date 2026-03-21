@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from byro.members.models import Member, Membership
@@ -17,6 +18,10 @@ def _build_profile_serializer(profile_cls):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
+    amount = extend_schema_field({"type": "number", "example": 10})(
+        serializers.DecimalField(max_digits=8, decimal_places=2)
+    )
+
     class Meta:
         model = Membership
         fields = ["id", "start", "end", "amount", "interval"]
@@ -24,7 +29,9 @@ class MembershipSerializer(serializers.ModelSerializer):
 
 class MemberSerializer(serializers.ModelSerializer):
     memberships = MembershipSerializer(many=True, read_only=True)
-    balance = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    balance = extend_schema_field({"type": "number", "example": 0})(
+        serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    )
     is_active = serializers.BooleanField(read_only=True)
 
     class Meta:
