@@ -4,6 +4,11 @@
 
 {% block headline %}{% trans "User" %}
     {% if user.last_name %}{{user.last_name}} ({{user.username}}){% else %}{{user.username}}{% endif %}
+    {% if not user.has_usable_password %}
+        <span class="badge badge-warning ml-2" title="{% trans "Password disabled – user cannot log in with a password" %}">
+            <span class="fa fa-lock"></span> {% trans "Password disabled" %}
+        </span>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -13,4 +18,22 @@
         {% bootstrap_form form layout='horizontal' %}
         <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
     </form>
+
+    {% if user.pk != request.user.pk %}
+        <hr>
+        {% if user.has_usable_password %}
+            <form method="post" action="{% url 'office:settings.users.disable-password' pk=user.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('{% trans "Disable this user's password? They will no longer be able to log in with a password." %}')">
+                    <span class="fa fa-lock"></span> {% trans "Disable password" %}
+                </button>
+            </form>
+        {% else %}
+            <p class="text-muted">
+                <span class="fa fa-lock"></span>
+                {% trans "This user's password is disabled. Set a new password above to re-enable password login." %}
+            </p>
+        {% endif %}
+    {% endif %}
 {% endblock %}
