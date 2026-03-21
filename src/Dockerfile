@@ -16,7 +16,7 @@ ADD . /byro
 ADD byro.docker.cfg /byro/byro.cfg
 WORKDIR /byro 
 RUN   pip install --upgrade pip && pip3 install -e . && pip3 install gunicorn
-RUN  /bin/zsh install_local_plugins.sh
+RUN   pip install setuptools && /bin/zsh install_local_plugins.sh
 
 CMD ["runserver", "0.0.0.0:8020"]
 
