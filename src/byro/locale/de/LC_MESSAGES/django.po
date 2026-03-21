@@ -1402,6 +1402,18 @@ msgstr "Zahl"
 msgid "Refresh"
 msgstr "Aktualisieren"
 
+#: byro/office/templates/office/member/list.html
+msgid "Refreshing…"
+msgstr "Wird aktualisiert…"
+
+#: byro/office/views/members.py
+msgid "Balance refresh is already running in the background."
+msgstr "Kontenstandaktualisierung läuft bereits im Hintergrund."
+
+#: byro/office/views/members.py
+msgid "Balance refresh has been started in the background."
+msgstr "Kontenstandaktualisierung wurde im Hintergrund gestartet."
+
 #: byro/office/templates/office/member/list_export.html:9
 msgid ""
 "Select the export format and fields to be exported, then press 'Export'."
