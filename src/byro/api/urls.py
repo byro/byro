@@ -25,10 +25,16 @@ urlpatterns = router.urls + [
         membership_detail,
         name="member-memberships-detail",
     ),
-    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "schema/",
+        SpectacularAPIView.as_view(permission_classes=[], authentication_classes=[]),
+        name="schema",
+    ),
     path(
         "docs/",
-        SpectacularSwaggerView.as_view(url_name="api:schema"),
+        SpectacularSwaggerView.as_view(
+            url_name="api:schema", permission_classes=[], authentication_classes=[]
+        ),
         name="swagger-ui",
     ),
 ]
