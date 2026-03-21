@@ -6,6 +6,16 @@ from byro.members.models import Member, Membership
 AUDIT_FIELDS = {"id", "member", "created", "modified", "created_by", "modified_by"}
 
 
+@extend_schema_field({"type": "string", "format": "decimal", "example": "0.00"})
+class BalanceField(serializers.DecimalField):
+    pass
+
+
+@extend_schema_field({"type": "string", "format": "decimal", "example": "10.00"})
+class MembershipAmountField(serializers.DecimalField):
+    pass
+
+
 def _build_profile_serializer(profile_cls):
     fields = [f.name for f in profile_cls._meta.fields if f.name not in AUDIT_FIELDS]
 
@@ -18,9 +28,7 @@ def _build_profile_serializer(profile_cls):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
-    amount = extend_schema_field({"type": "number", "example": 10})(
-        serializers.DecimalField(max_digits=8, decimal_places=2)
-    )
+    amount = MembershipAmountField(max_digits=8, decimal_places=2)
 
     class Meta:
         model = Membership
@@ -29,9 +37,7 @@ class MembershipSerializer(serializers.ModelSerializer):
 
 class MemberSerializer(serializers.ModelSerializer):
     memberships = MembershipSerializer(many=True, read_only=True)
-    balance = extend_schema_field({"type": "number", "example": 0})(
-        serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
-    )
+    balance = BalanceField(max_digits=10, decimal_places=2, read_only=True)
     is_active = serializers.BooleanField(read_only=True)
 
     class Meta:
