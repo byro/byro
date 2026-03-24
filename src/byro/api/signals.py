@@ -10,4 +10,3 @@ def _is_api_request(request, url):
 @receiver(unauthenticated_urls)
 def api_unauthenticated_urls(sender, **kwargs):
     return [_is_api_request]
-
