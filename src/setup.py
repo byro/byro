@@ -102,7 +102,7 @@ setup(
             "freezegun",
             "isort",
             "ipython",
-            "pytest<9",
+            "pytest<10",
             "pytest-cov",
             "pytest-django",
             "pytest-rerunfailures",
