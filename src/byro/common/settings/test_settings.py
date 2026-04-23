@@ -16,7 +16,14 @@ MEDIA_ROOT = os.path.join(DATA_DIR, "media")
 STATIC_ROOT = os.path.join(DATA_DIR, "static")
 HTMLEXPORT_ROOT = os.path.join(DATA_DIR, "htmlexport")
 
-for directory in (BASE_DIR, DATA_DIR, LOG_DIR, MEDIA_ROOT, HTMLEXPORT_ROOT):
+for directory in (
+    BASE_DIR,
+    DATA_DIR,
+    LOG_DIR,
+    MEDIA_ROOT,
+    STATIC_ROOT,
+    HTMLEXPORT_ROOT,
+):
     os.makedirs(directory, exist_ok=True)
 
 atexit.register(tmpdir.cleanup)

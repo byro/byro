@@ -15,7 +15,7 @@ This guide assumes that you have installed and set up the following system servi
 * Docker
 * docker-compose
 * An SMTP server to send out mails
-* An HTTP reverse proxy, e.g. `nginx`_ or Apache to allow HTTPS connections
+* An HTTP reverse proxy, e.g. `nginx` or Apache to allow HTTPS connections
 
 Step 1: Configuration
 ---------------------
@@ -68,5 +68,4 @@ The following call will install the `byro-fints plugin`_::
   # byro/production/setup.sh fints
 
 
-.. _nginx: https://botleg.com/stories/https-with-lets-encrypt-and-nginx/
 .. _byro-fints plugin: https://github.com/henryk/byro-fints
