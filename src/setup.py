@@ -91,7 +91,7 @@ setup(
         "qrcode[pil]>=7.3,<8.2",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
         "schwifty==2026.3.0",
         "unicodecsv~=0.14.0",
-        "whitenoise>=6.4,<6.10",
+        "whitenoise>=6.4,<6.13",
     ],
     extras_require={
         "dev": [
