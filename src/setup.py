@@ -71,7 +71,7 @@ setup(
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         "dateparser>=1.1,<1.5",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
-        "django-bootstrap4>=23.1,<25.2",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
+        "django-bootstrap4>=23.1,<26.2",  # http://django-bootstrap4.readthedocs.io/en/latest/history.html
         "django-compressor>=2.4,<5.0",  # https://django-compressor.readthedocs.io/en/latest/changelog/
         "django-extensions>=3.1,<4.2",  # https://github.com/django-extensions/django-extensions/blob/master/CHANGELOG.md
         "django-i18nfield>=1.9,<1.12",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
