@@ -45,16 +45,14 @@ class Document(models.Model, LogTargetMixin):
     )
     content_hash = models.CharField(max_length=300, null=True)
 
-    template = _(
-        """
+    template = _("""
 Hi, {name},
 
 Please find attached a document we wanted to send you/that you requested.
 
 Thank you,
 {association}
-"""
-    ).strip()
+""").strip()
 
     def _get_log_properties(self):
         return {

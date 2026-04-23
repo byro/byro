@@ -70,7 +70,7 @@ Plugin registration
 -------------------
 
 Somehow, byro needs to know that your plugin exists at all. For this purpose, we
-make use of the `entry point`_ feature of setuptools. To register a plugin that lives
+make use of the `entry point`_ mechanism. To register a plugin that lives
 in a separate python package, your ``setup.py`` should contain something like this::
 
     setup(
@@ -117,5 +117,5 @@ your Django app label.
 .. _Django app: https://docs.djangoproject.com/en/dev/ref/applications/
 .. _signal dispatcher: https://docs.djangoproject.com/en/dev/topics/signals/
 .. _namespace packages: http://legacy.python.org/dev/peps/pep-0420/
-.. _entry point: https://setuptools.pypa.io/en/latest/pkg_resources.html#locating-plugins
+.. _entry point: https://packaging.python.org/en/latest/specifications/entry-points/
 .. _cookiecutter: https://cookiecutter.readthedocs.io/en/latest/

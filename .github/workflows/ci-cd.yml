@@ -25,12 +25,12 @@ jobs:
     name: "[Style] isort"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
-      - uses: actions/cache@v4
+          python-version: "3.12"
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -46,12 +46,12 @@ jobs:
     name: "[Style] flake8"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
-      - uses: actions/cache@v4
+          python-version: "3.12"
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -67,12 +67,12 @@ jobs:
     name: "[Style] black"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
-      - uses: actions/cache@v4
+          python-version: "3.12"
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -88,12 +88,12 @@ jobs:
     name: "[Style] DjHTML"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
-      - uses: actions/cache@v4
+          python-version: "3.12"
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -111,19 +111,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9, '3.10', 3.11 ]
+        python-version: [ '3.12', '3.13' ]
         database: [ sqlite, postgres, mysql ]
         exclude:
           - database: mysql
-            python-version: 3.9
-          - database: mysql
-            python-version: 3.11
-          - database: sqlite
-            python-version: 3.9
-          - database: sqlite
-            python-version: 3.11
+            python-version: '3.13'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: getong/mariadb-action@v1.1
         with:
           mariadb version: '10.7'
@@ -138,10 +132,10 @@ jobs:
           postgresql password: 'postgres'
         if: matrix.database == 'postgres'
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
@@ -190,12 +184,12 @@ jobs:
       - testing
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: 🏗 Set up Python 3.10
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - name: 🏗 Set up Python 3.12
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
-      - uses: actions/cache@v4
+          python-version: "3.12"
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -224,7 +218,7 @@ jobs:
         working-directory: ./src
       - name: ⬆ Upload build result
         if: github.event_name == 'release' && github.event.action == 'published'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: src/dist
@@ -241,7 +235,7 @@ jobs:
       id-token: write
     steps:
       - name: ⬇ Download build result
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
@@ -256,22 +250,22 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: 🏗 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.event.release.tag_name }}"/' byro/__init__.py
         if: github.event_name == 'release' && github.event.action == 'published'
         working-directory: ./src
       - name: 🏗 Setup QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: 🏗 Setup Docker buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: 🏗 Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - name: 🏗 Build Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: src
           platforms: linux/amd64
@@ -295,29 +289,29 @@ jobs:
       contents: read
     steps:
       - name: 🏗 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.event.release.tag_name }}"/' src/byro/__init__.py
         if: github.event_name == 'release' && github.event.action == 'published'
       - name: 🏗 Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: all
       - name: 🏗 Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: 🏗 Login to DockerHub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: 🏗 Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - name: 🏗 Build container image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: src
           platforms: linux/amd64,linux/arm64
