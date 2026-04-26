@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 _discovery_cache = {}
+_HTTP_TIMEOUT = 10
 
 
 class OIDCError(Exception):
@@ -21,7 +22,7 @@ def discover(issuer_url):
         return _discovery_cache[issuer_url]
     url = issuer_url.rstrip("/") + "/.well-known/openid-configuration"
     try:
-        with urllib.request.urlopen(url) as resp:
+        with urllib.request.urlopen(url, timeout=_HTTP_TIMEOUT) as resp:
             doc = json.loads(resp.read().decode())
     except Exception as exc:
         raise OIDCError(f"Failed to fetch OIDC discovery document: {exc}") from exc
@@ -62,7 +63,7 @@ def exchange_code(code, redirect_uri):
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=_HTTP_TIMEOUT) as resp:
             return json.loads(resp.read().decode())
     except urllib.request.HTTPError as exc:
         body = exc.read().decode()
@@ -121,7 +122,7 @@ def get_userinfo(access_token):
         headers={"Authorization": f"Bearer {access_token}"},
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=_HTTP_TIMEOUT) as resp:
             return json.loads(resp.read().decode())
     except Exception as exc:
         raise OIDCError(f"Userinfo request failed: {exc}") from exc
