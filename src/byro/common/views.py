@@ -114,14 +114,17 @@ class OIDCCallbackView(View):
 
         try:
             state = request.GET.get("state", "")
-            if not state or state != request.session.get("oidc_state"):
+            if not state or not secrets.compare_digest(
+                state, request.session.get("oidc_state", "")
+            ):
                 raise OIDCError("Invalid or missing state parameter")
 
             code = request.GET.get("code")
             if not code:
                 raise OIDCError("Missing authorization code")
 
-            nonce = request.session.get("oidc_nonce", "")
+            nonce = request.session.pop("oidc_nonce", "")
+            request.session.pop("oidc_state", None)
             redirect_uri = request.build_absolute_uri(reverse("common:oidc-callback"))
 
             token_response = exchange_code(code, redirect_uri)
@@ -137,6 +140,7 @@ class OIDCCallbackView(View):
                 messages.error(request, _("User account is deactivated."))
                 return redirect("common:login")
 
+            user.backend = "django.contrib.auth.backends.ModelBackend"
             login(request, user)
             LogEntry.objects.create(
                 content_object=user,
