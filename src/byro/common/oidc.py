@@ -16,17 +16,6 @@ def is_oidc_configured():
     return bool(settings.OIDC_ISSUER_URL and settings.OIDC_CLIENT_ID)
 
 
-def get_oidc_settings():
-    return {
-        "issuer_url": settings.OIDC_ISSUER_URL,
-        "client_id": settings.OIDC_CLIENT_ID,
-        "client_secret": settings.OIDC_CLIENT_SECRET,
-        "admin_group": settings.OIDC_ADMIN_GROUP,
-        "auto_create_account": settings.OIDC_AUTO_CREATE_ACCOUNT,
-        "username_field": settings.OIDC_USERNAME_FIELD,
-    }
-
-
 def discover(issuer_url):
     if issuer_url in _discovery_cache:
         return _discovery_cache[issuer_url]
