@@ -1,0 +1,58 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+# Kurzer Intro-Text – vor dem Publishen manuell ergänzen
+header: |
+  <!-- Kurze Beschreibung des Releases: Was ist das Highlight? Breaking Changes? -->
+
+categories:
+  - title: '🚨 Breaking Changes'
+    label: 'breaking-change'
+  - title: '🎉 New Features'
+    label: 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'bug'
+      - 'fix'
+  - title: '🔧 Maintenance'
+    label: 'maintenance'
+  - title: '📦 Updated Dependencies'
+    labels:
+      - 'dependencies'
+  - title: '📖 Documentation'
+    label: 'documentation'
+
+exclude-labels:
+  - 'skip-changelog'
+
+autolabeler:
+  - label: 'dependencies'
+    author:
+      - 'dependabot[bot]'
+      - 'renovate[bot]'
+
+change-template: '- $TITLE by @$AUTHOR in #$NUMBER'
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - 'breaking-change'
+  minor:
+    labels:
+      - 'enhancement'
+  patch:
+    labels:
+      - 'bug'
+      - 'fix'
+      - 'maintenance'
+      - 'dependencies'
+      - 'documentation'
+  default: patch
+
+template: |
+  $HEADER
+
+  $CHANGES
+
+  **Full Changelog**: $PREVIOUS_TAG...$TAG
