@@ -152,6 +152,8 @@ def get_or_create_user(claims, access_token):
             if userinfo is None:
                 userinfo = get_userinfo(access_token)
             groups = userinfo.get("groups", [])
+        if isinstance(groups, str):
+            groups = groups.split()
         if admin_group not in groups:
             raise OIDCError(
                 f"User is not a member of the required group '{admin_group}'"
