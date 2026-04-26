@@ -8,7 +8,5 @@ fi
 for plugin in local/*(N); do  # this is a nullglob
   echo "installing $plugin"
 
-  cd $plugin
-  python setup.py develop
-  cd -
+  pip install -e $plugin --no-build-isolation
 done
