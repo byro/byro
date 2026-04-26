@@ -1,11 +1,13 @@
 import json
+import time
 import urllib.parse
 import urllib.request
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-_discovery_cache = {}
+_discovery_cache = {}  # issuer_url -> (doc, fetched_at)
+_DISCOVERY_TTL = 4 * 60 * 60  # 4 hours
 _HTTP_TIMEOUT = 10
 
 
@@ -18,15 +20,16 @@ def is_oidc_configured():
 
 
 def discover(issuer_url):
-    if issuer_url in _discovery_cache:
-        return _discovery_cache[issuer_url]
+    cached = _discovery_cache.get(issuer_url)
+    if cached and time.monotonic() - cached[1] < _DISCOVERY_TTL:
+        return cached[0]
     url = issuer_url.rstrip("/") + "/.well-known/openid-configuration"
     try:
         with urllib.request.urlopen(url, timeout=_HTTP_TIMEOUT) as resp:
             doc = json.loads(resp.read().decode())
     except Exception as exc:
         raise OIDCError(f"Failed to fetch OIDC discovery document: {exc}") from exc
-    _discovery_cache[issuer_url] = doc
+    _discovery_cache[issuer_url] = (doc, time.monotonic())
     return doc
 
 
