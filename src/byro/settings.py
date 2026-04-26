@@ -236,10 +236,9 @@ OIDC_ADMIN_GROUP = config.get("oidc", "admin_group", fallback="").strip()
 OIDC_AUTO_CREATE_ACCOUNT = config.getboolean(
     "oidc", "auto_create_account", fallback=False
 )
-OIDC_USERNAME_FIELD = (
-    config.get("oidc", "username_field", fallback="preferred_username").strip()
-    or "preferred_username"
-)
+OIDC_USERNAME_FIELD = config.get(
+    "oidc", "username_field", fallback="preferred_username"
+).strip()
 
 AUTH_PASSWORD_VALIDATORS = [
     {
