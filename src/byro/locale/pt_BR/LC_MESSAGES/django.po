@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: byro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 14:58-0300\n"
+"POT-Creation-Date: 2026-03-15 22:53+0000\n"
 "Language: pt-br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -997,7 +997,12 @@ msgstr "Geral"
 msgid "Users"
 msgstr "Usuárias"
 
-#: byro/office/templates/office/base.html:116
+#: byro/office/templates/office/base.html:101
+#: byro/office/templates/office/settings/api_token.html:6
+msgid "API Token"
+msgstr "Token de API"
+
+#: byro/office/templates/office/base.html:119
 msgid "Log"
 msgstr "Log"
 
@@ -1631,6 +1636,22 @@ msgstr "Encontre mais plugins online…"
 #: byro/office/templates/office/settings/about.html:57
 msgid "Find plugins online …"
 msgstr "Encontre plug-ins on-line…"
+
+#: byro/office/templates/office/settings/api_token.html:8
+msgid "Use this token to authenticate API requests:"
+msgstr "Use este token para autenticar requisições à API:"
+
+#: byro/office/templates/office/settings/api_token.html:13
+msgid "Include it in requests as:"
+msgstr "Inclua nas requisições como:"
+
+#: byro/office/templates/office/settings/api_token.html:18
+msgid "Regenerate token? The old token will stop working immediately."
+msgstr "Regenerar token? O token antigo deixará de funcionar imediatamente."
+
+#: byro/office/templates/office/settings/api_token.html:19
+msgid "Regenerate token"
+msgstr "Regenerar token"
 
 #: byro/office/templates/office/settings/log.html:5
 msgid "Audit Log"

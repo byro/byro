@@ -2,6 +2,7 @@ from django.urls import include, path, re_path
 
 from .views import (
     accounts,
+    api_token,
     dashboard,
     documents,
     mails,
@@ -36,6 +37,16 @@ urlpatterns = [
         "settings/users/<int:pk>/",
         users.UserDetailView.as_view(),
         name="settings.users.detail",
+    ),
+    path(
+        "settings/api-token",
+        api_token.ApiTokenView.as_view(),
+        name="settings.api-token",
+    ),
+    path(
+        "settings/api-token/regenerate",
+        api_token.ApiTokenRegenerateView.as_view(),
+        name="settings.api-token.regenerate",
     ),
     path("settings", settings.ConfigurationView.as_view(), name="settings.base"),
     path("", dashboard.DashboardView.as_view(), name="dashboard"),

@@ -66,6 +66,11 @@ INSTALLED_APPS = [
     "byro.plugins.profile.ProfilePluginConfig",
     "byro.plugins.sepa.SepaPluginConfig",
     "annoying",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "drf_spectacular",
+    "django_filters",
+    "byro.api",
 ]
 
 PLUGINS = []
@@ -322,6 +327,26 @@ with suppress(ImportError):
     INSTALLED_APPS.append("debug_toolbar")
     MIDDLEWARE.insert(2, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAdminUser",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 50,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "byro API",
+    "DESCRIPTION": "REST API for byro membership administration",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 COMPRESS_ENABLED = COMPRESS_OFFLINE = not DEBUG
 COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
