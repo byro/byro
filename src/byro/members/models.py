@@ -324,11 +324,12 @@ class Member(Auditable, models.Model, LogTargetMixin):
         )
         if asset_start:
             credits = credits.filter(transaction__value_datetime__gte=asset_start)
-        liability = debits.aggregate(liability=models.Sum("amount"))[
-            "liability"
-        ] or Decimal("0.00")
-        asset = credits.aggregate(asset=models.Sum("amount"))["asset"] or Decimal(
-            "0.00"
+        liability = (
+            debits.aggregate(liability=models.Sum("amount"))["liability"]
+            or Decimal("0.00")
+        )
+        asset = (
+            credits.aggregate(asset=models.Sum("amount"))["asset"] or Decimal("0.00")
         )
         return asset - liability
 
