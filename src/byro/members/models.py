@@ -324,12 +324,11 @@ class Member(Auditable, models.Model, LogTargetMixin):
         )
         if asset_start:
             credits = credits.filter(transaction__value_datetime__gte=asset_start)
-        liability = (
-            debits.aggregate(liability=models.Sum("amount"))["liability"]
-            or Decimal("0.00")
-        )
-        asset = (
-            credits.aggregate(asset=models.Sum("amount"))["asset"] or Decimal("0.00")
+        liability = debits.aggregate(liability=models.Sum("amount"))[
+            "liability"
+        ] or Decimal("0.00")
+        asset = credits.aggregate(asset=models.Sum("amount"))["asset"] or Decimal(
+            "0.00"
         )
         return asset - liability
 
@@ -557,7 +556,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
             transaction__reversed_by__isnull=True,
         )
         if _from is not None:
-            stray_liabilities_qs = stray_liabilities_qs.filter(transaction__value_datetime__gte=_from)
+            stray_liabilities_qs = stray_liabilities_qs.filter(
+                transaction__value_datetime__gte=_from
+            )
         if membership_ranges:
             stray_liabilities_qs = stray_liabilities_qs.exclude(date_range_q)
         stray_liabilities_qs = stray_liabilities_qs.prefetch_related("transaction")
