@@ -1,8 +1,10 @@
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, FormView, ListView, UpdateView
+from django.views.generic import DetailView, FormView, ListView, UpdateView, View
 
 from byro.common.models import LogEntry
 
@@ -79,6 +81,23 @@ class UserDetailView(UpdateView):
 
     def get_success_url(self):
         return reverse("office:settings.users.detail", kwargs={"pk": self.kwargs["pk"]})
+
+
+class UserPasswordDisableView(View):
+    def post(self, request, pk, *args, **kwargs):
+        if request.user.pk == pk:
+            messages.error(request, _("You cannot disable your own password."))
+            return redirect(reverse("office:settings.users.detail", kwargs={"pk": pk}))
+        user = get_object_or_404(User, pk=pk)
+        user.set_unusable_password()
+        user.save()
+        LogEntry.objects.create(
+            content_object=user,
+            user=request.user,
+            action_type="byro.common.user.password_disabled",
+        )
+        messages.success(request, _("The user's password has been disabled."))
+        return redirect(reverse("office:settings.users.detail", kwargs={"pk": pk}))
 
 
 # FIXME No implemented yet

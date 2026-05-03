@@ -1686,6 +1686,31 @@ msgstr "Benutzer hinzufügen …"
 msgid "User"
 msgstr "Benutzer"
 
+#: byro/office/templates/office/user/detail.html:8
+msgid "Password disabled – user cannot log in with a password"
+msgstr "Passwort deaktiviert – Benutzer kann sich nicht mit einem Passwort anmelden"
+
+#: byro/office/templates/office/user/detail.html:9
+#: byro/office/templates/office/user/list.html:30
+msgid "Password disabled"
+msgstr "Passwort deaktiviert"
+
+#: byro/office/templates/office/user/detail.html:28
+msgid "Disable password for this user? They will no longer be able to log in with a password."
+msgstr "Passwort dieses Benutzers deaktivieren? Der Benutzer kann sich danach nicht mehr mit einem Passwort anmelden."
+
+#: byro/office/templates/office/user/detail.html:29
+msgid "Disable password"
+msgstr "Passwort deaktivieren"
+
+#: byro/office/templates/office/user/detail.html:35
+msgid ""
+"This user's password is disabled. Set a new password above to re-enable "
+"password login."
+msgstr ""
+"Das Passwort dieses Benutzers ist deaktiviert. Oben ein neues Passwort "
+"setzen, um die Passwortanmeldung wieder zu aktivieren."
+
 #: byro/office/templates/office/user/list.html:10
 msgid "Add new user"
 msgstr "Neuen Benutzer hinzufügen"
@@ -2009,6 +2034,14 @@ msgstr "Der Import konnte nicht verarbeitet werden: "
 #: byro/office/views/users.py:11
 msgid "Password"
 msgstr "Passwort"
+
+#: byro/office/views/users.py:89
+msgid "You cannot disable your own password."
+msgstr "Du kannst dein eigenes Passwort nicht deaktivieren."
+
+#: byro/office/views/users.py:99
+msgid "The user's password has been disabled."
+msgstr "Das Passwort des Benutzers wurde deaktiviert."
 
 #: byro/plugins/profile/models.py:13
 msgid "Nick"
