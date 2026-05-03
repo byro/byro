@@ -104,6 +104,22 @@ class MemberListMixin:
         return qs.order_by("-id").distinct()
 
 
+_BALANCE_REFRESH_LOCK = "byro_balance_refresh_running"
+_BALANCE_REFRESH_LOCK_TIMEOUT = 60 * 60  # 1 hour safety expiry
+
+
+def _run_balance_refresh():
+    from django.core.cache import cache
+
+    if not cache.add(_BALANCE_REFRESH_LOCK, True, _BALANCE_REFRESH_LOCK_TIMEOUT):
+        return
+    try:
+        for member in Member.objects.all():
+            member.update_liabilites()
+    finally:
+        cache.delete(_BALANCE_REFRESH_LOCK)
+
+
 class MemberListView(MemberListMixin, ListView):
     template_name = "office/member/list.html"
     context_object_name = "members"
@@ -115,9 +131,29 @@ class MemberListView(MemberListMixin, ListView):
         _filter = self.request.GET.get("filter", "active")
         return self.get_members_queryset(search, _filter)
 
+    def get_context_data(self, **kwargs):
+        from django.core.cache import cache
+
+        context = super().get_context_data(**kwargs)
+        context["balance_refresh_running"] = bool(cache.get(_BALANCE_REFRESH_LOCK))
+        return context
+
     def post(self, request, *args, **kwargs):
-        for member in Member.objects.all():
-            member.update_liabilites()
+        from django.core.cache import cache
+
+        if cache.get(_BALANCE_REFRESH_LOCK):
+            messages.info(
+                request,
+                _("Balance refresh is already running in the background."),
+            )
+        else:
+            import threading
+
+            threading.Thread(target=_run_balance_refresh, daemon=True).start()
+            messages.success(
+                request,
+                _("Balance refresh has been started in the background."),
+            )
         return redirect(request.path)
 
 
