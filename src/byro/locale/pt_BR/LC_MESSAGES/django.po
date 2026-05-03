@@ -1685,11 +1685,8 @@ msgid "Password disabled"
 msgstr "Senha desativada"
 
 #: byro/office/templates/office/user/detail.html:28
-msgid ""
-"Disable this user's password? They will no longer be able to log in with a "
-"password."
-msgstr ""
-"Desativar a senha desta pessoa? Ela não poderá mais entrar com senha."
+msgid "Disable password for this user? They will no longer be able to log in with a password."
+msgstr "Desativar a senha desta pessoa? Ela não poderá mais entrar com senha."
 
 #: byro/office/templates/office/user/detail.html:29
 msgid "Disable password"

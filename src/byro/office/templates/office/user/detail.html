@@ -25,7 +25,7 @@
             <form method="post" action="{% url 'office:settings.users.disable-password' pk=user.pk %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger"
-                    onclick="return confirm('{% trans "Disable this user's password? They will no longer be able to log in with a password." %}')">
+                    onclick="return confirm('{% trans "Disable password for this user? They will no longer be able to log in with a password." |escapejs %}')">
                     <span class="fa fa-lock"></span> {% trans "Disable password" %}
                 </button>
             </form>
