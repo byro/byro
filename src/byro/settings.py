@@ -229,6 +229,17 @@ FORMS_URLFIELD_ASSUME_HTTPS = True
 
 
 ## AUTHENTICATION SETTINGS
+OIDC_ISSUER_URL = config.get("oidc", "issuer_url", fallback="").strip()
+OIDC_CLIENT_ID = config.get("oidc", "client_id", fallback="").strip()
+OIDC_CLIENT_SECRET = config.get("oidc", "client_secret", fallback="").strip()
+OIDC_ADMIN_GROUP = config.get("oidc", "admin_group", fallback="").strip()
+OIDC_AUTO_CREATE_ACCOUNT = config.getboolean(
+    "oidc", "auto_create_account", fallback=False
+)
+OIDC_USERNAME_FIELD = config.get(
+    "oidc", "username_field", fallback="preferred_username"
+).strip()
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
