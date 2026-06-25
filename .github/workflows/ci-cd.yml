@@ -118,7 +118,7 @@ jobs:
             python-version: '3.13'
     steps:
       - uses: actions/checkout@v6
-      - uses: getong/mariadb-action@v1.1
+      - uses: getong/mariadb-action@v1.11
         with:
           mariadb version: '10.7'
           mysql database: 'byro'
