@@ -1,5 +1,6 @@
 import pytest
 
+from byro.public.forms import PrivacyConsentForm
 from byro.public.models import get_proposable_fields
 
 
@@ -26,11 +27,31 @@ def test_undeclared_fields_are_not_proposable(member):
 
 
 @pytest.mark.django_db
-def test_sepa_bank_data_is_not_proposable(member_with_sepa_profile):
-    # The SEPA plugin declares member_editable_fields = (); its bank data must
-    # never be member-editable.
+def test_sepa_editable_only_for_declared_fields(member_with_sepa_profile):
+    # The SEPA plugin opts in account and address data; mandate/administrative
+    # fields stay admin-only.
     proposable = set(get_proposable_fields(member_with_sepa_profile))
-    assert not any(field_id.startswith("MemberSepa__") for field_id in proposable)
+    for field in (
+        "iban",
+        "bic",
+        "institute",
+        "fullname",
+        "address",
+        "zip_code",
+        "city",
+        "country",
+    ):
+        assert f"MemberSepa__{field}" in proposable
+    for field in ("mandate_state", "issue_date", "mandate_reference", "mandate_reason"):
+        assert f"MemberSepa__{field}" not in proposable
+
+
+@pytest.mark.django_db
+def test_sepa_fields_are_never_shareable(member_with_sepa_profile):
+    # Making SEPA fields member-editable must not make them shareable in the
+    # member list: the sharing form excludes all SEPA fields.
+    form = PrivacyConsentForm(member=member_with_sepa_profile)
+    assert not any(name.startswith("MemberSepa__") for name in form.fields)
 
 
 @pytest.mark.django_db

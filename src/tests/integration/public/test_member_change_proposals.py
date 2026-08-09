@@ -1,20 +1,23 @@
 import pytest
 from django.urls import reverse
 
-from byro.public.models import MemberChangeProposal
+from byro.public.models import MemberChangeProposal, get_proposable_fields
 
 
 def base_proposal_data(member):
-    """POST data mirroring the current values, so unchanged fields cause no diff."""
-    profile = member.profile_profile
-    return {
-        "member__name": member.name or "",
-        "member__address": member.address or "",
-        "member__email": member.email or "",
-        "MemberProfile__nick": profile.nick or "",
-        "MemberProfile__birth_date": "",
-        "MemberProfile__phone_number": profile.phone_number or "",
-    }
+    """POST data mirroring current values for every proposable field, so
+    unchanged fields cause no diff regardless of which fields are editable."""
+    data = {}
+    for field_id, field in get_proposable_fields(member).items():
+        value = field.getter(member)
+        if value is None:
+            value = ""
+        elif hasattr(value, "isoformat"):
+            value = value.isoformat()
+        else:
+            value = str(value)
+        data[field_id] = value
+    return data
 
 
 def propose_url(member):
@@ -134,6 +137,39 @@ def test_office_accept_profile_field(
     )
     member.profile_profile.refresh_from_db()
     assert member.profile_profile.phone_number == "+49 123"
+
+
+@pytest.mark.django_db
+def test_office_accept_sepa_account_owner(
+    member_with_sepa_profile, membership, logged_in_client, configuration
+):
+    member = member_with_sepa_profile
+    proposal = MemberChangeProposal.objects.create(
+        member=member, field_id="MemberSepa__fullname", new_value="New Owner"
+    )
+    logged_in_client.post(
+        reverse("office:members.data", kwargs={"pk": member.pk}),
+        {f"accept_{proposal.pk}": "1"},
+    )
+    member.profile_sepa.refresh_from_db()
+    assert member.profile_sepa.fullname == "New Owner"
+
+
+@pytest.mark.django_db
+def test_office_accept_sepa_iban_validated(
+    member_with_sepa_profile, membership, logged_in_client, configuration
+):
+    member = member_with_sepa_profile
+    # An invalid IBAN must not be applied (IBANField validation via formfield).
+    proposal = MemberChangeProposal.objects.create(
+        member=member, field_id="MemberSepa__iban", new_value="not-an-iban"
+    )
+    logged_in_client.post(
+        reverse("office:members.data", kwargs={"pk": member.pk}),
+        {f"accept_{proposal.pk}": "1"},
+    )
+    member.profile_sepa.refresh_from_db()
+    assert member.profile_sepa.iban == "DE89370400440532013000"
 
 
 @pytest.mark.django_db
