@@ -556,7 +556,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
             transaction__reversed_by__isnull=True,
         )
         if _from is not None:
-            stray_liabilities_qs = stray_liabilities_qs.filter(transaction__value_datetime__gte=_from)
+            stray_liabilities_qs = stray_liabilities_qs.filter(
+                transaction__value_datetime__gte=_from
+            )
         if membership_ranges:
             stray_liabilities_qs = stray_liabilities_qs.exclude(date_range_q)
         stray_liabilities_qs = stray_liabilities_qs.prefetch_related("transaction")
