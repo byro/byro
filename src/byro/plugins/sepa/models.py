@@ -102,6 +102,9 @@ class MemberSepa(Auditable, models.Model):
     )
 
     form_title = _("SEPA information")
+    # Bank/mandate data stays admin-only: members cannot propose changes to it.
+    # A plugin opts fields in by listing their names here.
+    member_editable_fields = ()
 
     @property
     def is_usable(self):

@@ -11,28 +11,16 @@ from django.utils.translation import gettext_lazy as _
 from byro.common.models.configuration import Configuration
 from byro.members.models import Field, Member
 
-# Contact fields that members are allowed to propose changes to on their member
-# page. Keys reference Member.get_fields(); the set is intersected with the
-# actually available fields at runtime so a missing profile plugin cannot break
-# the form.
-PROPOSABLE_FIELDS = [
-    "member__name",
-    "member__address",
-    "member__email",
-    "MemberProfile__nick",
-    "MemberProfile__birth_date",
-    "MemberProfile__phone_number",
-]
-
 
 def get_proposable_fields(member):
-    """Return an OrderedDict {field_id: Field} of the fields a member may
-    propose changes to, in the order of PROPOSABLE_FIELDS."""
-    all_fields = member.get_fields()
+    """Return a dict {field_id: Field} of the fields a member may propose changes
+    to. Which fields are editable is declared by each contributing model (core or
+    plugin) via its ``member_editable_fields`` attribute and surfaced on the byro
+    Field as ``editable_by_member`` in Member.get_fields()."""
     return {
-        field_id: all_fields[field_id]
-        for field_id in PROPOSABLE_FIELDS
-        if field_id in all_fields
+        field_id: field
+        for field_id, field in member.get_fields().items()
+        if getattr(field, "editable_by_member", False)
     }
 
 
