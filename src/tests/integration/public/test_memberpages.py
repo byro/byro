@@ -37,6 +37,27 @@ def test_memberpage_access_list(member, membership, client, configuration):
     )
 
 
+@pytest.mark.django_db
+def test_memberlist_hides_inactive_members(
+    member, membership, inactive_member, client, configuration
+):
+    # Both members consent to sharing, but only the active one may be listed.
+    for m in (member, inactive_member):
+        m.profile_memberpage.is_visible_to_members = True
+        m.profile_memberpage.save()
+
+    response = client.get(
+        reverse(
+            "public:memberpage:member.list",
+            kwargs={"secret_token": member.profile_memberpage.secret_token},
+        )
+    )
+    content = response.content.decode()
+    assert response.status_code == 200
+    assert member.name in content
+    assert inactive_member.name not in content
+
+
 @pytest.mark.parametrize("page", ("list", "dashboard"))
 @pytest.mark.django_db
 def test_memberpage_access_dashboard_wrong_token(
