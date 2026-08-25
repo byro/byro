@@ -102,6 +102,22 @@ class MemberSepa(Auditable, models.Model):
     )
 
     form_title = _("SEPA information")
+    # Members may propose changes to their account and address data (IBAN, BIC,
+    # institute, account owner name and address). Mandate/administrative fields
+    # (mandate_state, issue_date, mandate_reference, mandate_reason) stay
+    # admin-only. Note: SEPA fields are always excluded from the member-list
+    # sharing form (see PrivacyConsentForm), so making them member-editable never
+    # makes them shareable.
+    member_editable_fields = (
+        "iban",
+        "bic",
+        "institute",
+        "fullname",
+        "address",
+        "zip_code",
+        "city",
+        "country",
+    )
 
     @property
     def is_usable(self):

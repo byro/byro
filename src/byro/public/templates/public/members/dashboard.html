@@ -134,6 +134,35 @@
             </div>
         </form>
 
+        <form method="post" action="{% url "public:memberpage:member.propose" secret_token=member.profile_memberpage.secret_token %}">
+            {% csrf_token %}
+            <div class="card mt-4 mb-4">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">{% trans "Propose changes to your data" %}</h4>
+                </div>
+                <div class="card-body">
+                    <p>{% blocktrans trimmed %}
+                        Here you can suggest corrections to your contact data. Your
+                        suggestions are not applied immediately – an administrator will
+                        review and confirm them.
+                    {% endblocktrans %}</p>
+                    {% if pending_proposals %}
+                        <div class="alert alert-warning">
+                            {% blocktrans trimmed %}
+                                You have changes awaiting confirmation.
+                            {% endblocktrans %}
+                        </div>
+                    {% endif %}
+                    {% bootstrap_form proposal_form layout="horizontal" %}
+                </div>
+                <div class="card-footer text-right">
+                    <p class="d-flex">
+                        <button type="submit" class="btn btn-lg btn-primary ml-auto">{% trans "Submit proposal" %}</button>
+                    </p>
+                </div>
+            </div>
+        </form>
+
     {% endwith %}
     <h4 class="mt-4">{% trans "Membership history" %}</h4>
     {% for ms in memberships %}

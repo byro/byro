@@ -29,6 +29,7 @@
                     <option value="">{% trans "Active members" %}</option>
                     <option value="negbalance"{% if "negbalance" == request.GET.filter %}selected{% endif %}>{% trans "Members with negative balance" %}</option>
                     <option value="inactive"{% if "inactive" == request.GET.filter %}selected{% endif %}>{% trans "Only inactive members" %}</option>
+                    <option value="pending"{% if "pending" == request.GET.filter %}selected{% endif %}>{% trans "Members with pending changes" %}</option>
                     <option value="all" {% if "all" == request.GET.filter %}selected{% endif %}>{% trans "All members" %}</option>
                 </select>
                 <input name="q" class="form-control" type="text" placeholder="{% trans "Search" %}"/>
@@ -60,7 +61,13 @@
                         </a></td>
                         <td><a href="{% url "office:members.dashboard" pk=member.pk %}">
                             {{ member.name }}
-                        </a></td>
+                        </a>
+                        {% if member.pending_changes_count %}
+                            <a href="{% url "office:members.data" pk=member.pk %}" class="text-danger" title="{% trans "Pending change proposals" %}">
+                                <span class="fa fa-exclamation-circle"></span>
+                            </a>
+                        {% endif %}
+                        </td>
                         <td>
                             <span{% if member.balance < 0 %} class="text-danger"{% endif %}>
                                 {{ member.balance }}

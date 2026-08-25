@@ -6,6 +6,51 @@
 
 {% block member_content %}
 
+    {% if change_proposals %}
+        <div class="card member-form-card border-danger">
+            <div class="card-header bg-danger text-white">
+                <span class="fa fa-exclamation-circle"></span>
+                {% trans "Pending change proposals" %}
+            </div>
+            <div class="card-body">
+                <p>{% blocktrans trimmed %}
+                    This member proposed the following changes to their data via their
+                    member page. Review each one and accept or reject it.
+                {% endblocktrans %}</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Data field" %}</th>
+                            <th>{% trans "Current value" %}</th>
+                            <th>{% trans "Proposed value" %}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for proposal in change_proposals %}
+                            <tr>
+                                <td>{{ proposal.label }}</td>
+                                <td>{{ proposal.current_value|default:"—" }}</td>
+                                <td><strong>{{ proposal.new_value|default:"—" }}</strong></td>
+                                <td class="text-right text-nowrap">
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" name="accept_{{ proposal.pk }}" class="btn btn-sm btn-success">
+                                            <span class="fa fa-check"></span> {% trans "Accept" %}
+                                        </button>
+                                        <button type="submit" name="reject_{{ proposal.pk }}" class="btn btn-sm btn-outline-danger">
+                                            <span class="fa fa-times"></span> {% trans "Reject" %}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
     <form method='post'>
         {% csrf_token %}
         {% for form in forms %}

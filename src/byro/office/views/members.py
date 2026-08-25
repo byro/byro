@@ -14,8 +14,9 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.dispatch import receiver
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect
@@ -56,6 +57,7 @@ from byro.office.signals import (
     member_list_importers,
     member_view,
 )
+from byro.public.models import model_field_for
 
 from .documents import DocumentUploadForm
 
@@ -78,12 +80,15 @@ class MemberView(DetailView):
         ]
         ctx["member_views"] = responses
         ctx["member"] = self.get_member()
+        ctx["pending_change_count"] = self.get_member().change_proposals.count()
         return ctx
 
 
 class MemberListMixin:
     def get_members_queryset(self, search=None, _filter="active"):
-        qs = Member.objects.all()
+        qs = Member.objects.all().annotate(
+            pending_changes_count=Count("change_proposals")
+        )
         if search:
             qs = qs.filter(Member.get_query_for_search(search))
 
@@ -97,6 +102,8 @@ class MemberListMixin:
             pass
         elif _filter == "negbalance":
             return [m for m in qs.order_by("-id").distinct() if m.balance < 0]
+        elif _filter == "pending":
+            qs = qs.filter(change_proposals__isnull=False)
         elif _filter == "inactive":
             qs = qs.filter(inactive_q)
         else:  # Default to 'active'
@@ -826,10 +833,66 @@ class MemberDataView(MemberView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["forms"] = self.get_forms()
+        context["change_proposals"] = self.get_object().change_proposals.all()
         return context
+
+    def handle_proposal(self, request):
+        """Accept or reject a single member change proposal. Returns True if a
+        proposal action was handled (and the caller should redirect)."""
+        member = self.get_object()
+        for key in request.POST:
+            if key.startswith("accept_") or key.startswith("reject_"):
+                action, _sep, raw_id = key.partition("_")
+                proposal = member.change_proposals.filter(pk=raw_id).first()
+                if proposal is None:
+                    return True
+                if action == "accept":
+                    self.accept_proposal(member, proposal)
+                else:
+                    member.log(
+                        self,
+                        ".data.proposal.rejected",
+                        field=proposal.field_id,
+                        value=proposal.new_value,
+                    )
+                    proposal.delete()
+                    messages.success(request, _("The proposed change was rejected."))
+                return True
+        return False
+
+    def accept_proposal(self, member, proposal):
+        field = member.get_fields().get(proposal.field_id)
+        if field is None:
+            proposal.delete()
+            messages.error(
+                self.request,
+                _("The proposed field no longer exists and was discarded."),
+            )
+            return
+        model_field = model_field_for(member, field)
+        try:
+            value = model_field.formfield(required=False).clean(proposal.new_value)
+        except ValidationError:
+            messages.error(
+                self.request,
+                _("The proposed value for %(field)s is invalid and was not applied.")
+                % {"field": field.name},
+            )
+            return
+        field.setter(member, value)
+        member.log(
+            self,
+            ".data.proposal.accepted",
+            field=proposal.field_id,
+            value=proposal.new_value,
+        )
+        proposal.delete()
+        messages.success(self.request, _("The proposed change was applied."))
 
     @transaction.atomic
     def post(self, *args, **kwargs):
+        if self.handle_proposal(self.request):
+            return redirect(reverse("office:members.data", kwargs=self.kwargs))
         any_changed = False
         form_list = self.get_forms()
         for form in form_list:
