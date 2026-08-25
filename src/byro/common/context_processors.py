@@ -10,6 +10,7 @@ from byro.common.models import Configuration, LogEntry
 from byro.common.utils import get_version
 from byro.mails.models import EMail
 from byro.office.signals import nav_event
+from byro.public.models import MemberChangeProposal
 
 
 def byro_information(request):
@@ -17,6 +18,7 @@ def byro_information(request):
         "config": Configuration.get_solo(),
         "pending_mails": EMail.objects.filter(sent__isnull=True).count(),
         "pending_transactions": Transaction.objects.unbalanced_transactions().count(),
+        "pending_member_changes": MemberChangeProposal.objects.count(),
         "log_end": LogEntry.objects.get_chain_end(),
         "effective_date_format": formats.get_format(
             "SHORT_DATE_FORMAT", lang=translation.get_language()
