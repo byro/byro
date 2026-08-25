@@ -28,6 +28,9 @@ class Field:
     computed = bool
     read_only = bool
     registration_form = dict
+    # Whether members may propose changes to this field from their member page.
+    # Set from the source model's ``member_editable_fields`` in get_fields().
+    editable_by_member = False
 
     def __init__(
         self,
@@ -179,6 +182,8 @@ class Member(Auditable, models.Model, LogTargetMixin):
     )
 
     form_title = _("Member")
+    # Fields members may propose changes to from their member page.
+    member_editable_fields = ("name", "address", "email")
     objects = MemberManager()
     all_objects = AllMemberManager()
 
@@ -266,6 +271,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
         }
 
         for model in [cls, Membership] + cls.profile_classes:
+            # Models (core or plugin) may declare which of their fields members
+            # are allowed to propose changes to via ``member_editable_fields``.
+            editable_fields = set(getattr(model, "member_editable_fields", ()) or ())
             for field in model._meta.fields:
                 if field.name in ("id", "member") or (
                     model is Member and field.name == "membership_type"
@@ -297,6 +305,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
                         registration_form=form_config.get(f_id, None),
                         computed=False,
                         read_only=False,
+                        editable_by_member=field.name in editable_fields,
                     )
                 )
 
@@ -556,7 +565,9 @@ class Member(Auditable, models.Model, LogTargetMixin):
             transaction__reversed_by__isnull=True,
         )
         if _from is not None:
-            stray_liabilities_qs = stray_liabilities_qs.filter(transaction__value_datetime__gte=_from)
+            stray_liabilities_qs = stray_liabilities_qs.filter(
+                transaction__value_datetime__gte=_from
+            )
         if membership_ranges:
             stray_liabilities_qs = stray_liabilities_qs.exclude(date_range_q)
         stray_liabilities_qs = stray_liabilities_qs.prefetch_related("transaction")
@@ -705,9 +716,8 @@ class Membership(Auditable, models.Model, LogTargetMixin):
         if not end:
             try:
                 end = _now.replace(day=start.day).date()
-            except (
-                ValueError
-            ):  # membership.start.day is not a valid date in our month, we'll use the last date instead
+            except ValueError:
+                # membership.start.day is not a valid date in our month, use last date instead
                 end = (_now + relativedelta(day=1, months=1, days=-1)).date()
         date = start
         while date <= end:

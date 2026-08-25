@@ -97,6 +97,9 @@
                             <a class="nav-link nav-link-second-level {% if "settings.users" in url_name %}active{% endif %}" href="{% url 'office:settings.users.list' %}">
                                 {% trans "Users" %}
                             </a>
+                            <a class="nav-link nav-link-second-level {% if "settings.api-token" in url_name %}active{% endif %}" href="{% url 'office:settings.api-token' %}">
+                                {% trans "API Token" %}
+                            </a>
                             {% for nav_element in nav_event %}
                                 {% if nav_element.section == 'settings' %}
                                     <a class="nav-link nav-link-second-level {% if nav_element.active %} active{% endif %}" href="{{ nav_element.url }}">
@@ -124,7 +127,12 @@
                         </div>
                     </li>
                     <a class="nav-link {% if url_name == "members.list" %}active{% endif %}" href="{% url 'office:members.list' %}">
-                        <span class="fa fa-address-book"></span> {% trans "Members" %}
+                        {% if pending_member_changes %}
+                            <span class="pending-mails">{{ pending_member_changes }}</span>
+                        {% else %}
+                            <span class="fa fa-address-book"></span>
+                        {% endif %}
+                        {% trans "Members" %}
                     </a>
                     <li class="nav-fold">
                         <span class="has-children">

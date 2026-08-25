@@ -27,6 +27,9 @@
         href="{% url "office:members.data" pk=member.pk %}"
       >
         {% trans "Data" %}
+        {% if pending_change_count %}
+          <span class="badge badge-danger" title="{% trans "Pending change proposals" %}">{{ pending_change_count }}</span>
+        {% endif %}
       </a>
     </li>
     <li class="nav-item">

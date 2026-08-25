@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: byro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 14:58-0300\n"
+"POT-Creation-Date: 2026-03-21 20:17+0000\n"
 "Language: pt-br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -997,7 +997,12 @@ msgstr "Geral"
 msgid "Users"
 msgstr "Usuárias"
 
-#: byro/office/templates/office/base.html:116
+#: byro/office/templates/office/base.html:101
+#: byro/office/templates/office/settings/api_token.html:6
+msgid "API Token"
+msgstr "Token de API"
+
+#: byro/office/templates/office/base.html:119
 msgid "Log"
 msgstr "Log"
 
@@ -1632,6 +1637,22 @@ msgstr "Encontre mais plugins online…"
 msgid "Find plugins online …"
 msgstr "Encontre plug-ins on-line…"
 
+#: byro/office/templates/office/settings/api_token.html:8
+msgid "Use this token to authenticate API requests:"
+msgstr "Use este token para autenticar requisições à API:"
+
+#: byro/office/templates/office/settings/api_token.html:13
+msgid "Include it in requests as:"
+msgstr "Inclua nas requisições como:"
+
+#: byro/office/templates/office/settings/api_token.html:18
+msgid "Regenerate token? The old token will stop working immediately."
+msgstr "Regenerar token? O token antigo deixará de funcionar imediatamente."
+
+#: byro/office/templates/office/settings/api_token.html:19
+msgid "Regenerate token"
+msgstr "Regenerar token"
+
 #: byro/office/templates/office/settings/log.html:5
 msgid "Audit Log"
 msgstr "Registro de Auditoria"
@@ -1691,6 +1712,31 @@ msgstr "Adicionar usuária …"
 #: byro/office/templates/office/user/detail.html:5
 msgid "User"
 msgstr "Usuária"
+
+#: byro/office/templates/office/user/detail.html:8
+msgid "Password disabled – user cannot log in with a password"
+msgstr "Senha desativada – usuário não pode entrar com senha"
+
+#: byro/office/templates/office/user/detail.html:9
+#: byro/office/templates/office/user/list.html:30
+msgid "Password disabled"
+msgstr "Senha desativada"
+
+#: byro/office/templates/office/user/detail.html:28
+msgid "Disable password for this user? They will no longer be able to log in with a password."
+msgstr "Desativar a senha desta pessoa? Ela não poderá mais entrar com senha."
+
+#: byro/office/templates/office/user/detail.html:29
+msgid "Disable password"
+msgstr "Desativar senha"
+
+#: byro/office/templates/office/user/detail.html:35
+msgid ""
+"This user's password is disabled. Set a new password above to re-enable "
+"password login."
+msgstr ""
+"A senha desta pessoa está desativada. Defina uma nova senha acima para "
+"reativar o login com senha."
 
 #: byro/office/templates/office/user/list.html:10
 msgid "Add new user"
@@ -2002,6 +2048,14 @@ msgstr "O upload não pôde ser processado: "
 #: byro/office/views/users.py:11
 msgid "Password"
 msgstr "Senha"
+
+#: byro/office/views/users.py:89
+msgid "You cannot disable your own password."
+msgstr "Você não pode desativar sua própria senha."
+
+#: byro/office/views/users.py:99
+msgid "The user's password has been disabled."
+msgstr "A senha da pessoa usuária foi desativada."
 
 #: byro/plugins/profile/models.py:13
 msgid "Nick"

@@ -18,3 +18,5 @@ class MemberProfile(Auditable, models.Model):
     )
 
     form_title = _("General information")
+    # Fields members may propose changes to from their member page.
+    member_editable_fields = ("nick", "birth_date", "phone_number")

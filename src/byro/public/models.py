@@ -9,6 +9,26 @@ from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
 from byro.common.models.configuration import Configuration
+from byro.members.models import Field, Member
+
+
+def get_proposable_fields(member):
+    """Return a dict {field_id: Field} of the fields a member may propose changes
+    to. Which fields are editable is declared by each contributing model (core or
+    plugin) via its ``member_editable_fields`` attribute and surfaced on the byro
+    Field as ``editable_by_member`` in Member.get_fields()."""
+    return {
+        field_id: field
+        for field_id, field in member.get_fields().items()
+        if getattr(field, "editable_by_member", False)
+    }
+
+
+def model_field_for(member, field):
+    """Resolve the concrete Django model field a byro Field points at, so we can
+    reuse its form field for validation and its value coercion."""
+    target, prop = Field._follow_path(member, field.path)
+    return target._meta.get_field(prop)
 
 
 def generate_default_token():
@@ -66,3 +86,37 @@ class MemberpageProfile(models.Model):
                 {"label": field.base_name, "value": field.getter(self.member)}
             )
         return result
+
+
+class MemberChangeProposal(models.Model):
+    """A change to a single member data field, proposed by the member via their
+    (token-secured) member page. Proposals never modify data directly; an admin
+    accepts or rejects them in the office backend."""
+
+    member = models.ForeignKey(
+        to=Member,
+        on_delete=models.CASCADE,
+        related_name="change_proposals",
+    )
+    field_id = models.CharField(max_length=200)
+    new_value = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("member", "field_id")
+        ordering = ("field_id",)
+
+    def get_field(self):
+        """Return the byro Field this proposal targets, or None if it is no
+        longer available (e.g. a removed profile plugin)."""
+        return self.member.get_fields().get(self.field_id)
+
+    @property
+    def label(self):
+        field = self.get_field()
+        return field.name if field else self.field_id
+
+    @property
+    def current_value(self):
+        field = self.get_field()
+        return field.getter(self.member) if field else None
