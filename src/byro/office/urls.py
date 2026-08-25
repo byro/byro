@@ -37,6 +37,11 @@ urlpatterns = [
         users.UserDetailView.as_view(),
         name="settings.users.detail",
     ),
+    path(
+        "settings/users/<int:pk>/disable-password",
+        users.UserPasswordDisableView.as_view(),
+        name="settings.users.disable-password",
+    ),
     path("settings", settings.ConfigurationView.as_view(), name="settings.base"),
     path("", dashboard.DashboardView.as_view(), name="dashboard"),
     path(
