@@ -16,6 +16,12 @@
             <input type="password" placeholder="Password" required id="password" autocomplete="off"
                    class="form-control" name="password">
             <button class="btn btn-lg btn-success form-control" type="submit">{% trans "Sign in" %}</button>
+            {% if oidc_enabled %}
+                <div style="margin-top: 1em; text-align: center;">{% trans "or" %}</div>
+                <a href="{% url 'common:oidc-login' %}" class="btn btn-lg btn-primary form-control">
+                    {% trans "Login with SSO" %}
+                </a>
+            {% endif %}
         </form>
     </div>
 {% endblock %}

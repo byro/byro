@@ -45,6 +45,20 @@ CONFIG = {
         "language_code": {"default": "en", "env": os.getenv("BYRO_LANGUAGE_CODE")},
         "time_zone": {"default": "UTC", "env": os.getenv("BYRO_TIME_ZONE")},
     },
+    "oidc": {
+        "issuer_url": {"default": "", "env": os.getenv("BYRO_OIDC_ISSUER_URL")},
+        "client_id": {"default": "", "env": os.getenv("BYRO_OIDC_CLIENT_ID")},
+        "client_secret": {"default": "", "env": os.getenv("BYRO_OIDC_CLIENT_SECRET")},
+        "admin_group": {"default": "", "env": os.getenv("BYRO_OIDC_ADMIN_GROUP")},
+        "auto_create_account": {
+            "default": "false",
+            "env": os.getenv("BYRO_OIDC_AUTO_CREATE_ACCOUNT"),
+        },
+        "username_field": {
+            "default": "preferred_username",
+            "env": os.getenv("BYRO_OIDC_USERNAME_FIELD"),
+        },
+    },
 }
 
 

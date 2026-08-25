@@ -308,6 +308,23 @@ msgstr "Boas-vindas ao byro!"
 msgid "Sign in"
 msgstr "Entrar"
 
+#: byro/common/templates/common/auth/login.html:21
+msgid "or"
+msgstr "ou"
+
+#: byro/common/templates/common/auth/login.html:22
+msgid "Login with SSO"
+msgstr "Entrar com SSO"
+
+#: byro/common/templates/log_entry/byro.common.login.oidc.html:1
+msgid "Logged in via SSO (OIDC)"
+msgstr "Conectado via SSO (OIDC)"
+
+#: byro/common/views.py
+#, python-format
+msgid "SSO login failed: %(error)s"
+msgstr "Falha no login SSO: %(error)s"
+
 #: byro/common/templates/common/log.html:7
 msgid "Date / Time"
 msgstr "Data / Hora"

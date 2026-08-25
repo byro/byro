@@ -4,12 +4,12 @@ from django.contrib import messages
 from django.db import transaction
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView, TemplateView, ListView
+from django.views.generic import FormView, ListView, TemplateView
 
 from byro.bookkeeping.models import Account
-from byro.common.forms import ConfigurationForm, RegistrationConfigForm, InitialForm
+from byro.common.forms import ConfigurationForm, InitialForm, RegistrationConfigForm
 from byro.common.models import LogEntry
-from byro.common.models.configuration import Configuration, ByroConfiguration
+from byro.common.models.configuration import ByroConfiguration, Configuration
 
 
 class InitialSettings(FormView):
