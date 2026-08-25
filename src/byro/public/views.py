@@ -1,10 +1,13 @@
 import collections.abc
 from datetime import timedelta
 
+from django.contrib import messages
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
+from django.utils.translation import gettext as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import FormMixin
 
@@ -13,7 +16,7 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models.configuration import Configuration, MemberViewLevel
 from byro.members.models import Member
 from byro.office.signals import member_dashboard_tile
-from byro.public.forms import PrivacyConsentForm
+from byro.public.forms import MemberChangeProposalForm, PrivacyConsentForm
 
 
 class MemberBaseView(DetailView):
@@ -47,6 +50,8 @@ class MemberView(FormMixin, MemberBaseView):
         context["config"] = config
         context["bookings"] = self.get_bookings(obj)
         context["member_view_level"] = MemberViewLevel
+        context["proposal_form"] = MemberChangeProposalForm(member=obj)
+        context["pending_proposals"] = obj.change_proposals.all()
 
         _now = now()
         memberships = obj.memberships.order_by("-start").all()
@@ -99,6 +104,30 @@ class MemberView(FormMixin, MemberBaseView):
         if form.is_valid():
             form.save()
         return HttpResponseRedirect(self.get_success_url())
+
+
+class MemberProposeView(MemberBaseView):
+    """Handles the member's data-change proposal form. Proposals are stored for
+    later admin review and never modify member data directly."""
+
+    def post(self, request, *args, **kwargs):
+        member = self.get_object()
+        form = MemberChangeProposalForm(request.POST, member=member)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                _(
+                    "Thank you! Your proposed changes were submitted and will be "
+                    "reviewed by an administrator."
+                ),
+            )
+        else:
+            messages.error(request, _("Your proposed changes could not be saved."))
+        return redirect(
+            "public:memberpage:member.dashboard",
+            secret_token=self.kwargs["secret_token"],
+        )
 
 
 class MemberListView(ListView):

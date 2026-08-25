@@ -25,12 +25,12 @@ jobs:
     name: "[Style] isort"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -46,12 +46,12 @@ jobs:
     name: "[Style] flake8"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -67,12 +67,12 @@ jobs:
     name: "[Style] black"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -88,12 +88,12 @@ jobs:
     name: "[Style] DjHTML"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -117,7 +117,7 @@ jobs:
           - database: mysql
             python-version: '3.13'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: getong/mariadb-action@v1.1
         with:
           mariadb version: '10.7'
@@ -132,10 +132,10 @@ jobs:
           postgresql password: 'postgres'
         if: matrix.database == 'postgres'
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
@@ -184,12 +184,12 @@ jobs:
       - testing
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: 🏗 Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
@@ -250,7 +250,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: 🏗 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.event.release.tag_name }}"/' byro/__init__.py
         if: github.event_name == 'release' && github.event.action == 'published'
@@ -289,7 +289,7 @@ jobs:
       contents: read
     steps:
       - name: 🏗 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: 🏗 Set byro version
         run: sed -i 's/__version__.*/__version__ = "${{ github.event.release.tag_name }}"/' src/byro/__init__.py
         if: github.event_name == 'release' && github.event.action == 'published'
