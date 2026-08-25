@@ -1,0 +1,24 @@
+{% extends "office/settings/base.html" %}
+{% load i18n %}
+
+{% block settings_content %}
+<div class="card">
+    <div class="card-header">{% trans "API Token" %}</div>
+    <div class="card-body">
+        <p>{% trans "Use this token to authenticate API requests:" %}</p>
+        <p>
+            <code id="api-token" style="word-break: break-all;">{{ token }}</code>
+        </p>
+        <p class="text-muted">
+            {% trans "Include it in requests as:" %}
+            <code>Authorization: Token {{ token }}</code>
+        </p>
+        <form method="post" action="{% url 'office:settings.api-token.regenerate' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning" onclick="return confirm('{% trans "Regenerate token? The old token will stop working immediately." %}')">
+                {% trans "Regenerate token" %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
