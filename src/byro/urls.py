@@ -39,6 +39,7 @@ urlpatterns = [
     path("", include("byro.common.urls", namespace="common")),
     path("", include("byro.office.urls", namespace="office")),
     path("p/", include("byro.public.urls", namespace="public")),
+    path("api/v1/", include("byro.api.urls", namespace="api")),
 ]
 
 if settings.DEBUG:
