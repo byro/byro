@@ -94,7 +94,7 @@ setup(
         "unicodecsv~=0.14.0",
         "whitenoise>=6.4,<6.13",
         "djangorestframework>=3.14,<4.0",
-        "django-filter>=23,<25",
+        "django-filter>=23,<27",
         "drf-spectacular>=0.27,<1.0",
     ],
     extras_require={
