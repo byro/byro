@@ -80,7 +80,7 @@ def get_active_key(member):
 
 
 def policy_for_key(config, key):
-    from byro.mails.models import PGPKeyStatus, PGPPolicy
+    from byro.mails.models import PGPKeyStatus
 
     if not key:
         return config.missing_key_policy
