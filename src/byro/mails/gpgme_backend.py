@@ -440,7 +440,7 @@ class GnuPGPGPBackend:
                 command[1:1] = ["--keyserver", server]
 
             try:
-                result = self._run(command, text=True, timeout=timeout, check=True)
+                self._run(command, text=True, timeout=timeout, check=True)
                 break
             except subprocess.CalledProcessError as e:
                 last_error = e.stderr.strip() or e.stdout.strip()
