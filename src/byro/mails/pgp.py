@@ -1,8 +1,9 @@
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import timedelta
 
 from django.conf import settings
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -28,6 +29,16 @@ class KeyImportResult:
     error: str = ""
 
 
+@dataclass
+class SigningKeyInfo:
+    fingerprint: str
+    user_ids: list[str] = field(default_factory=list)
+    created_at: object = None
+    expires_at: object = None
+    algorithm: str = ""
+    can_sign: bool = False
+
+
 class DisabledPGPBackend:
     def import_key(self, fingerprint, keyserver_url="", timeout=None):
         raise PGPBackendUnavailable(_("No PGP backend is configured."))
@@ -36,6 +47,12 @@ class DisabledPGPBackend:
         raise PGPBackendUnavailable(_("No PGP backend is configured."))
 
     def sign_message(self, email_message, signing_key_fingerprint):
+        raise PGPBackendUnavailable(_("No PGP backend is configured."))
+
+    def import_private_key(self, private_key):
+        raise PGPBackendUnavailable(_("No PGP backend is configured."))
+
+    def signing_key_info(self, fingerprint):
         raise PGPBackendUnavailable(_("No PGP backend is configured."))
 
     def fingerprint_from_public_key(self, public_key):
@@ -204,14 +221,15 @@ def get_dashboard_warnings():
                 "level": "danger",
                 "title": _("PGP signing incomplete"),
                 "lines": [_("Signing is enabled, but no signing key is configured.")],
+                "url": reverse("office:settings.base"),
             }
         )
 
     problematic_keys = MemberPGPKey.objects.filter(
         is_active=True,
         status__in=[PGPKeyStatus.INVALID, PGPKeyStatus.REVOKED, PGPKeyStatus.EXPIRED],
-    ).count()
-    if problematic_keys:
+    )
+    if problematic_keys.exists():
         warnings.append(
             {
                 "level": "danger",
@@ -219,8 +237,9 @@ def get_dashboard_warnings():
                 "lines": [
                     _(
                         "{count} active member keys are invalid, revoked, or expired."
-                    ).format(count=problematic_keys)
+                    ).format(count=problematic_keys.count())
                 ],
+                "url": _member_pgp_warning_url(problematic_keys),
             }
         )
 
@@ -230,22 +249,25 @@ def get_dashboard_warnings():
         status=PGPKeyStatus.VALID,
         expires_at__isnull=False,
         expires_at__lte=expiry_cutoff,
-    ).count()
-    if expiring_keys:
+    )
+    if expiring_keys.exists():
         warnings.append(
             {
                 "level": "warning",
                 "title": _("PGP keys expire soon"),
                 "lines": [
                     _("{count} active member keys expire soon.").format(
-                        count=expiring_keys
+                        count=expiring_keys.count()
                     )
                 ],
+                "url": _member_pgp_warning_url(expiring_keys),
             }
         )
 
-    refresh_errors = MemberPGPKey.objects.filter(last_error__gt="").count()
-    if refresh_errors:
+    refresh_error_keys = MemberPGPKey.objects.filter(last_error__gt="").exclude(
+        status=PGPKeyStatus.VALID
+    )
+    if refresh_error_keys.exists():
         warnings.append(
             {
                 "level": "warning",
@@ -253,9 +275,17 @@ def get_dashboard_warnings():
                 "lines": [
                     _(
                         "{count} member keys have keyserver import or refresh errors."
-                    ).format(count=refresh_errors)
+                    ).format(count=refresh_error_keys.count())
                 ],
+                "url": _member_pgp_warning_url(refresh_error_keys),
             }
         )
 
     return warnings
+
+
+def _member_pgp_warning_url(keys):
+    members = list(keys.values_list("member_id", flat=True).distinct()[:2])
+    if len(members) == 1:
+        return reverse("office:members.pgp", kwargs={"pk": members[0]})
+    return reverse("office:members.list")

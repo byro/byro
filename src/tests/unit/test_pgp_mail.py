@@ -1,9 +1,15 @@
 from datetime import timedelta
+from email.generator import BytesGenerator
+from io import BytesIO
 
 import pytest
+from django.contrib.messages import get_messages
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.mail import EmailMultiAlternatives
 from django.core.mail.message import SafeMIMEMultipart
-from django.test import override_settings
+from django.test import RequestFactory, override_settings
+from django.urls import reverse
 from django.utils import timezone
 
 from byro.common.forms import RegistrationConfigForm
@@ -19,6 +25,7 @@ from byro.mails.models import (
 )
 from byro.mails.pgp import (
     PGPBackendError,
+    SigningKeyInfo,
     get_dashboard_warnings,
     normalize_fingerprint,
 )
@@ -30,6 +37,7 @@ from byro.members.models import FeeIntervals, Member
 
 VALID_FINGERPRINT = "0123456789ABCDEF0123456789ABCDEF01234567"
 FAKE_BACKEND_PATH = f"{__name__}.FakePGPBackend"
+FAILING_BACKEND_PATH = f"{__name__}.FailingPGPBackend"
 
 
 class FakePGPBackend:
@@ -59,9 +67,27 @@ class FakePGPBackend:
         email_message.subject = "signed:" + email_message.subject
         return email_message
 
+    def import_private_key(self, private_key):
+        self.calls.append(("import-private", private_key))
+        return VALID_FINGERPRINT
+
+    def signing_key_info(self, fingerprint):
+        self.calls.append(("signing-key-info", fingerprint))
+        return SigningKeyInfo(
+            fingerprint=fingerprint,
+            user_ids=["PGP Office <pgp-office@example.org>"],
+            algorithm="EdDSA 255",
+            can_sign=True,
+        )
+
     def fingerprint_from_public_key(self, public_key):
         self.calls.append(("fingerprint", public_key))
         return VALID_FINGERPRINT
+
+
+class FailingPGPBackend:
+    def import_private_key(self, private_key):
+        raise PGPBackendError("The uploaded key is not private.")
 
 
 @pytest.fixture(autouse=True)
@@ -138,6 +164,310 @@ def test_gnupg_backend_tries_next_keyserver_after_timeout(monkeypatch):
     ]
     assert result.public_key == "public key"
     assert result.status == PGPKeyStatus.UNVERIFIED
+    assert result.error == ""
+
+
+def test_gnupg_backend_imports_one_signing_private_key(monkeypatch):
+    backend = GnuPGPGPBackend()
+    import_commands = []
+    secret_key_listing = "\n".join(
+        [
+            ":".join(["sec"] + [""] * 10 + ["s"]),
+            ":".join(["fpr"] + [""] * 8 + [VALID_FINGERPRINT]),
+        ]
+    )
+
+    def run(command, **kwargs):
+        if "--list-secret-keys" in command:
+            if "--homedir" not in command:
+                return type(
+                    "Result", (), {"returncode": 0, "stdout": "", "stderr": ""}
+                )()
+            return type(
+                "Result",
+                (),
+                {"returncode": 0, "stdout": secret_key_listing, "stderr": ""},
+            )()
+        if "--detach-sign" in command:
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        if "--import" in command:
+            import_commands.append(command)
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        raise AssertionError(f"Unexpected GnuPG command: {command}")
+
+    monkeypatch.setattr(backend, "_run", run)
+    monkeypatch.setattr(backend, "_ensure_agent", lambda: None)
+
+    assert backend.import_private_key(b"private key") == VALID_FINGERPRINT
+    assert len(import_commands) == 2
+    assert "--homedir" in import_commands[0]
+    assert "--homedir" not in import_commands[1]
+
+
+def test_gnupg_backend_replaces_existing_private_key(monkeypatch):
+    backend = GnuPGPGPBackend()
+    commands = []
+    secret_key_listing = "\n".join(
+        [
+            ":".join(["sec"] + [""] * 10 + ["s"]),
+            ":".join(["fpr"] + [""] * 8 + [VALID_FINGERPRINT]),
+        ]
+    )
+
+    def run(command, **kwargs):
+        commands.append(command)
+        if "--list-secret-keys" in command:
+            return type(
+                "Result",
+                (),
+                {"returncode": 0, "stdout": secret_key_listing, "stderr": ""},
+            )()
+        if "--detach-sign" in command:
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        if "--export-secret-keys" in command:
+            return type(
+                "Result",
+                (),
+                {"returncode": 0, "stdout": b"old private key", "stderr": b""},
+            )()
+        if "--delete-secret-keys" in command or "--import" in command:
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        raise AssertionError(f"Unexpected GnuPG command: {command}")
+
+    monkeypatch.setattr(backend, "_ensure_agent", lambda: None)
+    monkeypatch.setattr(backend, "_run", run)
+
+    assert backend.import_private_key(b"replacement private key") == VALID_FINGERPRINT
+    assert any("--delete-secret-keys" in command for command in commands)
+    assert any("--export-secret-keys" in command for command in commands)
+
+
+def test_gnupg_backend_replaces_a_private_key_that_cannot_be_exported(monkeypatch):
+    backend = GnuPGPGPBackend()
+    commands = []
+    secret_key_listing = "\n".join(
+        [
+            ":".join(["sec"] + [""] * 10 + ["s"]),
+            ":".join(["fpr"] + [""] * 8 + [VALID_FINGERPRINT]),
+        ]
+    )
+
+    def run(command, **kwargs):
+        commands.append(command)
+        if "--list-secret-keys" in command:
+            return type(
+                "Result",
+                (),
+                {"returncode": 0, "stdout": secret_key_listing, "stderr": ""},
+            )()
+        if "--detach-sign" in command:
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        if "--export-secret-keys" in command:
+            return type(
+                "Result", (), {"returncode": 2, "stdout": b"", "stderr": b"protected"}
+            )()
+        if "--delete-secret-keys" in command or "--import" in command:
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        raise AssertionError(f"Unexpected GnuPG command: {command}")
+
+    monkeypatch.setattr(backend, "_ensure_agent", lambda: None)
+    monkeypatch.setattr(backend, "_run", run)
+
+    assert backend.import_private_key(b"replacement private key") == VALID_FINGERPRINT
+    assert any("--delete-secret-keys" in command for command in commands)
+
+
+def test_gnupg_backend_rejects_passphrase_protected_private_key(monkeypatch):
+    backend = GnuPGPGPBackend()
+    secret_key_listing = "\n".join(
+        [
+            ":".join(["sec"] + [""] * 10 + ["s"]),
+            ":".join(["fpr"] + [""] * 8 + [VALID_FINGERPRINT]),
+        ]
+    )
+
+    def run(command, **kwargs):
+        if "--list-secret-keys" in command:
+            return type(
+                "Result",
+                (),
+                {"returncode": 0, "stdout": secret_key_listing, "stderr": ""},
+            )()
+        if "--detach-sign" in command:
+            return type(
+                "Result",
+                (),
+                {"returncode": 2, "stdout": b"", "stderr": b"Bad passphrase"},
+            )()
+        if "--import" in command:
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        raise AssertionError(f"Unexpected GnuPG command: {command}")
+
+    monkeypatch.setattr(backend, "_run", run)
+
+    with pytest.raises(PGPBackendError, match="must not be protected"):
+        backend.import_private_key(b"protected private key")
+
+
+def test_gnupg_backend_rejects_public_key_upload(monkeypatch):
+    backend = GnuPGPGPBackend()
+
+    def run(command, **kwargs):
+        if "--list-secret-keys" in command:
+            return type("Result", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if "--import" in command:
+            return type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+        raise AssertionError(f"Unexpected GnuPG command: {command}")
+
+    monkeypatch.setattr(backend, "_run", run)
+
+    with pytest.raises(PGPBackendError, match="does not contain a private PGP key"):
+        backend.import_private_key(b"public key")
+
+
+def test_gnupg_backend_reads_signing_key_info(monkeypatch):
+    backend = GnuPGPGPBackend()
+    agent_started = []
+    secret_key_listing = "\n".join(
+        [
+            ":".join(
+                ["sec", "", "255", "22", "", "1700000000", "", "", "", "", "", "sc"]
+            ),
+            ":".join(
+                [
+                    "uid",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "PGP Office <pgp-office@example.org>",
+                ]
+            ),
+            ":".join(
+                ["ssb", "", "255", "22", "", "", "1800000000", "", "", "", "", "s"]
+            ),
+        ]
+    )
+
+    monkeypatch.setattr(
+        backend,
+        "_run",
+        lambda *args, **kwargs: type(
+            "Result", (), {"returncode": 0, "stdout": secret_key_listing, "stderr": ""}
+        )(),
+    )
+    monkeypatch.setattr(backend, "_ensure_agent", lambda: agent_started.append(True))
+
+    info = backend.signing_key_info(VALID_FINGERPRINT)
+
+    assert agent_started == [True]
+    assert info.user_ids == ["PGP Office <pgp-office@example.org>"]
+    assert info.algorithm == "EdDSA 255"
+    assert info.can_sign
+    assert info.created_at is not None
+    assert info.expires_at is not None
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_pgp_configuration_form_imports_private_key(configuration):
+    from byro.mails.forms import PGPConfigurationForm
+
+    config = PGPConfiguration.get_solo()
+    original_values = {
+        field_name: getattr(config, field_name, None)
+        for field_name in PGPConfigurationForm(instance=config).fields
+    }
+    form = PGPConfigurationForm(
+        instance=config,
+        data={
+            field.name: getattr(config, field.name)
+            for field in config._meta.fields
+            if field.name != "id"
+        },
+        files={
+            "signing_key_file": SimpleUploadedFile(
+                "organization-private-key.asc", b"private key"
+            )
+        },
+    )
+
+    assert form.is_valid(), form.errors
+    form.import_signing_key()
+    form.save()
+
+    config.refresh_from_db()
+    assert config.signing_key_fingerprint == VALID_FINGERPRINT
+    assert "signing_key_fingerprint" not in form.fields
+    assert FakePGPBackend.calls == [("import-private", b"private key")]
+    changes = form.get_log_changes(original_values)
+    assert "signing_key_file" not in changes
+    assert changes["signing_key_fingerprint"] == ("", VALID_FINGERPRINT)
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAILING_BACKEND_PATH)
+def test_settings_shows_private_key_upload_errors(configuration, user):
+    from byro.mails.forms import PGPConfigurationForm
+    from byro.office.views.settings import ConfigurationView
+
+    config = PGPConfiguration.get_solo()
+    form = PGPConfigurationForm(
+        instance=config,
+        data={
+            field.name: getattr(config, field.name)
+            for field in config._meta.fields
+            if field.name != "id"
+        },
+        files={"signing_key_file": SimpleUploadedFile("public-key.asc", b"public key")},
+    )
+    assert form.is_valid(), form.errors
+
+    view = ConfigurationView()
+    request = RequestFactory().post("/settings")
+    request.user = user
+    request.session = {}
+    request._messages = FallbackStorage(request)
+    view.setup(request)
+    view._original_values = {
+        form: {
+            field_name: getattr(config, field_name, None) for field_name in form.fields
+        }
+    }
+
+    response = view.form_valid([form]).render()
+
+    assert response.status_code == 200
+    assert b"The uploaded key is not private." in response.content
+    assert any(
+        "The private PGP signing key could not be imported" in str(message)
+        for message in get_messages(request)
+    )
+
+
+@pytest.mark.django_db
+def test_pgp_configuration_form_places_private_key_upload_before_fingerprint():
+    from byro.mails.forms import PGPConfigurationForm
+
+    form = PGPConfigurationForm()
+
+    assert "signing_key_fingerprint" not in form.fields
+
+
+@pytest.mark.django_db
+def test_pgp_configuration_form_labels_upload_as_replacement_for_existing_key():
+    from byro.mails.forms import PGPConfigurationForm
+
+    config = PGPConfiguration.get_solo()
+    config.signing_key_fingerprint = VALID_FINGERPRINT
+
+    form = PGPConfigurationForm(instance=config)
+
+    assert str(form.fields["signing_key_file"].label) == "Replace signing key"
 
 
 def test_prepared_pgp_email_delegates_smtp_required_attributes():
@@ -154,6 +484,110 @@ def test_prepared_pgp_email_delegates_smtp_required_attributes():
     assert prepared.recipients() == ["member@example.org"]
     assert prepared.message().get_content_subtype() == "encrypted"
     assert prepared.message().as_bytes(linesep="\r\n")
+
+
+def test_gnupg_backend_starts_agent_before_signing(monkeypatch):
+    backend = GnuPGPGPBackend()
+    agent_started = []
+
+    monkeypatch.setattr(backend, "_ensure_agent", lambda: agent_started.append(True))
+    monkeypatch.setattr(backend, "_freeze", lambda email_message: b"mail")
+    monkeypatch.setattr(
+        backend,
+        "_run",
+        lambda *args, **kwargs: type(
+            "Result", (), {"returncode": 0, "stdout": b"signature", "stderr": b""}
+        )(),
+    )
+
+    backend.sign_message(
+        EmailMultiAlternatives("Subject", "Body", "sender@example.org"),
+        VALID_FINGERPRINT,
+    )
+
+    assert agent_started == [True]
+
+
+def test_gnupg_backend_signs_the_exact_mime_part_that_is_attached(monkeypatch):
+    backend = GnuPGPGPBackend()
+    signed_data = []
+
+    monkeypatch.setattr(backend, "_ensure_agent", lambda: None)
+
+    def run(command, **kwargs):
+        signed_data.append(kwargs["input_data"])
+        return type(
+            "Result", (), {"returncode": 0, "stdout": b"signature", "stderr": b""}
+        )()
+
+    monkeypatch.setattr(backend, "_run", run)
+    prepared = backend.sign_message(
+        EmailMultiAlternatives(
+            "Subject", "Body", "sender@example.org", to=["member@example.org"]
+        ),
+        VALID_FINGERPRINT,
+    )
+
+    output = BytesIO()
+    BytesGenerator(output, mangle_from_=False).flatten(
+        prepared.message().get_payload()[0], linesep="\r\n"
+    )
+
+    assert signed_data == [output.getvalue()]
+
+
+def test_gnupg_backend_explains_how_to_replace_a_passphrase_protected_key(
+    monkeypatch,
+):
+    backend = GnuPGPGPBackend()
+
+    monkeypatch.setattr(backend, "_ensure_agent", lambda: None)
+    monkeypatch.setattr(backend, "_freeze", lambda email_message: b"mail")
+    monkeypatch.setattr(
+        backend,
+        "_run",
+        lambda *args, **kwargs: type(
+            "Result",
+            (),
+            {
+                "returncode": 2,
+                "stdout": b"",
+                "stderr": b"gpg: Sorry, we are in batchmode - can't get input",
+            },
+        )(),
+    )
+
+    with pytest.raises(PGPBackendError, match="Replace it in the PGP settings"):
+        backend.sign_message(
+            EmailMultiAlternatives("Subject", "Body", "sender@example.org"),
+            VALID_FINGERPRINT,
+        )
+
+
+def test_gnupg_backend_restarts_agent_after_a_failed_launch(monkeypatch):
+    backend = GnuPGPGPBackend()
+    calls = []
+    results = iter(
+        [
+            type("Result", (), {"returncode": 1, "stdout": b"", "stderr": b"stale"})(),
+            type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})(),
+            type("Result", (), {"returncode": 0, "stdout": b"", "stderr": b""})(),
+        ]
+    )
+
+    def run_gpgconf(*arguments):
+        calls.append(arguments)
+        return next(results)
+
+    monkeypatch.setattr(backend, "_run_gpgconf", run_gpgconf)
+
+    backend._ensure_agent()
+
+    assert calls == [
+        ("--launch", "gpg-agent"),
+        ("--kill", "gpg-agent"),
+        ("--launch", "gpg-agent"),
+    ]
 
 
 @pytest.mark.django_db
@@ -460,7 +894,41 @@ def test_dashboard_warns_about_expiring_member_keys(member):
 
     warnings = get_dashboard_warnings()
 
-    assert any(warning["level"] == "warning" for warning in warnings)
+    warning = next(warning for warning in warnings if warning["level"] == "warning")
+    assert warning["url"] == reverse("office:members.pgp", kwargs={"pk": member.pk})
+
+
+@pytest.mark.django_db
+def test_dashboard_does_not_warn_about_successful_key_import_output(member):
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        public_key="public key",
+        status=PGPKeyStatus.VALID,
+        last_error="gpg: public key imported",
+    )
+
+    warnings = get_dashboard_warnings()
+
+    assert not any(warning["title"] == "PGP key refresh errors" for warning in warnings)
+
+
+@pytest.mark.django_db
+def test_dashboard_links_one_key_refresh_error_to_its_member_pgp_tab(member):
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        public_key="public key",
+        status=PGPKeyStatus.INVALID,
+        last_error="keyserver unavailable",
+    )
+
+    warnings = get_dashboard_warnings()
+
+    warning = next(
+        warning for warning in warnings if warning["title"] == "PGP key refresh errors"
+    )
+    assert warning["url"] == reverse("office:members.pgp", kwargs={"pk": member.pk})
 
 
 @pytest.mark.django_db

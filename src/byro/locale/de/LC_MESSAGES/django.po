@@ -573,6 +573,31 @@ msgstr ""
 msgid "Fingerprint"
 msgstr "Fingerprint"
 
+#: byro/mails/forms.py:11
+msgid "Upload private signing key"
+msgstr "Privaten Signaturschlüssel hochladen"
+
+#: byro/mails/forms.py:41
+msgid "Replace signing key"
+msgstr "Signaturschlüssel ersetzen"
+
+#: byro/mails/forms.py:13
+msgid ""
+"Upload an ASCII-armored private PGP key without a passphrase. It is imported "
+"into the configured PGP keyring and is not stored in byro."
+msgstr ""
+"Lade einen ASCII-armierten privaten PGP-Schlüssel ohne Passphrase hoch. Er "
+"wird in den konfigurierten PGP-Schlüsselbund importiert und nicht in byro "
+"gespeichert."
+
+#: byro/mails/forms.py:39
+msgid "The private PGP key file must not exceed 1 MiB."
+msgstr "Die Datei mit dem privaten PGP-Schlüssel darf höchstens 1 MiB groß sein."
+
+#: byro/mails/forms.py:53
+msgid "The configured PGP backend cannot import private keys."
+msgstr "Das konfigurierte PGP-Backend kann keine privaten Schlüssel importieren."
+
 #: byro/mails/forms.py:45
 msgid "The uploaded public key does not match the entered fingerprint."
 msgstr ""
@@ -583,21 +608,124 @@ msgstr ""
 msgid "The gpg executable is not installed."
 msgstr "Das gpg-Programm ist nicht installiert."
 
+#: byro/mails/gpgme_backend.py:78
+msgid "The gpgconf executable is not installed."
+msgstr "Das Programm gpgconf ist nicht installiert."
+
 #: byro/mails/gpgme_backend.py:99
 msgid "No usable key was found in the public key data."
 msgstr "In den Public-Key-Daten wurde kein nutzbarer Schlüssel gefunden."
+
+#: byro/mails/gpgme_backend.py:125
+msgid "The uploaded file does not contain a private PGP key. Upload an exported private key."
+msgstr ""
+"Die hochgeladene Datei enthält keinen privaten PGP-Schlüssel. Lade einen "
+"exportierten privaten Schlüssel hoch."
+
+#: byro/mails/gpgme_backend.py:132
+msgid "The uploaded file must contain exactly one private PGP key."
+msgstr "Die hochgeladene Datei muss genau einen privaten PGP-Schlüssel enthalten."
+
+#: byro/mails/gpgme_backend.py:138
+msgid "The uploaded private PGP key cannot be used for signing."
+msgstr "Der hochgeladene private PGP-Schlüssel kann nicht zum Signieren verwendet werden."
+
+#: byro/mails/gpgme_backend.py:191
+msgid ""
+"The uploaded private PGP key must not be protected by a passphrase. Upload a "
+"key without a passphrase."
+msgstr ""
+"Der hochgeladene private PGP-Schlüssel darf nicht mit einer Passphrase "
+"geschützt sein. Lade einen Schlüssel ohne Passphrase hoch."
+
+#: byro/mails/gpgme_backend.py:373
+msgid ""
+"The configured private PGP key is protected by a passphrase. Replace it in "
+"the PGP settings with a key without a passphrase."
+msgstr ""
+"Der konfigurierte private PGP-Schlüssel ist mit einer Passphrase geschützt. "
+"Ersetze ihn in den PGP-Einstellungen durch einen Schlüssel ohne Passphrase."
+
+#: byro/mails/gpgme_backend.py:192
+msgid "No private PGP key was found for this fingerprint."
+msgstr "Für diesen Fingerprint wurde kein privater PGP-Schlüssel gefunden."
+
+#: byro/mails/gpgme_backend.py:208
+msgid "Unknown"
+msgstr "Unbekannt"
 
 #: byro/mails/models.py:54
 msgid "Encrypt member emails with PGP"
 msgstr "Mitglieder-E-Mails mit PGP verschlüsseln"
 
+#: byro/office/templates/office/settings/form.html:16
+msgid "Encryption"
+msgstr "Verschlüsselung"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:5
+msgid "PGP signing"
+msgstr "PGP-Signierung"
+
 #: byro/mails/models.py:57
 msgid "Sign outgoing emails with PGP"
 msgstr "Ausgehende E-Mails mit PGP signieren"
 
+#: byro/office/templates/office/settings/form.html:25
+msgid "Signing"
+msgstr "Signieren"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:20
+msgid "PGP encryption"
+msgstr "PGP-Verschlüsselung"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:38
+msgid "Advanced key management"
+msgstr "Erweiterte Schlüsselverwaltung"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:43
+msgid "Expiry reminders"
+msgstr "Ablauf-Erinnerungen"
+
+#: byro/office/views/settings.py:94
+#, python-brace-format
+msgid "The private PGP signing key could not be imported: {error}"
+msgstr "Der private PGP-Signaturschlüssel konnte nicht importiert werden: {error}"
+
 #: byro/mails/models.py:62
 msgid "Signing key fingerprint"
 msgstr "Fingerprint des Signaturschlüssels"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:21
+msgid "No signing key configured."
+msgstr "Kein Signaturschlüssel hinterlegt."
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:24
+msgid "User IDs"
+msgstr "Benutzerkennungen"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:33
+msgid "Created"
+msgstr "Erstellt"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:43
+msgid "Never"
+msgstr "Läuft nicht ab"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:46
+msgid "Algorithm"
+msgstr "Algorithmus"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:51
+msgid "Signing capable"
+msgstr "Signaturfähig"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:53
+msgid "Cannot sign"
+msgstr "Nicht signaturfähig"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:57
+msgid "Key information is currently unavailable."
+msgstr "Schlüsselinformationen sind derzeit nicht verfügbar."
 
 #: byro/mails/models.py:64
 msgid ""

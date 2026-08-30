@@ -60,28 +60,38 @@ Office settings
 
 The byro office settings contain the operational PGP policy:
 
-* enable or disable encryption for member email
-* enable or disable signing of outgoing email
-* configure the organization's signing key fingerprint
-* configure keyserver URLs
-* configure the keyserver timeout and automatic refresh interval
-* decide whether missing, invalid, unverified, or expired keys block member
-  email or fall back to plain mail
-* enable or disable automatic key refresh
-* enable or disable reminders before member keys expire
+* **PGP signing** contains the organization's private signing key and the
+  option to sign outgoing email.
+* **PGP encryption** contains member-email encryption, the keyserver URLs, and
+  the policy for missing, invalid, unverified, or expired member keys.
+* **Advanced key management** contains automatic refresh, timeouts, and
+  expiry reminders for member keys.
 
 Organization signing key
 ------------------------
 
-Import or generate the organization's private signing key in the GnuPG home
-directory used by byro. The private key material is not stored in the byro
-database. byro stores only the configured signing key fingerprint.
+In the PGP settings card, upload the organization's ASCII-armored private
+signing key without a passphrase. byro validates that it contains exactly one
+signing-capable key, verifies that it can sign without a passphrase, imports it
+into the configured GnuPG home directory, and fills in its fingerprint
+automatically. The private key material is not stored in the byro database or
+audit log; it remains only in the GnuPG keyring.
+
+For an imported key, the settings show its fingerprint, user IDs, creation and
+expiry dates, algorithm, and whether it has signing capability. These details
+are read from the GnuPG keyring; no private key material is displayed.
+
+Alternatively, import or generate the key in the GnuPG home directory used by
+byro through deployment tooling. The office settings display the configured
+fingerprint read-only; upload a private key to replace it.
 
 Example as the byro user::
 
     $ GNUPGHOME=/var/byro/data/gnupg gpg --list-secret-keys --fingerprint
 
-Copy the full fingerprint into the PGP settings in the office area.
+The uploaded signing key must not be password-protected. byro does not store
+key passphrases. Protect the GnuPG home directory so that only the byro process
+can access the imported private key.
 
 Member keys
 -----------

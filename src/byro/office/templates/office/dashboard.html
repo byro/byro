@@ -46,7 +46,7 @@
         {% for warning in pgp_warnings %}
             <a
                 class="dashboard-block block-{{ warning.level }}"
-                href="{% url "office:settings.base" %}"
+                href="{{ warning.url }}"
             >
                 <h1>{{ warning.title }}</h1>
                 <span class="dashboard-description">

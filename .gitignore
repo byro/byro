@@ -125,3 +125,5 @@ data/
 *.sql*
 
 byro.cfg
+
+data/**

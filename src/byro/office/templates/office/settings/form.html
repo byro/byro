@@ -3,13 +3,17 @@
 {% load i18n %}
 
 {% block settings_content %}
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for f in form %}
             <div class="card member-form-card">
                 <div class="card-header">{{ f.instance.form_title }}</div>
                 <div class="card-body">
-                    {% bootstrap_form f layout='horizontal' %}
+                    {% if f.encryption_enabled %}
+                        {% include "office/settings/pgp_configuration_form.html" with form=f %}
+                    {% else %}
+                        {% bootstrap_form f layout='horizontal' %}
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}

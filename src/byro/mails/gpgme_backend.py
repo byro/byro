@@ -1,5 +1,6 @@
 import os
 import subprocess
+import tempfile
 from datetime import datetime, timezone
 from email.generator import BytesGenerator
 from email.mime.application import MIMEApplication
@@ -13,6 +14,7 @@ from byro.mails.pgp import (
     KeyImportResult,
     PGPBackendError,
     PGPBackendUnavailable,
+    SigningKeyInfo,
     normalize_fingerprint,
 )
 
@@ -66,9 +68,35 @@ class GnuPGPGPBackend:
         except subprocess.TimeoutExpired as e:
             raise PGPBackendError(str(e)) from e
 
-    def _freeze(self, email_message):
+    def _ensure_agent(self):
+        result = self._run_gpgconf("--launch", "gpg-agent")
+        if result.returncode != 0:
+            self._run_gpgconf("--kill", "gpg-agent")
+            result = self._run_gpgconf("--launch", "gpg-agent")
+
+        if result.returncode != 0:
+            raise PGPBackendError(
+                result.stderr.decode("utf-8", errors="replace").strip()
+                or result.stdout.decode("utf-8", errors="replace").strip()
+            )
+
+    def _run_gpgconf(self, *arguments):
+        try:
+            return subprocess.run(
+                ["gpgconf", *arguments],
+                env=self._env(),
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+        except FileNotFoundError as e:
+            raise PGPBackendUnavailable(
+                _("The gpgconf executable is not installed.")
+            ) from e
+
+    def _freeze(self, mime_message):
         out = BytesIO()
-        BytesGenerator(out, mangle_from_=False).flatten(email_message.message())
+        BytesGenerator(out, mangle_from_=False).flatten(mime_message, linesep="\r\n")
         return out.getvalue()
 
     def _copy_outer_headers(self, original, target):
@@ -104,6 +132,213 @@ class GnuPGPGPBackend:
     def fingerprint_from_public_key(self, public_key):
         return self._fingerprint_from_public_key(public_key)
 
+    def import_private_key(self, private_key):
+        with tempfile.TemporaryDirectory(prefix="byro-pgp-") as temporary_home:
+            result = self._run(
+                ["gpg", "--batch", "--homedir", temporary_home, "--import"],
+                input_data=private_key,
+                check=False,
+            )
+            if result.returncode != 0:
+                raise PGPBackendError(
+                    result.stderr.decode("utf-8", errors="replace").strip()
+                    or result.stdout.decode("utf-8", errors="replace").strip()
+                )
+
+            secret_keys = self._secret_keys_in_home(temporary_home)
+
+            if len(secret_keys) == 1 and secret_keys[0][1]:
+                self._require_unprotected_signing_key(temporary_home, secret_keys[0][0])
+
+        if not secret_keys:
+            raise PGPBackendError(
+                _(
+                    "The uploaded file does not contain a private PGP key. "
+                    "Upload an exported private key."
+                )
+            )
+        if len(secret_keys) != 1:
+            raise PGPBackendError(
+                _("The uploaded file must contain exactly one private PGP key.")
+            )
+
+        fingerprint, can_sign = secret_keys[0]
+        if not can_sign:
+            raise PGPBackendError(
+                _("The uploaded private PGP key cannot be used for signing.")
+            )
+
+        if self._secret_key_exists(fingerprint):
+            result = self._replace_existing_private_key(fingerprint, private_key)
+        else:
+            result = self._run(
+                ["gpg", "--batch", "--import"], input_data=private_key, check=False
+            )
+        if result.returncode != 0:
+            raise PGPBackendError(
+                result.stderr.decode("utf-8", errors="replace").strip()
+                or result.stdout.decode("utf-8", errors="replace").strip()
+            )
+        return fingerprint
+
+    def _secret_key_exists(self, fingerprint):
+        self._ensure_agent()
+        result = self._run(
+            ["gpg", "--batch", "--with-colons", "--list-secret-keys", fingerprint],
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise PGPBackendError(result.stderr.strip() or result.stdout.strip())
+        return any(line.startswith("sec:") for line in result.stdout.splitlines())
+
+    def _replace_existing_private_key(self, fingerprint, private_key):
+        backup = self._run(
+            ["gpg", "--batch", "--armor", "--export-secret-keys", fingerprint],
+            check=False,
+        )
+        backup_data = backup.stdout if backup.returncode == 0 else None
+
+        deletion = self._run(
+            ["gpg", "--batch", "--yes", "--delete-secret-keys", fingerprint],
+            check=False,
+        )
+        if deletion.returncode != 0:
+            raise PGPBackendError(
+                deletion.stderr.decode("utf-8", errors="replace").strip()
+                or deletion.stdout.decode("utf-8", errors="replace").strip()
+            )
+
+        result = self._run(
+            ["gpg", "--batch", "--import"], input_data=private_key, check=False
+        )
+        if result.returncode != 0 and backup_data:
+            self._run(
+                ["gpg", "--batch", "--import"], input_data=backup_data, check=False
+            )
+        return result
+
+    def _require_unprotected_signing_key(self, home, fingerprint):
+        result = self._run(
+            [
+                "gpg",
+                "--batch",
+                "--yes",
+                "--homedir",
+                home,
+                "--pinentry-mode",
+                "loopback",
+                "--passphrase",
+                "",
+                "--local-user",
+                fingerprint,
+                "--output",
+                os.path.join(home, "signing-validation.sig"),
+                "--detach-sign",
+            ],
+            input_data=b"byro private-key upload validation",
+            check=False,
+        )
+        if result.returncode != 0:
+            raise PGPBackendError(
+                _(
+                    "The uploaded private PGP key must not be protected by a "
+                    "passphrase. Upload a key without a passphrase."
+                )
+            )
+
+    def signing_key_info(self, fingerprint):
+        fingerprint = normalize_fingerprint(fingerprint)
+        self._ensure_agent()
+        result = self._run(
+            ["gpg", "--batch", "--with-colons", "--list-secret-keys", fingerprint],
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise PGPBackendError(result.stderr.strip() or result.stdout.strip())
+
+        info = SigningKeyInfo(fingerprint=fingerprint)
+        signing_expirations = []
+        found_secret_key = False
+        for line in result.stdout.splitlines():
+            parts = line.split(":")
+            record_type = parts[0]
+            if record_type in ("sec", "ssb"):
+                found_secret_key = found_secret_key or record_type == "sec"
+                capabilities = parts[11] if len(parts) > 11 else ""
+                can_sign = "s" in capabilities.lower()
+                info.can_sign = info.can_sign or can_sign
+                if can_sign and len(parts) > 6 and parts[6]:
+                    signing_expirations.append(int(parts[6]))
+                if record_type == "sec":
+                    info.algorithm = self._key_algorithm(parts)
+                    if len(parts) > 5 and parts[5]:
+                        info.created_at = datetime.fromtimestamp(
+                            int(parts[5]), tz=timezone.utc
+                        )
+            elif record_type == "uid" and len(parts) > 9 and parts[9]:
+                info.user_ids.append(parts[9])
+
+        if not found_secret_key:
+            raise PGPBackendError(
+                _("No private PGP key was found for this fingerprint.")
+            )
+        if signing_expirations:
+            info.expires_at = datetime.fromtimestamp(
+                min(signing_expirations), tz=timezone.utc
+            )
+        return info
+
+    def _key_algorithm(self, parts):
+        algorithm_ids = {
+            "1": "RSA",
+            "17": "DSA",
+            "19": "ECDSA",
+            "22": "EdDSA",
+        }
+        algorithm = algorithm_ids.get(parts[3] if len(parts) > 3 else "", _("Unknown"))
+        key_length = parts[2] if len(parts) > 2 else ""
+        return f"{algorithm} {key_length}".strip()
+
+    def _secret_keys_in_home(self, home):
+        result = self._run(
+            [
+                "gpg",
+                "--batch",
+                "--homedir",
+                home,
+                "--with-colons",
+                "--list-secret-keys",
+            ],
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise PGPBackendError(result.stderr.strip() or result.stdout.strip())
+
+        keys = []
+        current_key = None
+        for line in result.stdout.splitlines():
+            parts = line.split(":")
+            if parts[0] == "sec":
+                current_key = {
+                    "fingerprint": None,
+                    "can_sign": "s" in (parts[11] if len(parts) > 11 else "").lower(),
+                }
+                keys.append(current_key)
+            elif parts[0] == "ssb" and current_key:
+                current_key["can_sign"] = (
+                    current_key["can_sign"]
+                    or "s" in (parts[11] if len(parts) > 11 else "").lower()
+                )
+            elif parts[0] == "fpr" and current_key and not current_key["fingerprint"]:
+                current_key["fingerprint"] = normalize_fingerprint(parts[9])
+
+        return [
+            (key["fingerprint"], key["can_sign"]) for key in keys if key["fingerprint"]
+        ]
+
     def _import_public_key(self, public_key):
         fingerprint = self._fingerprint_from_public_key(public_key)
         result = self._run(
@@ -118,7 +353,7 @@ class GnuPGPGPBackend:
 
     def encrypt_message(self, email_message, public_key):
         recipient = self._import_public_key(public_key)
-        plaintext = self._freeze(email_message)
+        plaintext = self._freeze(email_message.message())
 
         result = self._run(
             [
@@ -152,7 +387,9 @@ class GnuPGPGPBackend:
 
     def sign_message(self, email_message, signing_key_fingerprint):
         signing_key_fingerprint = normalize_fingerprint(signing_key_fingerprint)
-        signed_data = self._freeze(email_message)
+        self._ensure_agent()
+        signed_part = email_message.message()
+        signed_data = self._freeze(signed_part)
 
         result = self._run(
             [
@@ -170,7 +407,15 @@ class GnuPGPGPBackend:
             check=False,
         )
         if result.returncode != 0:
-            raise PGPBackendError(result.stderr.decode("utf-8", errors="replace"))
+            error = result.stderr.decode("utf-8", errors="replace")
+            if "can't get input" in error:
+                raise PGPBackendError(
+                    _(
+                        "The configured private PGP key is protected by a passphrase. "
+                        "Replace it in the PGP settings with a key without a passphrase."
+                    )
+                )
+            raise PGPBackendError(error)
 
         signed = SafeMIMEMultipart(
             "signed",
@@ -178,7 +423,7 @@ class GnuPGPGPBackend:
             micalg="pgp-sha256",
         )
         self._copy_outer_headers(email_message, signed)
-        signed.attach(email_message.message())
+        signed.attach(signed_part)
         signed.attach(
             MIMEApplication(result.stdout, "pgp-signature", Name="signature.asc")
         )
@@ -221,7 +466,7 @@ class GnuPGPGPBackend:
             public_key=public_key,
             status=self._status_for_key(key_info),
             expires_at=self._expires_at(key_info),
-            error=result.stderr.strip(),
+            error="",
         )
 
     def _keyserver_urls(self, keyserver_url):

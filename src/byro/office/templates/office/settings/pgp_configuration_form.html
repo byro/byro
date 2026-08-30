@@ -1,0 +1,102 @@
+{% load bootstrap4 %}
+{% load i18n %}
+
+<section>
+    <h5>{% trans "PGP signing" %}</h5>
+    <div class="form-group row">
+        <label class="col-md-3 col-form-label" for="{{ form.signing_enabled.id_for_label }}">
+            {% trans "Signing" %}
+        </label>
+        <div class="col-md-9">
+            {% bootstrap_field form.signing_enabled form_group_class='mb-0' %}
+        </div>
+    </div>
+    {% bootstrap_field form.signing_key_file layout='horizontal' %}
+    {% if form.instance.signing_key_fingerprint and form.signing_key_info %}
+        <dl class="row mb-0">
+            <dt class="col-md-3">{% trans "Fingerprint" %}</dt>
+            <dd class="col-md-9 text-body" style="word-break: break-all;">
+                {{ form.instance.signing_key_fingerprint }}
+            </dd>
+            <dt class="col-md-3">{% trans "User IDs" %}</dt>
+            <dd class="col-md-9">
+                {% for user_id in form.signing_key_info.user_ids %}
+                    <div>{{ user_id }}</div>
+                {% empty %}
+                    <span class="text-muted">-</span>
+                {% endfor %}
+            </dd>
+            <dt class="col-md-3">{% trans "Created" %}</dt>
+            <dd class="col-md-9">{{ form.signing_key_info.created_at|date:"SHORT_DATE_FORMAT"|default:"-" }}</dd>
+            <dt class="col-md-3">{% trans "Expires" %}</dt>
+            <dd class="col-md-9">
+                {% if form.signing_key_info.expires_at %}
+                    {{ form.signing_key_info.expires_at|date:"SHORT_DATE_FORMAT" }}
+                {% else %}
+                    {% trans "Never" %}
+                {% endif %}
+            </dd>
+            <dt class="col-md-3">{% trans "Algorithm" %}</dt>
+            <dd class="col-md-9">{{ form.signing_key_info.algorithm|default:"-" }}</dd>
+            <dt class="col-md-3">{% trans "Status" %}</dt>
+            <dd class="col-md-9">
+                {% if form.signing_key_info.can_sign %}
+                    <span class="text-success">{% trans "Signing capable" %}</span>
+                {% else %}
+                    <span class="text-danger">{% trans "Cannot sign" %}</span>
+                {% endif %}
+            </dd>
+        </dl>
+    {% else %}
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label">{% trans "Fingerprint" %}</label>
+            <div class="col-md-9 pt-2">
+                {% if form.instance.signing_key_fingerprint %}
+                    <div class="text-body" style="word-break: break-all;">
+                        {{ form.instance.signing_key_fingerprint }}
+                    </div>
+                    <div class="text-muted mt-2">{% trans "Key information is currently unavailable." %}</div>
+                {% else %}
+                <span class="text-muted">{% trans "No signing key configured." %}</span>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</section>
+
+<hr>
+
+<section>
+    <h5>{% trans "PGP encryption" %}</h5>
+    <div class="form-group row">
+        <label class="col-md-3 col-form-label" for="{{ form.encryption_enabled.id_for_label }}">
+            {% trans "Encryption" %}
+        </label>
+        <div class="col-md-9">
+            {% bootstrap_field form.encryption_enabled form_group_class='mb-0' %}
+        </div>
+    </div>
+    {% bootstrap_field form.missing_key_policy layout='horizontal' %}
+    {% bootstrap_field form.invalid_key_policy layout='horizontal' %}
+    {% bootstrap_field form.unverified_key_policy layout='horizontal' %}
+    {% bootstrap_field form.expired_key_policy layout='horizontal' %}
+    {% bootstrap_field form.keyserver_url layout='horizontal' %}
+</section>
+
+<hr>
+
+<section>
+    <h5>{% trans "Advanced key management" %}</h5>
+    {% bootstrap_field form.refresh_keys_automatically layout='horizontal' %}
+    {% bootstrap_field form.key_refresh_interval_days layout='horizontal' %}
+    {% bootstrap_field form.keyserver_timeout_seconds layout='horizontal' %}
+    <div class="form-group row">
+        <label class="col-md-3 col-form-label" for="{{ form.send_expiry_reminders.id_for_label }}">
+            {% trans "Expiry reminders" %}
+        </label>
+        <div class="col-md-9">
+            {% bootstrap_field form.send_expiry_reminders form_group_class='mb-0' %}
+        </div>
+    </div>
+    {% bootstrap_field form.expiry_reminder_days layout='horizontal' %}
+</section>
