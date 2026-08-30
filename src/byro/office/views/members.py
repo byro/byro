@@ -32,7 +32,10 @@ from django.views.generic.list import (
 from byro.bookkeeping.models import Booking
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry
-from byro.mails.models import EMail
+from byro.mails.forms import MemberPGPFingerprintForm, MemberPGPKeyUploadForm
+from byro.mails.models import EMail, MemberPGPKey, PGPKeySource
+from byro.mails.pgp import import_member_key, normalize_fingerprint
+from byro.mails.registration import PGP_REGISTRATION_FIELD
 from byro.members.forms import CreateMemberForm
 from byro.members.models import Member, Membership
 from byro.members.signals import (
@@ -825,6 +828,27 @@ class MemberDataView(MemberView):
         return False
 
     def accept_proposal(self, member, proposal):
+        if proposal.field_id == PGP_REGISTRATION_FIELD:
+            try:
+                fingerprint = normalize_fingerprint(proposal.new_value)
+            except ValueError:
+                messages.error(
+                    self.request,
+                    _("The proposed PGP fingerprint is invalid and was not applied."),
+                )
+                return
+            key = import_member_key(member, fingerprint, PGPKeySource.KEYSERVER)
+            member.log(
+                self,
+                ".data.proposal.accepted",
+                field=proposal.field_id,
+                value=key.fingerprint,
+                status=key.status,
+            )
+            proposal.delete()
+            messages.success(self.request, _("The proposed change was applied."))
+            return
+
         field = member.get_fields().get(proposal.field_id)
         if field is None:
             proposal.delete()
@@ -873,6 +897,65 @@ class MemberDataView(MemberView):
             messages.success(self.request, _("Your changes have been saved."))
             update_member.send_robust(sender=self.request, form_list=form_list)
         return redirect(reverse("office:members.data", kwargs=self.kwargs))
+
+
+class MemberPGPView(MemberView):
+    template_name = "office/member/pgp.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        member = self.get_member()
+        context["pgp_keys"] = member.pgp_keys.all()
+        context["fingerprint_form"] = MemberPGPFingerprintForm(prefix="fingerprint")
+        context["upload_form"] = MemberPGPKeyUploadForm(prefix="upload")
+        return context
+
+    @transaction.atomic
+    def post(self, *args, **kwargs):
+        member = self.get_member()
+        if "deactivate_key" in self.request.POST:
+            key = MemberPGPKey.objects.get(
+                member=member, pk=self.request.POST["deactivate_key"]
+            )
+            key.is_active = False
+            key.save(update_fields=["is_active"])
+            key.log(self, ".deactivated", fingerprint=key.fingerprint)
+            messages.success(self.request, _("The PGP key was deactivated."))
+            return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
+        elif "delete_key" in self.request.POST:
+            key = MemberPGPKey.objects.get(
+                member=member, pk=self.request.POST["delete_key"]
+            )
+            fingerprint = key.fingerprint
+            key.log(self, ".deleted", fingerprint=fingerprint, status=key.status)
+            key.delete()
+            messages.success(self.request, _("The PGP key was deleted."))
+            return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
+        elif "submit_fingerprint" in self.request.POST:
+            form = MemberPGPFingerprintForm(self.request.POST, prefix="fingerprint")
+            if form.is_valid():
+                key = import_member_key(
+                    member,
+                    form.cleaned_data["fingerprint"],
+                    PGPKeySource.KEYSERVER,
+                )
+                key.log(
+                    self, ".imported", fingerprint=key.fingerprint, status=key.status
+                )
+                messages.success(self.request, _("The PGP key import was queued."))
+                return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
+        else:
+            form = MemberPGPKeyUploadForm(self.request.POST, prefix="upload")
+            if form.is_valid():
+                key = form.save(commit=False)
+                key.member = member
+                key.save()
+                key.log(
+                    self, ".uploaded", fingerprint=key.fingerprint, status=key.status
+                )
+                messages.success(self.request, _("The PGP public key was saved."))
+                return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
+        return self.get(self.request)
 
 
 class MemberFinanceView(MemberView):

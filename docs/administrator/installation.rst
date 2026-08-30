@@ -62,6 +62,11 @@ mentioned above::
 
     # apt-get install git build-essential libssl-dev gettext
 
+If you want to use PGP signing and encryption for outgoing email, you also need
+GnuPG before installing byro::
+
+    # apt-get install gnupg gpg-agent
+
 Replace all further "pip" commands with "pip3" if your system does not have
 Python 3 as default Python version.
 
@@ -95,6 +100,10 @@ branch or commit::
 
     $ pip install --user -U byro  # OR, alternatively
     $ pip install --user -U "git+git://github.com/byro/byro.git@main#egg=byro&subdirectory=src"
+
+If you want to use PGP support, install byro with the ``pgp`` extra instead::
+
+    $ pip install --user -U "byro[pgp]"
 
 We also need to create a data directory::
 
@@ -232,4 +241,3 @@ If you want to upgrade byro to a specific release, you can substitute
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
 .. _strong encryption settings: https://mozilla.github.io/server-side-tls/ssl-config-generator/
 .. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose.html
-

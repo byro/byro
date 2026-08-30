@@ -1,7 +1,12 @@
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 
+from byro.mails.models import PGPKeySource, PGPKeyStatus
+from byro.mails.registration import PGP_REGISTRATION_FIELD
 from byro.public.models import MemberChangeProposal, get_proposable_fields
+
+VALID_FINGERPRINT = "0123456789ABCDEF0123456789ABCDEF01234567"
 
 
 def base_proposal_data(member):
@@ -89,6 +94,19 @@ def test_propose_invalid_date_rejected(member, membership, client, configuration
     data["MemberProfile__birth_date"] = "not-a-date"
     client.post(propose_url(member), data)
     assert member.change_proposals.count() == 0
+
+
+@pytest.mark.django_db
+def test_propose_pgp_fingerprint_creates_proposal(
+    member, membership, client, configuration
+):
+    data = base_proposal_data(member)
+    data[PGP_REGISTRATION_FIELD] = VALID_FINGERPRINT
+    client.post(propose_url(member), data)
+
+    proposal = member.change_proposals.get(field_id=PGP_REGISTRATION_FIELD)
+    assert proposal.new_value == VALID_FINGERPRINT
+    assert member.pgp_keys.count() == 0
 
 
 @pytest.mark.django_db
@@ -185,6 +203,28 @@ def test_office_reject_discards_change(
     )
     member.refresh_from_db()
     assert member.name == "Jona Than"
+    assert member.change_proposals.count() == 0
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND="")
+def test_office_accept_pgp_fingerprint_creates_member_key(
+    member, membership, logged_in_client, configuration
+):
+    proposal = MemberChangeProposal.objects.create(
+        member=member, field_id=PGP_REGISTRATION_FIELD, new_value=VALID_FINGERPRINT
+    )
+
+    response = logged_in_client.post(
+        reverse("office:members.data", kwargs={"pk": member.pk}),
+        {f"accept_{proposal.pk}": "1"},
+    )
+
+    assert response.status_code == 302
+    key = member.pgp_keys.get()
+    assert key.fingerprint == VALID_FINGERPRINT
+    assert key.source == PGPKeySource.KEYSERVER
+    assert key.status == PGPKeyStatus.PENDING
     assert member.change_proposals.count() == 0
 
 

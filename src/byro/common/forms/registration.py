@@ -7,6 +7,7 @@ from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
 from byro.common.models import Configuration
+from byro.mails.registration import PGP_REGISTRATION_FIELD, build_pgp_fingerprint_field
 from byro.members.models import Member, Membership
 
 
@@ -110,6 +111,28 @@ class RegistrationConfigForm(forms.Form):
                     ),
                 )
             )
+
+        pgp_entry = data.get(PGP_REGISTRATION_FIELD, {})
+        position_field = forms.IntegerField(
+            required=False,
+            label=_("Position in form"),
+            initial=pgp_entry.get("position"),
+        )
+        fieldsets.append(
+            (
+                (pgp_entry.get("position", None) or 998, 80, 1),
+                PGP_REGISTRATION_FIELD,
+                build_pgp_fingerprint_field().label,
+                OrderedDict(
+                    (
+                        (
+                            f"{PGP_REGISTRATION_FIELD}__position",
+                            position_field,
+                        ),
+                    )
+                ),
+            )
+        )
 
         fieldsets.sort()
         for _position, key, verbose_name, form_fields in fieldsets:

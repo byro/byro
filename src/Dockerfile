@@ -5,7 +5,7 @@ EXPOSE 8020
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y zsh gettext libjpeg-dev libmagic-dev && \
+    apt-get install -y zsh gettext libjpeg-dev libmagic-dev gnupg gpg-agent && \
     rm -rf /var/lib/apt/lists/*
 
 RUN useradd uid1000 -d /home/uid1000
@@ -15,7 +15,7 @@ RUN mkdir -p /byro && chown uid1000: /byro
 ADD . /byro
 ADD byro.docker.cfg /byro/byro.cfg
 WORKDIR /byro 
-RUN   pip install --upgrade pip && pip3 install -e . && pip3 install gunicorn
+RUN   pip install --upgrade pip && pip3 install -e ".[pgp]" && pip3 install gunicorn
 RUN   pip install setuptools && /bin/zsh install_local_plugins.sh
 
 CMD ["runserver", "0.0.0.0:8020"]

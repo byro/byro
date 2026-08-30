@@ -37,6 +37,13 @@ CONFIG = {
         "tls": {"default": "False", "env": os.getenv("BYRO_MAIL_TLS")},
         "ssl": {"default": "False", "env": os.getenv("BYRO_MAIL_SSL")},
     },
+    "pgp": {
+        "backend": {
+            "default": "byro.mails.gpgme_backend.GnuPGPGPBackend",
+            "env": os.getenv("BYRO_PGP_BACKEND"),
+        },
+        "home": {"default": "", "env": os.getenv("BYRO_PGP_HOME")},
+    },
     "logging": {
         "email": {"default": "", "env": os.getenv("BYRO_LOGGING_EMAIL")},
         "email_level": {"default": "", "env": os.getenv("BYRO_LOGGING_EMAIL_LEVEL")},

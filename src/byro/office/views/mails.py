@@ -8,6 +8,7 @@ from django.views.generic import CreateView, ListView, UpdateView, View
 from i18nfield.forms import I18nModelForm
 
 from byro.mails.models import EMail, MailTemplate
+from byro.mails.send import SendMailException
 from byro.members.models import Member
 
 
@@ -98,10 +99,15 @@ class MailSendMixin:
             )
         result = super().form_valid(form)
         if form.data.get("action", "save") == "send":
-            form.instance.send()
-            messages.success(
-                self.request, _("Your changes have been saved and the email was sent.")
-            )
+            try:
+                form.instance.send()
+            except SendMailException as e:
+                messages.error(self.request, str(e))
+            else:
+                messages.success(
+                    self.request,
+                    _("Your changes have been saved and the email was sent."),
+                )
         else:
             messages.success(self.request, _("Your changes have been saved."))
         return result
@@ -165,7 +171,11 @@ class OutboxSend(OutboxQueryset, View):
         qs = self.get_queryset()
         length = len(qs)
         for mail in qs:
-            mail.send()
+            try:
+                mail.send()
+            except SendMailException as e:
+                messages.error(request, str(e))
+                return redirect(reverse("office:mails.outbox.list"))
         if length > 1:
             message = _("{count} mails have been sent.").format(count=length)
         elif length == 1:

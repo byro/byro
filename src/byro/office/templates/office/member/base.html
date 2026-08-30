@@ -58,6 +58,14 @@
     </li>
     <li class="nav-item">
       <a
+        class="nav-link {% if "members.pgp" in url_name %}active{% endif %}"
+        href="{% url "office:members.pgp" pk=member.pk %}"
+      >
+        {% trans "PGP" %}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
         class="nav-link {% if "members.finance" in url_name %}active{% endif %}"
         href="{% url "office:members.finance" pk=member.pk %}"
       >
@@ -96,4 +104,3 @@
   {% endblock %}
 
 {% endblock %}
-

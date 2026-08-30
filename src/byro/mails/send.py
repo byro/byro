@@ -45,6 +45,45 @@ class SendMailException(Exception):
     pass
 
 
+def _recipient_addresses(*address_lists):
+    recipients = []
+    seen = set()
+    for addresses in address_lists:
+        if isinstance(addresses, str):
+            addresses = [addresses]
+        for address in addresses or []:
+            address = (address or "").strip()
+            if address and address.lower() not in seen:
+                recipients.append(address)
+                seen.add(address.lower())
+    return recipients
+
+
+def _build_email(
+    subject,
+    body,
+    sender,
+    to,
+    *,
+    html=None,
+    headers=None,
+    attachments=None,
+    cc=None,
+    bcc=None,
+):
+    email = EmailMultiAlternatives(
+        subject, body, sender, to=to, cc=cc, bcc=bcc, headers=headers
+    )
+    if html is not None:
+        email.attach_alternative(inline_css(html), "text/html")
+    if attachments:
+        from byro.documents.models import Document
+
+        for attachment in attachments:
+            email.attach_file(Document.objects.get(pk=attachment).document.path)
+    return email
+
+
 def mail(
     email: str,
     subject: str,
@@ -71,7 +110,7 @@ def mail(
 
 
 def mail_send_task(
-    to: str,
+    to: list,
     subject: str,
     body: str,
     sender: str,
@@ -81,20 +120,53 @@ def mail_send_task(
     headers: dict = None,
     attachments: list = None,
 ):
-    email = EmailMultiAlternatives(
-        subject, body, sender, to=to, cc=cc, bcc=bcc, headers=headers
-    )
-    if html is not None:
-        email.attach_alternative(inline_css(html), "text/html")
-    if attachments:
-        from byro.documents.models import Document
+    from byro.mails.models import PGPConfiguration
+    from byro.mails.pgp import prepare_email_message
 
-        for attachment in attachments:
-            email.attach_file(Document.objects.get(pk=attachment).document.path)
+    to = _recipient_addresses(to)
+    cc = _recipient_addresses(cc)
+    bcc = _recipient_addresses(bcc)
+
+    if PGPConfiguration.get_solo().encryption_enabled:
+        visible_headers = dict(headers or {})
+        if to:
+            visible_headers["To"] = ", ".join(to)
+        if cc:
+            visible_headers["Cc"] = ", ".join(cc)
+        emails = [
+            _build_email(
+                subject,
+                body,
+                sender,
+                [recipient],
+                html=html,
+                headers=visible_headers,
+                attachments=attachments,
+            )
+            for recipient in _recipient_addresses(to, cc, bcc)
+        ]
+    else:
+        emails = [
+            _build_email(
+                subject,
+                body,
+                sender,
+                to,
+                html=html,
+                cc=cc,
+                bcc=bcc,
+                headers=headers,
+                attachments=attachments,
+            )
+        ]
+
+    emails = [
+        prepare_email_message(email, recipient_address=email.to[0]) for email in emails
+    ]
     backend = get_connection(fail_silently=False)
 
     try:
-        backend.send_messages([email])
+        backend.send_messages(emails)
     except Exception:
         logger.exception("Error sending email")
         raise SendMailException(f"Failed to send an email to {to}.")

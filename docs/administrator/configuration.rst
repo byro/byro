@@ -185,6 +185,26 @@ The mail section
 - **Environment variable:** ``BYRO_MAIL_SSL``
 - **Default:** ``False``
 
+The PGP section
+---------------
+
+``backend``
+~~~~~~~~~~~
+
+- Python import path of the PGP backend used for signing, encryption, and key
+  imports.
+- **Environment variable:** ``BYRO_PGP_BACKEND``
+- **Default:** ``byro.mails.gpgme_backend.GnuPGPGPBackend``
+
+``home``
+~~~~~~~~
+
+- GnuPG home directory used by byro. This directory stores public keys imported
+  by byro and is also where GnuPG looks for the organization's private signing
+  key. It should only be readable and writable by the user running byro.
+- **Environment variable:** ``BYRO_PGP_HOME``
+- **Default:** ``''`` – GnuPG uses its normal default for the executing user.
+
 The logging section
 -------------------
 

@@ -1,9 +1,11 @@
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
 
+from byro.mails.models import MemberPGPKey, PGPKeySource, PGPKeyStatus
 from byro.members.models import Member
 
 pytestmark = pytest.mark.usefixtures("configuration")
@@ -55,6 +57,40 @@ def test_member_view(member, membership, logged_in_client):
     content = response.content.decode()
     assert response.status_code == 200, content
     assert member.name in content
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND="")
+def test_member_pgp_keyserver_import_view(member, membership, logged_in_client):
+    response = logged_in_client.post(
+        reverse("office:members.pgp", kwargs={"pk": member.pk}),
+        {
+            "fingerprint-fingerprint": "0123456789ABCDEF0123456789ABCDEF01234567",
+            "submit_fingerprint": "",
+        },
+    )
+
+    assert response.status_code == 302
+    key = member.pgp_keys.get()
+    assert key.source == PGPKeySource.KEYSERVER
+    assert key.status == PGPKeyStatus.PENDING
+
+
+@pytest.mark.django_db
+def test_member_pgp_key_delete_view(member, membership, logged_in_client):
+    key = MemberPGPKey.objects.create(
+        member=member,
+        fingerprint="0123456789ABCDEF0123456789ABCDEF01234567",
+        status=PGPKeyStatus.VALID,
+    )
+
+    response = logged_in_client.post(
+        reverse("office:members.pgp", kwargs={"pk": member.pk}),
+        {"delete_key": str(key.pk)},
+    )
+
+    assert response.status_code == 302
+    assert not member.pgp_keys.exists()
 
 
 @pytest.mark.django_db

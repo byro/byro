@@ -9,6 +9,7 @@ from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
 from byro.common.models.configuration import Configuration
+from byro.mails.registration import PGP_REGISTRATION_FIELD, get_member_pgp_fingerprint
 from byro.members.models import Field, Member
 
 
@@ -113,10 +114,14 @@ class MemberChangeProposal(models.Model):
 
     @property
     def label(self):
+        if self.field_id == PGP_REGISTRATION_FIELD:
+            return _("PGP fingerprint")
         field = self.get_field()
         return field.name if field else self.field_id
 
     @property
     def current_value(self):
+        if self.field_id == PGP_REGISTRATION_FIELD:
+            return get_member_pgp_fingerprint(self.member)
         field = self.get_field()
         return field.getter(self.member) if field else None

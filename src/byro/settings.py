@@ -209,6 +209,10 @@ else:
     EMAIL_USE_TLS = config.getboolean("mail", "tls")
     EMAIL_USE_SSL = config.getboolean("mail", "ssl")
 
+## PGP SETTINGS
+BYRO_PGP_BACKEND = config.get("pgp", "backend")
+BYRO_PGP_HOME = config.get("pgp", "home", fallback="")
+
 
 ## I18N SETTINGS
 USE_I18N = True
