@@ -170,7 +170,7 @@ jobs:
         env:
           BYRO_CONFIG_FILE: 'tests/byro.${{ matrix.database }}.cfg'
       - name: Upload coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: ./src/coverage.xml
           disable_search: true
