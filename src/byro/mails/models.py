@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -160,7 +161,10 @@ class MemberPGPKey(Auditable, models.Model, LogTargetMixin):
         super().clean()
         from byro.mails.pgp import normalize_fingerprint
 
-        self.fingerprint = normalize_fingerprint(self.fingerprint)
+        try:
+            self.fingerprint = normalize_fingerprint(self.fingerprint)
+        except ValueError as e:
+            raise ValidationError({"fingerprint": e})
 
     def save(self, *args, **kwargs):
         self.clean()

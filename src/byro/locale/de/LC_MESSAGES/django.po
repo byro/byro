@@ -2399,6 +2399,10 @@ msgstr ""
 msgid "The PGP key was deactivated."
 msgstr "Der PGP-Schlüssel wurde deaktiviert."
 
+#: byro/office/views/members.py
+msgid "The PGP key could not be found."
+msgstr "Der PGP-Schlüssel wurde nicht gefunden."
+
 #: byro/office/views/members.py:932
 msgid "The PGP key was deleted."
 msgstr "Der PGP-Schlüssel wurde gelöscht."

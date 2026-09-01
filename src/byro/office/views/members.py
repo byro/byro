@@ -903,29 +903,44 @@ class MemberPGPView(MemberView):
     template_name = "office/member/pgp.html"
 
     def get_context_data(self, *args, **kwargs):
+        fingerprint_form = kwargs.pop("fingerprint_form", None)
+        upload_form = kwargs.pop("upload_form", None)
         context = super().get_context_data(*args, **kwargs)
         member = self.get_member()
         context["pgp_keys"] = member.pgp_keys.all()
-        context["fingerprint_form"] = MemberPGPFingerprintForm(prefix="fingerprint")
-        context["upload_form"] = MemberPGPKeyUploadForm(prefix="upload")
+        context["fingerprint_form"] = fingerprint_form or MemberPGPFingerprintForm(
+            prefix="fingerprint"
+        )
+        context["upload_form"] = upload_form or MemberPGPKeyUploadForm(prefix="upload")
         return context
+
+    def render_invalid_form(self, **kwargs):
+        self.object = self.get_object()
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_pgp_key(self, member, key_pk):
+        try:
+            return MemberPGPKey.objects.get(member=member, pk=key_pk)
+        except (MemberPGPKey.DoesNotExist, ValueError):
+            messages.error(self.request, _("The PGP key could not be found."))
+            return None
 
     @transaction.atomic
     def post(self, *args, **kwargs):
         member = self.get_member()
         if "deactivate_key" in self.request.POST:
-            key = MemberPGPKey.objects.get(
-                member=member, pk=self.request.POST["deactivate_key"]
-            )
+            key = self.get_pgp_key(member, self.request.POST["deactivate_key"])
+            if key is None:
+                return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
             key.is_active = False
             key.save(update_fields=["is_active"])
             key.log(self, ".deactivated", fingerprint=key.fingerprint)
             messages.success(self.request, _("The PGP key was deactivated."))
             return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
         elif "delete_key" in self.request.POST:
-            key = MemberPGPKey.objects.get(
-                member=member, pk=self.request.POST["delete_key"]
-            )
+            key = self.get_pgp_key(member, self.request.POST["delete_key"])
+            if key is None:
+                return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
             fingerprint = key.fingerprint
             key.log(self, ".deleted", fingerprint=fingerprint, status=key.status)
             key.delete()
@@ -944,6 +959,7 @@ class MemberPGPView(MemberView):
                 )
                 messages.success(self.request, _("The PGP key import was queued."))
                 return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
+            return self.render_invalid_form(fingerprint_form=form)
         else:
             form = MemberPGPKeyUploadForm(self.request.POST, prefix="upload")
             if form.is_valid():
@@ -955,7 +971,7 @@ class MemberPGPView(MemberView):
                 )
                 messages.success(self.request, _("The PGP public key was saved."))
                 return redirect(reverse("office:members.pgp", kwargs=self.kwargs))
-        return self.get(self.request)
+            return self.render_invalid_form(upload_form=form)
 
 
 class MemberFinanceView(MemberView):

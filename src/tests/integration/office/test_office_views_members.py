@@ -77,6 +77,41 @@ def test_member_pgp_keyserver_import_view(member, membership, logged_in_client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "data, form_name",
+    [
+        (
+            {
+                "fingerprint-fingerprint": "not a fingerprint",
+                "submit_fingerprint": "",
+            },
+            "fingerprint_form",
+        ),
+        (
+            {
+                "upload-fingerprint": "not a fingerprint",
+                "upload-public_key": "public key",
+                "submit_upload": "",
+            },
+            "upload_form",
+        ),
+    ],
+)
+def test_member_pgp_view_shows_invalid_form_errors(
+    member, membership, logged_in_client, data, form_name
+):
+    response = logged_in_client.post(
+        reverse("office:members.pgp", kwargs={"pk": member.pk}), data
+    )
+
+    form = response.context[form_name]
+    assert response.status_code == 200
+    assert form.is_bound
+    assert form.errors
+    assert form["fingerprint"].value() == "not a fingerprint"
+
+
+@pytest.mark.django_db
 def test_member_pgp_key_delete_view(member, membership, logged_in_client):
     key = MemberPGPKey.objects.create(
         member=member,
@@ -91,6 +126,40 @@ def test_member_pgp_key_delete_view(member, membership, logged_in_client):
 
     assert response.status_code == 302
     assert not member.pgp_keys.exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "action, key_pk", [("deactivate_key", "not-a-key-id"), ("delete_key", "999999")]
+)
+def test_member_pgp_key_actions_handle_invalid_key_ids(
+    member, membership, logged_in_client, action, key_pk
+):
+    response = logged_in_client.post(
+        reverse("office:members.pgp", kwargs={"pk": member.pk}), {action: key_pk}
+    )
+
+    assert response.status_code == 302
+    assert not member.pgp_keys.exists()
+
+
+@pytest.mark.django_db
+def test_member_pgp_key_actions_do_not_modify_another_members_key(
+    member, membership, inactive_member, logged_in_client
+):
+    key = MemberPGPKey.objects.create(
+        member=inactive_member,
+        fingerprint="0123456789ABCDEF0123456789ABCDEF01234567",
+        status=PGPKeyStatus.VALID,
+    )
+
+    response = logged_in_client.post(
+        reverse("office:members.pgp", kwargs={"pk": member.pk}),
+        {"delete_key": str(key.pk)},
+    )
+
+    assert response.status_code == 302
+    assert MemberPGPKey.objects.filter(pk=key.pk).exists()
 
 
 @pytest.mark.django_db

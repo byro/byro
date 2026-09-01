@@ -5,6 +5,7 @@ from io import BytesIO
 import pytest
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.mail import EmailMultiAlternatives
 from django.core.mail.message import SafeMIMEMultipart
@@ -642,6 +643,14 @@ def test_member_pgp_key_normalizes_fingerprint(member):
 
     assert key.fingerprint == VALID_FINGERPRINT
     assert key.status == PGPKeyStatus.PENDING
+
+
+@pytest.mark.django_db
+def test_member_pgp_key_rejects_invalid_fingerprint(member):
+    key = MemberPGPKey(member=member, fingerprint="not a fingerprint")
+
+    with pytest.raises(ValidationError, match="Enter a valid PGP fingerprint"):
+        key.full_clean()
 
 
 @pytest.mark.django_db
