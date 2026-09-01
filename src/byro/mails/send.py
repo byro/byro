@@ -126,6 +126,8 @@ def mail_send_task(
     to = _recipient_addresses(to)
     cc = _recipient_addresses(cc)
     bcc = _recipient_addresses(bcc)
+    if not _recipient_addresses(to, cc, bcc):
+        raise SendMailException("Cannot send an email without recipients.")
 
     if PGPConfiguration.get_solo().encryption_enabled:
         visible_headers = dict(headers or {})
@@ -161,7 +163,11 @@ def mail_send_task(
         ]
 
     emails = [
-        prepare_email_message(email, recipient_address=email.to[0]) for email in emails
+        prepare_email_message(
+            email,
+            recipient_address=email.to[0] if email.to else None,
+        )
+        for email in emails
     ]
     backend = get_connection(fail_silently=False)
 

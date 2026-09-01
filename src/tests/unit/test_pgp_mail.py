@@ -762,6 +762,61 @@ def test_missing_member_key_can_block_mail(member):
 
 
 @pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_pgp_block_keeps_successful_recipients_for_retry(member, mailoutbox):
+    blocked_member = Member.objects.create(
+        email="blocked@example.org", number="2", name="Blocked Member"
+    )
+    config = PGPConfiguration.get_solo()
+    config.encryption_enabled = True
+    config.save()
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        public_key="public key",
+        status=PGPKeyStatus.VALID,
+    )
+    blocked_key = MemberPGPKey.objects.create(
+        member=blocked_member,
+        fingerprint="1111111111111111111111111111111111111111",
+        status=PGPKeyStatus.INVALID,
+    )
+    mail = EMail.objects.create(
+        to=f"{member.email},{blocked_member.email}", subject="Test", text="Text"
+    )
+
+    with pytest.raises(SendMailException, match="blocked@example.org"):
+        mail.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is None
+    assert mail.delivered_to == [member.email]
+    assert list(mail.members.all()) == [member]
+    assert len(mailoutbox) == 1
+
+    blocked_key.status = PGPKeyStatus.VALID
+    blocked_key.public_key = "blocked member public key"
+    blocked_key.save()
+    mail.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is not None
+    assert set(mail.delivered_to) == {member.email, blocked_member.email}
+    assert set(mail.members.all()) == {member, blocked_member}
+    assert len(mailoutbox) == 2
+    assert [message.to for message in mailoutbox] == [
+        [member.email],
+        [blocked_member.email],
+    ]
+
+
+@pytest.mark.django_db
+def test_mail_send_task_rejects_an_empty_recipient_list():
+    with pytest.raises(SendMailException, match="without recipients"):
+        mail_send_task(to=[], subject="Test", body="Text", sender="sender@example.org")
+
+
+@pytest.mark.django_db
 def test_missing_member_key_can_fall_back_to_plain_mail(member, mailoutbox):
     config = PGPConfiguration.get_solo()
     config.encryption_enabled = True

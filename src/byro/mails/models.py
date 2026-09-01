@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -272,6 +272,12 @@ class EMail(Auditable, models.Model):
     members = models.ManyToManyField(to="members.Member", related_name="emails")
     text = models.TextField(verbose_name=_("Text"))
     sent = models.DateTimeField(null=True, blank=True, verbose_name=_("Sent at"))
+    delivered_to = models.JSONField(
+        default=list,
+        blank=True,
+        editable=False,
+        verbose_name=_("Delivered to"),
+    )
     template = models.ForeignKey(
         to=MailTemplate, null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -296,10 +302,8 @@ class EMail(Auditable, models.Model):
             if self.to.startswith("special:member:"):
                 member = Member.all_objects.get(pk=self.to.split(":", 2)[2])
                 self.to = member.email
-                self.members.add(member)
                 self.save(update_fields=["to"])
 
-    @transaction.atomic
     def send(self):
         if self.sent:
             raise TypeError("This mail has been sent already. It cannot be sent again.")
@@ -326,20 +330,16 @@ class EMail(Auditable, models.Model):
                     .exclude(email="")
                     .all()
                 ):
-                    send_tos.append(member)
-                    self.members.add(member)
+                    send_tos.append((member.email, member))
 
             else:
                 to_addrs = self.to.split(",")
                 for addr in to_addrs:
+                    addr = addr.strip()
                     member = Member.all_objects.filter(
                         email__iexact=addr.lower()
                     ).first()
-                    if member:
-                        send_tos.append(member)
-                        self.members.add(member)
-                    else:
-                        send_tos.append(addr)
+                    send_tos.append((addr, member))
 
             headers = {}
             if self.reply_to:
@@ -347,28 +347,43 @@ class EMail(Auditable, models.Model):
 
             from byro.mails.send import mail_send_task
 
-            for addr in send_tos:
+            delivered_to = {address.lower() for address in self.delivered_to}
+            errors = []
+            for addr, member in send_tos:
+                if addr.lower() in delivered_to:
+                    continue
                 body = self.text
-                if isinstance(addr, Member):
+                if member:
                     signature = _(
                         "You are receiving this email due to your membership in {name}."
                     ).format(name=config.name)
                     signature += "\n"
                     signature += _(
                         "You can see your member page at this URL: {url}"
-                    ).format(url=addr.profile_memberpage.get_url())
+                    ).format(url=member.profile_memberpage.get_url())
                     body += "\n\n-- \n" + signature
-                    addr = addr.email
-                mail_send_task(
-                    to=[addr],
-                    subject=self.subject,
-                    body=body,
-                    sender=config.mail_from,
-                    cc=(self.cc or "").split(","),
-                    bcc=(self.bcc or "").split(","),
-                    attachments=self.attachment_ids,
-                    headers=headers,
-                )
+                try:
+                    mail_send_task(
+                        to=[addr],
+                        subject=self.subject,
+                        body=body,
+                        sender=config.mail_from,
+                        cc=(self.cc or "").split(","),
+                        bcc=(self.bcc or "").split(","),
+                        attachments=self.attachment_ids,
+                        headers=headers,
+                    )
+                except SendMailException as e:
+                    errors.append(str(e))
+                    continue
+
+                self.delivered_to.append(addr.lower())
+                self.save(update_fields=["delivered_to"])
+                if member:
+                    self.members.add(member)
+
+            if errors:
+                raise SendMailException("\n".join(errors))
 
         self.sent = now()
         self.save(update_fields=["sent"])
@@ -377,5 +392,6 @@ class EMail(Auditable, models.Model):
         new_mail = deepcopy(self)
         new_mail.pk = None
         new_mail.sent = None
+        new_mail.delivered_to = []
         new_mail.save()
         return new_mail

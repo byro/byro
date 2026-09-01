@@ -170,19 +170,28 @@ class OutboxSend(OutboxQueryset, View):
     def dispatch(self, request, *args, **kwargs):
         qs = self.get_queryset()
         length = len(qs)
+        failed = []
         for mail in qs:
             try:
                 mail.send()
             except SendMailException as e:
-                messages.error(request, str(e))
-                return redirect(reverse("office:mails.outbox.list"))
-        if length > 1:
-            message = _("{count} mails have been sent.").format(count=length)
-        elif length == 1:
-            message = _("The mail has been sent.")
-        else:
-            message = _("No mail has been sent.")
-        messages.success(request, message)
+                failed.append(str(e))
+        sent = length - len(failed)
+        if sent > 1:
+            messages.success(
+                request, _("{count} mails have been sent.").format(count=sent)
+            )
+        elif sent == 1:
+            messages.success(request, _("The mail has been sent."))
+        elif not failed:
+            messages.success(request, _("No mail has been sent."))
+        if failed:
+            messages.error(
+                request,
+                _("{count} mails could not be sent.").format(count=len(failed)),
+            )
+            for error in failed:
+                messages.error(request, error)
         return redirect(reverse("office:mails.outbox.list"))
 
 

@@ -25,6 +25,28 @@ def test_outbox_send_shows_error_when_pgp_blocks_mail(
 
 
 @pytest.mark.django_db
+def test_outbox_send_continues_after_a_pgp_failure(
+    member, logged_in_client, configuration
+):
+    pgp_config = PGPConfiguration.get_solo()
+    pgp_config.encryption_enabled = True
+    pgp_config.missing_key_policy = PGPPolicy.BLOCK
+    pgp_config.save()
+    blocked_mail = EMail.objects.create(to=member.email, subject="Blocked", text="Text")
+    deliverable_mail = EMail.objects.create(
+        to="office@example.org", subject="Deliverable", text="Text"
+    )
+
+    response = logged_in_client.get(reverse("office:mails.outbox.send"))
+
+    assert response.status_code == 302
+    blocked_mail.refresh_from_db()
+    deliverable_mail.refresh_from_db()
+    assert blocked_mail.sent is None
+    assert deliverable_mail.sent is not None
+
+
+@pytest.mark.django_db
 def test_settings_show_private_signing_key_upload(logged_in_client, configuration):
     response = logged_in_client.get(reverse("office:settings.base"))
     content = response.content.decode()
