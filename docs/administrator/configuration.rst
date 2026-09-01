@@ -194,7 +194,7 @@ The PGP section
 - Python import path of the PGP backend used for signing, encryption, and key
   imports.
 - **Environment variable:** ``BYRO_PGP_BACKEND``
-- **Default:** ``byro.mails.gpgme_backend.GnuPGPGPBackend``
+- **Default:** ``byro.mails.gnupg_backend.GnuPGBackend``
 
 ``home``
 ~~~~~~~~

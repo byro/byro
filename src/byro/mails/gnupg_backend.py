@@ -34,7 +34,7 @@ class PreparedPGPEmail:
         return self.original.recipients()
 
 
-class GnuPGPGPBackend:
+class GnuPGBackend:
     def _env(self):
         env = os.environ.copy()
         home = getattr(settings, "BYRO_PGP_HOME", "")
@@ -534,6 +534,3 @@ class GnuPGPGPBackend:
             return None
         expires = min(expirations)
         return datetime.fromtimestamp(expires, tz=timezone.utc)
-
-
-GPGMEPGPBackend = GnuPGPGPBackend

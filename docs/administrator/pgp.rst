@@ -23,14 +23,13 @@ Install the system packages required by GnuPG. On Debian or Ubuntu::
 
     # apt-get install gnupg gpg-agent
 
-Then install byro with the PGP extra in the same Python environment that runs
-byro::
+Then install byro in the same Python environment that runs byro::
 
-    $ pip install --user -U "byro[pgp]"
+    $ pip install --user -U byro
 
-If you install from git, keep the ``[pgp]`` extra on the package specifier::
+If you install from git::
 
-    $ pip install --user -U "git+https://github.com/byro/byro.git@main#egg=byro[pgp]&subdirectory=src"
+    $ pip install --user -U "git+https://github.com/byro/byro.git@main#egg=byro&subdirectory=src"
 
 Configuration file
 ------------------
@@ -38,7 +37,7 @@ Configuration file
 The runtime backend is configured in the ``[pgp]`` section of ``byro.cfg``::
 
     [pgp]
-    backend = byro.mails.gpgme_backend.GnuPGPGPBackend
+    backend = byro.mails.gnupg_backend.GnuPGBackend
     home = /var/byro/data/gnupg
 
 ``backend``

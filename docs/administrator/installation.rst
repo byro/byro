@@ -101,10 +101,6 @@ branch or commit::
     $ pip install --user -U byro  # OR, alternatively
     $ pip install --user -U "git+git://github.com/byro/byro.git@main#egg=byro&subdirectory=src"
 
-If you want to use PGP support, install byro with the ``pgp`` extra instead::
-
-    $ pip install --user -U "byro[pgp]"
-
 We also need to create a data directory::
 
     $ mkdir -p /var/byro/data/media

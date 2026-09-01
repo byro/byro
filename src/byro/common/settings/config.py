@@ -39,7 +39,7 @@ CONFIG = {
     },
     "pgp": {
         "backend": {
-            "default": "byro.mails.gpgme_backend.GnuPGPGPBackend",
+            "default": "byro.mails.gnupg_backend.GnuPGBackend",
             "env": os.getenv("BYRO_PGP_BACKEND"),
         },
         "home": {"default": "", "env": os.getenv("BYRO_PGP_HOME")},

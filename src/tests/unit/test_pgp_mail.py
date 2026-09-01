@@ -15,7 +15,7 @@ from django.utils import timezone
 
 from byro.common.forms import RegistrationConfigForm
 from byro.common.models import LogEntry
-from byro.mails.gpgme_backend import GnuPGPGPBackend, PreparedPGPEmail
+from byro.mails.gnupg_backend import GnuPGBackend, PreparedPGPEmail
 from byro.mails.models import (
     EMail,
     MemberPGPKey,
@@ -27,6 +27,7 @@ from byro.mails.models import (
 from byro.mails.pgp import (
     PGPBackendError,
     SigningKeyInfo,
+    get_backend,
     get_dashboard_warnings,
     normalize_fingerprint,
 )
@@ -108,8 +109,13 @@ def test_normalize_fingerprint_rejects_invalid_value():
         normalize_fingerprint("not a fingerprint")
 
 
+@override_settings(BYRO_PGP_BACKEND="byro.mails.gnupg_backend.GnuPGBackend")
+def test_get_backend_loads_gnupg_backend():
+    assert isinstance(get_backend(), GnuPGBackend)
+
+
 def test_gnupg_backend_normalizes_keyserver_urls():
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
 
     assert backend._keyserver_urls(
         [
@@ -127,7 +133,7 @@ def test_gnupg_backend_normalizes_keyserver_urls():
 
 
 def test_gnupg_backend_tries_next_keyserver_after_timeout(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     attempted_servers = []
 
     def run(command, **kwargs):
@@ -169,7 +175,7 @@ def test_gnupg_backend_tries_next_keyserver_after_timeout(monkeypatch):
 
 
 def test_gnupg_backend_imports_one_signing_private_key(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     import_commands = []
     secret_key_listing = "\n".join(
         [
@@ -206,7 +212,7 @@ def test_gnupg_backend_imports_one_signing_private_key(monkeypatch):
 
 
 def test_gnupg_backend_replaces_existing_private_key(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     commands = []
     secret_key_listing = "\n".join(
         [
@@ -244,7 +250,7 @@ def test_gnupg_backend_replaces_existing_private_key(monkeypatch):
 
 
 def test_gnupg_backend_replaces_a_private_key_that_cannot_be_exported(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     commands = []
     secret_key_listing = "\n".join(
         [
@@ -279,7 +285,7 @@ def test_gnupg_backend_replaces_a_private_key_that_cannot_be_exported(monkeypatc
 
 
 def test_gnupg_backend_rejects_passphrase_protected_private_key(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     secret_key_listing = "\n".join(
         [
             ":".join(["sec"] + [""] * 10 + ["s"]),
@@ -311,7 +317,7 @@ def test_gnupg_backend_rejects_passphrase_protected_private_key(monkeypatch):
 
 
 def test_gnupg_backend_rejects_public_key_upload(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
 
     def run(command, **kwargs):
         if "--list-secret-keys" in command:
@@ -327,7 +333,7 @@ def test_gnupg_backend_rejects_public_key_upload(monkeypatch):
 
 
 def test_gnupg_backend_reads_signing_key_info(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     agent_started = []
     secret_key_listing = "\n".join(
         [
@@ -488,7 +494,7 @@ def test_prepared_pgp_email_delegates_smtp_required_attributes():
 
 
 def test_gnupg_backend_starts_agent_before_signing(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     agent_started = []
 
     monkeypatch.setattr(backend, "_ensure_agent", lambda: agent_started.append(True))
@@ -510,7 +516,7 @@ def test_gnupg_backend_starts_agent_before_signing(monkeypatch):
 
 
 def test_gnupg_backend_signs_the_exact_mime_part_that_is_attached(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     signed_data = []
 
     monkeypatch.setattr(backend, "_ensure_agent", lambda: None)
@@ -540,7 +546,7 @@ def test_gnupg_backend_signs_the_exact_mime_part_that_is_attached(monkeypatch):
 def test_gnupg_backend_explains_how_to_replace_a_passphrase_protected_key(
     monkeypatch,
 ):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
 
     monkeypatch.setattr(backend, "_ensure_agent", lambda: None)
     monkeypatch.setattr(backend, "_freeze", lambda email_message: b"mail")
@@ -566,7 +572,7 @@ def test_gnupg_backend_explains_how_to_replace_a_passphrase_protected_key(
 
 
 def test_gnupg_backend_restarts_agent_after_a_failed_launch(monkeypatch):
-    backend = GnuPGPGPBackend()
+    backend = GnuPGBackend()
     calls = []
     results = iter(
         [
