@@ -6,6 +6,7 @@ from byro.mails.pgp import PGPBackendError, get_backend, normalize_fingerprint
 
 
 class PGPConfigurationForm(forms.ModelForm):
+    LOG_EXCLUDE_FIELDS = frozenset(("signing_key_file",))
     field_order = (
         "encryption_enabled",
         "signing_enabled",
@@ -77,12 +78,8 @@ class PGPConfigurationForm(forms.ModelForm):
 
         self.instance.signing_key_fingerprint = self.imported_signing_key_fingerprint
 
-    def get_log_changes(self, original_values):
-        changes = {
-            key: (original_values[key], self.cleaned_data[key])
-            for key in self.changed_data
-            if key != "signing_key_file"
-        }
+    def get_additional_log_changes(self, original_values):
+        changes = {}
         fingerprint = self.instance.signing_key_fingerprint
         if self.original_signing_key_fingerprint != fingerprint:
             changes["signing_key_fingerprint"] = (

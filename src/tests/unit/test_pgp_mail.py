@@ -383,6 +383,7 @@ def test_gnupg_backend_reads_signing_key_info(monkeypatch):
 @override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
 def test_pgp_configuration_form_imports_private_key(configuration):
     from byro.mails.forms import PGPConfigurationForm
+    from byro.office.views.settings import ConfigurationView
 
     config = PGPConfiguration.get_solo()
     original_values = {
@@ -411,7 +412,7 @@ def test_pgp_configuration_form_imports_private_key(configuration):
     assert config.signing_key_fingerprint == VALID_FINGERPRINT
     assert "signing_key_fingerprint" not in form.fields
     assert FakePGPBackend.calls == [("import-private", b"private key")]
-    changes = form.get_log_changes(original_values)
+    changes = ConfigurationView.get_log_changes(form, original_values)
     assert "signing_key_file" not in changes
     assert changes["signing_key_fingerprint"] == ("", VALID_FINGERPRINT)
 

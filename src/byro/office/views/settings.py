@@ -100,14 +100,7 @@ class ConfigurationView(FormView):
 
         for f in form:
             f.save()
-            changes = (
-                f.get_log_changes(self._original_values[f])
-                if hasattr(f, "get_log_changes")
-                else {
-                    k: (self._original_values[f][k], f.cleaned_data[k])
-                    for k in f.changed_data
-                }
-            )
+            changes = self.get_log_changes(f, self._original_values[f])
             if changes:
                 f.instance.log(
                     self,
@@ -117,6 +110,29 @@ class ConfigurationView(FormView):
 
         messages.success(self.request, _("The config was saved successfully."))
         return super().form_valid(f)
+
+    @staticmethod
+    def get_log_changes(form, original_values):
+        """Return audit-loggable changes for a configuration form.
+
+        Forms can exclude sensitive input fields by declaring
+        ``LOG_EXCLUDE_FIELDS``. They may also add changes which are not part of
+        their ModelForm fields through ``get_additional_log_changes``.
+        """
+        excluded_fields = getattr(form, "LOG_EXCLUDE_FIELDS", frozenset())
+        changes = {
+            field: (original_values[field], form.cleaned_data[field])
+            for field in form.changed_data
+            if field not in excluded_fields
+        }
+        get_additional_changes = getattr(form, "get_additional_log_changes", None)
+        if get_additional_changes:
+            changes.update(get_additional_changes(original_values))
+        return {
+            field: change
+            for field, change in changes.items()
+            if field not in excluded_fields
+        }
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
