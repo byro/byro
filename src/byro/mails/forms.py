@@ -2,7 +2,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from byro.mails.models import MemberPGPKey, PGPConfiguration, PGPKeySource, PGPKeyStatus
-from byro.mails.pgp import PGPBackendError, get_backend, normalize_fingerprint
+from byro.mails.pgp import (
+    KEYSERVER_URL_SCHEMES,
+    PGPBackendError,
+    get_backend,
+    normalize_fingerprint,
+)
 
 
 class PGPConfigurationForm(forms.ModelForm):
@@ -56,6 +61,20 @@ class PGPConfigurationForm(forms.ModelForm):
                 _("The private PGP key file must not exceed 1 MiB.")
             )
         return signing_key_file
+
+    def clean_keyserver_url(self):
+        value = self.cleaned_data["keyserver_url"]
+        for line_number, line in enumerate(value.splitlines(), start=1):
+            scheme, separator, _server = line.strip().partition("://")
+            if separator and scheme.lower() not in KEYSERVER_URL_SCHEMES:
+                raise forms.ValidationError(
+                    _(
+                        "Keyserver URL on line %(line_number)s must use one of "
+                        "the hkp, hkps, http, or https schemes."
+                    ),
+                    params={"line_number": line_number},
+                )
+        return value
 
     def import_signing_key(self):
         signing_key_file = self.cleaned_data.get("signing_key_file")

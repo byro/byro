@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from byro.mails.send import SendMailException
 
 FINGERPRINT_RE = re.compile(r"^[0-9A-F]{40,64}$")
+KEYSERVER_URL_SCHEMES = frozenset(("hkp", "hkps", "http", "https"))
 
 
 class PGPBackendError(Exception):

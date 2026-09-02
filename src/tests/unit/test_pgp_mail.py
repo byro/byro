@@ -132,6 +132,60 @@ def test_gnupg_backend_normalizes_keyserver_urls():
     ]
 
 
+def test_gnupg_backend_rejects_unsupported_keyserver_url_schemes():
+    backend = GnuPGBackend()
+
+    with pytest.raises(PGPBackendError, match="Unsupported keyserver URL scheme"):
+        backend._keyserver_urls(["file:///tmp/keyring"])
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "keyserver_url",
+    [
+        "keys.openpgp.org",
+        "hkp://keyserver.ubuntu.com",
+        "HKPS://keys.example.org",
+        "http://pgp.mit.edu",
+        "https://keys.openpgp.org",
+    ],
+)
+def test_pgp_configuration_form_accepts_supported_keyserver_url_schemes(
+    keyserver_url,
+):
+    from byro.mails.forms import PGPConfigurationForm
+
+    config = PGPConfiguration.get_solo()
+    data = {
+        field.name: getattr(config, field.name)
+        for field in config._meta.fields
+        if field.name != "id"
+    }
+    data["keyserver_url"] = keyserver_url
+
+    form = PGPConfigurationForm(instance=config, data=data)
+
+    assert form.is_valid(), form.errors
+
+
+@pytest.mark.django_db
+def test_pgp_configuration_form_rejects_unsupported_keyserver_url_schemes():
+    from byro.mails.forms import PGPConfigurationForm
+
+    config = PGPConfiguration.get_solo()
+    data = {
+        field.name: getattr(config, field.name)
+        for field in config._meta.fields
+        if field.name != "id"
+    }
+    data["keyserver_url"] = "hkps://keys.example.org\nfile:///tmp/keyring"
+
+    form = PGPConfigurationForm(instance=config, data=data)
+
+    assert not form.is_valid()
+    assert "line 2" in str(form.errors["keyserver_url"])
+
+
 def test_gnupg_backend_tries_next_keyserver_after_timeout(monkeypatch):
     backend = GnuPGBackend()
     attempted_servers = []

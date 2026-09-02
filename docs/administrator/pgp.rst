@@ -139,7 +139,8 @@ The PGP office settings accept one keyserver per line. byro tries them in
 order until one returns the requested key. You can enter plain hostnames;
 byro will use ``hkps://`` for them. If you enter ``https://`` or ``http://``,
 byro converts those schemes to GnuPG's ``hkps://`` or ``hkp://`` keyserver
-schemes. The default list is:
+schemes. Explicitly specified schemes are limited to ``hkp://``, ``hkps://``,
+``http://``, and ``https://``. The default list is:
 
 * ``keys.openpgp.org``
 * ``keyserver.ubuntu.com``

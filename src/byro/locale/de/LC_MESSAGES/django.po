@@ -742,6 +742,20 @@ msgstr "Keyserver-URLs"
 msgid "Enter one keyserver per line. They are tried in order."
 msgstr "Gib einen Keyserver pro Zeile ein. Sie werden der Reihe nach versucht."
 
+#: byro/mails/forms.py:72
+#, python-format
+msgid ""
+"Keyserver URL on line %(line_number)s must use one of the hkp, hkps, http, or "
+"https schemes."
+msgstr ""
+"Die Keyserver-URL in Zeile %(line_number)s muss eines der Schemata hkp, hkps, "
+"http oder https verwenden."
+
+#: byro/mails/gnupg_backend.py:491
+#, python-format
+msgid "Unsupported keyserver URL scheme: %(scheme)s"
+msgstr "Nicht unterstütztes Keyserver-URL-Schema: %(scheme)s"
+
 #: byro/mails/models.py:77
 msgid "When no PGP key is available"
 msgstr "Wenn kein PGP-Schlüssel vorhanden ist"

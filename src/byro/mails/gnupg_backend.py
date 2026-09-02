@@ -11,6 +11,7 @@ from django.core.mail.message import SafeMIMEMultipart
 from django.utils.translation import gettext_lazy as _
 
 from byro.mails.pgp import (
+    KEYSERVER_URL_SCHEMES,
     KeyImportResult,
     PGPBackendError,
     PGPBackendUnavailable,
@@ -482,13 +483,19 @@ class GnuPGBackend:
         return urls or [""]
 
     def _normalize_keyserver_url(self, value):
-        if value.startswith("https://"):
-            return "hkps://" + value[len("https://") :]
-        if value.startswith("http://"):
-            return "hkp://" + value[len("http://") :]
-        if "://" not in value:
+        scheme, separator, server = value.partition("://")
+        if not separator:
             return "hkps://" + value
-        return value
+        scheme = scheme.lower()
+        if scheme not in KEYSERVER_URL_SCHEMES:
+            raise PGPBackendError(
+                _("Unsupported keyserver URL scheme: %(scheme)s") % {"scheme": scheme}
+            )
+        if scheme == "https":
+            scheme = "hkps"
+        elif scheme == "http":
+            scheme = "hkp"
+        return scheme + "://" + server
 
     def _key_info(self, fingerprint):
         result = self._run(
