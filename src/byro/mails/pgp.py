@@ -89,6 +89,8 @@ def get_active_key(member):
 
     if not member:
         return None
+    if hasattr(member, "active_pgp_keys"):
+        return member.active_pgp_keys[0] if member.active_pgp_keys else None
     return (
         member.pgp_keys.filter(is_active=True)
         .exclude(status__in=[PGPKeyStatus.NOT_FOUND])
@@ -117,10 +119,12 @@ def should_block(policy):
     return policy == PGPPolicy.BLOCK
 
 
-def prepare_email_message(email_message, recipient_address=None):
+def prepare_email_message(
+    email_message, recipient_address=None, member=None, config=None
+):
     from byro.mails.models import PGPConfiguration
 
-    config = PGPConfiguration.get_solo()
+    config = config or PGPConfiguration.get_solo()
     if not config.encryption_enabled and not config.signing_enabled:
         return email_message
 
@@ -141,7 +145,7 @@ def prepare_email_message(email_message, recipient_address=None):
     if not config.encryption_enabled:
         return email_message
 
-    member = get_member_for_recipient(recipient_address)
+    member = member or get_member_for_recipient(recipient_address)
     if not member:
         return email_message
 
@@ -230,7 +234,8 @@ def get_dashboard_warnings():
         is_active=True,
         status__in=[PGPKeyStatus.INVALID, PGPKeyStatus.REVOKED, PGPKeyStatus.EXPIRED],
     )
-    if problematic_keys.exists():
+    problematic_key_count = problematic_keys.count()
+    if problematic_key_count:
         warnings.append(
             {
                 "level": "danger",
@@ -238,7 +243,7 @@ def get_dashboard_warnings():
                 "lines": [
                     _(
                         "{count} active member keys are invalid, revoked, or expired."
-                    ).format(count=problematic_keys.count())
+                    ).format(count=problematic_key_count)
                 ],
                 "url": _member_pgp_warning_url(problematic_keys),
             }
@@ -251,14 +256,15 @@ def get_dashboard_warnings():
         expires_at__isnull=False,
         expires_at__lte=expiry_cutoff,
     )
-    if expiring_keys.exists():
+    expiring_key_count = expiring_keys.count()
+    if expiring_key_count:
         warnings.append(
             {
                 "level": "warning",
                 "title": _("PGP keys expire soon"),
                 "lines": [
                     _("{count} active member keys expire soon.").format(
-                        count=expiring_keys.count()
+                        count=expiring_key_count
                     )
                 ],
                 "url": _member_pgp_warning_url(expiring_keys),
@@ -268,7 +274,8 @@ def get_dashboard_warnings():
     refresh_error_keys = MemberPGPKey.objects.filter(last_error__gt="").exclude(
         status=PGPKeyStatus.VALID
     )
-    if refresh_error_keys.exists():
+    refresh_error_key_count = refresh_error_keys.count()
+    if refresh_error_key_count:
         warnings.append(
             {
                 "level": "warning",
@@ -276,7 +283,7 @@ def get_dashboard_warnings():
                 "lines": [
                     _(
                         "{count} member keys have keyserver import or refresh errors."
-                    ).format(count=refresh_error_keys.count())
+                    ).format(count=refresh_error_key_count)
                 ],
                 "url": _member_pgp_warning_url(refresh_error_keys),
             }

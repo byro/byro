@@ -119,6 +119,8 @@ def mail_send_task(
     bcc: list = None,
     headers: dict = None,
     attachments: list = None,
+    member=None,
+    pgp_config=None,
 ):
     from byro.mails.models import PGPConfiguration
     from byro.mails.pgp import prepare_email_message
@@ -129,7 +131,8 @@ def mail_send_task(
     if not _recipient_addresses(to, cc, bcc):
         raise SendMailException("Cannot send an email without recipients.")
 
-    if PGPConfiguration.get_solo().encryption_enabled:
+    pgp_config = pgp_config or PGPConfiguration.get_solo()
+    if pgp_config.encryption_enabled:
         visible_headers = dict(headers or {})
         if to:
             visible_headers["To"] = ", ".join(to)
@@ -166,6 +169,12 @@ def mail_send_task(
         prepare_email_message(
             email,
             recipient_address=email.to[0] if email.to else None,
+            member=(
+                member
+                if member and email.to and member.email.lower() == email.to[0].lower()
+                else None
+            ),
+            config=pgp_config,
         )
         for email in emails
     ]

@@ -1,6 +1,7 @@
 from datetime import timedelta
 from email.generator import BytesGenerator
 from io import BytesIO
+from unittest.mock import patch
 
 import pytest
 from django.contrib.messages import get_messages
@@ -9,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.mail import EmailMultiAlternatives
 from django.core.mail.message import SafeMIMEMultipart
+from django.db.models import Prefetch
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -27,6 +29,7 @@ from byro.mails.models import (
 from byro.mails.pgp import (
     PGPBackendError,
     SigningKeyInfo,
+    get_active_key,
     get_backend,
     get_dashboard_warnings,
     normalize_fingerprint,
@@ -993,6 +996,50 @@ def test_pgp_delivery_treats_to_cc_and_bcc_as_individual_recipients(member, mail
 
 
 @pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_bulk_mail_uses_preloaded_member_and_active_key(
+    member, membership, mailoutbox, django_assert_num_queries
+):
+    config = PGPConfiguration.get_solo()
+    config.encryption_enabled = True
+    config.save()
+    key = MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        public_key="public key",
+        status=PGPKeyStatus.VALID,
+    )
+    preloaded_member = Member.objects.prefetch_related(
+        Prefetch(
+            "pgp_keys",
+            queryset=(
+                MemberPGPKey.objects.filter(is_active=True)
+                .exclude(status=PGPKeyStatus.NOT_FOUND)
+                .order_by("-verified_at", "-last_checked_at", "fingerprint")
+            ),
+            to_attr="active_pgp_keys",
+        )
+    ).get(pk=member.pk)
+
+    with django_assert_num_queries(0):
+        assert get_active_key(preloaded_member) == key
+
+    mail = EMail.objects.create(to="special:all", subject="Test", text="Text")
+    with patch(
+        "byro.mails.pgp.get_active_key", wraps=get_active_key
+    ) as get_active_key_mock:
+        with patch(
+            "byro.mails.pgp.get_member_for_recipient"
+        ) as get_member_for_recipient:
+            mail.send()
+
+    get_member_for_recipient.assert_not_called()
+    assert hasattr(get_active_key_mock.call_args.args[0], "active_pgp_keys")
+    assert len(mailoutbox) == 1
+    assert mailoutbox[0].subject == "encrypted:Test"
+
+
+@pytest.mark.django_db
 def test_dashboard_warns_about_missing_signing_key():
     config = PGPConfiguration.get_solo()
     config.signing_enabled = True
@@ -1021,6 +1068,35 @@ def test_dashboard_warns_about_expiring_member_keys(member):
 
     warning = next(warning for warning in warnings if warning["level"] == "warning")
     assert warning["url"] == reverse("office:members.pgp", kwargs={"pk": member.pk})
+
+
+@pytest.mark.django_db
+def test_dashboard_warning_categories_use_one_count_query_each(
+    member, django_assert_num_queries
+):
+    PGPConfiguration.get_solo()
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        status=PGPKeyStatus.INVALID,
+    )
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint="1111111111111111111111111111111111111111",
+        status=PGPKeyStatus.VALID,
+        expires_at=timezone.now() + timedelta(days=10),
+    )
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint="2222222222222222222222222222222222222222",
+        status=PGPKeyStatus.UNVERIFIED,
+        last_error="keyserver unavailable",
+    )
+
+    with django_assert_num_queries(7):
+        warnings = get_dashboard_warnings()
+
+    assert len(warnings) == 3
 
 
 @pytest.mark.django_db

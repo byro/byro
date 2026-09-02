@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -317,12 +317,13 @@ class EMail(Auditable, models.Model):
         from byro.common.models import Configuration
 
         config = Configuration.get_solo()
+        pgp_config = PGPConfiguration.get_solo()
 
         if self.to == "special:all" or not self.to.startswith("special:"):
             send_tos = []
 
             if self.to == "special:all":
-                for member in (
+                members = (
                     Member.objects.filter(
                         Q(memberships__start__lte=now().date())
                         & (
@@ -333,7 +334,22 @@ class EMail(Auditable, models.Model):
                     .filter(email__isnull=False)
                     .exclude(email="")
                     .all()
-                ):
+                )
+                if pgp_config.encryption_enabled:
+                    members = members.prefetch_related(
+                        Prefetch(
+                            "pgp_keys",
+                            queryset=(
+                                MemberPGPKey.objects.filter(is_active=True)
+                                .exclude(status=PGPKeyStatus.NOT_FOUND)
+                                .order_by(
+                                    "-verified_at", "-last_checked_at", "fingerprint"
+                                )
+                            ),
+                            to_attr="active_pgp_keys",
+                        )
+                    )
+                for member in members:
                     send_tos.append((member.email, member))
 
             else:
@@ -376,6 +392,8 @@ class EMail(Auditable, models.Model):
                         bcc=(self.bcc or "").split(","),
                         attachments=self.attachment_ids,
                         headers=headers,
+                        member=member,
+                        pgp_config=pgp_config,
                     )
                 except SendMailException as e:
                     errors.append(str(e))
