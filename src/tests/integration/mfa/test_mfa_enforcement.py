@@ -14,6 +14,15 @@ SETTINGS_POST_DATA = {
     "Configuration-liability_interval": "36",
     "Configuration-default_order_name": "last",
     "Configuration-default_direct_address_name": "first",
+    # PGPConfiguration is rendered on the same page; its required fields
+    # must be present for the combined form to validate.
+    "PGPConfiguration-missing_key_policy": "send_plain",
+    "PGPConfiguration-invalid_key_policy": "block",
+    "PGPConfiguration-unverified_key_policy": "block",
+    "PGPConfiguration-expired_key_policy": "block",
+    "PGPConfiguration-key_refresh_interval_days": "1",
+    "PGPConfiguration-keyserver_timeout_seconds": "30",
+    "PGPConfiguration-expiry_reminder_days": "30",
 }
 
 
