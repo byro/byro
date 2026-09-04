@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django import forms
 from django.db import models
+from django.db.models.fields import NOT_PROVIDED
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
@@ -48,6 +49,58 @@ SPECIAL_ORDER = [
     "membership__interval",
     "membership__amount",
 ]
+# Fields offered in the registration form as long as nothing has been configured.
+DEFAULT_FIELDS = list(SPECIAL_ORDER)
+
+
+def get_field_key(model, field):
+    return f"{SPECIAL_NAMES.get(model, model.__name__)}__{field.name}"
+
+
+def is_mandatory_field(field):
+    """Return True if a new member cannot be saved without a value for ``field``.
+
+    This mirrors what happens when a model instance is saved without the
+    attribute being set: a NOT NULL column without a (database) default that
+    does not fall back to the empty string ends up as NULL and violates the
+    database constraint.
+    """
+    return (
+        field.editable
+        and not field.primary_key
+        and not field.null
+        and not field.empty_strings_allowed
+        and not field.has_default()
+        and getattr(field, "db_default", NOT_PROVIDED) is NOT_PROVIDED
+    )
+
+
+def get_mandatory_fields():
+    """Return the keys of all fields that always have to be part of the
+    registration form, ordered like ``SPECIAL_ORDER``."""
+    keys = [
+        get_field_key(model, field)
+        for model, field in RegistrationConfigForm.get_form_fields()
+        if is_mandatory_field(field)
+    ]
+    return sorted(
+        keys,
+        key=lambda key: (
+            SPECIAL_ORDER.index(key) if key in SPECIAL_ORDER else len(SPECIAL_ORDER),
+            key,
+        ),
+    )
+
+
+def get_default_entries():
+    """Return the configuration shown when no registration form has been
+    saved yet, keyed by field name."""
+    entries = {
+        key: {"name": key, "position": index + 1}
+        for index, key in enumerate(DEFAULT_FIELDS)
+    }
+    entries["membership__start"]["default_date"] = DefaultDates.BEGINNING_MONTH
+    return entries
 
 
 class RegistrationConfigForm(forms.Form):
@@ -57,10 +110,26 @@ class RegistrationConfigForm(forms.Form):
         fieldsets = []
         config = Configuration.get_solo().registration_form or []
         data = {entry["name"]: entry for entry in config if "name" in entry}
+        if not data:
+            data = get_default_entries()
+
+        # Mandatory fields missing from the stored configuration are appended
+        # to the end of the current form, so they can neither be left out by
+        # older configurations nor by removing them client-side.
+        mandatory = get_mandatory_fields()
+        positions = {}
+        next_position = (
+            max((entry.get("position") or 0 for entry in data.values()), default=0) + 1
+        )
+        for key in mandatory:
+            if not data.get(key, {}).get("position"):
+                positions[key] = next_position
+                next_position += 1
 
         for model, field in self.get_form_fields():
-            key = f"{SPECIAL_NAMES.get(model, model.__name__)}__{field.name}"
+            key = get_field_key(model, field)
             entry = data.get(key, {})
+            position = entry.get("position") or positions.get(key)
 
             verbose_name = field.verbose_name or field.name
             if model not in SPECIAL_NAMES:
@@ -89,12 +158,12 @@ class RegistrationConfigForm(forms.Form):
                 fields["default"] = default_field
             for name, form_field in fields.items():
                 form_field.initial = entry.get(name, form_field.initial)
+            fields["position"].initial = position
 
             fieldsets.append(
                 (
                     (  # This part is responsible for sorting the model fields:
-                        data.get(key, {}).get("position", None)
-                        or 998,  # Position in form, if set (or 998)
+                        position or 998,  # Position in form, if set (or 998)
                         (
                             SPECIAL_ORDER.index(key) if key in SPECIAL_ORDER else 66
                         ),  # SPECIAL_ORDER first
@@ -109,6 +178,7 @@ class RegistrationConfigForm(forms.Form):
                         )  # TODO: make fields an ordered dict that prepends {key} to every key for more fanciness
                         for name, value in fields.items()
                     ),
+                    key in mandatory,
                 )
             )
 
@@ -131,14 +201,16 @@ class RegistrationConfigForm(forms.Form):
                         ),
                     )
                 ),
+                False,
             )
         )
 
         fieldsets.sort()
-        for _position, key, verbose_name, form_fields in fieldsets:
+        for _position, key, verbose_name, form_fields, is_mandatory in fieldsets:
             self.fields_extra[key] = (
                 verbose_name,
                 (self[name] for name in form_fields.keys()),
+                is_mandatory,
             )
             self.fields.update(form_fields)
 
@@ -182,8 +254,24 @@ class RegistrationConfigForm(forms.Form):
             for (key, value) in ret.items()
             if key.endswith("__position") and value is not None
         ]
-        if not len(list(positions)) == len(set(positions)):
-            raise forms.ValidationError("Every position must be unique!")
+        if len(positions) != len(set(positions)):
+            self.add_error(None, _("Every position must be unique!"))
+
+        # The position inputs are hidden client-side, so errors about them
+        # have to be reported as non-field errors to be visible at all.
+        missing = [
+            str(self.fields_extra[key][0])
+            for key in get_mandatory_fields()
+            if ret.get(f"{key}__position") is None
+        ]
+        if missing:
+            self.add_error(
+                None,
+                _(
+                    "These fields are required and have to be part of the registration form: %(fields)s"
+                )
+                % {"fields": ", ".join(missing)},
+            )
         return ret
 
     def save(self):
