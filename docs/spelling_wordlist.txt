@@ -1,6 +1,11 @@
+Aegis
+Authenticator
+authenticator
+Bitwarden
 byro
 changelog
 cronjob
+fail2ban
 filesystem
 formatters
 frontend
@@ -8,10 +13,13 @@ html
 libjpeg
 libmagic
 LogEntry
+MFA
 middleware
 namespace
 nginx
 NGOs
+NTP
+OIDC
 poedit
 pre
 prepended
@@ -19,5 +27,6 @@ Solaris
 submenu
 submodule
 systemd
+TOTP
 url
 virtualenv

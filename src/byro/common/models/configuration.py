@@ -10,7 +10,13 @@ from byro.common.models.log import LogTargetMixin
 
 class ByroConfiguration(LogTargetMixin, SingletonModel):
     """Use this class to build a configuration set that will automatically show
-    up on the office settings interface."""
+    up on the office settings interface.
+
+    Set ``settings_template`` to a template name to render the form fields
+    yourself (the form is available as ``form``); otherwise all fields are
+    rendered with ``bootstrap_form`` in the horizontal layout."""
+
+    settings_template = None
 
     class Meta:
         abstract = True

@@ -9,6 +9,7 @@ recursive-include byro *.py
 recursive-include byro/locale *
 recursive-include byro/static *
 recursive-include byro/common/templates *
+recursive-include byro/mfa/templates *
 recursive-include byro/office/templates *
 recursive-include byro/public/templates *
 recursive-exclude tests *

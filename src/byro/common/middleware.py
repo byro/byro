@@ -16,12 +16,39 @@ class SettingsMiddleware:
     def __call__(self, request):
         url = resolve(request.path_info)
         translation.activate(settings.DEFAULT_LANGUAGE)
-        if not request.user.is_anonymous and url.url_name not in self.ALLOWED_URLS:
+        if (
+            not request.user.is_anonymous
+            and url.url_name not in self.ALLOWED_URLS
+            and url.namespace != "mfa"
+        ):
             config = Configuration.get_solo()
             values = ("name", "backoffice_mail", "mail_from")
             if not all(getattr(config, value, None) for value in values):
                 return redirect("office:settings.initial")
         return self.get_response(request)
+
+
+def url_allows_unauthenticated(request, url, sender=None):
+    """Return True if the resolved ``url`` may be used without a logged in
+    user: core public URLs (login, logout, …) and everything registered via
+    the ``unauthenticated_urls`` signal (member pages, REST API, plugins)."""
+    if url.url_name in PermissionMiddleware.UNAUTHENTICATED_URLS:
+        return True
+
+    unauthenticated_urls_matchers = []
+    for _receiver, response in unauthenticated_urls.send(
+        sender or PermissionMiddleware
+    ):
+        unauthenticated_urls_matchers.extend(response)
+
+    for url_matcher in unauthenticated_urls_matchers:
+        if callable(url_matcher):
+            if url_matcher(request, url):
+                return True
+        else:
+            if url.view_name == url_matcher:
+                return True
+    return False
 
 
 class PermissionMiddleware:
@@ -41,23 +68,10 @@ class PermissionMiddleware:
 
         allow = True
 
-        if request.user.is_anonymous and url.url_name not in self.UNAUTHENTICATED_URLS:
+        if request.user.is_anonymous and not url_allows_unauthenticated(
+            request, url, sender=self
+        ):
             allow = False
-
-        if not allow:
-            unauthenticated_urls_matchers = []
-            for _receiver, response in unauthenticated_urls.send(self):
-                unauthenticated_urls_matchers.extend(response)
-
-            for url_matcher in unauthenticated_urls_matchers:
-                if callable(url_matcher):
-                    if url_matcher(request, url):
-                        allow = True
-                        break
-                else:
-                    if url.view_name == url_matcher:
-                        allow = True
-                        break
 
         if not allow:
             return redirect(reverse("common:login") + f"?next={request.path}")

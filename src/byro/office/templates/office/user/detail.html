@@ -1,12 +1,18 @@
 {% extends "office/base_headline.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
+{% load mfa_tags %}
 
 {% block headline %}{% trans "User" %}
     {% if user.last_name %}{{user.last_name}} ({{user.username}}){% else %}{{user.username}}{% endif %}
     {% if not user.has_usable_password %}
         <span class="badge badge-warning ml-2" title="{% trans "Password disabled – user cannot log in with a password" %}">
             <span class="fa fa-lock"></span> {% trans "Password disabled" %}
+        </span>
+    {% endif %}
+    {% if user|mfa_enabled %}
+        <span class="badge badge-success ml-2" title="{% trans "Multi-factor authentication is enabled for this user" %}">
+            <span class="fa fa-shield"></span> {% trans "MFA enabled" %}
         </span>
     {% endif %}
 {% endblock %}
@@ -19,13 +25,27 @@
         <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
     </form>
 
-    {% if user.pk != request.user.pk %}
+    {% if user.pk == request.user.pk %}
         <hr>
+        <p>
+            <a class="btn btn-outline-primary" href="{% url 'mfa:settings' %}">
+                <span class="fa fa-shield"></span> {% trans "Multi-factor authentication" %}
+            </a>
+        </p>
+    {% else %}
+        <hr>
+        {% if user|mfa_enabled %}
+            <p class="text-muted">
+                <span class="fa fa-shield"></span>
+                {% trans "Multi-factor authentication is enabled. If this user lost access to their authenticator app and recovery codes, an administrator can reset it on the server:" %}
+                <code>python manage.py mfa_reset {{ user.username }}</code>
+            </p>
+        {% endif %}
         {% if user.has_usable_password %}
             <form method="post" action="{% url 'office:settings.users.disable-password' pk=user.pk %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger"
-                    onclick="return confirm('{% trans "Disable password for this user? They will no longer be able to log in with a password."|escapejs %}')">
+                        onclick="return confirm('{% trans "Disable password for this user? They will no longer be able to log in with a password."|escapejs %}')">
                     <span class="fa fa-lock"></span> {% trans "Disable password" %}
                 </button>
             </form>

@@ -9,7 +9,11 @@
             <div class="card member-form-card">
                 <div class="card-header">{{ f.instance.form_title }}</div>
                 <div class="card-body">
-                    {% bootstrap_form f layout='horizontal' %}
+                    {% if f.instance.settings_template %}
+                        {% include f.instance.settings_template with form=f %}
+                    {% else %}
+                        {% bootstrap_form f layout='horizontal' %}
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
