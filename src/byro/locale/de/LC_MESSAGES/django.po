@@ -3443,3 +3443,23 @@ msgstr ""
 #: byro/office/templates/office/base.html:74
 msgid "My profile"
 msgstr "Mein Profil"
+
+#: byro/common/forms/registration.py:258
+msgid "Every position must be unique!"
+msgstr "Jede Position darf nur einmal vergeben werden!"
+
+#: byro/common/forms/registration.py:271
+msgid ""
+"These fields are required and have to be part of the registration form: "
+"%(fields)s"
+msgstr ""
+"Diese Felder sind Pflichtfelder und müssen Teil des Beitrittsformulars sein: "
+"%(fields)s"
+
+#: byro/office/templates/office/settings/registration_form.html:148
+msgid "Required"
+msgstr "Pflichtfeld"
+
+#: byro/office/templates/office/settings/registration_form.html:148
+msgid "This field cannot be removed from the registration form."
+msgstr "Dieses Feld kann nicht aus dem Beitrittsformular entfernt werden."

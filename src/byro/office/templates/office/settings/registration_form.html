@@ -14,6 +14,7 @@
             .add-button, .remove-button { font-size: 90%; }
             .available-fields .remove-button { display: none; }
             .current-fields .add-button { display: none; }
+            .mandatory-hint { font-size: 0.75rem; font-weight: 400; }
             #fancy-registration-form > .card {
                 width: 50%;
                 min-width: 34em;
@@ -72,12 +73,15 @@
             };
             form.find('div.fancy-entry').each(function(i, elem){
                 var elem = $(elem);
+                var mandatory = elem.hasClass('mandatory-entry');
                 var number_input = elem.find('input[name$=__position]');
                 var button_area = $($.parseHTML('<div class="col-md-3"></div>'));
                 var add_button = $($.parseHTML('<button type="button" class="btn add-button"><i class="fa fa-arrow-left"></i>&nbsp;{% trans "Add" %}</button>'));
                 var remove_button = $($.parseHTML('<button type="button" class="btn remove-button">{% trans "Remove" %}&nbsp;<i class="fa fa-arrow-right"></i></button>'));
                 button_area.append(add_button);
-                button_area.append(remove_button);
+                if (!mandatory) {
+                    button_area.append(remove_button);
+                }
                 add_button.click(function(){
                     elem.detach();
                     current.append(elem);
@@ -93,7 +97,7 @@
                 elem.detach();
                 elem.find(".card-title").parent().prepend(button_area);
                 elem.prepend($('<div class="grab-parent"><div class="grab-child"></div></div>'));
-                if(number_input.val()) {
+                if(number_input.val() || mandatory) {
                     current.append(elem);
                 } else {
                     avail.append(elem);
@@ -117,22 +121,31 @@
                 }
 
             });
+            update_states();
             form_sortable = form.find('.current-fields, .available-fields').sortable({
                 connectWith: ".current-fields, .available-fields",
                 update: update_states,
                 placeholder: 'field-placeholder',
+            });
+            // Mandatory fields cannot be dragged out of the registration form.
+            avail.on('sortreceive', function(event, ui) {
+                if (ui.item.hasClass('mandatory-entry')) {
+                    ui.sender.sortable('cancel');
+                    update_states();
+                }
             });
         });
     </script>
 {% endblock %}
 
 {% block settings_content %}
+    {% bootstrap_form_errors form type='non_fields' %}
     <form method="post" id='fancy-registration-form'>
         {% csrf_token %}
         {% for key, field_info in form.fields_extra.items %}
-            <div class="card fancy-entry my-2">
+            <div class="card fancy-entry my-2{% if field_info.2 %} mandatory-entry{% endif %}">
                 <div class="card-body">
-                    <div class="row"><h5 class="card-title col-md-9">{{field_info.0}}</h5></div>
+                    <div class="row"><h5 class="card-title col-md-9">{{field_info.0}}{% if field_info.2 %} <small class="text-danger mandatory-hint" title="{% trans "This field cannot be removed from the registration form." %}">({% trans "Required" %})</small>{% endif %}</h5></div>
                     {% for field in field_info.1 %}
                         {% bootstrap_field field layout='horizontal' %}
                     {% endfor %}

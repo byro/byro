@@ -17,7 +17,9 @@ reference ``byro.members.Member`` in a OneToOne relation, and the related name
 Once you have generated this plugin (and have added the migrations, and run
 them), byro will discover the profile on its own, generate the fitting forms
 for members' profile pages, and offer you to include it when configuring your
-registration form.
+registration form. Profile fields the database requires (``NOT NULL`` without
+a default) are always part of the registration form and cannot be removed from
+it, so prefer nullable fields or fields with a default.
 
 The Profile class
 -----------------

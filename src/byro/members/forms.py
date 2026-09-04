@@ -4,7 +4,7 @@ from django import forms
 from django.db.models.fields.related import OneToOneRel
 from django.utils.timezone import now
 
-from byro.common.forms.registration import DefaultDates
+from byro.common.forms.registration import DefaultDates, get_mandatory_fields
 from byro.common.models import Configuration
 from byro.mails.models import PGPKeySource
 from byro.mails.pgp import import_member_key, normalize_fingerprint
@@ -19,10 +19,17 @@ class CreateMemberForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         config = Configuration.get_solo().registration_form or []
+        by_name = {entry["name"]: entry for entry in config if "name" in entry}
         config = sorted(
-            (field for field in config if field["position"] is not None),
+            (field for field in config if field.get("position") is not None),
             key=lambda field: field["position"],
         )
+        if config:
+            # Fields the database requires are always asked for, even if an
+            # older configuration does not contain them (see issue #335).
+            for key in get_mandatory_fields():
+                if by_name.get(key, {}).get("position") is None:
+                    config.append(by_name.get(key, {"name": key}))
         profiles = {
             profile.related_model.__name__: profile.related_model
             for profile in Member._meta.related_objects
