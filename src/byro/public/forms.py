@@ -1,6 +1,12 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from byro.mails.pgp import normalize_fingerprint
+from byro.mails.registration import (
+    PGP_REGISTRATION_FIELD,
+    build_pgp_fingerprint_field,
+    get_member_pgp_fingerprint,
+)
 from byro.public.models import get_proposable_fields, model_field_for
 
 
@@ -43,6 +49,26 @@ class MemberChangeProposalForm(forms.Form):
                 form_field.initial = field.getter(member)
             self.fields[field_id] = form_field
 
+        form_field = build_pgp_fingerprint_field()
+        if PGP_REGISTRATION_FIELD in pending:
+            form_field.initial = pending[PGP_REGISTRATION_FIELD].new_value
+            form_field.help_text = _(
+                "Currently stored: %(value)s. Your proposed change is awaiting "
+                "confirmation."
+            ) % {"value": get_member_pgp_fingerprint(member)}
+        else:
+            form_field.initial = get_member_pgp_fingerprint(member)
+        self.fields[PGP_REGISTRATION_FIELD] = form_field
+
+    def clean_pgp__fingerprint(self):
+        value = self.cleaned_data.get(PGP_REGISTRATION_FIELD)
+        if not value:
+            return ""
+        try:
+            return normalize_fingerprint(value)
+        except ValueError as e:
+            raise forms.ValidationError(e)
+
     def save(self):
         for field_id, field in self.proposable_fields.items():
             proposed = self.cleaned_data.get(field_id)
@@ -54,6 +80,18 @@ class MemberChangeProposalForm(forms.Form):
                     field_id=field_id,
                     defaults={"new_value": _serialize(proposed)},
                 )
+
+        proposed = self.cleaned_data.get(PGP_REGISTRATION_FIELD)
+        current = get_member_pgp_fingerprint(self.member)
+        if _normalize(proposed) == _normalize(current):
+            self.member.change_proposals.filter(
+                field_id=PGP_REGISTRATION_FIELD
+            ).delete()
+        else:
+            self.member.change_proposals.update_or_create(
+                field_id=PGP_REGISTRATION_FIELD,
+                defaults={"new_value": _serialize(proposed)},
+            )
 
 
 class PrivacyConsentForm(forms.Form):

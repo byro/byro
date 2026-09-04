@@ -40,6 +40,12 @@ Open this file in an editor, and configure the following aspects:
     Change the URL to an URL your server is reachable on. If your server is not yet
     exposed to the world, you will need to enable `debug` to bypass Django URL security.
 
+`[pgp]`
+    The example configuration stores GnuPG data in ``/var/byro/data/gnupg``, which
+    is part of the byro data volume. The official byro image includes the
+    required GnuPG packages. Enable signing and encryption in the byro office
+    settings after the deployment is running.
+
 .. note:: Never expose your server to the world with `debug = True` enabled.
           This will allow users accessing the page to view potentially sensitive
           information.

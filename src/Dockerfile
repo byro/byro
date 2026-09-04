@@ -5,7 +5,7 @@ EXPOSE 8020
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y zsh gettext libjpeg-dev libmagic-dev && \
+    apt-get install -y zsh gettext libjpeg-dev libmagic-dev gnupg gpg-agent && \
     rm -rf /var/lib/apt/lists/*
 
 RUN useradd uid1000 -d /home/uid1000

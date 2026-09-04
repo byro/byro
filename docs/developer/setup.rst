@@ -129,6 +129,7 @@ Before you check in your code into git, always run the static checkers and unit 
 
     (env)$ isort -c -rc .
     (env)$ black .
+    (env)$ flake8 .
     (env)$ python manage.py check
     (env)$ py.test tests
 
@@ -144,6 +145,7 @@ for example::
     source ../env/bin/activate
     isort -c -rc .
     black .
+    flake8 .
 
 
 Working with translations

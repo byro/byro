@@ -41,6 +41,7 @@ def test_mail_can_copy_to_draft(sent_email):
     assert new_mail.subject == sent_email.subject
     assert new_mail.to == sent_email.to
     assert new_mail.sent is None
+    assert new_mail.delivered_to == []
     assert new_mail.pk != sent_email.pk
     assert EMail.objects.count() == count + 1
 

@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block settings_content %}
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for f in form %}
             <div class="card member-form-card">

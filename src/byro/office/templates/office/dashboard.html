@@ -43,5 +43,16 @@
                 {% trans "(all time)" %}
             </span>
         </a>
+        {% for warning in pgp_warnings %}
+            <a
+                class="dashboard-block block-{{ warning.level }}"
+                href="{{ warning.url }}"
+            >
+                <h1>{{ warning.title }}</h1>
+                <span class="dashboard-description">
+                    {{ warning.lines|join:"<br>" }}
+                </span>
+            </a>
+        {% endfor %}
     </div>
 {% endblock %}

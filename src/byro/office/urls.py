@@ -109,6 +109,7 @@ urlpatterns = [
                 ),
                 path("log", members.MemberLogView.as_view(), name="members.log"),
                 path("mails", members.MemberMailsView.as_view(), name="members.mails"),
+                path("pgp", members.MemberPGPView.as_view(), name="members.pgp"),
                 path(
                     "documents",
                     members.MemberDocumentsView.as_view(),

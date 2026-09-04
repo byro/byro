@@ -1,17 +1,181 @@
 from copy import deepcopy
 
-from django.db import models, transaction
-from django.db.models import Q
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Prefetch, Q
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override
 from i18nfield.fields import I18nCharField, I18nTextField
 
+from byro.common.models import LogTargetMixin
 from byro.common.models.auditable import Auditable
+from byro.common.models.choices import Choices
+from byro.common.models.configuration import ByroConfiguration
 from byro.mails.send import SendMailException
 from byro.members.models import Member
+
+
+class PGPPolicy(Choices):
+    SEND_PLAIN = "send_plain"
+    BLOCK = "block"
+
+
+class PGPKeySource(Choices):
+    APPLICATION = "application"
+    MEMBER_PAGE = "member_page"
+    MANUAL_UPLOAD = "manual_upload"
+    KEYSERVER = "keyserver"
+
+
+class PGPKeyStatus(Choices):
+    PENDING = "pending"
+    VALID = "valid"
+    EXPIRED = "expired"
+    REVOKED = "revoked"
+    INVALID = "invalid"
+    NOT_FOUND = "not_found"
+    UNVERIFIED = "unverified"
+
+
+class PGPConfiguration(ByroConfiguration):
+    LOG_TARGET_BASE = "byro.settings.pgp"
+    settings_template = "office/settings/pgp_configuration_form.html"
+    DEFAULT_KEYSERVERS = "\n".join(
+        [
+            "keys.openpgp.org",
+            "keyserver.ubuntu.com",
+            "pgp.mit.edu",
+        ]
+    )
+
+    encryption_enabled = models.BooleanField(
+        default=False, verbose_name=_("Encrypt member emails with PGP")
+    )
+    signing_enabled = models.BooleanField(
+        default=False, verbose_name=_("Sign outgoing emails with PGP")
+    )
+    signing_key_fingerprint = models.CharField(
+        max_length=64,
+        blank=True,
+        verbose_name=_("Signing key fingerprint"),
+        help_text=_(
+            "Fingerprint of the organization's private key in the configured PGP backend."
+        ),
+    )
+    keyserver_url = models.TextField(
+        blank=True,
+        default=DEFAULT_KEYSERVERS,
+        verbose_name=_("Keyserver URLs"),
+        help_text=_("Enter one keyserver per line. They are tried in order."),
+    )
+    missing_key_policy = models.CharField(
+        max_length=PGPPolicy.max_length,
+        choices=PGPPolicy.choices,
+        default=PGPPolicy.SEND_PLAIN,
+        verbose_name=_("When no PGP key is available"),
+    )
+    invalid_key_policy = models.CharField(
+        max_length=PGPPolicy.max_length,
+        choices=PGPPolicy.choices,
+        default=PGPPolicy.BLOCK,
+        verbose_name=_("When a PGP key is invalid"),
+    )
+    unverified_key_policy = models.CharField(
+        max_length=PGPPolicy.max_length,
+        choices=PGPPolicy.choices,
+        default=PGPPolicy.BLOCK,
+        verbose_name=_("When a PGP key is unverified"),
+    )
+    expired_key_policy = models.CharField(
+        max_length=PGPPolicy.max_length,
+        choices=PGPPolicy.choices,
+        default=PGPPolicy.BLOCK,
+        verbose_name=_("When a PGP key is expired"),
+    )
+    refresh_keys_automatically = models.BooleanField(
+        default=True, verbose_name=_("Refresh PGP keys automatically")
+    )
+    key_refresh_interval_days = models.PositiveIntegerField(
+        default=1, verbose_name=_("Days between automatic PGP key refreshes")
+    )
+    keyserver_timeout_seconds = models.PositiveIntegerField(
+        default=30, verbose_name=_("Keyserver timeout in seconds")
+    )
+    send_expiry_reminders = models.BooleanField(
+        default=True, verbose_name=_("Remind members before PGP keys expire")
+    )
+    expiry_reminder_days = models.PositiveIntegerField(
+        default=30, verbose_name=_("Days before expiry to send reminders")
+    )
+
+    form_title = _("PGP settings")
+
+    def __str__(self):
+        return "PGP settings"
+
+    @property
+    def keyserver_urls(self):
+        return [
+            line.strip()
+            for line in (self.keyserver_url or self.DEFAULT_KEYSERVERS).splitlines()
+            if line.strip()
+        ]
+
+
+class MemberPGPKey(Auditable, models.Model, LogTargetMixin):
+    LOG_TARGET_BASE = "byro.members.pgp_key"
+
+    member = models.ForeignKey(
+        to="members.Member", related_name="pgp_keys", on_delete=models.CASCADE
+    )
+    fingerprint = models.CharField(max_length=64, db_index=True)
+    public_key = models.TextField(blank=True)
+    source = models.CharField(
+        max_length=PGPKeySource.max_length,
+        choices=PGPKeySource.choices,
+        default=PGPKeySource.MANUAL_UPLOAD,
+    )
+    status = models.CharField(
+        max_length=PGPKeyStatus.max_length,
+        choices=PGPKeyStatus.choices,
+        default=PGPKeyStatus.PENDING,
+    )
+    is_active = models.BooleanField(default=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    last_checked_at = models.DateTimeField(null=True, blank=True)
+    last_reminder_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ("member", "-is_active", "fingerprint")
+        unique_together = (("member", "fingerprint"),)
+
+    def __str__(self):
+        return f"{self.member}: {self.fingerprint}"
+
+    def clean(self):
+        super().clean()
+        from byro.mails.pgp import normalize_fingerprint
+
+        try:
+            self.fingerprint = normalize_fingerprint(self.fingerprint)
+        except ValueError as e:
+            raise ValidationError({"fingerprint": e})
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        if self.status == PGPKeyStatus.VALID and not self.verified_at:
+            self.verified_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+    @property
+    def is_usable_for_encryption(self):
+        return self.is_active and self.status == PGPKeyStatus.VALID
 
 
 class MailTemplate(Auditable, models.Model):
@@ -113,6 +277,12 @@ class EMail(Auditable, models.Model):
     members = models.ManyToManyField(to="members.Member", related_name="emails")
     text = models.TextField(verbose_name=_("Text"))
     sent = models.DateTimeField(null=True, blank=True, verbose_name=_("Sent at"))
+    delivered_to = models.JSONField(
+        default=list,
+        blank=True,
+        editable=False,
+        verbose_name=_("Delivered to"),
+    )
     template = models.ForeignKey(
         to=MailTemplate, null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -137,10 +307,8 @@ class EMail(Auditable, models.Model):
             if self.to.startswith("special:member:"):
                 member = Member.all_objects.get(pk=self.to.split(":", 2)[2])
                 self.to = member.email
-                self.members.add(member)
                 self.save(update_fields=["to"])
 
-    @transaction.atomic
     def send(self):
         if self.sent:
             raise TypeError("This mail has been sent already. It cannot be sent again.")
@@ -150,12 +318,13 @@ class EMail(Auditable, models.Model):
         from byro.common.models import Configuration
 
         config = Configuration.get_solo()
+        pgp_config = PGPConfiguration.get_solo()
 
         if self.to == "special:all" or not self.to.startswith("special:"):
             send_tos = []
 
             if self.to == "special:all":
-                for member in (
+                members = (
                     Member.objects.filter(
                         Q(memberships__start__lte=now().date())
                         & (
@@ -166,21 +335,32 @@ class EMail(Auditable, models.Model):
                     .filter(email__isnull=False)
                     .exclude(email="")
                     .all()
-                ):
-                    send_tos.append(member)
-                    self.members.add(member)
+                )
+                if pgp_config.encryption_enabled:
+                    members = members.prefetch_related(
+                        Prefetch(
+                            "pgp_keys",
+                            queryset=(
+                                MemberPGPKey.objects.filter(is_active=True)
+                                .exclude(status=PGPKeyStatus.NOT_FOUND)
+                                .order_by(
+                                    "-verified_at", "-last_checked_at", "fingerprint"
+                                )
+                            ),
+                            to_attr="active_pgp_keys",
+                        )
+                    )
+                for member in members:
+                    send_tos.append((member.email, member))
 
             else:
                 to_addrs = self.to.split(",")
                 for addr in to_addrs:
+                    addr = addr.strip()
                     member = Member.all_objects.filter(
                         email__iexact=addr.lower()
                     ).first()
-                    if member:
-                        send_tos.append(member)
-                        self.members.add(member)
-                    else:
-                        send_tos.append(addr)
+                    send_tos.append((addr, member))
 
             headers = {}
             if self.reply_to:
@@ -188,28 +368,45 @@ class EMail(Auditable, models.Model):
 
             from byro.mails.send import mail_send_task
 
-            for addr in send_tos:
+            delivered_to = {address.lower() for address in self.delivered_to}
+            errors = []
+            for addr, member in send_tos:
+                if addr.lower() in delivered_to:
+                    continue
                 body = self.text
-                if isinstance(addr, Member):
+                if member:
                     signature = _(
                         "You are receiving this email due to your membership in {name}."
                     ).format(name=config.name)
                     signature += "\n"
                     signature += _(
                         "You can see your member page at this URL: {url}"
-                    ).format(url=addr.profile_memberpage.get_url())
+                    ).format(url=member.profile_memberpage.get_url())
                     body += "\n\n-- \n" + signature
-                    addr = addr.email
-                mail_send_task(
-                    to=[addr],
-                    subject=self.subject,
-                    body=body,
-                    sender=config.mail_from,
-                    cc=(self.cc or "").split(","),
-                    bcc=(self.bcc or "").split(","),
-                    attachments=self.attachment_ids,
-                    headers=headers,
-                )
+                try:
+                    mail_send_task(
+                        to=[addr],
+                        subject=self.subject,
+                        body=body,
+                        sender=config.mail_from,
+                        cc=(self.cc or "").split(","),
+                        bcc=(self.bcc or "").split(","),
+                        attachments=self.attachment_ids,
+                        headers=headers,
+                        member=member,
+                        pgp_config=pgp_config,
+                    )
+                except SendMailException as e:
+                    errors.append(str(e))
+                    continue
+
+                self.delivered_to.append(addr.lower())
+                self.save(update_fields=["delivered_to"])
+                if member:
+                    self.members.add(member)
+
+            if errors:
+                raise SendMailException("\n".join(errors))
 
         self.sent = now()
         self.save(update_fields=["sent"])
@@ -218,5 +415,6 @@ class EMail(Auditable, models.Model):
         new_mail = deepcopy(self)
         new_mail.pk = None
         new_mail.sent = None
+        new_mail.delivered_to = []
         new_mail.save()
         return new_mail

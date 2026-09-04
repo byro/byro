@@ -1,0 +1,92 @@
+{% extends "office/member/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{{ block.super }} :: {% trans "PGP" %}{% endblock %}
+
+{% block member_content %}
+  <div class="card member-form-card">
+    <div class="card-header">{% trans "PGP keys" %}</div>
+    <div class="card-body">
+      {% if pgp_keys %}
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>{% trans "Fingerprint" %}</th>
+              <th>{% trans "Status" %}</th>
+              <th>{% trans "Expires" %}</th>
+              <th>{% trans "Last checked" %}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for key in pgp_keys %}
+              <tr>
+                <td><code>{{ key.fingerprint }}</code></td>
+                <td>{{ key.get_status_display }}</td>
+                <td>{{ key.expires_at|default:"-" }}</td>
+                <td>{{ key.last_checked_at|default:"-" }}</td>
+                <td class="text-right">
+                  <form method="post">
+                    {% csrf_token %}
+                    {% if key.is_active %}
+                      <button
+                        class="btn btn-sm btn-warning"
+                        name="deactivate_key"
+                        value="{{ key.pk }}"
+                        type="submit"
+                      >
+                        {% trans "Deactivate" %}
+                      </button>
+                    {% endif %}
+                    <button
+                      class="btn btn-sm btn-danger"
+                      name="delete_key"
+                      value="{{ key.pk }}"
+                      type="submit"
+                    >
+                      {% trans "Delete" %}
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% if key.last_error %}
+                <tr>
+                  <td colspan="5" class="text-muted">{{ key.last_error }}</td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>{% trans "No PGP keys are stored for this member." %}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="card member-form-card">
+      <div class="card-header">{% trans "Import from keyserver" %}</div>
+      <div class="card-body">
+        {% bootstrap_form fingerprint_form layout='horizontal' %}
+        <button class="btn btn-success" name="submit_fingerprint" type="submit">
+          {% trans "Import key" %}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="card member-form-card">
+      <div class="card-header">{% trans "Upload public key" %}</div>
+      <div class="card-body">
+        {% bootstrap_form upload_form layout='horizontal' %}
+        <button class="btn btn-success" name="submit_upload" type="submit">
+          {% trans "Save key" %}
+        </button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

@@ -15,6 +15,7 @@ services:
     volumes:
      - .:/byro
      - ./byro.docker.cfg:/byro/byro.cfg
+     - ../data:/var/byro/data
     ports:
      - "127.0.0.1:8020:8020"
 

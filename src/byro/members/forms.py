@@ -6,6 +6,9 @@ from django.utils.timezone import now
 
 from byro.common.forms.registration import DefaultDates
 from byro.common.models import Configuration
+from byro.mails.models import PGPKeySource
+from byro.mails.pgp import import_member_key, normalize_fingerprint
+from byro.mails.registration import PGP_REGISTRATION_FIELD, build_pgp_fingerprint_field
 from byro.members.models import Member, Membership, get_next_member_number
 
 MAPPING = {"member": Member, "membership": Membership}
@@ -54,6 +57,10 @@ class CreateMemberForm(forms.Form):
 
     def build_field(self, field, profiles):
         model_name = field["name"].split("__")[0]
+        if field["name"] == PGP_REGISTRATION_FIELD:
+            form_field = build_pgp_fingerprint_field()
+            self.fields[field["name"]] = form_field
+            return
         if model_name in MAPPING:
             model = MAPPING[model_name]
         else:
@@ -68,6 +75,18 @@ class CreateMemberForm(forms.Form):
         elif "default" in field:
             form_field.initial = field["default"]
 
+    def clean(self):
+        cleaned_data = super().clean()
+        fingerprint = cleaned_data.get(PGP_REGISTRATION_FIELD)
+        if fingerprint:
+            try:
+                cleaned_data[PGP_REGISTRATION_FIELD] = normalize_fingerprint(
+                    fingerprint
+                )
+            except ValueError as e:
+                self.add_error(PGP_REGISTRATION_FIELD, e)
+        return cleaned_data
+
     def save(self):
         profiles = {
             profile.related_model.__name__: profile.related_model()
@@ -78,6 +97,8 @@ class CreateMemberForm(forms.Form):
         membership = Membership()
 
         for key, value in self.cleaned_data.items():
+            if key == PGP_REGISTRATION_FIELD:
+                continue
             model_name = key.split("__")[0]
             if model_name == "member":
                 obj = member
@@ -93,3 +114,6 @@ class CreateMemberForm(forms.Form):
         for profile in profiles.values():
             profile.member = member
             profile.save()
+        fingerprint = self.cleaned_data.get(PGP_REGISTRATION_FIELD)
+        if fingerprint:
+            import_member_key(member, fingerprint, PGPKeySource.KEYSERVER)

@@ -8,6 +8,7 @@ from django.views.generic import CreateView, ListView, UpdateView, View
 from i18nfield.forms import I18nModelForm
 
 from byro.mails.models import EMail, MailTemplate
+from byro.mails.send import SendMailException
 from byro.members.models import Member
 
 
@@ -98,10 +99,15 @@ class MailSendMixin:
             )
         result = super().form_valid(form)
         if form.data.get("action", "save") == "send":
-            form.instance.send()
-            messages.success(
-                self.request, _("Your changes have been saved and the email was sent.")
-            )
+            try:
+                form.instance.send()
+            except SendMailException as e:
+                messages.error(self.request, str(e))
+            else:
+                messages.success(
+                    self.request,
+                    _("Your changes have been saved and the email was sent."),
+                )
         else:
             messages.success(self.request, _("Your changes have been saved."))
         return result
@@ -164,15 +170,28 @@ class OutboxSend(OutboxQueryset, View):
     def dispatch(self, request, *args, **kwargs):
         qs = self.get_queryset()
         length = len(qs)
+        failed = []
         for mail in qs:
-            mail.send()
-        if length > 1:
-            message = _("{count} mails have been sent.").format(count=length)
-        elif length == 1:
-            message = _("The mail has been sent.")
-        else:
-            message = _("No mail has been sent.")
-        messages.success(request, message)
+            try:
+                mail.send()
+            except SendMailException as e:
+                failed.append(str(e))
+        sent = length - len(failed)
+        if sent > 1:
+            messages.success(
+                request, _("{count} mails have been sent.").format(count=sent)
+            )
+        elif sent == 1:
+            messages.success(request, _("The mail has been sent."))
+        elif not failed:
+            messages.success(request, _("No mail has been sent."))
+        if failed:
+            messages.error(
+                request,
+                _("{count} mails could not be sent.").format(count=len(failed)),
+            )
+            for error in failed:
+                messages.error(request, error)
         return redirect(reverse("office:mails.outbox.list"))
 
 

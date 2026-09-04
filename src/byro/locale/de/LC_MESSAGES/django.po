@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-09 12:36+0000\n"
+"POT-Creation-Date: 2026-08-25 18:10+0000\n"
 "PO-Revision-Date: 2022-03-08 02:52+0100\n"
 "Last-Translator: Henryk Plötz <henryk@ploetzli.ch>\n"
 "Language-Team: \n"
@@ -83,48 +83,48 @@ msgstr "Alle Namen updaten (Sortierreihenfolge)"
 msgid "Update all address names"
 msgstr "Alle Namen updaten (Ansprache)"
 
-#: byro/common/forms/registration.py:25
+#: byro/common/forms/registration.py:26
 msgid "Current day"
 msgstr "Aktueller Tag"
 
-#: byro/common/forms/registration.py:26
+#: byro/common/forms/registration.py:27
 msgid "Beginning of current month"
 msgstr "Anfang des aktuellen Monats"
 
-#: byro/common/forms/registration.py:27
+#: byro/common/forms/registration.py:28
 msgid "Beginning of next month"
 msgstr "Anfang nächsten Monats"
 
-#: byro/common/forms/registration.py:28
+#: byro/common/forms/registration.py:29
 msgid "Beginning of current year"
 msgstr "Anfang des aktuellen Jahres"
 
-#: byro/common/forms/registration.py:29
+#: byro/common/forms/registration.py:30
 msgid "Beginning of next year"
 msgstr "Anfang nächsten Jahres"
 
-#: byro/common/forms/registration.py:30 byro/common/forms/registration.py:153
+#: byro/common/forms/registration.py:31 byro/common/forms/registration.py:176
 msgid "Other/fixed date"
 msgstr "Anderes/Festes Datum"
 
-#: byro/common/forms/registration.py:37
+#: byro/common/forms/registration.py:38
 msgid "False"
 msgstr "Falsch"
 
-#: byro/common/forms/registration.py:37
+#: byro/common/forms/registration.py:38
 msgid "True"
 msgstr "Wahr"
 
-#: byro/common/forms/registration.py:72
+#: byro/common/forms/registration.py:73 byro/common/forms/registration.py:118
 msgid "Position in form"
 msgstr "Position im Formular"
 
-#: byro/common/forms/registration.py:77
+#: byro/common/forms/registration.py:78
 msgid "Default date"
 msgstr "Standarddatum"
 
-#: byro/common/forms/registration.py:83 byro/common/forms/registration.py:139
-#: byro/common/forms/registration.py:144 byro/common/forms/registration.py:148
+#: byro/common/forms/registration.py:84 byro/common/forms/registration.py:162
+#: byro/common/forms/registration.py:167 byro/common/forms/registration.py:171
 msgid "Default value"
 msgstr "Standardwert"
 
@@ -569,25 +569,252 @@ msgstr ""
 "Danke,\n"
 "Das Helferlein"
 
-#: byro/mails/models.py:18 byro/mails/models.py:112
+#: byro/mails/forms.py:9 byro/office/templates/office/member/pgp.html:15
+msgid "Fingerprint"
+msgstr "Fingerprint"
+
+#: byro/mails/forms.py:11
+msgid "Upload private signing key"
+msgstr "Privaten Signaturschlüssel hochladen"
+
+#: byro/mails/forms.py:41
+msgid "Replace signing key"
+msgstr "Signaturschlüssel ersetzen"
+
+#: byro/mails/forms.py:13
+msgid ""
+"Upload an ASCII-armored private PGP key without a passphrase. It is imported "
+"into the configured PGP keyring and is not stored in byro."
+msgstr ""
+"Lade einen ASCII-armierten privaten PGP-Schlüssel ohne Passphrase hoch. Er "
+"wird in den konfigurierten PGP-Schlüsselbund importiert und nicht in byro "
+"gespeichert."
+
+#: byro/mails/forms.py:39
+msgid "The private PGP key file must not exceed 1 MiB."
+msgstr "Die Datei mit dem privaten PGP-Schlüssel darf höchstens 1 MiB groß sein."
+
+#: byro/mails/forms.py:53
+msgid "The configured PGP backend cannot import private keys."
+msgstr "Das konfigurierte PGP-Backend kann keine privaten Schlüssel importieren."
+
+#: byro/mails/forms.py:45
+msgid "The uploaded public key does not match the entered fingerprint."
+msgstr ""
+"Der hochgeladene öffentliche Schlüssel passt nicht zum eingegebenen "
+"Fingerprint."
+
+#: byro/mails/gpgme_backend.py:61
+msgid "The gpg executable is not installed."
+msgstr "Das gpg-Programm ist nicht installiert."
+
+#: byro/mails/gpgme_backend.py:78
+msgid "The gpgconf executable is not installed."
+msgstr "Das Programm gpgconf ist nicht installiert."
+
+#: byro/mails/gpgme_backend.py:99
+msgid "No usable key was found in the public key data."
+msgstr "In den Public-Key-Daten wurde kein nutzbarer Schlüssel gefunden."
+
+#: byro/mails/gpgme_backend.py:125
+msgid "The uploaded file does not contain a private PGP key. Upload an exported private key."
+msgstr ""
+"Die hochgeladene Datei enthält keinen privaten PGP-Schlüssel. Lade einen "
+"exportierten privaten Schlüssel hoch."
+
+#: byro/mails/gpgme_backend.py:132
+msgid "The uploaded file must contain exactly one private PGP key."
+msgstr "Die hochgeladene Datei muss genau einen privaten PGP-Schlüssel enthalten."
+
+#: byro/mails/gpgme_backend.py:138
+msgid "The uploaded private PGP key cannot be used for signing."
+msgstr "Der hochgeladene private PGP-Schlüssel kann nicht zum Signieren verwendet werden."
+
+#: byro/mails/gpgme_backend.py:191
+msgid ""
+"The uploaded private PGP key must not be protected by a passphrase. Upload a "
+"key without a passphrase."
+msgstr ""
+"Der hochgeladene private PGP-Schlüssel darf nicht mit einer Passphrase "
+"geschützt sein. Lade einen Schlüssel ohne Passphrase hoch."
+
+#: byro/mails/gpgme_backend.py:373
+msgid ""
+"The configured private PGP key is protected by a passphrase. Replace it in "
+"the PGP settings with a key without a passphrase."
+msgstr ""
+"Der konfigurierte private PGP-Schlüssel ist mit einer Passphrase geschützt. "
+"Ersetze ihn in den PGP-Einstellungen durch einen Schlüssel ohne Passphrase."
+
+#: byro/mails/gpgme_backend.py:192
+msgid "No private PGP key was found for this fingerprint."
+msgstr "Für diesen Fingerprint wurde kein privater PGP-Schlüssel gefunden."
+
+#: byro/mails/gpgme_backend.py:208
+msgid "Unknown"
+msgstr "Unbekannt"
+
+#: byro/mails/models.py:54
+msgid "Encrypt member emails with PGP"
+msgstr "Mitglieder-E-Mails mit PGP verschlüsseln"
+
+#: byro/office/templates/office/settings/form.html:16
+msgid "Encryption"
+msgstr "Verschlüsselung"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:5
+msgid "PGP signing"
+msgstr "PGP-Signierung"
+
+#: byro/mails/models.py:57
+msgid "Sign outgoing emails with PGP"
+msgstr "Ausgehende E-Mails mit PGP signieren"
+
+#: byro/office/templates/office/settings/form.html:25
+msgid "Signing"
+msgstr "Signieren"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:20
+msgid "PGP encryption"
+msgstr "PGP-Verschlüsselung"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:38
+msgid "Advanced key management"
+msgstr "Erweiterte Schlüsselverwaltung"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:43
+msgid "Expiry reminders"
+msgstr "Ablauf-Erinnerungen"
+
+#: byro/office/views/settings.py:94
+#, python-brace-format
+msgid "The private PGP signing key could not be imported: {error}"
+msgstr "Der private PGP-Signaturschlüssel konnte nicht importiert werden: {error}"
+
+#: byro/mails/models.py:62
+msgid "Signing key fingerprint"
+msgstr "Fingerprint des Signaturschlüssels"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:21
+msgid "No signing key configured."
+msgstr "Kein Signaturschlüssel hinterlegt."
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:24
+msgid "User IDs"
+msgstr "Benutzerkennungen"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:33
+msgid "Created"
+msgstr "Erstellt"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:43
+msgid "Never"
+msgstr "Läuft nicht ab"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:46
+msgid "Algorithm"
+msgstr "Algorithmus"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:51
+msgid "Signing capable"
+msgstr "Signaturfähig"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:53
+msgid "Cannot sign"
+msgstr "Nicht signaturfähig"
+
+#: byro/office/templates/office/settings/pgp_configuration_form.html:57
+msgid "Key information is currently unavailable."
+msgstr "Schlüsselinformationen sind derzeit nicht verfügbar."
+
+#: byro/mails/models.py:64
+msgid ""
+"Fingerprint of the organization's private key in the configured PGP backend."
+msgstr ""
+"Fingerprint des privaten Organisationsschlüssels im konfigurierten PGP-"
+"Backend."
+
+#: byro/mails/models.py:70
+msgid "Keyserver URLs"
+msgstr "Keyserver-URLs"
+
+#: byro/mails/models.py:71
+msgid "Enter one keyserver per line. They are tried in order."
+msgstr "Gib einen Keyserver pro Zeile ein. Sie werden der Reihe nach versucht."
+
+#: byro/mails/forms.py:72
+#, python-format
+msgid ""
+"Keyserver URL on line %(line_number)s must use one of the hkp, hkps, http, or "
+"https schemes."
+msgstr ""
+"Die Keyserver-URL in Zeile %(line_number)s muss eines der Schemata hkp, hkps, "
+"http oder https verwenden."
+
+#: byro/mails/gnupg_backend.py:491
+#, python-format
+msgid "Unsupported keyserver URL scheme: %(scheme)s"
+msgstr "Nicht unterstütztes Keyserver-URL-Schema: %(scheme)s"
+
+#: byro/mails/models.py:77
+msgid "When no PGP key is available"
+msgstr "Wenn kein PGP-Schlüssel vorhanden ist"
+
+#: byro/mails/models.py:83
+msgid "When a PGP key is invalid"
+msgstr "Wenn ein PGP-Schlüssel ungültig ist"
+
+#: byro/mails/models.py:89
+msgid "When a PGP key is unverified"
+msgstr "Wenn ein PGP-Schlüssel nicht verifiziert ist"
+
+#: byro/mails/models.py:95
+msgid "When a PGP key is expired"
+msgstr "Wenn ein PGP-Schlüssel abgelaufen ist"
+
+#: byro/mails/models.py:98
+msgid "Refresh PGP keys automatically"
+msgstr "PGP-Schlüssel automatisch aktualisieren"
+
+#: byro/mails/models.py:101
+msgid "Days between automatic PGP key refreshes"
+msgstr "Tage zwischen automatischen PGP-Schlüssel-Aktualisierungen"
+
+#: byro/mails/models.py:104
+msgid "Keyserver timeout in seconds"
+msgstr "Keyserver-Timeout in Sekunden"
+
+#: byro/mails/models.py:107
+msgid "Remind members before PGP keys expire"
+msgstr "Mitglieder vor Ablauf von PGP-Schlüsseln erinnern"
+
+#: byro/mails/models.py:110
+msgid "Days before expiry to send reminders"
+msgstr "Tage vor Ablauf für Erinnerungen"
+
+#: byro/mails/models.py:113
+msgid "PGP settings"
+msgstr "PGP-Einstellungen"
+
+#: byro/mails/models.py:177 byro/mails/models.py:271
 #: byro/office/templates/office/mails/outbox.html:25
 #: byro/office/templates/office/mails/sent_mails_part.html:5
 #: byro/office/templates/office/mails/templates.html:22
 #: byro/office/templates/office/member/data_disclosure.html:10
-#: byro/office/views/members.py:170
+#: byro/office/views/members.py:173
 msgid "Subject"
 msgstr "Betreff"
 
-#: byro/mails/models.py:19 byro/mails/models.py:114
-#: byro/office/views/members.py:172
+#: byro/mails/models.py:178 byro/mails/models.py:273
+#: byro/office/views/members.py:175
 msgid "Text"
 msgstr "Text"
 
-#: byro/mails/models.py:24 byro/mails/models.py:96
+#: byro/mails/models.py:183 byro/mails/models.py:255
 msgid "Reply-To"
 msgstr "Reply-To"
 
-#: byro/mails/models.py:26
+#: byro/mails/models.py:185
 msgid ""
 "Change the Reply-To address if you do not want to use the default orga "
 "address"
@@ -595,11 +822,11 @@ msgstr ""
 "Ändere das Reply-To-Feld, wenn du Antworten nicht an die allgemeine Adresse "
 "geschickt haben möchtest"
 
-#: byro/mails/models.py:33 byro/mails/models.py:109
+#: byro/mails/models.py:192 byro/mails/models.py:268
 msgid "BCC"
 msgstr "BCC"
 
-#: byro/mails/models.py:35
+#: byro/mails/models.py:194
 msgid ""
 "Enter comma separated addresses. Will receive a blind copy of every mail "
 "sent from this template. This may be a LOT!"
@@ -608,66 +835,158 @@ msgstr ""
 "jeder Mail, die durch dieses Template verschickt wird. Das können viele "
 "werden!"
 
-#: byro/mails/models.py:92 byro/office/templates/office/mails/outbox.html:26
+#: byro/mails/models.py:251 byro/office/templates/office/mails/outbox.html:26
 #: byro/office/templates/office/mails/sent_mails_part.html:6
 msgid "To"
 msgstr "To"
 
-#: byro/mails/models.py:93 byro/mails/models.py:103 byro/mails/models.py:110
+#: byro/mails/models.py:252 byro/mails/models.py:262 byro/mails/models.py:269
 msgid "One email address or several addresses separated by commas."
 msgstr "Eine Adresse oder mehrere durch Kommas getrennte."
 
-#: byro/mails/models.py:102
+#: byro/mails/models.py:261
 msgid "CC"
 msgstr "CC"
 
-#: byro/mails/models.py:115
+#: byro/mails/models.py:274
 msgid "Sent at"
 msgstr "Verschickt"
 
-#: byro/mails/models.py:195
+#: byro/mails/models.py:354
 #, python-brace-format
 msgid "You are receiving this email due to your membership in {name}."
 msgstr ""
 "Du erhältst diese E-Mail aufgrund Deiner Mitgliedschaft im Verein {name}."
 
-#: byro/mails/models.py:199
+#: byro/mails/models.py:358
 #, python-brace-format
 msgid "You can see your member page at this URL: {url}"
 msgstr "Deine persönliche Mitgliedsseite ist hier: {url}"
 
-#: byro/members/models.py:153
+#: byro/mails/pgp.py:33 byro/mails/pgp.py:36 byro/mails/pgp.py:39
+#: byro/mails/pgp.py:42
+msgid "No PGP backend is configured."
+msgstr "Es ist kein PGP-Backend konfiguriert."
+
+#: byro/mails/pgp.py:49
+msgid "Enter a valid PGP fingerprint."
+msgstr "Gib einen gültigen PGP-Fingerprint ein."
+
+#: byro/mails/pgp.py:114
+msgid "PGP signing is enabled, but no signing key is configured."
+msgstr ""
+"PGP-Signaturen sind aktiviert, aber es ist kein Signaturschlüssel "
+"konfiguriert."
+
+#: byro/mails/pgp.py:134
+#, python-brace-format
+msgid "Cannot send email to {recipient}: no usable PGP key."
+msgstr ""
+"E-Mail an {recipient} kann nicht gesendet werden: kein nutzbarer PGP-"
+"Schlüssel."
+
+#: byro/mails/pgp.py:180
+msgid "Imported key does not match the requested fingerprint."
+msgstr "Der importierte Schlüssel passt nicht zum angefragten Fingerprint."
+
+#: byro/mails/pgp.py:204
+msgid "PGP signing incomplete"
+msgstr "PGP-Signatur unvollständig"
+
+#: byro/mails/pgp.py:205
+msgid "Signing is enabled, but no signing key is configured."
+msgstr ""
+"Signaturen sind aktiviert, aber es ist kein Signaturschlüssel konfiguriert."
+
+#: byro/mails/pgp.py:217
+msgid "PGP key problems"
+msgstr "PGP-Schlüsselprobleme"
+
+#: byro/mails/pgp.py:220
+#, python-brace-format
+msgid "{count} active member keys are invalid, revoked, or expired."
+msgstr ""
+"{count} aktive Mitgliederschlüssel sind ungültig, widerrufen oder abgelaufen."
+
+#: byro/mails/pgp.py:237
+msgid "PGP keys expire soon"
+msgstr "PGP-Schlüssel laufen bald ab"
+
+#: byro/mails/pgp.py:239
+#, python-brace-format
+msgid "{count} active member keys expire soon."
+msgstr "{count} aktive Mitgliederschlüssel laufen bald ab."
+
+#: byro/mails/pgp.py:251
+msgid "PGP key refresh errors"
+msgstr "Fehler bei PGP-Schlüssel-Aktualisierung"
+
+#: byro/mails/pgp.py:254
+#, python-brace-format
+msgid "{count} member keys have keyserver import or refresh errors."
+msgstr ""
+"Bei {count} Mitgliederschlüsseln gibt es Keyserver-Import- oder "
+"Aktualisierungsfehler."
+
+#: byro/mails/registration.py:9 byro/public/models.py:118
+msgid "PGP fingerprint"
+msgstr "PGP-Fingerprint"
+
+#: byro/mails/registration.py:12
+msgid "Full OpenPGP fingerprint used to import the member's public key."
+msgstr ""
+"Vollständiger OpenPGP-Fingerprint zum Import des öffentlichen "
+"Mitgliederschlüssels."
+
+#: byro/mails/signals.py:51
+msgid "Your PGP key expires soon"
+msgstr "Dein PGP-Schlüssel läuft bald ab"
+
+#: byro/mails/signals.py:53
+#, python-brace-format
+msgid ""
+"Hello {name},\n"
+"\n"
+"the PGP key stored for your membership expires on {date}. Please send us an "
+"updated public key before it expires.\n"
+msgstr ""
+"Hallo {name},\n"
+"\n"
+"der für deine Mitgliedschaft gespeicherte PGP-Schlüssel läuft am {date} ab. "
+"Bitte sende uns vor Ablauf einen aktualisierten öffentlichen Schlüssel.\n"
+
+#: byro/members/models.py:156
 msgid "Membership number/ID"
 msgstr "Mitgliedsnummer"
 
-#: byro/members/models.py:159 byro/office/templates/office/account/list.html:20
+#: byro/members/models.py:162 byro/office/templates/office/account/list.html:20
 #: byro/office/templates/office/member/list.html:47
 #: byro/office/templates/office/upload/list.html:16
-#: byro/office/templates/office/user/list.html:18 byro/office/views/users.py:15
+#: byro/office/templates/office/user/list.html:18 byro/office/views/users.py:17
 msgid "Name"
 msgstr "Name"
 
-#: byro/members/models.py:162
+#: byro/members/models.py:165
 msgid "Name for direct address"
 msgstr "Name für direkte Ansprache"
 
-#: byro/members/models.py:165
+#: byro/members/models.py:168
 msgid "Name (sort order)"
 msgstr "Name (Sortierreihenfolge)"
 
-#: byro/members/models.py:168
+#: byro/members/models.py:171
 msgid "Address"
 msgstr "Adresse"
 
-#: byro/members/models.py:171 byro/office/templates/office/user/list.html:19
+#: byro/members/models.py:174 byro/office/templates/office/user/list.html:19
 msgid "E-Mail"
 msgstr "E-Mail-Adresse"
 
-#: byro/members/models.py:176
+#: byro/members/models.py:179
 msgid "Contact type"
 msgstr "Kontakt-Typ"
 
-#: byro/members/models.py:181
+#: byro/members/models.py:184
 #: byro/office/templates/office/account/detail.html:21
 #: byro/office/templates/office/mails/special_to_part.html:27
 #: byro/office/templates/office/transaction/detail.html:19
@@ -675,130 +994,130 @@ msgstr "Kontakt-Typ"
 msgid "Member"
 msgstr "Mitglied"
 
-#: byro/members/models.py:221
+#: byro/members/models.py:226
 msgid "Internal database ID"
 msgstr "Interne Datenbank-ID"
 
-#: byro/members/models.py:231
+#: byro/members/models.py:236
 msgid "Member active?"
 msgstr "Mitglied aktiv?"
 
-#: byro/members/models.py:241
+#: byro/members/models.py:246
 msgid "Account balance"
 msgstr "Kontostand"
 
-#: byro/members/models.py:251
+#: byro/members/models.py:256
 msgid "Last Member Fee Transaction Timestamp"
 msgstr "Letzter Zeitpunkt einer Beitragstransaktion"
 
-#: byro/members/models.py:285
+#: byro/members/models.py:293
 msgid "Current membership"
 msgstr "Aktuelle Mitgliedschaft"
 
-#: byro/members/models.py:526
+#: byro/members/models.py:535
 msgid "Due amount canceled because of change in membership amount"
 msgstr "Ausstehender Betrag durch Änderung des Mitgliedsbeitrags storniert"
 
-#: byro/members/models.py:535
+#: byro/members/models.py:544
 #: byro/office/templates/office/member/timeline.html:66
 msgid "Membership due"
 msgstr "Mitgliedsbeitrag fällig"
 
-#: byro/members/models.py:565
+#: byro/members/models.py:576
 msgid "Due amount outside of membership canceled"
 msgstr "Ausstehender Betrag außerhalb der Mitgliedschaft storniert"
 
-#: byro/members/models.py:656
+#: byro/members/models.py:667
 msgid "monthly"
 msgstr "monatlich"
 
-#: byro/members/models.py:657
+#: byro/members/models.py:668
 msgid "quarterly"
 msgstr "pro Quartal"
 
-#: byro/members/models.py:658
+#: byro/members/models.py:669
 msgid "biannually"
 msgstr "halbjährlich"
 
-#: byro/members/models.py:659
+#: byro/members/models.py:670
 msgid "annually"
 msgstr "jährlich"
 
-#: byro/members/models.py:664
+#: byro/members/models.py:675
 msgid "name"
 msgstr "Name"
 
-#: byro/members/models.py:668
+#: byro/members/models.py:679
 msgid "amount"
 msgstr "Betrag"
 
-#: byro/members/models.py:669
+#: byro/members/models.py:680
 msgid "Please enter the yearly fee for this membership type."
 msgstr "Bitte gib den Jahresbeitrag für diesen Beitragstyp ein."
 
-#: byro/members/models.py:679
+#: byro/members/models.py:690
 msgid "start"
 msgstr "Beginn"
 
-#: byro/members/models.py:680
+#: byro/members/models.py:691
 msgid "end"
 msgstr "Ende"
 
-#: byro/members/models.py:684
+#: byro/members/models.py:695
 #: byro/office/templates/office/member/dashboard.html:93
 #: byro/public/templates/public/members/dashboard.html:63
 msgid "membership fee"
 msgstr "Beitrag"
 
-#: byro/members/models.py:685
+#: byro/members/models.py:696
 msgid "The amount to be paid in the chosen interval"
 msgstr "Der Beitrag, der im angegebenen Intervall gezahlt werden soll"
 
-#: byro/members/models.py:689
+#: byro/members/models.py:700
 msgid "payment interval"
 msgstr "Intervall"
 
-#: byro/members/models.py:690
+#: byro/members/models.py:701
 msgid "How often does the member pay their fees?"
 msgstr "Wie oft soll das Mitglied zahlen?"
 
-#: byro/members/models.py:693
+#: byro/members/models.py:704
 #: byro/office/templates/office/member/timeline.html:15
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
-#: byro/members/models.py:747
+#: byro/members/models.py:757
 msgid "Reference"
 msgstr "Referenznummer"
 
-#: byro/members/models.py:748
+#: byro/members/models.py:758
 msgid "For example an invoice number or a payment reference"
 msgstr "Beispielsweise eine Rechnungsnummer oder eine Zahlungsreferenz"
 
-#: byro/members/models.py:753
+#: byro/members/models.py:763
 #: byro/office/templates/office/member/finance_table.html:6
 #: byro/office/templates/office/realtransaction/list.html:29
 #: byro/office/templates/office/realtransaction/match.html:16
 msgid "Amount"
 msgstr "Betrag"
 
-#: byro/members/models.py:755
+#: byro/members/models.py:765
 msgid "Start"
 msgstr "Beginn"
 
-#: byro/members/models.py:756
+#: byro/members/models.py:766
 msgid "End"
 msgstr "Ende"
 
-#: byro/members/models.py:759
+#: byro/members/models.py:769
 msgid "paid"
 msgstr "bezahlt"
 
-#: byro/members/models.py:760
+#: byro/members/models.py:770
 msgid "partially paid"
 msgstr "teilweise bezahlt"
 
-#: byro/members/models.py:761
+#: byro/members/models.py:771
 msgid "unpaid"
 msgstr "nicht bezahlt"
 
@@ -899,7 +1218,7 @@ msgstr "Konto hinzufügen …"
 #: byro/office/templates/office/transaction/detail.html:62
 #: byro/office/templates/office/upload/add.html:14
 #: byro/office/templates/office/user/add.html:12
-#: byro/office/templates/office/user/detail.html:14
+#: byro/office/templates/office/user/detail.html:19
 #: byro/public/templates/public/members/dashboard.html:131
 msgid "Save"
 msgstr "Speichern"
@@ -930,7 +1249,7 @@ msgid "Originator/Recipient"
 msgstr "Urheber/Empfänger"
 
 #: byro/office/templates/office/account/list.html:5
-#: byro/office/templates/office/base.html:145
+#: byro/office/templates/office/base.html:153
 msgid "Accounts"
 msgstr "Konten"
 
@@ -1000,36 +1319,36 @@ msgstr "API-Token"
 msgid "Log"
 msgstr "Logbuch"
 
-#: byro/office/templates/office/base.html:122
+#: byro/office/templates/office/base.html:125
 msgid "About"
 msgstr "Über"
 
-#: byro/office/templates/office/base.html:127
+#: byro/office/templates/office/base.html:135
 msgid "Members"
 msgstr "Mitglieder"
 
-#: byro/office/templates/office/base.html:137
-#: byro/office/templates/office/member/base.html:64
+#: byro/office/templates/office/base.html:145
+#: byro/office/templates/office/member/base.html:72
 #: byro/office/templates/office/member/finance.html:4
 #: byro/office/templates/office/member/timeline.html:19
 msgid "Finance"
 msgstr "Finanzen"
 
-#: byro/office/templates/office/base.html:148
+#: byro/office/templates/office/base.html:156
 msgid "Transaction Upload"
 msgstr "Transaktions-Import"
 
-#: byro/office/templates/office/base.html:170
+#: byro/office/templates/office/base.html:178
 #: byro/office/templates/office/mails/base.html:4
 msgid "Mails"
 msgstr "E-Mails"
 
-#: byro/office/templates/office/base.html:206
+#: byro/office/templates/office/base.html:214
 #, python-format
 msgid "powered by <a %(a_attr)s>byro</a>"
 msgstr "powered by <a %(a_attr)s>byro</a>"
 
-#: byro/office/templates/office/base.html:211
+#: byro/office/templates/office/base.html:219
 msgid "running in development mode"
 msgstr "Entwicklungsmodus"
 
@@ -1183,7 +1502,7 @@ msgstr "Verschickt"
 #: byro/office/templates/office/mails/sent_mails_part.html:18
 #: byro/office/templates/office/mails/special_to_part.html:20
 #: byro/office/templates/office/member/list.html:33
-#: byro/office/views/mails.py:34 byro/office/views/members.py:263
+#: byro/office/views/mails.py:34 byro/office/views/members.py:266
 msgid "All members"
 msgstr "Alle Mitglieder"
 
@@ -1269,11 +1588,16 @@ msgstr "Log-Einträge"
 msgid "Mail history"
 msgstr "E-Mail-Verlauf"
 
-#: byro/office/templates/office/member/base.html:72
+#: byro/office/templates/office/member/base.html:64
+#: byro/office/templates/office/member/pgp.html:5
+msgid "PGP"
+msgstr "PGP"
+
+#: byro/office/templates/office/member/base.html:80
 msgid "Operations"
 msgstr "Vorgänge"
 
-#: byro/office/templates/office/member/base.html:80
+#: byro/office/templates/office/member/base.html:88
 msgid "Record Disclosure"
 msgstr "Datenbrief"
 
@@ -1343,8 +1667,8 @@ msgid ""
 "page. Review each one and accept or reject it."
 msgstr ""
 "Dieses Mitglied hat über seine Mitgliedsseite die folgenden Änderungen an "
-"seinen Daten vorgeschlagen. Prüfe jede einzeln und nimm sie an oder lehne sie "
-"ab."
+"seinen Daten vorgeschlagen. Prüfe jede einzeln und nimm sie an oder lehne "
+"sie ab."
 
 #: byro/office/templates/office/member/data.html:23
 #: byro/public/templates/public/members/dashboard.html:112
@@ -1428,17 +1752,17 @@ msgid "Export member list"
 msgstr "Mitgliederliste exportieren"
 
 #: byro/office/templates/office/member/list.html:29
-#: byro/office/views/members.py:260
+#: byro/office/views/members.py:263
 msgid "Active members"
 msgstr "Aktive Mitglieder"
 
 #: byro/office/templates/office/member/list.html:30
-#: byro/office/views/members.py:261
+#: byro/office/views/members.py:264
 msgid "Members with negative balance"
 msgstr ""
 
 #: byro/office/templates/office/member/list.html:31
-#: byro/office/views/members.py:262
+#: byro/office/views/members.py:265
 msgid "Only inactive members"
 msgstr "Inaktive Mitglieder"
 
@@ -1494,6 +1818,52 @@ msgstr "Importieren"
 #: byro/office/templates/office/member/mails.html:10
 msgid "Compose new message …"
 msgstr "Neue Nachricht schreiben …"
+
+#: byro/office/templates/office/member/pgp.html:9
+msgid "PGP keys"
+msgstr "PGP-Schlüssel"
+
+#: byro/office/templates/office/member/pgp.html:16
+#, fuzzy
+#| msgid "State"
+msgid "Status"
+msgstr "Status"
+
+#: byro/office/templates/office/member/pgp.html:17
+msgid "Expires"
+msgstr "Läuft ab"
+
+#: byro/office/templates/office/member/pgp.html:18
+msgid "Last checked"
+msgstr "Zuletzt geprüft"
+
+#: byro/office/templates/office/member/pgp.html:39
+msgid "Deactivate"
+msgstr "Deaktivieren"
+
+#: byro/office/templates/office/member/pgp.html:48
+msgid "Delete"
+msgstr "Löschen"
+
+#: byro/office/templates/office/member/pgp.html:62
+msgid "No PGP keys are stored for this member."
+msgstr "Für dieses Mitglied sind keine PGP-Schlüssel gespeichert."
+
+#: byro/office/templates/office/member/pgp.html:70
+msgid "Import from keyserver"
+msgstr "Von Keyserver importieren"
+
+#: byro/office/templates/office/member/pgp.html:74
+msgid "Import key"
+msgstr "Schlüssel importieren"
+
+#: byro/office/templates/office/member/pgp.html:83
+msgid "Upload public key"
+msgstr "Öffentlichen Schlüssel hochladen"
+
+#: byro/office/templates/office/member/pgp.html:87
+msgid "Save key"
+msgstr "Schlüssel speichern"
 
 #: byro/office/templates/office/member/timeline.html:23
 msgid "News"
@@ -1761,7 +2131,8 @@ msgstr "Benutzer"
 
 #: byro/office/templates/office/user/detail.html:8
 msgid "Password disabled – user cannot log in with a password"
-msgstr "Passwort deaktiviert – Benutzer kann sich nicht mit einem Passwort anmelden"
+msgstr ""
+"Passwort deaktiviert – Benutzer kann sich nicht mit einem Passwort anmelden"
 
 #: byro/office/templates/office/user/detail.html:9
 #: byro/office/templates/office/user/list.html:30
@@ -1769,8 +2140,12 @@ msgid "Password disabled"
 msgstr "Passwort deaktiviert"
 
 #: byro/office/templates/office/user/detail.html:28
-msgid "Disable password for this user? They will no longer be able to log in with a password."
-msgstr "Passwort dieses Benutzers deaktivieren? Der Benutzer kann sich danach nicht mehr mit einem Passwort anmelden."
+msgid ""
+"Disable password for this user? They will no longer be able to log in with a "
+"password."
+msgstr ""
+"Passwort dieses Benutzers deaktivieren? Der Benutzer kann sich danach nicht "
+"mehr mit einem Passwort anmelden."
 
 #: byro/office/templates/office/user/detail.html:29
 msgid "Disable password"
@@ -1796,15 +2171,15 @@ msgstr "Benutzername"
 msgid "User deactivated"
 msgstr "Benutzer deaktiviert"
 
-#: byro/office/templates/office/user/list.html:30
+#: byro/office/templates/office/user/list.html:33
 msgid "Superuser"
 msgstr "Administrator"
 
-#: byro/office/templates/office/user/list.html:33
+#: byro/office/templates/office/user/list.html:36
 msgid "Backend user"
 msgstr "Backend-Benutzer"
 
-#: byro/office/templates/office/user/list.html:35
+#: byro/office/templates/office/user/list.html:38
 msgid "Frontend user"
 msgstr "Frontend-Benutzer"
 
@@ -1845,7 +2220,7 @@ msgstr ""
 "wenn nötig."
 
 #: byro/office/views/accounts.py:90 byro/office/views/mails.py:106
-#: byro/office/views/members.py:873
+#: byro/office/views/members.py:897
 msgid "Your changes have been saved."
 msgstr "Deine Änderungen wurden gespeichert."
 
@@ -1902,35 +2277,35 @@ msgstr "Die Mail wurde verschickt."
 msgid "No mail has been sent."
 msgstr "Keine Mail wurde verschickt."
 
-#: byro/office/views/members.py:148
+#: byro/office/views/members.py:151
 #, python-brace-format
 msgid "Generated {count} data disclosure emails and placed them in the outbox."
 msgstr "{count} Datenbriefe wurden erstellt und in den Postausgang gelegt."
 
-#: byro/office/views/members.py:155
+#: byro/office/views/members.py:158
 msgid "Start of balance timeframe"
 msgstr "Beginn des Bilanzzeitraums"
 
-#: byro/office/views/members.py:156
+#: byro/office/views/members.py:159
 msgid "End of balance timeframe"
 msgstr "Ende des Bilanzzeitraums"
 
-#: byro/office/views/members.py:158
+#: byro/office/views/members.py:161
 msgid "Create balances even if there was no payment due in the time chosen?"
 msgstr ""
 "Abschluss erstellen, auch wenn in dem Zeitfenster keine Zahlung fällig wurde?"
 
-#: byro/office/views/members.py:164
+#: byro/office/views/members.py:167
 msgid "Balance cutoff"
 msgstr "Erinnerungs-Minimum"
 
-#: byro/office/views/members.py:166
+#: byro/office/views/members.py:169
 msgid "Only members with a deficit greater than this will receive an email."
 msgstr ""
 "Nur Mitglieder mit einem ausstehenden Beitrag oberhalb dieser Grenze werden "
 "eine Mail erhalten."
 
-#: byro/office/views/members.py:173
+#: byro/office/views/members.py:176
 #, python-brace-format
 msgid ""
 "Hello {name},\n"
@@ -1953,15 +2328,15 @@ msgstr ""
 "zu zahlen. Bitte hole dies so bald wie möglich nach, oder lass\n"
 "uns wissen, wenn diese Erinnerung irrtümlich versandt wurde."
 
-#: byro/office/views/members.py:196
+#: byro/office/views/members.py:199
 msgid "End must be in the past!"
 msgstr "Das Ende muss in der Vergangenheit liegen!"
 
-#: byro/office/views/members.py:198
+#: byro/office/views/members.py:201
 msgid "Start must be before end!"
 msgstr "Der Start muss vor dem Ende liegen!"
 
-#: byro/office/views/members.py:239
+#: byro/office/views/members.py:242
 #, python-brace-format
 msgid ""
 "{balance_count} balances were created and {mail_count} reminder emails were "
@@ -1970,7 +2345,7 @@ msgstr ""
 "{balance_count} Abschlüsse wurden erstellt und {mail_count} "
 "Zahlungserinnerungen wurden in den Postausgang gelegt."
 
-#: byro/office/views/members.py:245
+#: byro/office/views/members.py:248
 #, python-brace-format
 msgid ""
 "{errors} balances could not be created due to errors. Presumably, these "
@@ -1980,99 +2355,125 @@ msgstr ""
 "lagen für diese Mitglieder bereits Zahlungsaufforderungen in einem "
 "überlappenden Zeitraum vor."
 
-#: byro/office/views/members.py:268
+#: byro/office/views/members.py:271
 msgid "CSV (Comma Separated Values)"
 msgstr "CSV (Komma-Separierte Werte)"
 
-#: byro/office/views/members.py:269
+#: byro/office/views/members.py:272
 msgid "CSV (Semicolon Separated Values, German Windows versions)"
 msgstr "CSV (Semikolon-Separierte Werte, deutsche Windows-Versionen)"
 
-#: byro/office/views/members.py:489
+#: byro/office/views/members.py:492
 #, python-brace-format
 msgid "Couldn't map input column '{}' to field"
 msgstr "Konnte die Eingangsspalte '{}' keinem Datenbank-Feld zuordnen"
 
-#: byro/office/views/members.py:554
+#: byro/office/views/members.py:557
 #, python-brace-format
 msgid "Either both or none columns has to be given: '{}' and '{}'"
 msgstr ""
 "Entweder beide oder keine dieser Spalten muss angegeben werden: '{}' und '{}'"
 
-#: byro/office/views/members.py:591
+#: byro/office/views/members.py:594
 msgid "Generic CSV import (Comma Separated Values)"
 msgstr "Generischer CSV-Import (Komma-Separierte Werte)"
 
-#: byro/office/views/members.py:601
+#: byro/office/views/members.py:604
 msgid ""
 "Generic CSV import (Semicolon Separated Values, German Windows versions)"
 msgstr ""
 "Generischer CSV-Import (Semikolon-Separierte Werte, deutsche Windows-"
 "Versionen)"
 
-#: byro/office/views/members.py:620
+#: byro/office/views/members.py:623
 msgid "The member was added, please edit additional details if applicable."
 msgstr ""
 "Das Mitglied wurde gespeichert, bitte füge zusätzliche Informationen hinzu, "
 "wenn nötig."
 
-#: byro/office/views/members.py:629 byro/office/views/members.py:1186
+#: byro/office/views/members.py:632 byro/office/views/members.py:1269
 msgid "Some post processing steps could not be completed: "
 msgstr ""
 "Einige Schritte konnten nach dem Hinzufügen des Mitglieds nicht durchgeführt "
 "werden: "
 
-#: byro/office/views/members.py:823
+#: byro/office/views/members.py:826
 msgid "The proposed change was rejected."
 msgstr "Der Änderungsvorschlag wurde abgelehnt."
 
-#: byro/office/views/members.py:833
-msgid "The proposed field no longer exists and was discarded."
-msgstr "Das vorgeschlagene Feld existiert nicht mehr und wurde verworfen."
-
-#: byro/office/views/members.py:842
-#, python-format
-msgid "The proposed value for %(field)s is invalid and was not applied."
+#: byro/office/views/members.py:837
+msgid "The proposed PGP fingerprint is invalid and was not applied."
 msgstr ""
-"Der vorgeschlagene Wert für %(field)s ist ungültig und wurde nicht übernommen."
+"Der vorgeschlagene PGP-Fingerprint ist ungültig und wurde nicht übernommen."
 
-#: byro/office/views/members.py:854
+#: byro/office/views/members.py:849 byro/office/views/members.py:878
 msgid "The proposed change was applied."
 msgstr "Der Änderungsvorschlag wurde übernommen."
 
-#: byro/office/views/members.py:967 byro/office/views/members.py:1088
+#: byro/office/views/members.py:857
+msgid "The proposed field no longer exists and was discarded."
+msgstr "Das vorgeschlagene Feld existiert nicht mehr und wurde verworfen."
+
+#: byro/office/views/members.py:866
+#, python-format
+msgid "The proposed value for %(field)s is invalid and was not applied."
+msgstr ""
+"Der vorgeschlagene Wert für %(field)s ist ungültig und wurde nicht "
+"übernommen."
+
+#: byro/office/views/members.py:923
+msgid "The PGP key was deactivated."
+msgstr "Der PGP-Schlüssel wurde deaktiviert."
+
+#: byro/office/views/members.py
+msgid "The PGP key could not be found."
+msgstr "Der PGP-Schlüssel wurde nicht gefunden."
+
+#: byro/office/views/members.py:932
+msgid "The PGP key was deleted."
+msgstr "Der PGP-Schlüssel wurde gelöscht."
+
+#: byro/office/views/members.py:945
+msgid "The PGP key import was queued."
+msgstr "Der PGP-Schlüsselimport wurde eingereiht."
+
+#: byro/office/views/members.py:956
+msgid "The PGP public key was saved."
+msgstr "Der öffentliche PGP-Schlüssel wurde gespeichert."
+
+#: byro/office/views/members.py:1050 byro/office/views/members.py:1171
 msgid "Adjust member account balance"
 msgstr "Mitgliedskontostand korrigieren"
 
-#: byro/office/views/members.py:971
+#: byro/office/views/members.py:1054
 msgid "Initial balance"
 msgstr "Anfangssaldo"
 
-#: byro/office/views/members.py:971
+#: byro/office/views/members.py:1054
 msgid "Fees waived"
 msgstr "Mitgliedsbeiträge erlassen"
 
-#: byro/office/views/members.py:977
+#: byro/office/views/members.py:1060
 msgid "Relative (Add or subtract amount to/from balance)"
 msgstr "Relativ (Betrag abziehen oder aufaddieren)"
 
-#: byro/office/views/members.py:978
+#: byro/office/views/members.py:1061
 msgid "Absolute (Balance should be)"
 msgstr "Absolut (Sollbetrag eingeben)"
 
-#: byro/office/views/members.py:1075 byro/office/views/members.py:1077
+#: byro/office/views/members.py:1158 byro/office/views/members.py:1160
 msgid "End membership"
 msgstr "Mitgliedschaft beenden"
 
-#: byro/office/views/members.py:1090
+#: byro/office/views/members.py:1173
 msgid "Adjust balance"
 msgstr "Saldo korrigieren"
 
-#: byro/office/views/members.py:1104
+#: byro/office/views/members.py:1187
 msgid "Account adjustment"
 msgstr "Kontenkorrektur"
 
-#: byro/office/views/members.py:1136
+#: byro/office/views/members.py:1219
 msgid ""
 "Fee waiving needs to decrease debts. Use a negative value in relative mode, "
 "or a value higher than the current one in absolute mode."
@@ -2081,13 +2482,13 @@ msgstr ""
 "im relativen Modus oder einen Wert, der höher ist als der aktuelle, im "
 "absoluten Modus."
 
-#: byro/office/views/members.py:1160
+#: byro/office/views/members.py:1243
 #, python-brace-format
 msgid "Membership account adjusted by {amount}, current balance is {balance}"
 msgstr ""
 "Mitgliedskonto korrigiert um {amount}, Aktueller Kontostand ist {balance}"
 
-#: byro/office/views/members.py:1175
+#: byro/office/views/members.py:1258
 msgid ""
 "The membership has been terminated. Please check the outbox for the "
 "notifications."
@@ -2095,7 +2496,7 @@ msgstr ""
 "Die Mitgliedschaft wurde beendet. Bitte sieh dir die Benachrichtigungsmails "
 "im Postausgang an."
 
-#: byro/office/views/members.py:1262
+#: byro/office/views/members.py:1345
 msgid "The email was generated and can be sent in the outbox."
 msgstr ""
 "Die E-Mail wurde erstellt und kann jetzt im Postausgang versendet werden."
@@ -2124,7 +2525,7 @@ msgstr "The Transaktion wurde aktualisiert."
 msgid "The upload could not be processed: "
 msgstr "Der Import konnte nicht verarbeitet werden: "
 
-#: byro/office/views/users.py:11
+#: byro/office/views/users.py:13
 msgid "Password"
 msgstr "Passwort"
 
@@ -2321,7 +2722,7 @@ msgstr ""
 "Mandatsgrund: {mandate_reason}\n"
 "\n"
 
-#: byro/public/forms.py:39
+#: byro/public/forms.py:45 byro/public/forms.py:56
 #, python-format
 msgid ""
 "Currently stored: %(value)s. Your proposed change is awaiting confirmation."
@@ -2329,7 +2730,7 @@ msgstr ""
 "Aktuell gespeichert: %(value)s. Dein Änderungsvorschlag wartet auf "
 "Bestätigung."
 
-#: byro/public/forms.py:62
+#: byro/public/forms.py:100
 msgid ""
 "Yes, my data may be shown in the member list, where it will be visible to "
 "other members."
@@ -2337,11 +2738,11 @@ msgstr ""
 "Ja, meine Stammdaten dürfen in der Mitgliedsliste anderen Mitgliedern "
 "gezeigt werden."
 
-#: byro/public/models.py:57
+#: byro/public/models.py:46
 msgid "Memberpage settings"
 msgstr "Einstellungen zu Mitgliederseiten"
 
-#: byro/public/models.py:70
+#: byro/public/models.py:59
 msgid "Consent: Visible to other members"
 msgstr "Zustimmung: Sichtbar für andere Mitglieder"
 
@@ -2474,19 +2875,19 @@ msgstr ""
 "Danke! Deine Änderungsvorschläge wurden übermittelt und werden von einem "
 "Administrator geprüft."
 
-#: byro/public/views.py:127
+#: byro/public/views.py:126
 msgid "Your proposed changes could not be saved."
 msgstr "Deine Änderungsvorschläge konnten nicht gespeichert werden."
 
-#: byro/settings.py:212
+#: byro/settings.py:221
 msgid "English"
 msgstr "Englisch"
 
-#: byro/settings.py:213
+#: byro/settings.py:222
 msgid "German"
 msgstr "Deutsch"
 
-#: byro/settings.py:214
+#: byro/settings.py:223
 msgid "Brazilian Portuguese"
 msgstr "Brasilianisches Portugiesisch"
 
@@ -2583,6 +2984,12 @@ msgstr "Duplikate"
 
 msgid "No bank transactions have been imported yet."
 msgstr "Es wurden noch keine Banktransaktionen importiert."
+
+#~ msgid "Verify"
+#~ msgstr "Verifizieren"
+
+#~ msgid "The PGP key was marked as verified."
+#~ msgstr "Der PGP-Schlüssel wurde als verifiziert markiert."
 
 #~ msgid "Your profile is visible to other members."
 #~ msgstr "Deine Stammdaten sind für andere Mitglieder sichtbar."

@@ -10,6 +10,8 @@ from byro.bookkeeping.models import Account
 from byro.common.forms import ConfigurationForm, InitialForm, RegistrationConfigForm
 from byro.common.models import LogEntry
 from byro.common.models.configuration import ByroConfiguration, Configuration
+from byro.mails.forms import PGPConfigurationForm
+from byro.mails.models import PGPConfiguration
 
 
 class InitialSettings(FormView):
@@ -59,15 +61,21 @@ class ConfigurationView(FormView):
             model for model in apps.get_models() if issubclass(model, ByroConfiguration)
         ]
         data = self.request.POST if self.request.method == "POST" else None
+        files = self.request.FILES if self.request.method == "POST" else None
+        forms_by_model = {PGPConfiguration: PGPConfigurationForm}
         return [
             ConfigurationForm(
                 prefix=Configuration.__name__,
                 instance=Configuration.get_solo(),
                 data=data,
+                files=files,
             )
         ] + [
-            forms.modelform_factory(model, fields="__all__")(
-                prefix=model.__name__, instance=model.get_solo(), data=data
+            forms_by_model.get(model, forms.modelform_factory(model, fields="__all__"))(
+                prefix=model.__name__,
+                instance=model.get_solo(),
+                data=data,
+                files=files,
             )
             for model in config_models
             if not issubclass(model, Configuration)
@@ -76,19 +84,55 @@ class ConfigurationView(FormView):
     @transaction.atomic
     def form_valid(self, form):
         for f in form:
+            if not hasattr(f, "import_signing_key"):
+                continue
+            try:
+                f.import_signing_key()
+            except forms.ValidationError as e:
+                f.add_error("signing_key_file", e)
+                messages.error(
+                    self.request,
+                    _(
+                        "The private PGP signing key could not be imported: {error}"
+                    ).format(error=e.messages[0]),
+                )
+                return self.form_invalid(form)
+
+        for f in form:
             f.save()
-            if f.changed_data:
+            changes = self.get_log_changes(f, self._original_values[f])
+            if changes:
                 f.instance.log(
                     self,
                     "byro.settings.changed",
-                    changes={
-                        k: (self._original_values[f][k], f.cleaned_data[k])
-                        for k in f.changed_data
-                    },
+                    changes=changes,
                 )
 
         messages.success(self.request, _("The config was saved successfully."))
         return super().form_valid(f)
+
+    @staticmethod
+    def get_log_changes(form, original_values):
+        """Return audit-loggable changes for a configuration form.
+
+        Forms can exclude sensitive input fields by declaring
+        ``LOG_EXCLUDE_FIELDS``. They may also add changes which are not part of
+        their ModelForm fields through ``get_additional_log_changes``.
+        """
+        excluded_fields = getattr(form, "LOG_EXCLUDE_FIELDS", frozenset())
+        changes = {
+            field: (original_values[field], form.cleaned_data[field])
+            for field in form.changed_data
+            if field not in excluded_fields
+        }
+        get_additional_changes = getattr(form, "get_additional_log_changes", None)
+        if get_additional_changes:
+            changes.update(get_additional_changes(original_values))
+        return {
+            field: change
+            for field, change in changes.items()
+            if field not in excluded_fields
+        }
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
