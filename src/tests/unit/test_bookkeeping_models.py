@@ -135,3 +135,31 @@ def test_account_balances(bank_account, receivable_account, income_account):
 def test_real_transaction_source_process(real_transaction_source):
     with suppress(Exception):
         real_transaction_source.process()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "data, expected",
+    (
+        (None, None),
+        ({}, None),
+        ({"counterparty_name": "Max Mustermann"}, "Max Mustermann"),
+        ({"other_party": "Erika Musterfrau"}, "Erika Musterfrau"),
+        (
+            {"counterparty_name": "Max Mustermann", "other_party": "Erika Musterfrau"},
+            "Max Mustermann",
+        ),
+        (
+            {"counterparty_name": "", "other_party": "Erika Musterfrau"},
+            "Erika Musterfrau",
+        ),
+    ),
+)
+def test_booking_counterparty_name(bank_account, data, expected):
+    transaction = Transaction.objects.create(
+        value_datetime=now(), user_or_context="test"
+    )
+    booking = transaction.debit(
+        account=bank_account, amount=10, data=data, user_or_context="test"
+    )
+    assert booking.counterparty_name == expected

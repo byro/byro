@@ -353,6 +353,17 @@ class Booking(models.Model):
         return self.transaction.find_memo()
 
     @property
+    def counterparty_name(self):
+        """Name of the other party of an imported bank transaction.
+
+        ``counterparty_name`` is the key written by
+        :mod:`byro.bookkeeping.bank_import`; ``other_party`` is the legacy key
+        used by older importer plugins and the 2018 data migration.
+        """
+        data = self.data or {}
+        return data.get("counterparty_name") or data.get("other_party")
+
+    @property
     def counter_bookings(self):
         if hasattr(self.transaction, "cached_bookings"):
             # Was prefetched with with_transaction_data()

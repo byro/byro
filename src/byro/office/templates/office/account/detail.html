@@ -48,8 +48,8 @@
                                 <a data-toggle="collapse" data-target=".collapse-{{transaction.id}}" aria-controls="collapse-{{transaction.id}}">
                                     <span class="fa fa-angle-down"></span>
                                     {{ transaction.find_memo }}
-                                    {% if booking.data.other_party %}
-                                        <br><i>{{ booking.data.other_party }}</i>
+                                    {% if booking.counterparty_name %}
+                                        <br><i>{{ booking.counterparty_name }}</i>
                                     {% endif %}
                                 </a>
                             </td>
@@ -79,8 +79,8 @@
                                 <td class="related-empty"></td>
                                 <td>
                                     {{ related_booking.memo|default:"" }}
-                                    {% if related_booking.data.other_party %}
-                                        <br><i>{{ related_booking.data.other_party }}</i>
+                                    {% if related_booking.counterparty_name %}
+                                        <br><i>{{ related_booking.counterparty_name }}</i>
                                     {% endif %}
                                 </td>
                                 <td>{{ related_booking.member.name }}</td>
