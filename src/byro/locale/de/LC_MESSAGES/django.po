@@ -2490,6 +2490,100 @@ msgstr "Deutsch"
 msgid "Brazilian Portuguese"
 msgstr "Brasilianisches Portugiesisch"
 
+#: bank transaction import (feature/bank-transaction-importer-api)
+msgid "Legacy bank importer (plugin)"
+msgstr "Bisheriger Bank-Importer (Plugin)"
+
+msgid "Importer"
+msgstr "Importer"
+
+msgid "File"
+msgstr "Datei"
+
+msgid "The file is larger than the allowed maximum of %(size)s."
+msgstr "Die Datei ist größer als das erlaubte Maximum von %(size)s."
+
+msgid "The file could not be imported: %(error)s"
+msgstr "Die Datei konnte nicht importiert werden: %(error)s"
+
+msgid "The file was saved, but could not be processed: %(error)s"
+msgstr "Die Datei wurde gespeichert, konnte aber nicht verarbeitet werden: %(error)s"
+
+msgid "Import successful. %(read)s transactions read, %(imported)s newly imported, %(duplicates)s already known."
+msgstr "Import erfolgreich. %(read)s Transaktionen gelesen, %(imported)s neu importiert, %(duplicates)s bereits vorhanden."
+
+msgid "%(success)s successful matches, %(errors)s errors."
+msgstr "%(success)s erfolgreiche Zuordnungen, %(errors)s Fehler."
+
+msgid "The bank transaction import failed."
+msgstr "Der Import der Banktransaktionen ist fehlgeschlagen."
+
+msgid "The selected bank transaction importer is not available."
+msgstr "Der ausgewählte Bank-Importer ist nicht verfügbar."
+
+msgid "The file could not be processed by the selected bank transaction importer."
+msgstr "Die Datei konnte vom ausgewählten Bank-Importer nicht verarbeitet werden."
+
+msgid "The selected bank transaction importer failed unexpectedly. Details have been written to the log."
+msgstr "Der ausgewählte Bank-Importer ist unerwartet fehlgeschlagen. Details wurden ins Log geschrieben."
+
+msgid "The file contains an invalid bank transaction."
+msgstr "Die Datei enthält eine ungültige Banktransaktion."
+
+msgid "The file contains a transaction in an unsupported currency."
+msgstr "Die Datei enthält eine Transaktion in einer nicht unterstützten Währung."
+
+msgid "The file contains a transaction in the unsupported currency %(currency)s."
+msgstr "Die Datei enthält eine Transaktion in der nicht unterstützten Währung %(currency)s."
+
+msgid "Entry %(position)s is not an imported bank transaction."
+msgstr "Eintrag %(position)s ist keine importierte Banktransaktion."
+
+msgid "Transaction %(position)s has an invalid amount."
+msgstr "Transaktion %(position)s hat einen ungültigen Betrag."
+
+msgid "Transaction %(position)s has an invalid date."
+msgstr "Transaktion %(position)s hat ein ungültiges Datum."
+
+msgid "Transaction %(position)s has an invalid memo."
+msgstr "Transaktion %(position)s hat einen ungültigen Verwendungszweck."
+
+msgid "Transaction %(position)s has invalid metadata."
+msgstr "Transaktion %(position)s hat ungültige Metadaten."
+
+msgid "Transaction %(position)s has metadata that cannot be stored."
+msgstr "Transaktion %(position)s hat Metadaten, die nicht gespeichert werden können."
+
+msgid "Import bank transactions"
+msgstr "Banktransaktionen importieren"
+
+msgid "Select the importer matching the format of your bank statement file (for example CSV or CAMT.053) and upload the file. Transactions that are already known are skipped, so overlapping exports can be imported safely."
+msgstr "Wählen Sie den Importer passend zum Format Ihrer Kontoauszugsdatei (zum Beispiel CSV oder CAMT.053) und laden Sie die Datei hoch. Bereits bekannte Transaktionen werden übersprungen, sodass sich überlappende Exporte gefahrlos importieren lassen."
+
+msgid "The maximum file size is %(size)s."
+msgstr "Die maximale Dateigröße beträgt %(size)s."
+
+msgid "No bank transaction importer is installed. Please install a plugin providing an importer for your bank's file format."
+msgstr "Es ist kein Bank-Importer installiert. Bitte installieren Sie ein Plugin, das einen Importer für das Dateiformat Ihrer Bank bereitstellt."
+
+msgid "Import history"
+msgstr "Import-Verlauf"
+
+msgid "Bank transaction imports"
+msgstr "Banktransaktions-Importe"
+
+msgid "Processed"
+msgstr "Verarbeitet"
+
+msgid "New transactions"
+msgstr "Neue Transaktionen"
+
+msgid "Duplicates"
+msgstr "Duplikate"
+
+msgid "No bank transactions have been imported yet."
+msgstr "Es wurden noch keine Banktransaktionen importiert."
+
 #~ msgid "Your profile is visible to other members."
 #~ msgstr "Deine Stammdaten sind für andere Mitglieder sichtbar."
 

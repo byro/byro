@@ -153,7 +153,7 @@
                                 {% trans "Accounts" %}
                             </a>
                             <a class="nav-link nav-link-second-level {% if "finance.uploads" in url_name %}active{% endif %}" href="{% url 'office:finance.uploads.list' %}">
-                                {% trans "Transaction Upload" %}
+                                {% trans "Import bank transactions" %}
                             </a>
                             {% for nav_element in nav_event %}
                                 {% if nav_element.section == 'finance' %}

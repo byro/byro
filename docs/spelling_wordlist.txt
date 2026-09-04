@@ -21,3 +21,17 @@ submodule
 systemd
 url
 virtualenv
+AcctSvcrRef
+CAMT
+casefold
+defusedxml
+dedup
+dict
+FinTS
+Fidor
+IBAN
+IBANs
+matchers
+memos
+Mustermann
+SEPA

@@ -2,27 +2,35 @@
 
 {% load i18n %}
 
-{% block headline %}{% trans "Transaction Imports" %}{% endblock %}
+{% block headline %}{% trans "Bank transaction imports" %}{% endblock %}
 
 {% block content %}
     <p>
         <a href="{% url "office:finance.uploads.add" %}" class="btn btn-success">
-            <span class="fa fa-plus"></span> {% trans "Add new import" %}
+            <span class="fa fa-plus"></span> {% trans "Import bank transactions" %}
         </a>
     </p>
     <table class="table table-sm">
         <thead>
             <tr>
-                <th>{% trans "Name" %}</th>
+                <th>{% trans "File" %}</th>
+                <th>{% trans "Importer" %}</th>
                 <th>{% trans "State" %}</th>
+                <th>{% trans "Processed" %}</th>
+                <th class="text-right">{% trans "New transactions" %}</th>
+                <th class="text-right">{% trans "Duplicates" %}</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for upload in uploads %}
                 <tr>
-                    <td class="text-md-left">{{ upload.source_file }}</td>
-                    <td class="text-md-left">{{ upload.state }}</td>
+                    <td class="text-md-left">{{ upload.filename }}</td>
+                    <td class="text-md-left">{{ upload.importer_label }}</td>
+                    <td class="text-md-left">{{ upload.get_state_display }}</td>
+                    <td class="text-md-left">{% if upload.processed_at %}{{ upload.processed_at|date:"SHORT_DATETIME_FORMAT" }}{% else %}–{% endif %}</td>
+                    <td class="text-right">{% if upload.imported_count is not None %}{{ upload.imported_count }}{% else %}–{% endif %}</td>
+                    <td class="text-right">{% if upload.duplicate_count is not None %}{{ upload.duplicate_count }}{% else %}–{% endif %}</td>
                     <td class="row">
                         <form method="post" action="{% url "office:finance.uploads.process" pk=upload.id %}">
                             {% csrf_token %}
@@ -34,6 +42,8 @@
                         </form>
                     </td>
                 </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center text-muted">{% trans "No bank transactions have been imported yet." %}</td></tr>
             {% endfor %}
         </tbody>
     </table>
