@@ -1,0 +1,19 @@
+{% extends "office/base_headline.html" %}
+{% load i18n %}
+
+{% block headline %}{{ headline }}{% endblock %}
+
+{% block content %}
+    <div class="card member-form-card">
+        <div class="card-header">{% trans "Recovery codes" %}</div>
+        <div class="card-body">
+            <p>
+                {% trans "Store these recovery codes in a safe place. Each code can be used once to sign in if you lose access to your authenticator app." %}
+                <strong>{% trans "They will not be shown again." %}</strong>
+            </p>
+            <pre style="font-size: 1.2em;">{% for code in codes %}{{ code }}
+{% endfor %}</pre>
+            <a class="btn btn-success" href="{{ next }}">{% trans "Continue" %}</a>
+        </div>
+    </div>
+{% endblock %}

@@ -26,6 +26,17 @@ body {
         li {
             padding: 0 8px;
         }
+
+        // Bootstrap keeps .navbar-nav .dropdown-menu static unless the navbar
+        // is a .navbar-expand-* one (which byro's is not), so the open menu
+        // would grow the bar instead of floating above it. Restore the normal
+        // absolute, right-aligned dropdown, above the sidebar.
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            left: auto;
+            z-index: 1000;
+        }
     }
 }
 .sidebar {

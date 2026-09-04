@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "djangoformsetjs",
     "solo.apps.SoloAppConfig",
     "django_select2",
+    "django_otp",
     "byro.common.apps.CommonConfig",
     "byro.bookkeeping.apps.BookkeepingConfig",
     "byro.documents.apps.DocumentsConfig",
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     "byro.members.apps.MemberConfig",
     "byro.office.apps.OfficeConfig",
     "byro.public.apps.PublicConfig",
+    "byro.mfa.apps.MFAConfig",
     "byro.plugins.profile.ProfilePluginConfig",
     "byro.plugins.sepa.SepaPluginConfig",
     "annoying",
@@ -263,9 +265,11 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "byro.common.middleware.PermissionMiddleware",
+    "byro.mfa.middleware.MFAMiddleware",
     "byro.common.middleware.SettingsMiddleware",
 ]
 
