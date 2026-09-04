@@ -1,0 +1,12 @@
+{% load bootstrap4 %}
+{% load i18n %}
+
+<div class="form-group row">
+    <label class="col-md-3 col-form-label" for="{{ form.require_mfa.id_for_label }}">
+        {% trans "Mandatory MFA" %}
+    </label>
+    <div class="col-md-9">
+        {% bootstrap_field form.require_mfa form_group_class='mb-0' %}
+    </div>
+</div>
+{% bootstrap_field form.account_label layout='horizontal' %}

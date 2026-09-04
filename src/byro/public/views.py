@@ -140,9 +140,11 @@ class MemberListView(ListView):
         config = Configuration.get_solo()
         context["config"] = config
         context["member_view_level"] = MemberViewLevel
-        context["member_undisclosed"] = Member.objects.exclude(
-            profile_memberpage__is_visible_to_members=True
-        ).count()
+        context["member_undisclosed"] = (
+            Member.objects.with_active_membership()
+            .exclude(profile_memberpage__is_visible_to_members=True)
+            .count()
+        )
         return context
 
     def get_queryset(self):
@@ -159,4 +161,8 @@ class MemberListView(ListView):
         if not member.is_active:
             raise Http404("Page does not exist")
 
-        return Member.objects.filter(profile_memberpage__is_visible_to_members=True)
+        # Only list members with a current active membership; former members
+        # (membership ended) are hidden even if they once consented to sharing.
+        return Member.objects.with_active_membership().filter(
+            profile_memberpage__is_visible_to_members=True
+        )

@@ -22,6 +22,7 @@ too.
    plugins
    general
    member-data
+   bank-transaction-importers
 
 .. _GitHub organisation: https://github.com/byro
 .. _tell us about it: https://github.com/byro/byro/issues/new

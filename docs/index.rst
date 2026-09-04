@@ -32,6 +32,7 @@ Please `open issues`_ for features you are missing!
 - **Send mails:** All mails can be reviewed before they are sent out. You can also edit the default mail templates and add new ones.
 - **See member balances**. You can also check every single transaction at any time.
 - **Upload member specific documents:** (either for or by them); optionally send them per mail automatically.
+- **Multi-factor authentication:** Backend users can protect their account with an authenticator app (TOTP); administrators can require this for everybody.
 - **Let members interact:** Members can choose to make their data (which parts is their decision) visible to other members. Having a look at the member directory helps them interact directly with other members.
 
 Please note that byro is a tool for tracking member data and payments, and the

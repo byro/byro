@@ -37,6 +37,7 @@ for app in apps.get_app_configs():
 urlpatterns = [
     path("", include((raw_plugin_patterns, "plugins"))),
     path("", include("byro.common.urls", namespace="common")),
+    path("", include("byro.mfa.urls", namespace="mfa")),
     path("", include("byro.office.urls", namespace="office")),
     path("p/", include("byro.public.urls", namespace="public")),
     path("api/v1/", include("byro.api.urls", namespace="api")),

@@ -18,7 +18,7 @@ Payment
 -------
 
 .. automodule:: byro.bookkeeping.signals
-   :members: process_transaction, process_csv_upload
+   :members: process_transaction, bank_transaction_importers, process_csv_upload
 
 
 Display
@@ -36,6 +36,10 @@ Import
 
 .. automodule:: byro.office.signals
    :members: member_list_importers
+
+Bank transaction importers are registered via
+``byro.bookkeeping.signals.bank_transaction_importers`` (see Payment above and
+:doc:`bank-transaction-importers`).
 
 
 General

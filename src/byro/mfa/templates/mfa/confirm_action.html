@@ -1,0 +1,21 @@
+{% extends "office/settings/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{{ action_title }}{% endblock %}
+
+{% block settings_content %}
+    <div class="card">
+        <div class="card-header">{{ action_title }}</div>
+        <div class="card-body">
+            <p>{{ action_text }}</p>
+            <form method="post" autocomplete="off">
+                {% csrf_token %}
+                <p>{% trans "To confirm, enter the current code from your authenticator app." %}</p>
+                {% bootstrap_form form %}
+                <button class="btn {{ submit_class }}" type="submit">{{ submit_label }}</button>
+                <a class="btn btn-outline-secondary" href="{% url 'mfa:settings' %}">{% trans "Cancel" %}</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

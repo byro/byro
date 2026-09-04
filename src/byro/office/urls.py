@@ -139,7 +139,11 @@ urlpatterns = [
         upload.UploadMatchView.as_view(),
         name="finance.uploads.match",
     ),
-    re_path("^upload/add", upload.CsvUploadView.as_view(), name="finance.uploads.add"),
+    re_path(
+        "^upload/add",
+        upload.BankTransactionImportView.as_view(),
+        name="finance.uploads.add",
+    ),
     re_path(
         "^documents/add", documents.DocumentUploadView.as_view(), name="documents.add"
     ),

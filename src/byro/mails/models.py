@@ -43,6 +43,7 @@ class PGPKeyStatus(Choices):
 
 class PGPConfiguration(ByroConfiguration):
     LOG_TARGET_BASE = "byro.settings.pgp"
+    settings_template = "office/settings/pgp_configuration_form.html"
     DEFAULT_KEYSERVERS = "\n".join(
         [
             "keys.openpgp.org",

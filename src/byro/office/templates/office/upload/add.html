@@ -1,16 +1,33 @@
 {% extends "office/base_headline.html" %}
 {% load i18n %}
 {% load bootstrap4 %}
-{% load static %}
-{% load formset_tags %}
 
-{% block headline %}{% trans "Upload Transaction …" %}{% endblock %}
+{% block headline %}{% trans "Import bank transactions" %}{% endblock %}
 
 {% block content %}
-
+    <p>
+        {% blocktrans trimmed %}
+            Select the importer matching the format of your bank statement file
+            (for example CSV or CAMT.053) and upload the file. Transactions that
+            are already known are skipped, so overlapping exports can be imported
+            safely.
+        {% endblocktrans %}
+        {% blocktrans trimmed with size=max_file_size %}
+            The maximum file size is {{ size }}.
+        {% endblocktrans %}
+    </p>
+    {% if not has_importers %}
+        <div class="alert alert-warning">
+            {% blocktrans trimmed %}
+                No bank transaction importer is installed. Please install a plugin
+                providing an importer for your bank's file format.
+            {% endblocktrans %}
+        </div>
+    {% endif %}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form form layout='horizontal' %}
-        <button class="btn btn-success" type="submit">{% trans "Save" %}</button>
+        <button class="btn btn-success" type="submit" {% if not has_importers %}disabled{% endif %}>{% trans "Import" %}</button>
+        <a href="{% url "office:finance.uploads.list" %}" class="btn btn-link">{% trans "Import history" %}</a>
     </form>
 {% endblock %}

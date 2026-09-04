@@ -1788,6 +1788,18 @@ msgstr "Zahl"
 msgid "Refresh"
 msgstr "Aktualisieren"
 
+#: byro/office/templates/office/member/list.html
+msgid "Refreshing…"
+msgstr "Wird aktualisiert…"
+
+#: byro/office/views/members.py
+msgid "Balance refresh is already running in the background."
+msgstr "Kontenstandaktualisierung läuft bereits im Hintergrund."
+
+#: byro/office/views/members.py
+msgid "Balance refresh has been started in the background."
+msgstr "Kontenstandaktualisierung wurde im Hintergrund gestartet."
+
 #: byro/office/templates/office/member/list_export.html:9
 msgid ""
 "Select the export format and fields to be exported, then press 'Export'."
@@ -2879,6 +2891,100 @@ msgstr "Deutsch"
 msgid "Brazilian Portuguese"
 msgstr "Brasilianisches Portugiesisch"
 
+#: bank transaction import (feature/bank-transaction-importer-api)
+msgid "Legacy bank importer (plugin)"
+msgstr "Bisheriger Bank-Importer (Plugin)"
+
+msgid "Importer"
+msgstr "Importer"
+
+msgid "File"
+msgstr "Datei"
+
+msgid "The file is larger than the allowed maximum of %(size)s."
+msgstr "Die Datei ist größer als das erlaubte Maximum von %(size)s."
+
+msgid "The file could not be imported: %(error)s"
+msgstr "Die Datei konnte nicht importiert werden: %(error)s"
+
+msgid "The file was saved, but could not be processed: %(error)s"
+msgstr "Die Datei wurde gespeichert, konnte aber nicht verarbeitet werden: %(error)s"
+
+msgid "Import successful. %(read)s transactions read, %(imported)s newly imported, %(duplicates)s already known."
+msgstr "Import erfolgreich. %(read)s Transaktionen gelesen, %(imported)s neu importiert, %(duplicates)s bereits vorhanden."
+
+msgid "%(success)s successful matches, %(errors)s errors."
+msgstr "%(success)s erfolgreiche Zuordnungen, %(errors)s Fehler."
+
+msgid "The bank transaction import failed."
+msgstr "Der Import der Banktransaktionen ist fehlgeschlagen."
+
+msgid "The selected bank transaction importer is not available."
+msgstr "Der ausgewählte Bank-Importer ist nicht verfügbar."
+
+msgid "The file could not be processed by the selected bank transaction importer."
+msgstr "Die Datei konnte vom ausgewählten Bank-Importer nicht verarbeitet werden."
+
+msgid "The selected bank transaction importer failed unexpectedly. Details have been written to the log."
+msgstr "Der ausgewählte Bank-Importer ist unerwartet fehlgeschlagen. Details wurden ins Log geschrieben."
+
+msgid "The file contains an invalid bank transaction."
+msgstr "Die Datei enthält eine ungültige Banktransaktion."
+
+msgid "The file contains a transaction in an unsupported currency."
+msgstr "Die Datei enthält eine Transaktion in einer nicht unterstützten Währung."
+
+msgid "The file contains a transaction in the unsupported currency %(currency)s."
+msgstr "Die Datei enthält eine Transaktion in der nicht unterstützten Währung %(currency)s."
+
+msgid "Entry %(position)s is not an imported bank transaction."
+msgstr "Eintrag %(position)s ist keine importierte Banktransaktion."
+
+msgid "Transaction %(position)s has an invalid amount."
+msgstr "Transaktion %(position)s hat einen ungültigen Betrag."
+
+msgid "Transaction %(position)s has an invalid date."
+msgstr "Transaktion %(position)s hat ein ungültiges Datum."
+
+msgid "Transaction %(position)s has an invalid memo."
+msgstr "Transaktion %(position)s hat einen ungültigen Verwendungszweck."
+
+msgid "Transaction %(position)s has invalid metadata."
+msgstr "Transaktion %(position)s hat ungültige Metadaten."
+
+msgid "Transaction %(position)s has metadata that cannot be stored."
+msgstr "Transaktion %(position)s hat Metadaten, die nicht gespeichert werden können."
+
+msgid "Import bank transactions"
+msgstr "Banktransaktionen importieren"
+
+msgid "Select the importer matching the format of your bank statement file (for example CSV or CAMT.053) and upload the file. Transactions that are already known are skipped, so overlapping exports can be imported safely."
+msgstr "Wählen Sie den Importer passend zum Format Ihrer Kontoauszugsdatei (zum Beispiel CSV oder CAMT.053) und laden Sie die Datei hoch. Bereits bekannte Transaktionen werden übersprungen, sodass sich überlappende Exporte gefahrlos importieren lassen."
+
+msgid "The maximum file size is %(size)s."
+msgstr "Die maximale Dateigröße beträgt %(size)s."
+
+msgid "No bank transaction importer is installed. Please install a plugin providing an importer for your bank's file format."
+msgstr "Es ist kein Bank-Importer installiert. Bitte installieren Sie ein Plugin, das einen Importer für das Dateiformat Ihrer Bank bereitstellt."
+
+msgid "Import history"
+msgstr "Import-Verlauf"
+
+msgid "Bank transaction imports"
+msgstr "Banktransaktions-Importe"
+
+msgid "Processed"
+msgstr "Verarbeitet"
+
+msgid "New transactions"
+msgstr "Neue Transaktionen"
+
+msgid "Duplicates"
+msgstr "Duplikate"
+
+msgid "No bank transactions have been imported yet."
+msgstr "Es wurden noch keine Banktransaktionen importiert."
+
 #~ msgid "Verify"
 #~ msgstr "Verifizieren"
 
@@ -2956,3 +3062,384 @@ msgstr "Brasilianisches Portugiesisch"
 
 #~ msgid "e-mail of backoffice"
 #~ msgstr "Verwaltungs-Mailadresse"
+
+#: byro/mfa/forms.py:9
+msgid "Authentication code"
+msgstr "Authentifizierungscode"
+
+#: byro/mfa/forms.py:25
+msgid "Please enter the six-digit code from your authenticator app."
+msgstr "Bitte gib den sechsstelligen Code aus deiner Authenticator-App ein."
+
+#: byro/mfa/forms.py:32 byro/mfa/models.py:225
+msgid "Recovery code"
+msgstr "Wiederherstellungscode"
+
+#: byro/mfa/forms.py:46
+msgid "Please enter a valid recovery code."
+msgstr "Bitte gib einen gültigen Wiederherstellungscode ein."
+
+#: byro/mfa/models.py:30
+msgid "Require MFA for all administrators"
+msgstr "MFA für alle Administratoren erzwingen"
+
+#: byro/mfa/models.py:32
+msgid ""
+"When enabled, all users with access to the byro backend have to set up "
+"multi-factor authentication with an authenticator app (TOTP). Users without "
+"MFA are asked to set it up at their next login."
+msgstr ""
+"Wenn aktiviert, müssen alle Benutzer mit Zugriff auf das byro-Backend eine "
+"Multi-Faktor-Authentifizierung mit einer Authenticator-App (TOTP) "
+"einrichten. Benutzer ohne MFA werden bei ihrer nächsten Anmeldung zur "
+"Einrichtung aufgefordert."
+
+#: byro/mfa/models.py:38 byro/mfa/signals.py:17
+#: byro/mfa/templates/mfa/challenge.html:5
+#: byro/mfa/templates/mfa/challenge.html:8
+#: byro/mfa/templates/mfa/settings.html:4
+#: byro/mfa/templates/mfa/settings.html:8
+#: byro/office/templates/office/user/detail.html:32
+msgid "Multi-factor authentication"
+msgstr "Multi-Faktor-Authentifizierung"
+
+#: byro/mfa/models.py:73
+msgid "TOTP device"
+msgstr "TOTP-Gerät"
+
+#: byro/mfa/templates/log_entry/byro.mfa.disabled.html:5
+msgid "Multi-factor authentication disabled"
+msgstr "Multi-Faktor-Authentifizierung deaktiviert"
+
+#: byro/mfa/templates/log_entry/byro.mfa.enabled.html:5
+msgid "Multi-factor authentication enabled"
+msgstr "Multi-Faktor-Authentifizierung aktiviert"
+
+#: byro/mfa/templates/log_entry/byro.mfa.recovery_code.used.html:5
+msgid "Signed in with an MFA recovery code"
+msgstr "Anmeldung mit einem MFA-Wiederherstellungscode"
+
+#: byro/mfa/templates/log_entry/byro.mfa.recovery_codes.regenerated.html:5
+msgid "MFA recovery codes regenerated"
+msgstr "MFA-Wiederherstellungscodes neu erzeugt"
+
+#: byro/mfa/templates/log_entry/byro.mfa.reset.html:5
+msgid "Multi-factor authentication reset (management command)"
+msgstr "Multi-Faktor-Authentifizierung zurückgesetzt (Management-Befehl)"
+
+#: byro/mfa/templates/mfa/challenge.html:18
+msgid "Enter one of your recovery codes. Each code can only be used once."
+msgstr ""
+"Gib einen deiner Wiederherstellungscodes ein. Jeder Code kann nur einmal "
+"verwendet werden."
+
+#: byro/mfa/templates/mfa/challenge.html:20
+msgid "Enter the code from your authenticator app."
+msgstr "Gib den Code aus deiner Authenticator-App ein."
+
+#: byro/mfa/templates/mfa/challenge.html:24
+#: byro/mfa/templates/mfa/recovery_codes.html:16
+msgid "Continue"
+msgstr "Weiter"
+
+#: byro/mfa/templates/mfa/challenge.html:27
+msgid "Use your authenticator app instead"
+msgstr "Stattdessen Authenticator-App verwenden"
+
+#: byro/mfa/templates/mfa/challenge.html:29
+msgid "Use a recovery code"
+msgstr "Wiederherstellungscode verwenden"
+
+#: byro/mfa/templates/mfa/confirm_action.html:14
+msgid "To confirm, enter the current code from your authenticator app."
+msgstr ""
+"Gib zur Bestätigung den aktuellen Code aus deiner Authenticator-App ein."
+
+#: byro/mfa/templates/mfa/confirm_action.html:17
+#: byro/mfa/templates/mfa/setup.html:41
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: byro/mfa/templates/mfa/recovery_codes.html:8
+#: byro/mfa/templates/mfa/settings.html:27
+msgid "Recovery codes"
+msgstr "Wiederherstellungscodes"
+
+#: byro/mfa/templates/mfa/recovery_codes.html:11
+msgid ""
+"Store these recovery codes in a safe place. Each code can be used once to "
+"sign in if you lose access to your authenticator app."
+msgstr ""
+"Bewahre diese Wiederherstellungscodes an einem sicheren Ort auf. Jeder Code "
+"kann einmal zur Anmeldung verwendet werden, falls du keinen Zugriff auf "
+"deine Authenticator-App mehr hast."
+
+#: byro/mfa/templates/mfa/recovery_codes.html:12
+msgid "They will not be shown again."
+msgstr "Sie werden nicht noch einmal angezeigt."
+
+#: byro/mfa/templates/mfa/settings.html:12
+#: byro/mfa/templates/mfa/settings.html:56
+msgid "Status:"
+msgstr "Status:"
+
+#: byro/mfa/templates/mfa/settings.html:13
+msgid "Enabled"
+msgstr "Aktiviert"
+
+#: byro/mfa/templates/mfa/settings.html:16
+msgid "Authenticator app"
+msgstr "Authenticator-App"
+
+#: byro/mfa/templates/mfa/settings.html:18
+msgid "Configured"
+msgstr "Eingerichtet"
+
+#: byro/mfa/templates/mfa/settings.html:21
+msgid "last used %(date)s"
+msgstr "zuletzt verwendet %(date)s"
+
+#: byro/mfa/templates/mfa/settings.html:29
+msgid "%(counter)s remaining"
+msgid_plural "%(counter)s remaining"
+msgstr[0] "%(counter)s verbleibend"
+msgstr[1] "%(counter)s verbleibend"
+
+#: byro/mfa/templates/mfa/settings.html:38
+msgid ""
+"You have no recovery codes left. Generate new recovery codes now so you are "
+"not locked out if you lose your authenticator app."
+msgstr ""
+"Du hast keine Wiederherstellungscodes mehr. Erzeuge jetzt neue "
+"Wiederherstellungscodes, damit du nicht ausgesperrt wirst, falls du deine "
+"Authenticator-App verlierst."
+
+#: byro/mfa/templates/mfa/settings.html:42 byro/mfa/views.py:178
+#: byro/mfa/views.py:183
+msgid "Generate new recovery codes"
+msgstr "Neue Wiederherstellungscodes erzeugen"
+
+#: byro/mfa/templates/mfa/settings.html:46 byro/mfa/views.py:230
+msgid "Disable MFA"
+msgstr "MFA deaktivieren"
+
+#: byro/mfa/templates/mfa/settings.html:51
+msgid ""
+"Multi-factor authentication is required for all administrators of this byro "
+"installation and cannot be disabled."
+msgstr ""
+"Die Multi-Faktor-Authentifizierung ist für alle Administratoren dieser "
+"byro-Installation verpflichtend und kann nicht deaktiviert werden."
+
+#: byro/mfa/templates/mfa/settings.html:57
+msgid "Not configured"
+msgstr "Nicht eingerichtet"
+
+#: byro/mfa/templates/mfa/settings.html:61
+msgid ""
+"Multi-factor authentication is required for all administrators of this byro "
+"installation. Please set it up now."
+msgstr ""
+"Die Multi-Faktor-Authentifizierung ist für alle Administratoren dieser "
+"byro-Installation verpflichtend. Bitte richte sie jetzt ein."
+
+#: byro/mfa/templates/mfa/settings.html:65
+msgid ""
+"Protect your account with an authenticator app (TOTP), for example Aegis, "
+"Google Authenticator, Microsoft Authenticator, 1Password or Bitwarden."
+msgstr ""
+"Schütze dein Konto mit einer Authenticator-App (TOTP), zum Beispiel Aegis, "
+"Google Authenticator, Microsoft Authenticator, 1Password oder Bitwarden."
+
+#: byro/mfa/templates/mfa/settings.html:68
+msgid "Set up MFA"
+msgstr "MFA einrichten"
+
+#: byro/mfa/templates/mfa/setup.html:6
+msgid "Set up multi-factor authentication"
+msgstr "Multi-Faktor-Authentifizierung einrichten"
+
+#: byro/mfa/templates/mfa/setup.html:11
+msgid ""
+"Multi-factor authentication is required for all administrators of this byro "
+"installation. Please set it up to continue."
+msgstr ""
+"Die Multi-Faktor-Authentifizierung ist für alle Administratoren dieser "
+"byro-Installation verpflichtend. Bitte richte sie ein, um fortzufahren."
+
+#: byro/mfa/templates/mfa/setup.html:17
+msgid "Step 1: Add byro to your authenticator app"
+msgstr "Schritt 1: byro zu deiner Authenticator-App hinzufügen"
+
+#: byro/mfa/templates/mfa/setup.html:19
+msgid ""
+"Scan this QR code with your authenticator app (for example Aegis, Google "
+"Authenticator, Microsoft Authenticator, 1Password or Bitwarden)."
+msgstr ""
+"Scanne diesen QR-Code mit deiner Authenticator-App (zum Beispiel Aegis, "
+"Google Authenticator, Microsoft Authenticator, 1Password oder Bitwarden)."
+
+#: byro/mfa/templates/mfa/setup.html:21
+msgid "QR code for your authenticator app"
+msgstr "QR-Code für deine Authenticator-App"
+
+#: byro/mfa/templates/mfa/setup.html:24
+msgid "Or enter this key manually:"
+msgstr "Oder gib diesen Schlüssel manuell ein:"
+
+#: byro/mfa/templates/mfa/setup.html:26
+msgid "Type: time-based (TOTP), 6 digits, 30 seconds, SHA-1."
+msgstr "Typ: zeitbasiert (TOTP), 6 Stellen, 30 Sekunden, SHA-1."
+
+#: byro/mfa/templates/mfa/setup.html:32
+msgid "Step 2: Confirm"
+msgstr "Schritt 2: Bestätigen"
+
+#: byro/mfa/templates/mfa/setup.html:37
+msgid "Enter the six-digit code generated by your authenticator app:"
+msgstr "Gib den sechsstelligen Code ein, den deine Authenticator-App anzeigt:"
+
+#: byro/mfa/templates/mfa/setup.html:39
+msgid "Verify and enable"
+msgstr "Prüfen und aktivieren"
+
+#: byro/mfa/templates/mfa/setup.html:45
+msgid ""
+"Multi-factor authentication is only enabled after a code has been verified "
+"successfully. You will then receive recovery codes for the case that you "
+"lose access to your authenticator app."
+msgstr ""
+"Die Multi-Faktor-Authentifizierung wird erst aktiviert, nachdem ein Code "
+"erfolgreich geprüft wurde. Anschließend erhältst du Wiederherstellungscodes "
+"für den Fall, dass du den Zugriff auf deine Authenticator-App verlierst."
+
+#: byro/mfa/views.py:38
+msgid "Too many failed attempts. Please wait a moment and try again."
+msgstr ""
+"Zu viele Fehlversuche. Bitte warte einen Moment und versuche es erneut."
+
+#: byro/mfa/views.py:41
+msgid "The authentication code is invalid or has expired."
+msgstr "Der Authentifizierungscode ist ungültig oder abgelaufen."
+
+#: byro/mfa/views.py:83
+#, python-format
+msgid "You signed in with a recovery code. %(count)d recovery code is left."
+msgid_plural ""
+"You signed in with a recovery code. %(count)d recovery codes are left."
+msgstr[0] ""
+"Du hast dich mit einem Wiederherstellungscode angemeldet. %(count)d "
+"Wiederherstellungscode ist noch übrig."
+msgstr[1] ""
+"Du hast dich mit einem Wiederherstellungscode angemeldet. %(count)d "
+"Wiederherstellungscodes sind noch übrig."
+
+#: byro/mfa/views.py:123
+msgid "Multi-factor authentication is already enabled for your account."
+msgstr ""
+"Die Multi-Faktor-Authentifizierung ist für dein Konto bereits aktiviert."
+
+#: byro/mfa/views.py:135
+msgid "The setup has expired. Please start again."
+msgstr "Die Einrichtung ist abgelaufen. Bitte beginne von vorne."
+
+#: byro/mfa/views.py:160
+msgid "Multi-factor authentication is now enabled."
+msgstr "Die Multi-Faktor-Authentifizierung ist jetzt aktiviert."
+
+#: byro/mfa/views.py:180
+msgid ""
+"All existing recovery codes stop working immediately. The new codes are "
+"shown once, store them in a safe place."
+msgstr ""
+"Alle bisherigen Wiederherstellungscodes werden sofort ungültig. Die neuen "
+"Codes werden einmalig angezeigt, bewahre sie an einem sicheren Ort auf."
+
+#: byro/mfa/views.py:198
+msgid "New recovery codes"
+msgstr "Neue Wiederherstellungscodes"
+
+#: byro/mfa/views.py:216
+msgid ""
+"Multi-factor authentication is required for all administrators and cannot be "
+"disabled."
+msgstr ""
+"Die Multi-Faktor-Authentifizierung ist für alle Administratoren "
+"verpflichtend und kann nicht deaktiviert werden."
+
+#: byro/mfa/views.py:225
+msgid "Disable multi-factor authentication"
+msgstr "Multi-Faktor-Authentifizierung deaktivieren"
+
+#: byro/mfa/views.py:227
+msgid ""
+"Your authenticator app and all recovery codes will be removed. Afterwards "
+"your account is only protected by your password."
+msgstr ""
+"Deine Authenticator-App und alle Wiederherstellungscodes werden entfernt. "
+"Danach ist dein Konto nur noch durch dein Passwort geschützt."
+
+#: byro/mfa/views.py:242
+msgid "Multi-factor authentication has been disabled."
+msgstr "Die Multi-Faktor-Authentifizierung wurde deaktiviert."
+
+#: byro/office/templates/office/base.html:75
+msgid "Log out"
+msgstr "Abmelden"
+
+#: byro/office/templates/office/user/detail.html:14
+msgid "Multi-factor authentication is enabled for this user"
+msgstr "Die Multi-Faktor-Authentifizierung ist für diesen Benutzer aktiviert"
+
+#: byro/office/templates/office/user/detail.html:15
+#: byro/office/templates/office/user/list.html:34
+msgid "MFA enabled"
+msgstr "MFA aktiviert"
+
+#: byro/office/templates/office/user/detail.html:40
+msgid ""
+"Multi-factor authentication is enabled. If this user lost access to their "
+"authenticator app and recovery codes, an administrator can reset it on the "
+"server:"
+msgstr ""
+"Die Multi-Faktor-Authentifizierung ist aktiviert. Falls dieser Benutzer den "
+"Zugriff auf Authenticator-App und Wiederherstellungscodes verloren hat, kann "
+"ein Administrator sie auf dem Server zurücksetzen:"
+
+#: byro/mfa/templates/mfa/settings_form.html:6
+msgid "Mandatory MFA"
+msgstr "MFA-Pflicht"
+
+#: byro/mfa/models.py:82
+msgid "Account name in authenticator apps"
+msgstr "Kontobezeichnung in Authenticator-Apps"
+
+#: byro/mfa/models.py:38
+#, python-format
+msgid ""
+"Unknown placeholder: %(placeholder)s. Available placeholders: %(available)s"
+msgstr ""
+"Unbekannter Platzhalter: %(placeholder)s. Verfügbare Platzhalter: "
+"%(available)s"
+
+#: byro/mfa/models.py:60
+msgid ""
+"Colons are not allowed here: authenticator apps use them to separate the "
+"name from the account."
+msgstr ""
+"Doppelpunkte sind hier nicht erlaubt: Authenticator-Apps trennen damit den "
+"Namen vom Konto."
+
+#: byro/mfa/models.py:94
+msgid ""
+"Shown below \"BYRO\" in the authenticator app. Available placeholders: "
+"{username}, {email}, {name} (the user's name) and {association}. Colons are "
+"not allowed."
+msgstr ""
+"Wird in der Authenticator-App unter „BYRO“ angezeigt. Verfügbare "
+"Platzhalter: {username}, {email}, {name} (Name des Benutzers) und "
+"{association}. Doppelpunkte sind nicht erlaubt."
+
+#: byro/office/templates/office/base.html:74
+msgid "My profile"
+msgstr "Mein Profil"

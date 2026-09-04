@@ -1,0 +1,73 @@
+{% extends "office/settings/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Multi-factor authentication" %}{% endblock %}
+
+{% block settings_content %}
+    <div class="card">
+        <div class="card-header">{% trans "Multi-factor authentication" %}</div>
+        <div class="card-body">
+            {% if status.enabled %}
+                <p>
+                    <strong>{% trans "Status:" %}</strong>
+                    <span class="badge badge-success">{% trans "Enabled" %}</span>
+                </p>
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans "Authenticator app" %}</dt>
+                    <dd class="col-sm-9">
+                        {% trans "Configured" %}
+                        {% if status.device.last_used_at %}
+                            <span class="text-muted">
+                                ({% blocktrans trimmed with date=status.device.last_used_at|date:"SHORT_DATETIME_FORMAT" %}
+                                    last used {{ date }}
+                                {% endblocktrans %})
+                            </span>
+                        {% endif %}
+                    </dd>
+                    <dt class="col-sm-3">{% trans "Recovery codes" %}</dt>
+                    <dd class="col-sm-9">
+                        {% blocktrans trimmed count counter=status.recovery_codes_remaining %}
+                            {{ counter }} remaining
+                        {% plural %}
+                            {{ counter }} remaining
+                        {% endblocktrans %}
+                    </dd>
+                </dl>
+                {% if status.recovery_codes_remaining == 0 %}
+                    <div class="alert alert-warning">
+                        {% trans "You have no recovery codes left. Generate new recovery codes now so you are not locked out if you lose your authenticator app." %}
+                    </div>
+                {% endif %}
+                <a class="btn btn-outline-primary" href="{% url 'mfa:recovery-codes' %}">
+                    <span class="fa fa-refresh"></span> {% trans "Generate new recovery codes" %}
+                </a>
+                {% if can_disable %}
+                    <a class="btn btn-outline-danger" href="{% url 'mfa:disable' %}">
+                        <span class="fa fa-times"></span> {% trans "Disable MFA" %}
+                    </a>
+                {% else %}
+                    <p class="text-muted mt-3">
+                        <span class="fa fa-lock"></span>
+                        {% trans "Multi-factor authentication is required for all administrators of this byro installation and cannot be disabled." %}
+                    </p>
+                {% endif %}
+            {% else %}
+                <p>
+                    <strong>{% trans "Status:" %}</strong>
+                    <span class="badge badge-secondary">{% trans "Not configured" %}</span>
+                </p>
+                {% if status.required_by_policy %}
+                    <div class="alert alert-warning">
+                        {% trans "Multi-factor authentication is required for all administrators of this byro installation. Please set it up now." %}
+                    </div>
+                {% endif %}
+                <p>
+                    {% trans "Protect your account with an authenticator app (TOTP), for example Aegis, Google Authenticator, Microsoft Authenticator, 1Password or Bitwarden." %}
+                </p>
+                <a class="btn btn-success" href="{% url 'mfa:setup' %}">
+                    <span class="fa fa-shield"></span> {% trans "Set up MFA" %}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

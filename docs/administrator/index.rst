@@ -19,4 +19,5 @@ on administrative basics like securing your server, or performing backups.
    installation
    configuration
    pgp
+   mfa
    docker-compose

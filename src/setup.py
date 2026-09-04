@@ -67,7 +67,7 @@ setup(
     install_requires=[
         "canonicaljson==2.0.0",  # https://github.com/matrix-org/python-canonicaljson/blob/master/CHANGES.md
         "celery>=5.4,<6.0",  # search for "what's new" on http://docs.celeryproject.org/en/latest/
-        "chardet>=5.2,<7.5",  # https://github.com/chardet/chardet/releases
+        "chardet>=5.2,<7.7",  # https://github.com/chardet/chardet/releases
         "csscompressor~=0.9.5",  # 2017-11, no changelog, https://github.com/sprymix/csscompressor
         "dateparser>=1.1,<1.5",  # https://github.com/scrapinghub/dateparser/blob/master/HISTORY.rst
         "django-annoying~=0.10.0",  # https://github.com/skorokithakis/django-annoying/releases
@@ -77,24 +77,25 @@ setup(
         "django-i18nfield>=1.9,<1.12",  # 2017-11, no changelog, https://github.com/raphaelm/django-i18nfield/
         "django-formset-js-improved==0.5.0.5",  # no changelog, https://github.com/pretix/django-formset-js
         "django-libsass>=0.8,<0.10",  # inactive, https://github.com/torchbox/django-libsass/blob/master/CHANGELOG.txt
-        "django-localflavor>=3.0,<5.1",
+        "django-localflavor>=3.0,<5.2",
+        "django-otp>=1.6,<1.8",  # https://github.com/django-otp/django-otp/blob/master/CHANGES.rst
         "django-select2>=7.7,<8.5",  # https://github.com/applegrew/django-select2/releases
         "django-solo>=2.1,<2.6",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
         "Django>=5.2,<5.3",  # https://docs.djangoproject.com/en/5.2/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
-        "more-itertools>=8.10,<11.1",
+        "more-itertools>=8.10,<11.2",
         "psycopg2-binary",
         "PyJWT[crypto]>=2.8,<3",
         "pynacl>=1.4,<1.7",  # https://github.com/pyca/pynacl/blob/master/CHANGELOG.rst
         "python-dateutil",
         "python-magic~=0.4.0",
         "qrcode[pil]>=7.3,<8.3",  # https://github.com/lincolnloop/python-qrcode/blob/master/CHANGES.rst
-        "schwifty==2026.3.0",
+        "schwifty==2026.7.3",
         "unicodecsv~=0.14.0",
         "whitenoise>=6.4,<6.13",
         "djangorestframework>=3.14,<4.0",
-        "django-filter>=23,<25",
+        "django-filter>=23,<27",
         "drf-spectacular>=0.27,<1.0",
     ],
     extras_require={
