@@ -81,7 +81,7 @@ setup(
         "django-otp>=1.6,<1.8",  # https://github.com/django-otp/django-otp/blob/master/CHANGES.rst
         "django-select2>=7.7,<8.5",  # https://github.com/applegrew/django-select2/releases
         "django-solo>=2.1,<2.6",  # https://github.com/lazybird/django-solo/blob/master/CHANGES
-        "Django>=5.2,<5.3",  # https://docs.djangoproject.com/en/5.2/releases/
+        "Django>=5.2,<6.2",  # https://docs.djangoproject.com/en/5.2/releases/
         "inlinestyler~=0.2",  # https://github.com/dlanger/inlinestyler/blob/master/CHANGELOG
         "jinja2>=2.10.1",  # https://github.com/pallets/jinja/blob/master/CHANGES.rst
         "more-itertools>=8.10,<11.2",
