@@ -7,8 +7,7 @@ updates:
     open-pull-requests-limit: 10
     ignore:
     - dependency-name: Django
-      versions:
-        - "> 4.2"
+      update-types: ["version-update:semver-major", "version-update:semver-minor"]
     - dependency-name: python
       update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: pip
