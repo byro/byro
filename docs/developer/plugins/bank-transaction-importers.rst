@@ -138,7 +138,8 @@ the browser.
 
 ``counterparty_name``, ``counterparty_iban``, ``counterparty_bic``
     Information about the other party. The IBAN is normalized (upper case,
-    no whitespace) before it is stored.
+    no whitespace) before it is stored. The name is shown below the memo in
+    the account and transaction views of the office.
 
 ``external_id``
     A stable reference the *bank* assigned to this transaction, for example
@@ -149,8 +150,7 @@ the browser.
     other values that depend on the export. If your format has no such
     reference, leave it ``None`` and let the core fall back to a fingerprint.
 
-``end_to_end_id``, ``mandate_id``, ``creditor_id``, ``bank_reference``,
-``transaction_code``
+``end_to_end_id``, ``mandate_id``, ``creditor_id``, ``bank_reference``, ``transaction_code``
     Optional SEPA and bank references. They are stored with the booking and
     contribute to the fallback fingerprint.
 

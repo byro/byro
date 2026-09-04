@@ -28,8 +28,8 @@
                         <td class="related-empty"></td>
                         <td>
                             {{ booking.memo|default:"" }}
-                            {% if booking.data.other_party %}
-                                <br><i>{{ booking.data.other_party }}</i>
+                            {% if booking.counterparty_name %}
+                                <br><i>{{ booking.counterparty_name }}</i>
                             {% endif %}
                         </td>
                         <td>{{ booking.member.name }}</td>
