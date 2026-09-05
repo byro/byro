@@ -78,6 +78,18 @@ The site section
 - **Environment variable:** ``BYRO_SITE_URL``
 - **Default:** ``http://localhost``
 
+``trust_proxy``
+~~~~~~~~~~~~~~~
+
+- Set this to ``True`` **only** if byro runs behind a reverse proxy (nginx, Apache, Caddy, …)
+  that terminates TLS and sets the ``X-Forwarded-Proto`` header. byro then treats requests
+  with ``X-Forwarded-Proto: https`` as secure, which is required for correct absolute URLs,
+  for example the OpenID Connect redirect URI. Leave it at ``False`` when byro is reachable
+  directly, because clients could otherwise forge the header. This setting is independent of
+  ``https``, which only controls cookie security.
+- **Environment variable:** ``BYRO_TRUST_PROXY``
+- **Default:** ``False``
+
 ``secret``
 ~~~~~~~~~~
 

@@ -3,7 +3,6 @@ from contextlib import suppress
 from pathlib import Path
 from urllib.parse import urlparse
 
-from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
 try:
@@ -12,6 +11,7 @@ except ImportError:  # pragma: no cover - fallback for very old Pythons
     from importlib_metadata import entry_points as _entry_points  # type: ignore
 
 from byro.common.settings.config import build_config
+from byro.common.settings.secret import get_or_create_secret
 from byro.common.settings.utils import log_initial
 
 config, config_files = build_config()
@@ -102,21 +102,15 @@ SESSION_COOKIE_NAME = "byro_session"
 SESSION_COOKIE_SECURE = config.getboolean(
     "site", "https", fallback=SITE_URL.startswith("https:")
 )
+# Trust X-Forwarded-Proto only when an administrator confirms that a reverse
+# proxy sits in front of byro. Deliberately independent from ``https``: cookie
+# security and trusting proxy headers are separate decisions.
+if config.getboolean("site", "trust_proxy"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 if config.has_option("site", "secret"):
     SECRET_KEY = config.get("site", "secret")
 else:
-    SECRET_FILE = os.path.join(DATA_DIR, ".secret")
-    if os.path.exists(SECRET_FILE):
-        with open(SECRET_FILE) as f:
-            SECRET_KEY = f.read().strip()
-    else:
-        chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
-        SECRET_KEY = get_random_string(50, chars)
-        with open(SECRET_FILE, "w") as f:
-            os.chmod(SECRET_FILE, 0o600)
-            if hasattr(os, "chown"):
-                os.chown(SECRET_FILE, os.getuid(), os.getgid())
-            f.write(SECRET_KEY)
+    SECRET_KEY = get_or_create_secret(os.path.join(DATA_DIR, ".secret"))
 
 
 ## DATABASE SETTINGS

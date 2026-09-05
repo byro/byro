@@ -19,6 +19,7 @@ CONFIG = {
         "debug": {"default": "runserver" in sys.argv, "env": os.getenv("BYRO_DEBUG")},
         "url": {"default": "http://localhost", "env": os.getenv("BYRO_SITE_URL")},
         "https": {"env": os.getenv("BYRO_HTTPS")},
+        "trust_proxy": {"default": "False", "env": os.getenv("BYRO_TRUST_PROXY")},
     },
     "database": {
         "name": {"env": os.getenv("BYRO_DB_NAME")},
