@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 # Integration test for byroctl against a locally built byro image and real
-# Docker: install, config, start/stop/restart, manage, logs, idempotent re-run.
+# Docker: install with a plugin, config, start/stop/restart, manage, logs,
+# idempotent re-run, update, plugin remove/add.
 #
 # Usage: byroctl-integration.sh <image repo> <image tag> <root dir> [host port]
 #   e.g. byroctl-integration.sh byro-ci smoke "$RUNNER_TEMP/byro-it" 18345
 #
-# Requires bash >= 4, docker with compose, curl on the machine that runs the
-# script; the root directory must be usable as a bind mount source by the
-# Docker daemon (same path on host and daemon).
+# Requires bash >= 4, docker with compose and buildx, curl on the machine that
+# runs the script; the root directory must be usable as a bind mount source by
+# the Docker daemon (same path on host and daemon). The plugin image is built
+# FROM the daemon-local test image, which only the docker-driver builder can
+# see, hence BUILDX_BUILDER=default (a docker-container builder, as set up by
+# docker/setup-buildx-action, would try to pull it).
 set -euo pipefail
 
 repo="${1:?image repo}"
@@ -18,10 +22,13 @@ port="${4:-18345}"
 http_host="${BYROCTL_IT_HTTP_HOST:-127.0.0.1}"
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 byroctl="$here/deploy/byroctl"
+fixture="$here/deploy/tests/fixtures/byro-testplugin"
+plugin_image="byro-it-$$-plugins"
 
 export BYROCTL_SOURCE_DIR="$here/deploy"
 export BYROCTL_ADMIN_PASSWORD="It-Passw0rd-$$"
 export BYROCTL_WEB_HEALTH_TIMEOUT=240
+export BUILDX_BUILDER="${BUILDX_BUILDER:-default}"
 
 failures=0
 pass() { printf 'OK    %s\n' "$*"; }
@@ -38,15 +45,18 @@ cleanup() {
         (cd "$root" && docker compose down -v --remove-orphans >/dev/null 2>&1) || true
     fi
     rm -rf "$root"
-    docker rmi "$repo:${tag}2" >/dev/null 2>&1 || true
+    docker rmi "$repo:${tag}2" "$plugin_image:$tag" "$plugin_image:${tag}2" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
 rm -rf "$root"
+# a local plugin checkout inside the build context, referenced as ./testplugin
+mkdir -p "$root/plugins"
+cp -R "$fixture" "$root/plugins/testplugin"
 
-echo "--- install"
+echo "--- install (with a plugin)"
 if "$byroctl" --root "$root" install --non-interactive --no-pull --version "$tag" \
-        --admin-user admin --admin-email admin@example.org \
+        --admin-user admin --admin-email admin@example.org --plugin ./testplugin \
         --set BYRO_DEPLOY_IMAGE_REPO="$repo" --set COMPOSE_PROJECT_NAME="byro-it-$$" \
         --set BYRO_SITE_URL=http://localhost --set BYRO_HTTPS=false --set BYROCTL_PROXY=none \
         --set BYRO_DEPLOY_PORT="$port" --set BYROCTL_MAIL=host --set BYRO_MAIL_FROM=byro@example.org; then
@@ -60,11 +70,32 @@ check "byro.conf is 0600" [ "$(stat -c %a "$root/byro.conf")" = 600 ]
 check "version pinned in byro.conf" grep -q "^BYRO_DEPLOY_VERSION=$tag$" "$root/byro.conf"
 check "mail host set" grep -q "^BYRO_MAIL_HOST=host.docker.internal$" "$root/byro.conf"
 
+echo "--- plugin image"
+web_image() { docker inspect --format '{{.Config.Image}}' "$(compose_id web)"; }
+in_plugin_image() { docker run --rm --entrypoint sh "$plugin_image:$1" -c "$2"; }
+check "plugins.txt lists the local plugin" grep -qx './testplugin' "$root/plugins/plugins.txt"
+check "compose/plugins.yml active" grep -q 'compose/plugins.yml' "$root/byro.conf"
+check "plugin image exists" docker image inspect "$plugin_image:$tag"
+check "web runs the plugin image (got $(web_image))" [ "$(web_image)" = "$plugin_image:$tag" ]
+check "plugin importable in the container" "$byroctl" --root "$root" manage shell -c "import byro_testplugin"
+check "plugin migration applied" "$byroctl" --root "$root" manage shell -c \
+    "import sys; from django.db import connection; sys.exit(0 if 'byro_testplugin_testpluginmarker' in connection.introspection.table_names() else 1)"
+# shellcheck disable=SC2016  # expanded by the shell inside the container
+check "plugin translation compiled in the image" in_plugin_image "$tag" \
+    'test -f "$(python -c "import byro_testplugin, os; print(os.path.dirname(byro_testplugin.__file__))")/locale/de/LC_MESSAGES/django.mo"'
+check "plugin static file collected" in_plugin_image "$tag" 'test -f /byro/static.dist/byro_testplugin/testplugin.css'
+check "no git in the final image" in_plugin_image "$tag" '! command -v git'
+check "/byro/plugins.txt matches the list" diff <(docker run --rm --entrypoint cat "$plugin_image:$tag" /byro/plugins.txt) "$root/plugins/plugins.txt"
+list_out="$("$byroctl" --root "$root" plugin list)"
+check "plugin list names the local plugin" grep -q './testplugin' <<<"$list_out"
+check "plugin list names the image" grep -q "plugin image: $plugin_image:$tag" <<<"$list_out"
+
 echo "--- config check / version"
 check "config check" "$byroctl" --root "$root" config check
 version_out="$("$byroctl" --root "$root" version)"
 printf '%s\n' "$version_out"
 check "version output" grep -q "byro version:   $tag" <<<"$version_out"
+check "version lists the loaded plugin" grep -q "loaded plugins: byro_testplugin" <<<"$version_out"
 
 echo "--- http"
 code="$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: localhost' "http://$http_host:$port/login/")"
@@ -115,6 +146,35 @@ rc=$?
 set -e
 check "update --check exits 3 when current (got $rc)" [ "$rc" = 3 ]
 check "self-update keeps an identical script" "$byroctl" --root "$root" self-update
+check "plugin image rebuilt for ${tag}2" docker image inspect "$plugin_image:${tag}2"
+check "web runs the rebuilt plugin image (got $(web_image))" [ "$(web_image)" = "$plugin_image:${tag}2" ]
+check "update safeguard carries plugins.txt" [ -f "$safeguard/plugins.txt" ]
+
+echo "--- plugin remove / add on a running stack"
+check "plugin remove" "$byroctl" --root "$root" plugin remove ./testplugin
+check "web back on the base image (got $(web_image))" [ "$(web_image)" = "$repo:${tag}2" ]
+check "add-on disabled" bash -c "! grep -q compose/plugins.yml '$root/byro.conf'"
+plugin_safeguard="$(find "$root/backups" -mindepth 1 -maxdepth 1 -type d -name "pre-plugin-*" | head -n1 || true)"
+check "pre-plugin safeguard exists" [ -n "$plugin_safeguard" ]
+check "pre-plugin safeguard has a non-empty database dump" [ -s "$plugin_safeguard/db.dump" ]
+check "pre-plugin safeguard has the previous plugins.txt" grep -qx './testplugin' "$plugin_safeguard/plugins.txt"
+check "pre-plugin safeguard has the previous byro.conf" grep -q 'compose/plugins.yml' "$plugin_safeguard/byro.conf"
+web_before="$(compose_id web)"
+check "plugin add" "$byroctl" --root "$root" plugin add ./testplugin
+check "web recreated by plugin add" [ "$(compose_id web)" != "$web_before" ]
+check "web runs the plugin image again (got $(web_image))" [ "$(web_image)" = "$plugin_image:${tag}2" ]
+code="$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: localhost' "http://$http_host:$port/login/")"
+check "GET /login/ -> 200 after plugin add (got $code)" [ "$code" = 200 ]
+plugins_before="$(cat "$root/plugins/plugins.txt")"
+set +e
+"$byroctl" --root "$root" plugin add 'byro-does-not-exist-xyz==99'
+rc=$?
+set -e
+check "unresolvable requirement fails in phase 1 (exit $rc)" [ "$rc" = 1 ]
+check "plugins.txt unchanged after the failed add" [ "$(cat "$root/plugins/plugins.txt")" = "$plugins_before" ]
+check "web still runs the plugin image (got $(web_image))" [ "$(web_image)" = "$plugin_image:${tag}2" ]
+code="$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: localhost' "http://$http_host:$port/login/")"
+check "GET /login/ -> 200 after the failed add (got $code)" [ "$code" = 200 ]
 
 echo "--- secrets"
 not_in_tree() { ! grep -rq -- "$1" "$2"; }

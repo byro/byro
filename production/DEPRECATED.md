@@ -26,7 +26,9 @@ by nginx: documents are delivered by byro itself after authentication.
   error 500 (`OfflineGenerationError`). Run `manage collectstatic` before
   `manage compress`, or run `manage rebuild` once.
 * `setup.sh plugin` cannot work: no service in `docker-compose.yml` has a
-  `build:` section.
+  `build:` section. Plugins are supported by the new deployment
+  (`byroctl plugin add`, see
+  https://byro.readthedocs.io/en/latest/administrator/plugins.html).
 * `nginx.conf` serves `/media/` without authentication.
 * `docker-compose.yml` uses the `latest` tag, so every release changes the
   running image without notice.

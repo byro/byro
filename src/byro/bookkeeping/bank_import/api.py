@@ -75,7 +75,7 @@ class BankTransactionImporter:
     and ``parse()`` with the same semantics is accepted.
     """
 
-    #: Stable, dotted identifier, e.g. ``"byro_camt.camt053"``. Stored on
+    #: Stable, dotted identifier, e.g. ``"byro_finance_import_bank_files.camt053"``. Stored on
     #: every import and booking, must never depend on the translated label.
     identifier: str = ""
     #: Human readable (translatable) label shown in the importer selection.

@@ -33,11 +33,13 @@ run_install() {
     [ -f "$BYRO_ROOT/byro.conf" ]
     [ "$(stat -c %a "$BYRO_ROOT/byro.conf")" = "600" ]
     [ "$(readlink "$BYRO_ROOT/.env")" = "byro.conf" ]
-    for f in docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env; do
+    for f in "${BYROCTL_ARTIFACTS[@]}"; do
         [ -f "$BYRO_ROOT/$f" ]
         [ "$(sha256sum <"$BYRO_ROOT/$f")" = "$(sha256sum <"$DEPLOY_DIR/$f")" ]
     done
-    for d in data db caddy backups .byroctl; do [ -d "$BYRO_ROOT/$d" ]; done
+    for d in data db caddy backups .byroctl plugins; do [ -d "$BYRO_ROOT/$d" ]; done
+    [ -f "$BYRO_ROOT/plugins/plugins.txt" ]
+    [ -z "$(plugin_specs)" ]
     [ "$(conf_get BYRO_DEPLOY_VERSION)" = "v2026.3.0" ]
     [ "$(conf_get BYRO_SITE_URL)" = "https://byro.example.org" ]
     [ "$(conf_get BYRO_HTTPS)" = "true" ]
@@ -238,11 +240,8 @@ run_install() {
     export BYROCTL_SOURCE_DIR=""
     export BYROCTL_RAW_BASE="https://example.test"
     export SHIM_RAW="$BATS_TEST_TMPDIR/raw"
-    mkdir -p "$SHIM_RAW/v2026.3.0/deploy/compose"
-    for f in docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env; do
-        cp "$DEPLOY_DIR/$f" "$SHIM_RAW/v2026.3.0/deploy/$f"
-    done
-    ( cd "$SHIM_RAW/v2026.3.0/deploy" && sha256sum docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env >SHA256SUMS )
+    copy_artifacts "$SHIM_RAW/v2026.3.0/deploy"
+    write_sha256sums "$SHIM_RAW/v2026.3.0/deploy" "${BYROCTL_ARTIFACTS[@]}"
     run_install
     [ "$status" -eq 0 ]
     grep -q "curl .*--proto =https .*v2026.3.0/deploy/SHA256SUMS" "$SHIM_LOG"
@@ -254,4 +253,64 @@ run_install() {
     [[ "$output" == *"checksum mismatch for Caddyfile"* ]]
     [ ! -f "$BYRO_ROOT/Caddyfile" ]
     [ ! -f "$BYRO_ROOT/byro.conf" ]
+}
+
+# --- plugins at installation time
+
+# finance-import-bank-files is the shipped catalog entry; GitHub answers from the curl shim
+bank_files_release() {
+    mkdir -p "$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/releases" "$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/commits"
+    printf '{\n  "tag_name": "%s",\n  "prerelease": false\n}\n' "$1" >"$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/releases/latest"
+    printf '%s' "$2" >"$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/commits/$1"
+}
+
+@test "--plugin installs catalog entries and requirements, builds before the first migration" {
+    bank_files_release v1.0.0 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    run_install --plugin finance-import-bank-files --plugin 'byro-x @ git+https://example.test/x.git@1111111111111111111111111111111111111111'
+    [ "$status" -eq 0 ]
+    grep -qxF 'byro-finance-import-bank-files @ git+https://github.com/byro/byro-finance-import-bank-files.git@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  # byroctl:catalog=finance-import-bank-files version=v1.0.0' "$BYRO_ROOT/plugins/plugins.txt"
+    grep -qxF 'byro-x @ git+https://example.test/x.git@1111111111111111111111111111111111111111' "$BYRO_ROOT/plugins/plugins.txt"
+    [ "$(conf_get COMPOSE_FILE)" = "docker-compose.yml:compose/postgres.yml:compose/plugins.yml" ]
+    seq="$(grep -oE 'docker (manifest inspect|pull ghcr.io/byro/byro:v2026.3.0|compose pull --ignore-buildable|image inspect|buildx version|compose build web|compose up -d db|compose run --rm -T manage migrate|compose up -d$)' "$SHIM_LOG" | tr '\n' '|')"
+    [ "$seq" = "docker manifest inspect|docker pull ghcr.io/byro/byro:v2026.3.0|docker compose pull --ignore-buildable|docker image inspect|docker buildx version|docker compose build web|docker compose up -d db|docker compose run --rm -T manage migrate|docker compose up -d|" ]
+    [[ "$output" == *"plugins:        finance-import-bank-files v1.0.0, byro-x @ git+https://example.test/x.git@1111111111111111111111111111111111111111"* ]]
+}
+
+@test "--set BYROCTL_PLUGINS takes catalog names; unknown names are refused before anything is written" {
+    bank_files_release v1.0.0 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    run_install --set BYROCTL_PLUGINS=finance-import-bank-files
+    [ "$status" -eq 0 ]
+    grep -q "byroctl:catalog=finance-import-bank-files" "$BYRO_ROOT/plugins/plugins.txt"
+    make_root; : >"$SHIM_LOG"
+    run_install --set BYROCTL_PLUGINS="finance-import-bank-files unknown"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"unknown is not a catalog plugin; known: finance-import-bank-files"* ]]
+    [ ! -f "$BYRO_ROOT/byro.conf" ]
+    refute grep -qE "compose (pull|build|up|run)|docker pull" "$SHIM_LOG"
+}
+
+@test "--plugin with an invalid requirement is a usage error before anything is written" {
+    run_install --plugin --bad
+    [ "$status" -eq 64 ]
+    [[ "$output" == *"--plugin: not a catalog name"* ]]
+    [ ! -f "$BYRO_ROOT/byro.conf" ]
+    [ -z "$(ls -A "$BYRO_ROOT")" ]
+}
+
+@test "a failed plugin image build leaves the installation resumable and builds again on the next run" {
+    export SHIM_FAIL="compose build"
+    run_install --plugin 'byro-x==1.0'
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"the installation resumes here"* ]]
+    [ -f "$BYRO_ROOT/byro.conf" ]
+    grep -qxF 'byro-x==1.0' "$BYRO_ROOT/plugins/plugins.txt"
+    refute grep -q "manage migrate" "$SHIM_LOG"
+    [ ! -d "$BYRO_ROOT/.byroctl/lock" ]
+    unset SHIM_FAIL
+    : >"$SHIM_LOG"
+    run byroctl --root "$BYRO_ROOT" install --non-interactive --admin-user admin --admin-email admin@example.org
+    [ "$status" -eq 0 ]
+    grep -q "compose build web" "$SHIM_LOG"
+    grep -q "manage migrate" "$SHIM_LOG"
+    [ "$(grep -c 'byro-x==1.0' "$BYRO_ROOT/plugins/plugins.txt")" -eq 1 ]
 }

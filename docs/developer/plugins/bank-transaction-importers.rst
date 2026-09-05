@@ -85,7 +85,7 @@ free. Invalid importers and duplicate identifiers are logged and ignored.
 Stable identifier
 -----------------
 
-``identifier`` is a stable, dotted string such as ``byro_camt.camt053``. It is
+``identifier`` is a stable, dotted string such as ``byro_finance_import_bank_files.camt053``. It is
 stored on every :class:`~byro.bookkeeping.models.RealTransactionSource` and on
 every booking created from it (``Booking.importer``), and it is used for
 logging and debugging. It must never depend on the translated ``label`` and

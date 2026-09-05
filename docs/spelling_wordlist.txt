@@ -73,3 +73,5 @@ unattended
 uploads
 url
 virtualenv
+Dockerfile
+pip

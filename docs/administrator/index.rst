@@ -22,8 +22,8 @@ There are three ways to install byro:
    classic or individual deployments: :doc:`installation`.
 
 All three share the same configuration options (:doc:`configuration`), the
-same maintenance tasks and the same advice: run byro behind HTTPS only, and
-back up your data.
+same way to add plugins (:doc:`plugins`), the same maintenance tasks and the
+same advice: run byro behind HTTPS only, and back up your data.
 
 The following pages document a straightforward setup without going into details
 on administrative basics like securing your server, or performing backups.
@@ -36,6 +36,7 @@ on administrative basics like securing your server, or performing backups.
    installation-compose
    installation
    configuration
+   plugins
    pgp
    mfa
    docker-compose

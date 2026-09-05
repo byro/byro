@@ -6,10 +6,12 @@
 #   .github/scripts/deploy-checksums.sh --check   fail if the list is out of date (CI)
 #
 # The list is an explicit allowlist of the files that install.sh and byroctl
-# download from a release tag. Files that only go into the image (Dockerfile,
-# entrypoint.sh, healthcheck.py) are deliberately not listed: nobody verifies
-# them at runtime, and Dependabot's base image bumps must not invalidate the
-# list. Tests, caches and the list itself are not part of it either.
+# download from a release tag. Files that only go into the image (deploy/
+# Dockerfile, entrypoint.sh, healthcheck.py) are deliberately not listed:
+# nobody verifies them at runtime, and Dependabot's base image bumps must not
+# invalidate the list. plugins/Dockerfile is different: byroctl downloads it
+# into every installation that uses plugins, so it is listed. Tests, caches and
+# the list itself are not part of it either.
 set -euo pipefail
 
 FILES=(
@@ -18,9 +20,12 @@ FILES=(
     docker-compose.yml
     compose/postgres.yml
     compose/caddy.yml
+    compose/plugins.yml
     Caddyfile
     byro.conf.example
     release.env
+    plugin-catalog.conf
+    plugins/Dockerfile
 )
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../../deploy"

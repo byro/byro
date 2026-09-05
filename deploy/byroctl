@@ -11,6 +11,8 @@
 #   config       get | set | edit | check the configuration in byro.conf
 #   start | stop | restart | logs
 #   manage       run a byro/Django management command in a one-off container
+#   plugin       list | add | remove | update | rebuild plugins (derived image)
+#   update       update to the current stable release
 #   version      show the pinned byro version and the running one
 #   help
 #
@@ -34,7 +36,7 @@ BYROCTL_MIN_COMPOSE="2.20.0"
 BYROCTL_DEFAULT_REPO="ghcr.io/byro/byro"
 : "${BYROCTL_RAW_BASE:=https://raw.githubusercontent.com/byro/byro}"
 : "${BYROCTL_SOURCE_DIR:=}"
-BYROCTL_ARTIFACTS=(docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env)
+BYROCTL_ARTIFACTS=(docker-compose.yml compose/postgres.yml compose/caddy.yml compose/plugins.yml Caddyfile byro.conf.example release.env plugin-catalog.conf plugins/Dockerfile)
 BYROCTL_WEB_HEALTH_TIMEOUT="${BYROCTL_WEB_HEALTH_TIMEOUT:-180}"
 BYROCTL_DB_HEALTH_TIMEOUT="${BYROCTL_DB_HEALTH_TIMEOUT:-120}"
 
@@ -45,6 +47,10 @@ LOCK_DIR=""
 NONINTERACTIVE=0
 declare -A PRESET=()
 MISSING=()
+PLUGINS_FILE=""                       # $BYRO_ROOT/plugins/plugins.txt (set in main)
+PLUGINS_COMPOSE="compose/plugins.yml" # the add-on that switches to the derived image
+INSTALL_PLUGINS=()                    # --plugin arguments of byroctl install
+PLUGINS_SAFEGUARD=""                  # the pre-plugin safeguard of the running command
 
 # --- output -------------------------------------------------------------------
 
@@ -62,6 +68,20 @@ valid_version()  { [[ "$1" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; }
 valid_digest()   { [[ "$1" =~ ^sha256:[0-9a-f]{64}$ ]]; }
 valid_conf_key() { [[ "$1" =~ ^[A-Z][A-Z0-9_]*$ ]]; }
 is_secret_key()  { [[ "$1" == *PASS* || "$1" == *SECRET* ]]; }
+
+# valid_plugin_spec SPEC: a loose sanity check for one pip requirement line;
+# pip stays the authority. Rejected: pip options (a leading "-" or whitespace
+# followed by "-"), "#" (a comment marker for pip, and byroctl appends its own),
+# "$" (pip expands variables in requirement files), ";" and "\" (markers and
+# line continuations) and control characters.
+valid_plugin_spec() {
+    [[ -n "$1" && "$1" != -* && ! "$1" =~ [[:space:]]- && "$1" != *'#'* && "$1" != *'$'* \
+        && "$1" != *';'* && "$1" != *\\* && ! "$1" =~ [[:cntrl:]] ]]
+}
+# plugin_spec_pinned SPEC: an exact version, a VCS ref or a local path
+plugin_spec_pinned() { [[ "$1" == *==* || "$1" =~ @[^@/[:space:]]+$ || "$1" == ./* || "$1" == /* ]]; }
+valid_plugin_name() { [[ "$1" =~ ^[a-z0-9][a-z0-9-]*$ ]]; }
+valid_commit_sha()  { [[ "$1" =~ ^[0-9a-f]{40}$ ]]; }
 
 # version_ge A B: true if A >= B (dotted numbers)
 version_ge() { [[ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" == "$2" ]]; }
@@ -184,6 +204,19 @@ compose_files() {
 
 compose_file_active() { compose_files "${2:-$CONF_FILE}" | grep -qx -- "$1"; }
 
+# compose_file_add PATH / compose_file_remove PATH: toggle an add-on fragment in
+# COMPOSE_FILE; the order of the other entries is kept.
+compose_file_add() {
+    compose_file_active "$1" && return 0
+    conf_set COMPOSE_FILE "$(compose_files | tr '\n' ':')$1"
+}
+compose_file_remove() {
+    local value
+    compose_file_active "$1" || return 0
+    value="$(compose_files | grep -vx -- "$1" | tr '\n' ':' || true)"
+    conf_set COMPOSE_FILE "${value%:}"
+}
+
 # --- secrets and prompts --------------------------------------------------------
 
 # gen_password: 32 alphanumeric characters from /dev/urandom. head reads first,
@@ -300,6 +333,11 @@ release_lock() {
         rm -rf "$LOCK_DIR"
     fi
     LOCK_DIR=""
+    # a plugin snapshot that was not consumed (the command died before phase 2)
+    if [[ -n "${PLUGIN_SNAPSHOT:-}" && -d "$PLUGIN_SNAPSHOT" ]]; then
+        rm -rf "$PLUGIN_SNAPSHOT"
+    fi
+    PLUGIN_SNAPSHOT=""
 }
 
 # --- docker -----------------------------------------------------------------------
@@ -331,6 +369,24 @@ image_digest() {
     line="$(docker image inspect "$ref" --format '{{range .RepoDigests}}{{println .}}{{end}}' 2>/dev/null \
         | grep -F -- "$repo@sha256:" | head -n1 || true)"
     printf '%s' "${line#"$repo@"}"
+}
+
+# pull_images REF: pull the byro base image by tag (image_digest needs the tag
+# pull) and everything else the stack uses. With the plugin add-on no service
+# references the base image and web/periodic/manage are built locally, so the
+# buildable image is skipped.
+pull_images() {
+    if compose_file_active "$PLUGINS_COMPOSE"; then
+        docker pull "$1"
+        compose pull --ignore-buildable
+    else
+        compose pull
+    fi
+}
+
+need_buildx() {
+    docker buildx version >/dev/null 2>&1 \
+        || die "the docker buildx plugin is missing; byro builds the plugin image with it (Debian/Ubuntu: apt install docker-buildx-plugin)"
 }
 
 container_id() { compose ps -q "$1" 2>/dev/null | head -n1 || true; }
@@ -538,9 +594,12 @@ collect_config() {
     local BYRO_DB_HOST BYRO_DB_PORT BYRO_DB_NAME BYRO_DB_USER BYRO_DB_PASS
     local BYRO_MAIL_HOST BYRO_MAIL_PORT BYRO_MAIL_USER BYRO_MAIL_FROM BYRO_MAIL_TLS BYRO_MAIL_SSL BYRO_MAIL_PASSWORD
     local BYRO_DEPLOY_PORT BYRO_DEPLOY_BIND COMPOSE_PROJECT_NAME
-    local https compose_file trust_proxy=false default_proxy tz key
+    local https compose_file trust_proxy=false default_proxy tz key BYROCTL_PLUGINS
 
     log "No byro.conf yet - collecting the configuration for a new installation."
+    # The deployment files first: the plugin question below validates against the
+    # catalog of this release. A resumed installation picks up whatever is missing.
+    install_artifacts "$version"
     ask BYRO_SITE_URL "Public URL of your byro (e.g. https://byro.example.org, no path)" "" valid_url
     if [[ "${BYRO_SITE_URL:-}" == https://* ]]; then https=true; default_proxy=caddy; else https=false; default_proxy=none; fi
     ask BYROCTL_PROXY "Reverse proxy: caddy (byro obtains TLS certificates itself, ports 80/443 must be free), own (you run a reverse proxy), none (direct access, tests only)" "$default_proxy" valid_proxy_mode
@@ -569,6 +628,15 @@ collect_config() {
             ask BYRO_MAIL_TLS "Use STARTTLS (true/false)" "true" valid_bool
             ask BYRO_MAIL_SSL "Use implicit TLS/SSL (true/false)" "false" valid_bool ;;
     esac
+    # Catalog short names only: a free pip requirement may contain spaces and is
+    # given with --plugin instead. "none" keeps the question answerable without
+    # input in both modes.
+    if (( ${#INSTALL_PLUGINS[@]} == 0 )); then
+        ask BYROCTL_PLUGINS "Additional plugins (catalog names, space separated, see: byroctl plugin list; none = no plugins)" "none" valid_plugin_names
+        if [[ "${BYROCTL_PLUGINS:-none}" != none ]]; then
+            read -r -a INSTALL_PLUGINS <<<"$BYROCTL_PLUGINS"
+        fi
+    fi
     ask BYRO_DEPLOY_PORT "Local port for the web service" "8345" valid_port
     ask BYRO_DEPLOY_BIND "Bind address for the web service" "127.0.0.1"
     ask COMPOSE_PROJECT_NAME "Compose project name" "byro" valid_project
@@ -587,7 +655,6 @@ collect_config() {
     [[ "$BYROCTL_DB" == internal ]] && compose_file+=":compose/postgres.yml"
     [[ "$BYROCTL_PROXY" == caddy ]] && compose_file+=":compose/caddy.yml"
 
-    install_artifacts "$version"
     cp "$BYRO_ROOT/byro.conf.example" "$CONF_FILE"
     chmod 600 "$CONF_FILE"
 
@@ -668,6 +735,9 @@ Usage: byroctl install [options]
   --admin-user NAME    user name of the first administrator
   --admin-email MAIL   e-mail address of the first administrator
   --skip-superuser     do not create an administrator account
+  --plugin NAME|SPEC   install a plugin: a catalog short name (byroctl plugin list)
+                       or a pip requirement such as 'pkg==1.2.3' or
+                       'pkg @ git+https://host/repo.git@tag' (repeatable)
   --non-interactive    never prompt; fail if a required value is missing
   --no-pull            use the locally present image, never pull (development)
 
@@ -675,7 +745,8 @@ Secrets are read from the environment only: BYROCTL_ADMIN_PASSWORD,
 BYROCTL_DB_PASSWORD (external database), BYROCTL_MAIL_PASSWORD,
 BYROCTL_OIDC_CLIENT_SECRET.
 Installer switches usable with --set: BYROCTL_PROXY=caddy|own|none,
-BYROCTL_DB=internal|external, BYROCTL_MAIL=host|smtp|skip.
+BYROCTL_DB=internal|external, BYROCTL_MAIL=host|smtp|skip,
+BYROCTL_PLUGINS="name name..." (catalog short names, or none).
 USAGE
 }
 
@@ -703,6 +774,8 @@ cmd_install() {
             --admin-email) [[ $# -ge 2 ]] || die "--admin-email needs a value" 64; admin_email="$2"; shift 2 ;;
             --set) [[ $# -ge 2 ]] || die "--set needs KEY=VALUE" 64; add_preset "$2"; shift 2 ;;
             --set=*) add_preset "${1#--set=}"; shift ;;
+            --plugin) [[ $# -ge 2 ]] || die "--plugin needs a catalog name or a pip requirement" 64; add_install_plugin "$2"; shift 2 ;;
+            --plugin=*) add_install_plugin "${1#--plugin=}"; shift ;;
             -h|--help) install_usage; exit 0 ;;
             *) die "unknown install option: $1 (see byroctl install --help)" 64 ;;
         esac
@@ -737,6 +810,18 @@ cmd_install() {
     fi
     mkdir -p data db caddy backups .byroctl
 
+    # --- plugins: the list now, the image once the base image is present. On a
+    # resumed run entries that are already listed are skipped.
+    plugins_init
+    if (( ${#INSTALL_PLUGINS[@]} > 0 )); then
+        plugins_add_entries "${INSTALL_PLUGINS[@]}" || true
+    fi
+    if plugins_configured; then
+        compose_file_add "$PLUGINS_COMPOSE"
+    else
+        compose_file_remove "$PLUGINS_COMPOSE"
+    fi
+
     # --- image
     repo="$(conf_get BYRO_DEPLOY_IMAGE_REPO 2>/dev/null || true)"
     repo="${repo:-$BYROCTL_DEFAULT_REPO}"
@@ -748,7 +833,7 @@ cmd_install() {
     elif [[ -z "$digest" ]]; then
         image_exists "$ref" || die "image $ref does not exist in the registry (is $version a published byro release?)"
         log "pulling images for byro $version ..."
-        compose pull
+        pull_images "$ref"
         digest="$(image_digest "$repo" "$ref")"
         [[ -n "$digest" ]] || die "the pulled image $ref carries no digest for $repo; refusing to continue without a pin"
         valid_digest "$digest" || die "unexpected digest format: $digest"
@@ -756,7 +841,15 @@ cmd_install() {
         log "pinned image digest $digest"
     else
         log "image is pinned to $digest; making sure all images are present ..."
-        compose pull
+        pull_images "$ref"
+    fi
+
+    # --- plugin image (before the first migration, so that it includes the
+    # plugins' migrations)
+    if plugins_configured; then
+        need_buildx
+        log "building the byro image with plugins ($(plugins_image)) ..."
+        compose build web || die "building the image with plugins failed (see above). Fix plugins/plugins.txt or remove the entry (byroctl plugin remove NAME), then run 'byroctl install' again; the installation resumes here."
     fi
 
     # --- database and schema
@@ -794,9 +887,10 @@ byro $version is installed and running.
   URL:            ${site_url:-unknown}
   directory:      $BYRO_ROOT
   configuration:  $CONF_FILE  (change with: byroctl config set KEY VALUE --apply)
+  plugins:        $(plugin_summary)  (manage with: byroctl plugin list|add|remove|update)
 
 Back up regularly: $BYRO_ROOT/data (documents, keys, .secret), $BYRO_ROOT/db (database)
-or your external database, and $BYRO_ROOT/byro.conf.
+or your external database, $BYRO_ROOT/byro.conf and $BYRO_ROOT/plugins.
 SUMMARY
 }
 
@@ -875,6 +969,14 @@ config_check() {
         [[ -n "$f" ]] || continue
         [[ -f "$BYRO_ROOT/$f" ]] || err "COMPOSE_FILE names $f, but the file does not exist in $BYRO_ROOT"
     done < <(compose_files)
+    if [[ -f "$PLUGINS_FILE" ]] && ! plugins_lint; then
+        err "plugins/plugins.txt has invalid entries (see above)"
+    fi
+    if plugins_configured && ! compose_file_active "$PLUGINS_COMPOSE"; then
+        err "plugins/plugins.txt names plugins, but COMPOSE_FILE does not include $PLUGINS_COMPOSE; run byroctl plugin rebuild"
+    elif ! plugins_configured && compose_file_active "$PLUGINS_COMPOSE"; then
+        err "COMPOSE_FILE includes $PLUGINS_COMPOSE, but plugins/plugins.txt names no plugin; run byroctl plugin rebuild"
+    fi
     if conf_has BYRO_DEBUG; then
         note "BYRO_DEBUG is set - never run a production instance in debug mode"
     fi
@@ -1016,6 +1118,690 @@ cmd_manage() {
     compose run --rm "${tty[@]}" manage "$@"
 }
 
+# --- plugins --------------------------------------------------------------------------------
+#
+# Plugins are pip requirements in plugins/plugins.txt, installed into a derived
+# image that plugins/Dockerfile builds on top of the pinned release image;
+# compose/plugins.yml switches web, periodic and manage to that image while the
+# list names at least one plugin. A catalog entry (plugin-catalog.conf, metadata
+# only) is resolved to a pin when it is added: the current GitHub release by the
+# commit its tag points to, or the current PyPI release with ==. Such a line ends
+# in "# byroctl:catalog=NAME version=V".
+#
+# Every change runs in two phases. Phase 1 (build, manage check) is reversible:
+# on failure the previous plugins.txt, COMPOSE_FILE and image come back. Then a
+# pre-plugin safeguard is written, and phase 2 (migrate, recreate) is not
+# reversed automatically: a database that may already carry the new plugins'
+# schema is never combined with the old code by byroctl; plugin_recovery_hint
+# explains the way forward and the way back.
+
+# --- catalog: [shortname] sections with key=value lines; default file in BYRO_ROOT
+catalog_file() { printf '%s' "${1:-$BYRO_ROOT/plugin-catalog.conf}"; }
+catalog_names() {
+    local file; file="$(catalog_file "${1:-}")"
+    [[ -f "$file" ]] || return 0
+    grep -oE '^\[[a-z0-9-]+\]$' "$file" | tr -d '[]' || true
+}
+catalog_has() {
+    local file; file="$(catalog_file "${2:-}")"
+    [[ -f "$file" ]] && grep -qxF "[$1]" "$file"
+}
+# catalog_field NAME KEY [FILE]: the raw value, empty if absent (values may contain "=")
+catalog_field() {
+    local file; file="$(catalog_file "${3:-}")"
+    [[ -f "$file" ]] || return 0
+    awk -v s="[$1]" -v k="$2" '
+        $0 == s { f = 1; next }
+        /^\[/  { f = 0 }
+        f && index($0, k "=") == 1 { print substr($0, length(k) + 2); exit }
+    ' "$file"
+}
+
+# valid_plugin_names VALUE: "none" or catalog short names separated by spaces
+valid_plugin_names() {
+    local n
+    [[ "$1" == none ]] && return 0
+    for n in $1; do
+        if ! valid_plugin_name "$n" || ! catalog_has "$n"; then
+            printf 'byroctl: %s is not a catalog plugin; known: %s\n' "$n" "$(catalog_names | tr '\n' ' ')" >&2
+            return 1
+        fi
+    done
+}
+
+# add_install_plugin ARG: collect a --plugin argument (catalog name or requirement)
+add_install_plugin() {
+    valid_plugin_name "$1" || valid_plugin_spec "$1" \
+        || die "--plugin: not a catalog name or a usable pip requirement: $1 (no pip options, no #, \$, ; or backslash)" 64
+    INSTALL_PLUGINS+=("$1")
+}
+
+# --- version resolution (https only; api.github.com gets GITHUB_TOKEN when set)
+fetch_url() { # URL DEST [ACCEPT]
+    local url="$1" dest="$2" accept="${3:-application/json}"
+    local headers=(-H "Accept: $accept")
+    require_https "$url" "URL"
+    if [[ "$url" == https://api.github.com/* && -n "${GITHUB_TOKEN:-}" ]]; then
+        headers+=(-H "Authorization: Bearer $GITHUB_TOKEN")
+    fi
+    curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 "${headers[@]}" -o "$dest" "$url"
+}
+
+# github_repo_path URL: owner/repo from https://github.com/owner/repo[.git]
+github_repo_path() {
+    local path="${1#https://github.com/}"
+    path="${path%/}"; path="${path%.git}"
+    [[ "$path" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || return 1
+    printf '%s' "$path"
+}
+
+# resolve_github_release REPO_URL: "SHA<TAB>TAG" of the current regular release
+# (GitHub's releases/latest excludes pre-releases and drafts). The tag name is a
+# deliberately minimal grep over the JSON; the commit comes as plain text from the
+# commits endpoint with the sha media type (annotated tags are peeled).
+resolve_github_release() {
+    local repo_url="$1" path tmp tag sha
+    path="$(github_repo_path "$repo_url")" || die "not a GitHub repository URL: $repo_url"
+    tmp="$(mktemp)"
+    if ! fetch_url "https://api.github.com/repos/$path/releases/latest" "$tmp" "application/vnd.github+json" 2>/dev/null; then
+        rm -f "$tmp"
+        die "$path has no GitHub release yet, or api.github.com is not reachable. Ask the maintainer to publish a release, or give an explicit requirement such as '<package> @ git+https://github.com/$path.git@<ref>'"
+    fi
+    tag="$(grep -oE '"tag_name": *"[^"]+"' "$tmp" | head -n1 | sed -E 's/.*"([^"]+)"$/\1/' || true)"
+    rm -f "$tmp"
+    valid_tag "$tag" || die "the current release of $path has no usable tag name (got: ${tag:-nothing})"
+    case "$tag" in
+        main|master|HEAD|develop|trunk) die "the current release of $path is named $tag, a branch name, not a release tag" ;;
+    esac
+    tmp="$(mktemp)"
+    if ! fetch_url "https://api.github.com/repos/$path/commits/$tag" "$tmp" "application/vnd.github.sha" 2>/dev/null; then
+        rm -f "$tmp"
+        die "cannot resolve the commit of release $tag in $path"
+    fi
+    sha="$(tr -d '[:space:]' <"$tmp")"
+    rm -f "$tmp"
+    valid_commit_sha "$sha" || die "unexpected commit id for release $tag of $path: $sha"
+    printf '%s\t%s' "$sha" "$tag"
+}
+
+# resolve_pypi_release PACKAGE: the current release version on PyPI. The first
+# "version" key of the JSON document is info.version (the info object comes
+# before releases and urls; quotes inside description strings are escaped).
+resolve_pypi_release() {
+    local package="$1" tmp version
+    tmp="$(mktemp)"
+    if ! fetch_url "https://pypi.org/pypi/$package/json" "$tmp" 2>/dev/null; then
+        rm -f "$tmp"
+        die "$package is not on PyPI, or pypi.org is not reachable"
+    fi
+    version="$(grep -oE '"version": *"[^"]+"' "$tmp" | head -n1 | sed -E 's/.*"([^"]+)"$/\1/' || true)"
+    rm -f "$tmp"
+    [[ "$version" =~ ^[0-9][A-Za-z0-9.!+-]*$ ]] || die "PyPI reports no usable version for $package (got: ${version:-nothing})"
+    printf '%s' "$version"
+}
+
+# --- plugins.txt
+plugins_init() {
+    mkdir -p "$BYRO_ROOT/plugins"
+    if [[ ! -f "$PLUGINS_FILE" ]]; then
+        cat >"$PLUGINS_FILE" <<'EOF'
+# byro plugins: one pip requirement per line. A catalog entry is pinned by
+# byroctl (byroctl plugin add NAME); explicit entries look like "name==1.2.3",
+# "name @ git+https://host/repo.git@ref" or "./directory" for a checkout inside
+# plugins/. After editing by hand run: byroctl plugin rebuild
+EOF
+    fi
+}
+
+# The awk program behind plugin_entries: SPEC<TAB>NAME<TAB>VERSION per active
+# line. Comments follow pip's rule (a "#" at the start or after whitespace),
+# NAME and VERSION come from byroctl's marker "# byroctl:catalog=NAME version=V".
+# shellcheck disable=SC2016  # an awk program, not shell expansions
+PLUGIN_ENTRY_AWK='
+    {
+        line = $0; name = ""; version = ""
+        if (match(line, /(^|[ \t])#.*$/)) {
+            comment = substr(line, RSTART, RLENGTH)
+            line = substr(line, 1, RSTART - 1)
+            if (match(comment, /byroctl:catalog=[^ \t]+/)) name = substr(comment, RSTART + 16, RLENGTH - 16)
+            if (match(comment, /version=[^ \t]+/)) version = substr(comment, RSTART + 8, RLENGTH - 8)
+        }
+        gsub(/^[ \t]+|[ \t]+$/, "", line)
+        if (line != "") printf "%s\t%s\t%s\n", line, name, version
+    }'
+plugin_entries() { # [FILE]
+    local file="${1:-$PLUGINS_FILE}"
+    [[ -f "$file" ]] || return 0
+    awk "$PLUGIN_ENTRY_AWK" "$file"
+}
+plugin_parse_line() { awk "$PLUGIN_ENTRY_AWK" <<<"$1"; }   # one raw line -> entry or nothing
+entry_spec()    { printf '%s' "${1%%$'\t'*}"; }
+entry_name()    { local r="${1#*$'\t'}"; printf '%s' "${r%%$'\t'*}"; }
+entry_version() { printf '%s' "${1##*$'\t'}"; }
+# entry_label ENTRY: "finance-import-bank-files v1.2.0 (byro-finance-import-bank-files @ git+...)" or the bare requirement
+entry_label() {
+    local name; name="$(entry_name "$1")"
+    if [[ -n "$name" ]]; then printf '%s %s (%s)' "$name" "$(entry_version "$1")" "$(entry_spec "$1")"; else entry_spec "$1"; fi
+}
+plugin_specs() { plugin_entries | cut -f1; }
+plugins_configured() { [[ -n "$(plugin_specs)" ]]; }
+plugins_image() {
+    local project version
+    project="$(conf_get COMPOSE_PROJECT_NAME 2>/dev/null || true)"
+    version="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
+    printf '%s-plugins:%s' "${project:-byro}" "$version"
+}
+plugin_line() { # SPEC NAME VERSION
+    if [[ -n "$2" ]]; then printf '%s  # byroctl:catalog=%s version=%s\n' "$1" "$2" "$3"; else printf '%s\n' "$1"; fi
+}
+# spec_project SPEC: the (normalized) project name of a requirement, or the path
+spec_project() {
+    local s="$1"
+    s="${s%%[\[<>=!~\ @]*}"
+    printf '%s' "$s" | tr 'A-Z_.' 'a-z--'
+}
+# plugin_summary: "none" or "finance-import-bank-files v1.2.0, byro-x==1.0, ./local"
+plugin_summary() {
+    local entry name out=""
+    while IFS= read -r entry; do
+        [[ -n "$entry" ]] || continue
+        name="$(entry_name "$entry")"
+        if [[ -n "$name" ]]; then
+            out+="${out:+, }$name $(entry_version "$entry")"
+        else
+            out+="${out:+, }$(entry_spec "$entry")"
+        fi
+    done < <(plugin_entries)
+    printf '%s' "${out:-none}"
+}
+# plugin_installed_version NAME: the pinned version of a catalog entry, or nothing
+plugin_installed_version() {
+    local entry
+    while IFS= read -r entry; do
+        [[ "$(entry_name "$entry")" == "$1" ]] || continue
+        printf '%s' "$(entry_version "$entry")"
+        return 0
+    done < <(plugin_entries)
+    return 1
+}
+# entry_matches ENTRY ARG: by catalog name, exact requirement or project name
+entry_matches() {
+    local spec; spec="$(entry_spec "$1")"
+    [[ "$spec" == "$2" || "$(entry_name "$1")" == "$2" ]] && return 0
+    [[ "$(spec_project "$spec")" == "$(spec_project "$2")" ]]
+}
+plugins_lint() {
+    local entry ok=0
+    while IFS= read -r entry; do
+        [[ -n "$entry" ]] || continue
+        if ! valid_plugin_spec "$(entry_spec "$entry")"; then
+            printf 'byroctl: plugins/plugins.txt: invalid line: %s\n' "$(entry_spec "$entry")" >&2
+            ok=1
+        fi
+    done < <(plugin_entries)
+    return $ok
+}
+
+# plugin_resolve ARG [CATALOG]: SPEC<TAB>NAME<TAB>VERSION. A catalog short name is
+# resolved through the plugin's source (decision: the current release, whether
+# it fits the installed byro is decided by the build); anything else is an
+# explicit pip requirement and is only sanity-checked.
+plugin_resolve() {
+    local arg="$1" catalog="${2:-}" package source repo resolved sha tag version
+    if valid_plugin_name "$arg" && catalog_has "$arg" "$catalog"; then
+        package="$(catalog_field "$arg" package "$catalog")"
+        source="$(catalog_field "$arg" source "$catalog")"
+        repo="$(catalog_field "$arg" repo "$catalog")"
+        [[ -n "$package" && -n "$source" && -n "$repo" ]] || die "catalog entry [$arg] is incomplete (package, source, repo)"
+        case "$source" in
+            github)
+                log "resolving the current release of $package from $repo ..."
+                # "|| exit": a command substitution does not inherit set -e, so a
+                # die() inside the resolver must be propagated by hand
+                resolved="$(resolve_github_release "$repo")" || exit $?
+                sha="${resolved%%$'\t'*}"; tag="${resolved#*$'\t'}"
+                printf '%s @ git+https://github.com/%s.git@%s\t%s\t%s' "$package" "$(github_repo_path "$repo")" "$sha" "$arg" "$tag" ;;
+            pypi)
+                log "resolving the current release of $package on PyPI ..."
+                version="$(resolve_pypi_release "$package")" || exit $?
+                printf '%s==%s\t%s\t%s' "$package" "$version" "$arg" "$version" ;;
+            *) die "catalog entry [$arg] has an unknown source: $source" ;;
+        esac
+        return 0
+    fi
+    if valid_plugin_name "$arg"; then
+        die "$arg is not in the plugin catalog (byroctl plugin list). For a package outside the catalog give a pinned requirement, e.g. '$arg==1.2.3' or '$arg @ git+https://host/repo.git@<tag>'" 64
+    fi
+    valid_plugin_spec "$arg" || die "invalid plugin requirement: $arg (no pip options, no #, \$, ; or backslash)" 64
+    plugin_spec_pinned "$arg" || warn "$arg is not pinned to a version; a rebuild may pick a different release of it"
+    printf '%s\t\t' "$arg"
+}
+
+# plugins_prepare_add ARG...: resolve and check everything, print the new entries
+# (nothing is written here). Already listed entries are skipped with a note; the
+# same project with a different requirement is refused.
+plugins_prepare_add() {
+    local arg resolved spec name project existing new_entries=() e
+    for arg in "$@"; do
+        resolved="$(plugin_resolve "$arg")" || exit $?
+        spec="$(entry_spec "$resolved")"; name="$(entry_name "$resolved")"
+        if [[ -n "$name" ]] && plugin_installed_version "$name" >/dev/null; then
+            log "already listed: $name $(plugin_installed_version "$name")"
+            continue
+        fi
+        project="$(spec_project "$spec")"
+        while IFS= read -r existing; do
+            [[ -n "$existing" ]] || continue
+            [[ "$(entry_spec "$existing")" == "$spec" ]] && { log "already listed: $spec"; continue 2; }
+            [[ "$(spec_project "$(entry_spec "$existing")")" == "$project" ]] \
+                && die "$project is already listed with a different requirement ($(entry_spec "$existing")); remove it first: byroctl plugin remove $project" 64
+        done < <(plugin_entries)
+        for e in "${new_entries[@]}"; do
+            [[ "$(spec_project "$(entry_spec "$e")")" == "$project" ]] && die "$project is given twice with different requirements" 64
+        done
+        new_entries+=("$resolved")
+    done
+    (( ${#new_entries[@]} == 0 )) || printf '%s\n' "${new_entries[@]}"
+}
+# plugins_add_entries ARG...: prepare, then append; returns 1 if nothing was new
+plugins_add_entries() {
+    local prepared entry
+    prepared="$(plugins_prepare_add "$@")" || exit $?
+    [[ -n "$prepared" ]] || return 1
+    while IFS= read -r entry; do
+        [[ -n "$entry" ]] || continue
+        plugin_line "$(entry_spec "$entry")" "$(entry_name "$entry")" "$(entry_version "$entry")" >>"$PLUGINS_FILE"
+        log "added $(entry_label "$entry")"
+    done <<<"$prepared"
+}
+
+# --- snapshot, apply, revert
+PLUGIN_SNAPSHOT=""   # removed by release_lock if a command dies before consuming it
+
+# plugins_snapshot [APPLIED_FILE]: the state before a change, for the revert of
+# phase 1 and for the safeguard at the phase boundary. Without an argument the
+# current plugins.txt is the previous state; with a file that file is (rebuild
+# passes the list the running image was built from); an empty argument records
+# that no previously applied plugin state existed.
+plugins_snapshot() {
+    local dir
+    dir="$(mktemp -d "$BYRO_ROOT/.byroctl/plugin-snapshot.XXXXXX")"
+    cp "$CONF_FILE" "$dir/byro.conf"
+    chmod 600 "$dir/byro.conf"
+    if (( $# == 0 )); then
+        cp "$PLUGINS_FILE" "$dir/plugins.txt"
+    elif [[ -n "$1" ]]; then
+        cp "$1" "$dir/plugins.txt"
+    fi
+    PLUGIN_SNAPSHOT="$dir"
+    printf '%s' "$dir"
+}
+
+# plugins_applied_state DEST: the plugins.txt the running plugin image was built
+# from (/byro/plugins.txt in the web container, else in the local plugin image);
+# returns 1 when no previously applied plugin state exists.
+plugins_applied_state() {
+    local dest="$1" image
+    image="$(plugins_image)"
+    if compose_file_active "$PLUGINS_COMPOSE" && [[ -n "$(container_id web)" ]]; then
+        if compose exec -T web cat /byro/plugins.txt >"$dest" 2>/dev/null; then return 0; fi
+    fi
+    if image_local "$image"; then
+        if docker run --rm --entrypoint cat "$image" /byro/plugins.txt >"$dest" 2>/dev/null; then return 0; fi
+    fi
+    return 1
+}
+
+# plugins_build_and_check [--no-cache]: phase 1. Returns 1 on failure; nothing
+# irreversible has happened then.
+plugins_build_and_check() {
+    local nocache=()
+    [[ "${1:-}" == --no-cache ]] && nocache=(--no-cache)
+    if plugins_configured; then
+        compose_file_add "$PLUGINS_COMPOSE"
+        log "building the byro image with plugins ($(plugins_image)) ..."
+        compose build "${nocache[@]}" web || return 1
+        log "checking the new image (manage check) ..."
+        compose run --rm -T manage check || return 1
+    else
+        compose_file_remove "$PLUGINS_COMPOSE"
+    fi
+}
+
+# plugins_migrate_and_start SNAPSHOT SKIP_SAFEGUARD: the safeguard (still phase 1:
+# a failure here returns 1 and is reverted), then phase 2. Returns 2 when the
+# migration failed and 3 when the stack did not come back healthy.
+plugins_migrate_and_start() {
+    local snapshot="$1" skip="$2" version digest
+    PLUGINS_SAFEGUARD=""
+    if (( skip )); then
+        warn "skipping the pre-plugin safeguard (--skip-safeguard)"
+    else
+        version="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
+        digest="$(conf_get BYRO_DEPLOY_IMAGE_DIGEST 2>/dev/null || true)"
+        if ! PLUGINS_SAFEGUARD="$(pre_update_safeguard "$version" "$digest" "$version" pre-plugin "$snapshot")"; then
+            return 1
+        fi
+        log "safeguard written to $PLUGINS_SAFEGUARD"
+    fi
+    rm -rf "$snapshot"; PLUGIN_SNAPSHOT=""
+    log "applying database migrations ..."
+    compose run --rm -T manage migrate --noinput || return 2
+    if [[ -n "$(container_id web)" ]]; then
+        log "recreating the byro services with the new image ..."
+        compose up -d || return 3
+        wait_healthy web "$BYROCTL_WEB_HEALTH_TIMEOUT" || return 3
+    else
+        log "the stack is not running; start it with: byroctl start"
+    fi
+    return 0
+}
+
+# plugins_revert SNAPSHOT WAS_ACTIVE KEEP_LIST: after a phase 1 failure only
+plugins_revert() {
+    local snapshot="$1" was_active="$2" keep_list="$3"
+    if (( ! keep_list )) && [[ -f "$snapshot/plugins.txt" ]]; then
+        cp "$snapshot/plugins.txt" "$PLUGINS_FILE"
+    fi
+    cp "$snapshot/byro.conf" "$CONF_FILE"
+    chmod 600 "$CONF_FILE"
+    if (( was_active )); then
+        log "restoring the previous plugin image from the build cache ..."
+        compose build web >/dev/null 2>&1 \
+            || warn "could not rebuild the previous plugin image; the running containers are unaffected, run byroctl plugin rebuild after fixing the cause"
+    fi
+    rm -rf "$snapshot"; PLUGIN_SNAPSHOT=""
+}
+
+# plugin_recovery_hint KIND(migrate|start) SAFEGUARD
+plugin_recovery_hint() {
+    local kind="$1" safeguard="$2"
+    if [[ "$kind" == migrate ]]; then
+        log "plugin migration failed; the database may already contain changes of the new plugin set."
+    else
+        log "web did not become healthy after the plugin change; the migration has run."
+    fi
+    log "  plugins/plugins.txt and COMPOSE_FILE keep the attempted state on purpose."
+    log "  Do not switch back to the previous plugins by hand: the schema may no longer match their code."
+    log "  Forward: read the error above and 'byroctl logs web', fix the cause, then: byroctl plugin rebuild"
+    log "  Back:    1. restore ${safeguard:-the pre-plugin safeguard in $BYRO_ROOT/backups}: the database from db.dump (pg_restore),"
+    log "              then byro.conf and plugins/plugins.txt from there (META says whether a previous plugin list existed)"
+    log "           2. byroctl plugin rebuild"
+    log "           3. byroctl start, then byroctl version (loaded plugins) and the health of web"
+}
+
+# plugins_finish SNAPSHOT WAS_ACTIVE KEEP_LIST SKIP_SAFEGUARD [--no-cache]: both
+# phases with the agreed exits: 1 reverted, 2 migration failed, 3 start failed.
+plugins_finish() {
+    local snapshot="$1" was_active="$2" keep_list="$3" skip="$4" rc=0
+    shift 4
+    plugins_build_and_check "$@" || rc=1
+    if (( rc == 0 )); then
+        plugins_migrate_and_start "$snapshot" "$skip" || rc=$?
+    fi
+    case "$rc" in
+        0)
+            log "plugins now: $(plugin_summary)"
+            return 0 ;;
+        1)
+            plugins_revert "$snapshot" "$was_active" "$keep_list"
+            if (( keep_list )); then
+                die "the plugin image could not be built or checked (see above). plugins/plugins.txt was kept as you edited it; COMPOSE_FILE is back to its previous state and the stack is unchanged. Fix the cause, then run byroctl plugin rebuild again." 1
+            fi
+            die "the plugin image could not be built or checked (see above); nothing was changed, the stack still runs the previous plugin set" 1 ;;
+        2) plugin_recovery_hint migrate "$PLUGINS_SAFEGUARD"; exit 2 ;;
+        *) plugin_recovery_hint start "$PLUGINS_SAFEGUARD"; exit 3 ;;
+    esac
+}
+
+# plugins_resolve_updates TMP CATALOG [NAME...]: resolve every (or the named)
+# catalog entries again and write the resulting list to TMP. Per entry: the same
+# requirement -> unchanged; a new release -> updated; the same release tag now
+# pointing to another commit -> integrity error. Returns 1 if any integrity
+# error occurred (fail-closed: TMP must not be used), 3 if nothing changed, 0 if
+# TMP carries changes.
+plugins_resolve_updates() {
+    local tmp="$1" catalog="${2:-}" line entry spec name version resolved new_spec new_version rc
+    local -a filter=("${@:3}")
+    local n changed=0 integrity=0
+    for n in "${filter[@]}"; do
+        plugin_installed_version "$n" >/dev/null || die "$n is not an installed catalog plugin (byroctl plugin list)" 64
+    done
+    : >"$tmp"
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        entry="$(plugin_parse_line "$line")"
+        name="$(entry_name "${entry:-$'\t\t'}")"
+        if [[ -z "$entry" || -z "$name" ]]; then
+            printf '%s\n' "$line" >>"$tmp"
+            continue
+        fi
+        if (( ${#filter[@]} > 0 )) && [[ " ${filter[*]} " != *" $name "* ]]; then
+            printf '%s\n' "$line" >>"$tmp"
+            continue
+        fi
+        if ! catalog_has "$name" "$catalog"; then
+            warn "$name is no longer in the plugin catalog; keeping the installed pin"
+            printf '%s\n' "$line" >>"$tmp"
+            continue
+        fi
+        spec="$(entry_spec "$entry")"; version="$(entry_version "$entry")"
+        # this function runs in a "|| rc=$?" context where set -e is off: a
+        # resolution failure (die inside) must end the command explicitly
+        resolved="$(plugin_resolve "$name" "$catalog")" || { rc=$?; rm -f "$tmp"; exit "$rc"; }
+        new_spec="$(entry_spec "$resolved")"; new_version="$(entry_version "$resolved")"
+        if [[ "$new_spec" == "$spec" ]]; then
+            log "$name: $version (current)"
+            printf '%s\n' "$line" >>"$tmp"
+        elif [[ "$new_version" == "$version" && "$spec" == *git+* && "$new_spec" == *git+* ]]; then
+            printf 'byroctl: ERROR: %s: release %s now points to commit %s, the installed pin is %s. Published release tags are treated as immutable; byroctl keeps the installed pin. Ask the plugin maintainer to publish a new release for changed code.\n' \
+                "$name" "$version" "${new_spec##*@}" "${spec##*@}" >&2
+            printf '%s\n' "$line" >>"$tmp"
+            integrity=1
+        else
+            log "$name: $version -> $new_version"
+            plugin_line "$new_spec" "$name" "$new_version" >>"$tmp"
+            changed=1
+        fi
+    done <"$PLUGINS_FILE"
+    (( integrity == 0 )) || return 1
+    (( changed )) || return 3
+    return 0
+}
+
+plugin_usage() {
+    cat >&2 <<'USAGE'
+Usage: byroctl plugin <subcommand> [options]
+
+  list                     the plugin catalog, what is installed, extra entries
+  add NAME|SPEC...         add catalog plugins (short names) or pip requirements
+                           ('pkg==1.2.3', 'pkg @ git+https://host/repo.git@tag',
+                           './dir' for a checkout inside plugins/), then rebuild
+  remove NAME|SPEC...      remove entries (database tables of a plugin are kept)
+  update [--check] [NAME...]
+                           move catalog plugins to their current release; --check
+                           only reports (exit 0 changes, 3 none, 1 error)
+  rebuild [--no-cache]     rebuild the image from plugins/plugins.txt (after
+                           editing it by hand)
+
+Options for add, remove, update, rebuild:
+  --skip-safeguard         no pre-plugin safeguard (database dump, byro.conf,
+                           previous plugins.txt, .secret) before the migration
+
+Exit codes: 1 build, check, resolution or integrity error (nothing changed),
+2 migration failed, 3 start or health check failed (see the recovery hint),
+64 usage.
+USAGE
+}
+
+plugin_list() {
+    local name installed entry extras=() catalog
+    catalog="$(catalog_file)"
+    if [[ -f "$catalog" ]]; then
+        printf '%-14s %-24s %-7s %-16s %s\n' NAME PACKAGE SOURCE INSTALLED DESCRIPTION
+        while IFS= read -r name; do
+            [[ -n "$name" ]] || continue
+            installed="$(plugin_installed_version "$name" || true)"
+            printf '%-14s %-24s %-7s %-16s %s\n' "$name" "$(catalog_field "$name" package)" \
+                "$(catalog_field "$name" source)" "${installed:--}" "$(catalog_field "$name" description)"
+        done < <(catalog_names)
+    else
+        warn "no plugin catalog in $BYRO_ROOT (plugin-catalog.conf); byroctl install or update fetches it"
+    fi
+    while IFS= read -r entry; do
+        [[ -n "$entry" && -z "$(entry_name "$entry")" ]] || continue
+        extras+=("$(entry_spec "$entry")")
+    done < <(plugin_entries)
+    if (( ${#extras[@]} > 0 )); then
+        printf '\nAdditional entries in plugins/plugins.txt:\n'
+        printf '  %s\n' "${extras[@]}"
+    fi
+    if plugins_configured; then
+        printf '\nplugin image: %s\n' "$(plugins_image)"
+    fi
+}
+
+plugin_add() {
+    local skip=0 args=() arg snapshot was_active=0 prepared entry
+    for arg in "$@"; do
+        case "$arg" in
+            --skip-safeguard) skip=1 ;;
+            -*) die "unknown plugin add option: $arg; a plugin is a catalog name or a pip requirement, never a pip option (see byroctl plugin --help)" 64 ;;
+            *) args+=("$arg") ;;
+        esac
+    done
+    (( ${#args[@]} > 0 )) || die "usage: byroctl plugin add NAME|SPEC..." 64
+    prepared="$(plugins_prepare_add "${args[@]}")" || exit $?
+    if [[ -z "$prepared" ]]; then
+        log "nothing to do"
+        return 0
+    fi
+    snapshot="$(plugins_snapshot)"
+    compose_file_active "$PLUGINS_COMPOSE" && was_active=1
+    while IFS= read -r entry; do
+        [[ -n "$entry" ]] || continue
+        plugin_line "$(entry_spec "$entry")" "$(entry_name "$entry")" "$(entry_version "$entry")" >>"$PLUGINS_FILE"
+        log "adding $(entry_label "$entry")"
+    done <<<"$prepared"
+    log "note: web is recreated once the image is built; users see a short interruption"
+    plugins_finish "$snapshot" "$was_active" 0 "$skip"
+}
+
+plugin_remove() {
+    local skip=0 args=() arg snapshot was_active=0 tmp line entry matched
+    for arg in "$@"; do
+        case "$arg" in
+            --skip-safeguard) skip=1 ;;
+            -*) die "unknown plugin remove option: $arg (see byroctl plugin --help)" 64 ;;
+            *) args+=("$arg") ;;
+        esac
+    done
+    (( ${#args[@]} > 0 )) || die "usage: byroctl plugin remove NAME|SPEC..." 64
+    for arg in "${args[@]}"; do
+        matched=0
+        while IFS= read -r entry; do
+            [[ -n "$entry" ]] || continue
+            entry_matches "$entry" "$arg" && matched=1
+        done < <(plugin_entries)
+        (( matched )) || die "$arg is not listed in plugins/plugins.txt (byroctl plugin list)" 64
+    done
+    snapshot="$(plugins_snapshot)"
+    compose_file_active "$PLUGINS_COMPOSE" && was_active=1
+    tmp="$(mktemp "$PLUGINS_FILE.XXXXXX")"
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        entry="$(plugin_parse_line "$line")"
+        if [[ -n "$entry" ]]; then
+            matched=0
+            for arg in "${args[@]}"; do entry_matches "$entry" "$arg" && matched=1; done
+            if (( matched )); then
+                log "removing $(entry_spec "$entry")"
+                continue
+            fi
+        fi
+        printf '%s\n' "$line" >>"$tmp"
+    done <"$PLUGINS_FILE"
+    chmod 644 "$tmp"
+    mv "$tmp" "$PLUGINS_FILE"
+    plugins_finish "$snapshot" "$was_active" 0 "$skip"
+    if ! plugins_configured; then
+        log "back on the plain byro image. Database tables of removed plugins are kept (run 'byroctl manage migrate <app> zero' before removing a plugin if you want them gone); 'docker image rm $(plugins_image)' frees the old plugin image."
+    fi
+}
+
+plugin_update() {
+    local check=0 skip=0 names=() arg snapshot was_active=0 tmp rc=0
+    for arg in "$@"; do
+        case "$arg" in
+            --check) check=1 ;;
+            --skip-safeguard) skip=1 ;;
+            -*) die "unknown plugin update option: $arg (see byroctl plugin --help)" 64 ;;
+            *) valid_plugin_name "$arg" || die "not a catalog short name: $arg" 64; names+=("$arg") ;;
+        esac
+    done
+    tmp="$(mktemp "$BYRO_ROOT/.byroctl/plugins.txt.XXXXXX")"
+    plugins_resolve_updates "$tmp" "" "${names[@]}" || rc=$?
+    case "$rc" in
+        0) ;;
+        3)
+            rm -f "$tmp"
+            log "all catalog plugins are at their current release"
+            (( check )) && exit 3
+            return 0 ;;
+        *)
+            rm -f "$tmp"
+            die "plugin update stopped: a release tag moved (see above); nothing was changed, no plugin was updated" 1 ;;
+    esac
+    if (( check )); then
+        rm -f "$tmp"
+        log "run byroctl plugin update to apply"
+        return 0
+    fi
+    snapshot="$(plugins_snapshot)"
+    compose_file_active "$PLUGINS_COMPOSE" && was_active=1
+    chmod 644 "$tmp"
+    mv "$tmp" "$PLUGINS_FILE"
+    log "note: web is recreated once the image is built; users see a short interruption"
+    plugins_finish "$snapshot" "$was_active" 0 "$skip"
+}
+
+plugin_rebuild() {
+    local nocache=() skip=0 arg snapshot was_active=0 applied
+    for arg in "$@"; do
+        case "$arg" in
+            --no-cache) nocache=(--no-cache) ;;
+            --skip-safeguard) skip=1 ;;
+            *) die "unknown plugin rebuild option: $arg (see byroctl plugin --help)" 64 ;;
+        esac
+    done
+    plugins_lint || die "plugins/plugins.txt has invalid entries (see above); fix them first" 1
+    compose_file_active "$PLUGINS_COMPOSE" && was_active=1
+    # The safeguard gets the list the running image was built from, not the
+    # edited file: plugins/plugins.txt is the desired state, /byro/plugins.txt in
+    # the image the previously applied one.
+    applied="$(mktemp "$BYRO_ROOT/.byroctl/plugins.applied.XXXXXX")"
+    if plugins_applied_state "$applied"; then
+        snapshot="$(plugins_snapshot "$applied")"
+    else
+        log "no previously applied plugin state (no plugin container or image); the safeguard records that"
+        snapshot="$(plugins_snapshot "")"
+    fi
+    rm -f "$applied"
+    plugins_finish "$snapshot" "$was_active" 1 "$skip" "${nocache[@]}"
+}
+
+cmd_plugin() {
+    local sub="${1:-}"
+    [[ -n "$sub" ]] || { plugin_usage; exit 64; }
+    shift
+    case "$sub" in
+        list) enter_root; plugin_list ;;
+        add|remove|update|rebuild)
+            enter_root; need_docker; need_buildx; acquire_lock; plugins_init
+            "plugin_$sub" "$@" ;;
+        -h|--help|help) plugin_usage; exit 0 ;;
+        *) die "unknown plugin subcommand: $sub (list | add | remove | update | rebuild)" 64 ;;
+    esac
+}
+
 # --- update ---------------------------------------------------------------------------------
 
 release_notes_url() { printf 'https://github.com/byro/byro/releases/tag/%s' "$1"; }
@@ -1136,15 +1922,33 @@ update_artifacts() {
     done
 }
 
-# pre_update_safeguard CURRENT DIGEST TARGET: dump + byro.conf + .secret + META
+# pre_update_safeguard CURRENT DIGEST TARGET [PREFIX] [SNAPSHOT]: dump + byro.conf
+# + plugins.txt + .secret + META in backups/PREFIX-CURRENT-<timestamp>/. With a
+# SNAPSHOT directory (plugin commands), byro.conf and plugins.txt are taken from
+# there, i.e. the state before the command started changing files; a snapshot
+# without plugins.txt means no previously applied plugin state existed.
 pre_update_safeguard() {
-    local current="$1" digest="$2" target="$3" dir major db_user db_name db_host db_port
-    dir="$BYRO_ROOT/backups/pre-update-$current-$(date -u +%Y%m%d-%H%M%S)"
+    local current="$1" digest="$2" target="$3" prefix="${4:-pre-update}" snapshot="${5:-}"
+    local dir major db_user db_name db_host db_port conf_src plugins_src="" plugins_note=""
+    dir="$BYRO_ROOT/backups/$prefix-$current-$(date -u +%Y%m%d-%H%M%S)"
     mkdir -p "$dir"
     chmod 700 "$dir"
     db_user="$(conf_get BYRO_DB_USER 2>/dev/null || true)"; db_user="${db_user:-byro}"
     db_name="$(conf_get BYRO_DB_NAME 2>/dev/null || true)"; db_name="${db_name:-byro}"
-    log "pre-update safeguard: dumping the database to $dir/db.dump"
+    conf_src="$CONF_FILE"
+    if [[ -n "$snapshot" ]]; then
+        conf_src="$snapshot/byro.conf"
+        if [[ -f "$snapshot/plugins.txt" ]]; then
+            plugins_src="$snapshot/plugins.txt"
+        else
+            plugins_note="none (no plugin container or image existed before this command)"
+        fi
+    elif [[ -f "$PLUGINS_FILE" ]]; then
+        plugins_src="$PLUGINS_FILE"
+    else
+        plugins_note="none (no plugins/plugins.txt)"
+    fi
+    log "$prefix safeguard: dumping the database to $dir/db.dump"
     if compose_file_active compose/postgres.yml; then
         compose up -d db
         wait_healthy db "$BYROCTL_DB_HEALTH_TIMEOUT" || die "the database is not healthy; cannot create the pre-update dump"
@@ -1158,8 +1962,12 @@ pre_update_safeguard() {
             pg_dump -h "$db_host" -p "$db_port" -U "$db_user" -Fc "$db_name" >"$dir/db.dump"
     fi
     [[ -s "$dir/db.dump" ]] || die "the database dump is empty; not continuing without a safeguard (use --skip-safeguard to override)"
-    cp "$CONF_FILE" "$dir/byro.conf"
+    cp "$conf_src" "$dir/byro.conf"
     chmod 600 "$dir/byro.conf"
+    if [[ -n "$plugins_src" ]]; then
+        cp "$plugins_src" "$dir/plugins.txt"
+        chmod 644 "$dir/plugins.txt"
+    fi
     if [[ -f "$BYRO_ROOT/data/.secret" ]]; then
         cp "$BYRO_ROOT/data/.secret" "$dir/.secret"
         chmod 600 "$dir/.secret"
@@ -1167,11 +1975,13 @@ pre_update_safeguard() {
         warn "data/.secret not found; nothing to copy"
     fi
     {
+        printf 'BYROCTL_KIND=%s\n' "$prefix"
         printf 'BYROCTL_PREVIOUS_VERSION=%s\n' "$current"
         printf 'BYROCTL_PREVIOUS_DIGEST=%s\n' "$digest"
         printf 'BYROCTL_TARGET_VERSION=%s\n' "$target"
+        printf 'BYROCTL_PREVIOUS_PLUGINS=%s\n' "$([[ -n "$plugins_src" ]] && printf 'plugins.txt' || printf '%s' "'$plugins_note'")"
         printf 'BYROCTL_CREATED_AT=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-        printf 'BYROCTL_NOTE=%s\n' "'pre-update safeguard, not a full backup: documents and other files in data/ are not included'"
+        printf 'BYROCTL_NOTE=%s\n' "'$prefix safeguard, not a full backup: documents and other files in data/ are not included'"
     } >"$dir/META"
     printf '%s' "$dir"
 }
@@ -1187,6 +1997,9 @@ rollback_hint() {
         log "  2. byroctl config set BYRO_DEPLOY_IMAGE_DIGEST ''"
     fi
     log "  3. fetch the compose files of $current again (deploy/ of that tag) or restore them from ${safeguard:-your backup}"
+    if plugins_configured; then
+        log "  3b. byroctl plugin rebuild (rebuilds the plugin image for $current; plugins.txt of that version is in ${safeguard:-the safeguard})"
+    fi
     if [[ -n "$safeguard" ]]; then
         log "  4. if the migration changed the database: restore $safeguard/db.dump with pg_restore, then"
     fi
@@ -1204,14 +2017,17 @@ Usage: byroctl update [options]
   --skip-safeguard        do not create the pre-update safeguard (database dump, byro.conf, .secret)
   --data-safeguard-done   confirm that a full backup of data/ exists (required when the
                           release changes persistent files)
+  --update-plugins        also move catalog plugins to their current release; without
+                          this the plugin pins stay as they are (the image is rebuilt anyway)
   --non-interactive       never prompt
   --no-pull               use the locally present target image (development)
 USAGE
 }
 
 cmd_update() {
-    local check=0 prefetch=0 skip_safeguard=0 data_ok=0 yes=0 no_pull=0 stage2=0 target=""
+    local check=0 prefetch=0 skip_safeguard=0 data_ok=0 yes=0 no_pull=0 stage2=0 update_plugins=0 target=""
     local current repo digest relation sums="" relenv breaking datamig notes next flags=() safeguard="" now new_digest
+    local plugins_next="" catalog_next prc
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --check) check=1; shift ;;
@@ -1220,6 +2036,7 @@ cmd_update() {
             --prefetch) prefetch=1; shift ;;
             --skip-safeguard) skip_safeguard=1; shift ;;
             --data-safeguard-done) data_ok=1; shift ;;
+            --update-plugins) update_plugins=1; shift ;;
             --yes) yes=1; shift ;;
             --no-pull) no_pull=1; shift ;;
             --non-interactive) NONINTERACTIVE=1; shift ;;
@@ -1283,6 +2100,10 @@ cmd_update() {
         printf 'release notes:  %s\n' "$notes"
         printf 'breaking:       %s\n' "$([[ "$breaking" == 1 ]] && printf 'yes - read the release notes and confirm with --yes' || printf 'no')"
         printf 'file migration: %s\n' "$([[ "$datamig" == 1 ]] && printf 'yes - a full backup of data/ is required (--data-safeguard-done)' || printf 'no')"
+        if plugins_configured; then
+            printf 'plugins:        %s configured; the plugin image is rebuilt for %s with the pins unchanged (--update-plugins moves catalog plugins to their current release)\n' \
+                "$(plugin_specs | grep -c . || true)" "$target"
+        fi
         [[ -z "$sums" ]] || rm -f "$sums"
         return 0
     fi
@@ -1336,6 +2157,7 @@ cmd_update() {
         flags=(--yes)
         (( skip_safeguard )) && flags+=(--skip-safeguard)
         (( data_ok )) && flags+=(--data-safeguard-done)
+        (( update_plugins )) && flags+=(--update-plugins)
         (( no_pull )) && flags+=(--no-pull)
         (( NONINTERACTIVE )) && flags+=(--non-interactive)
         log "switching to byroctl of $target and continuing the update"
@@ -1350,6 +2172,27 @@ cmd_update() {
         die "less than 2 GB free in $BYRO_ROOT; free some space before updating"
     fi
     compose config -q || die "the current compose configuration is invalid; fix it (byroctl config check) before updating"
+
+    # plugins: lint, and with --update-plugins resolve every catalog entry against
+    # the target's catalog now, before anything is changed. A moved release tag
+    # stops the update here (fail-closed); the new list is applied after the pull.
+    if plugins_configured; then
+        plugins_lint || die "plugins/plugins.txt has invalid entries (see above); fix them before updating"
+        if (( update_plugins )); then
+            catalog_next="$(mktemp "$BYRO_ROOT/.byroctl/plugin-catalog.XXXXXX")"
+            fetch_verified "$target" plugin-catalog.conf "$catalog_next" "$sums"
+            plugins_next="$(mktemp "$BYRO_ROOT/.byroctl/plugins.txt.XXXXXX")"
+            prc=0
+            plugins_resolve_updates "$plugins_next" "$catalog_next" || prc=$?
+            rm -f "$catalog_next"
+            case "$prc" in
+                0) log "catalog plugins will be moved to their current release during the update" ;;
+                3) rm -f "$plugins_next"; plugins_next=""; log "catalog plugins are already at their current release" ;;
+                *) rm -f "$plugins_next"; [[ -z "$sums" ]] || rm -f "$sums"
+                   die "a plugin release tag moved (see above); the update was not started and nothing was changed" ;;
+            esac
+        fi
+    fi
     run_hook pre-update "$current" "$target"
 
     if (( skip_safeguard )); then
@@ -1377,12 +2220,30 @@ cmd_update() {
         log "using the local image $repo:$target (--no-pull); the digest stays unpinned"
     else
         log "pulling images for byro $target ..."
-        compose pull
+        pull_images "$repo:$target"
         new_digest="$(image_digest "$repo" "$repo:$target")"
         [[ -n "$new_digest" ]] || { rollback_hint "$current" "$digest" "$safeguard"; die "the pulled image $repo:$target carries no digest for $repo"; }
         valid_digest "$new_digest" || die "unexpected digest format: $new_digest"
         conf_set BYRO_DEPLOY_IMAGE_DIGEST "$new_digest"
         log "pinned image digest $new_digest"
+    fi
+
+    # plugin image on top of the new base (the running stack is untouched until
+    # the build succeeded)
+    if plugins_configured; then
+        if [[ -n "$plugins_next" ]]; then
+            log "moving catalog plugins to their current release:"
+            diff -u "$PLUGINS_FILE" "$plugins_next" >&2 || true
+            mv "$plugins_next" "$PLUGINS_FILE"
+            plugins_next=""
+        fi
+        compose_file_add "$PLUGINS_COMPOSE"
+        need_buildx
+        log "building the byro image with plugins for $target ($(plugins_image)) ..."
+        if ! compose build web; then
+            rollback_hint "$current" "$digest" "$safeguard"
+            die "building the image with plugins for $target failed (see above); the running stack was not touched"
+        fi
     fi
 
     # switch over
@@ -1416,6 +2277,7 @@ byro updated: $current -> $target
   release notes:  $notes
   safeguard:      ${safeguard:-skipped}
   previous image: ${digest:-unpinned}
+  plugins:        $(plugin_summary)$(plugins_configured && printf '  (image %s; the previous plugin image can go with: docker image rm %s)' "$(plugins_image)" "$(conf_get COMPOSE_PROJECT_NAME 2>/dev/null || printf byro)-plugins:$current")
 
 Old images are kept (docker image prune removes them when you no longer need a way back).
 SUMMARY
@@ -1461,9 +2323,10 @@ Commands:
   restart      recreate the byro services (web, periodic, caddy), not the database
   logs         show logs: byroctl logs [-f] [SERVICE...]
   manage       run a byro management command: byroctl manage migrate
+  plugin       list | add NAME|SPEC... | remove NAME... | update [--check] | rebuild
   update       update to the current stable release: byroctl update [--check] [--to TAG]
   self-update  re-fetch byroctl for the installed release (repair)
-  version      show the installed and running byro version
+  version      show the installed and running byro version and plugins
   help         this text
 
 Global options:
@@ -1473,16 +2336,19 @@ USAGE
 }
 
 cmd_version() {
-    local version digest running
+    local version digest running loaded
     version="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
     digest="$(conf_get BYRO_DEPLOY_IMAGE_DIGEST 2>/dev/null || true)"
     printf 'byro version:   %s\n' "${version:-unset}"
     printf 'image digest:   %s\n' "${digest:-not pinned}"
     printf 'root:           %s\n' "$BYRO_ROOT"
     printf 'compose files:  %s\n' "$(compose_files | tr '\n' ' ')"
+    printf 'plugins:        %s\n' "$(plugin_summary)"
     if [[ -n "$(container_id web)" ]]; then
         running="$(compose exec -T web python -c 'import byro; print(byro.__version__)' 2>/dev/null | tail -n1 || true)"
         printf 'running byro:   %s\n' "${running:-unknown}"
+        loaded="$(compose exec -T web python -c 'from django.conf import settings; print(" ".join(settings.PLUGINS))' 2>/dev/null | tail -n1 || true)"
+        printf 'loaded plugins: %s\n' "${loaded:-none}"
     else
         printf 'running byro:   not running\n'
     fi
@@ -1506,6 +2372,7 @@ main() {
     fi
     BYRO_ROOT="${root%/}"
     CONF_FILE="$BYRO_ROOT/byro.conf"
+    PLUGINS_FILE="$BYRO_ROOT/plugins/plugins.txt"
     case "$cmd" in
         install) cmd_install "$@" ;;
         config)  cmd_config "$@" ;;
@@ -1514,6 +2381,7 @@ main() {
         restart) cmd_restart "$@" ;;
         logs)    cmd_logs "$@" ;;
         manage)  cmd_manage "$@" ;;
+        plugin)  cmd_plugin "$@" ;;
         update)  cmd_update "$@" ;;
         self-update) cmd_self_update "$@" ;;
         version) enter_root; cmd_version ;;

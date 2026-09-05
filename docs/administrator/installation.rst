@@ -120,6 +120,21 @@ If you just want to play around with byro, you can load test data::
 
     $ python -m byro make_testdata
 
+Step 5a: Plugins (optional)
+---------------------------
+
+Plugins are Python packages installed into the same environment as byro (see
+:doc:`plugins` for what is available). Pin a version or a tag, then migrate,
+rebuild and restart::
+
+    $ pip install --user 'byro-finance-import-bank-files @ git+https://github.com/byro/byro-finance-import-bank-files.git@v1.2.0'
+    $ python -m byro migrate
+    $ python -m byro rebuild
+    # systemctl restart byro-web    (once the service from step 6 exists)
+
+``rebuild`` compiles the translations of every installed plugin as well as
+byro's own and collects the plugins' static files.
+
 Step 6: Starting byro as a service
 ----------------------------------
 
@@ -263,6 +278,10 @@ If you want to upgrade byro to a specific release, you can substitute
     $ python -m byro migrate
     $ python -m byro rebuild
     # systemctl restart byro-web
+
+Check the release notes of your plugins as well and upgrade them in the same
+way (``pip install -U 'byro-finance-import-bank-files @ git+...@<new tag>'``)
+before ``migrate``.
 
 
 .. _Let's Encrypt: https://letsencrypt.org/

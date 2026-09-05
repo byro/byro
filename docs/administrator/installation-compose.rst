@@ -40,6 +40,18 @@ Caddy as a reverse proxy with automatic HTTPS is the second add-on:
 .. literalinclude:: ../../deploy/compose/caddy.yml
    :language: yaml
 
+The third add-on switches the byro services to an image built locally with
+plugins (see :doc:`plugins`):
+
+.. literalinclude:: ../../deploy/compose/plugins.yml
+   :language: yaml
+
+That image is built from ``plugins/Dockerfile`` and the plugin list
+``plugins/plugins.txt`` in the installation directory:
+
+.. literalinclude:: ../../deploy/plugins/Dockerfile
+   :language: docker
+
 All values come from one file, ``byro.conf``, which Docker Compose reads as
 ``.env`` for interpolation and passes to the containers as ``env_file``:
 
@@ -89,6 +101,25 @@ service waits until the web service is healthy and then runs byro's periodic
 tasks every ten minutes. byro listens on ``127.0.0.1:8345`` unless you change
 ``BYRO_DEPLOY_BIND`` and ``BYRO_DEPLOY_PORT``.
 
+Plugins
+~~~~~~~
+
+To run byro with plugins, download ``plugins/Dockerfile`` and
+``compose/plugins.yml`` of the same release, list the plugins as pinned pip
+requirements and build the derived image::
+
+    $ mkdir -p plugins && curl -fsSL -o plugins/Dockerfile "$R/plugins/Dockerfile"
+    $ curl -fsSL -o compose/plugins.yml "$R/compose/plugins.yml"
+    $ printf '%s\n' 'byro-finance-import-bank-files @ git+https://github.com/byro/byro-finance-import-bank-files.git@v1.2.0' > plugins/plugins.txt
+    $ docker compose build web
+    $ docker compose run --rm manage migrate
+    $ docker compose up -d
+
+and append ``:compose/plugins.yml`` to ``COMPOSE_FILE`` before the build. The
+image is named ``<COMPOSE_PROJECT_NAME>-plugins:<BYRO_DEPLOY_VERSION>``; rebuild
+it after every change to ``plugins.txt`` and after every byro update. Details
+and the plugin catalog: :doc:`plugins`.
+
 Everyday operations
 -------------------
 
@@ -119,6 +150,14 @@ directory:
 4. Pull and restart; the web service applies the migrations::
 
        $ docker compose pull
+       $ docker compose up -d
+
+   With plugins, pull the base image explicitly and rebuild the derived image
+   before ``up``::
+
+       $ docker pull ghcr.io/byro/byro:<new tag>
+       $ docker compose pull --ignore-buildable
+       $ docker compose build web
        $ docker compose up -d
 
 Downgrades are not supported: restore the dump and the previous files instead.

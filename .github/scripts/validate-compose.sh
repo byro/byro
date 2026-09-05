@@ -19,6 +19,10 @@ trap 'rm -rf "$workdir"' EXIT
 cp "$deploy/docker-compose.yml" "$deploy/Caddyfile" "$workdir/"
 cp -R "$deploy/compose" "$workdir/compose"
 cp "$deploy/byro.conf.example" "$workdir/byro.conf"
+# The plugin build context as byroctl lays it out: the managed Dockerfile and
+# an administrator's plugin list.
+cp -R "$deploy/plugins" "$workdir/plugins"
+printf 'byro-example==1.0.0\n' >"$workdir/plugins/plugins.txt"
 ln -s byro.conf "$workdir/.env"
 cd "$workdir"
 
@@ -31,6 +35,8 @@ combos=(
     "docker-compose.yml:compose/postgres.yml"
     "docker-compose.yml:compose/postgres.yml:compose/caddy.yml"
     "docker-compose.yml:compose/caddy.yml"
+    "docker-compose.yml:compose/postgres.yml:compose/plugins.yml"
+    "docker-compose.yml:compose/postgres.yml:compose/caddy.yml:compose/plugins.yml"
 )
 
 failures=0
@@ -87,6 +93,23 @@ expect "web depends on db" "condition: service_healthy"
 expect "caddy sets BYRO_TRUST_PROXY" 'BYRO_TRUST_PROXY: "true"'
 expect "periodic disables auto-migrate" 'BYRO_AUTO_MIGRATE: "false"'
 expect "manage entrypoint" "byro-entrypoint"
+
+# With the plugin add-on, web/periodic/manage switch to the locally built image
+# whose build argument carries the digest-pinned base image.
+rendered="$(env COMPOSE_FILE="docker-compose.yml:compose/postgres.yml:compose/caddy.yml:compose/plugins.yml" \
+    BYRO_DEPLOY_IMAGE_DIGEST="$test_digest" docker compose --profile tools config)"
+expect "plugins: local image name" "image: byro-plugins:${BYRO_DEPLOY_VERSION}"
+expect "plugins: base image build argument" "BYRO_BASE_IMAGE: ghcr.io/byro/byro:${BYRO_DEPLOY_VERSION}@${test_digest}"
+expect "plugins: build context" "context: .*/plugins"
+# Only the services block counts: compose config also prints the x-* extension
+# blocks, and x-byro legitimately still names the base image.
+services_block="$(awk '/^services:/ { p = 1; next } /^[^[:space:]]/ { p = 0 } p' <<<"$rendered")"
+if grep -qE "image: ghcr.io/byro/byro:" <<<"$services_block"; then
+    printf 'FAIL  rendered: plugins: a byro service still uses the base image\n'
+    failures=$((failures + 1))
+else
+    printf 'OK    rendered: plugins: no byro service uses the base image\n'
+fi
 
 if [[ "$failures" -gt 0 ]]; then
     printf '\n%d check(s) failed\n' "$failures" >&2

@@ -4,6 +4,7 @@
 load helpers/common
 
 setup() {
+    load_byroctl
     make_root
     use_shims
     export HOME="$BATS_TEST_TMPDIR/home"; mkdir -p "$HOME"
@@ -13,11 +14,10 @@ setup() {
     export BYROCTL_RAW_BASE="https://example.test"
     export SHIM_RAW="$BATS_TEST_TMPDIR/raw"
     # a fake release tag on the "raw" server: deploy/ of the repository + correct checksums
-    mkdir -p "$SHIM_RAW/v2026.3.0/deploy/compose" "$SHIM_RAW/stable"
-    for f in byroctl docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env; do
-        cp "$DEPLOY_DIR/$f" "$SHIM_RAW/v2026.3.0/deploy/$f"
-    done
-    ( cd "$SHIM_RAW/v2026.3.0/deploy" && sha256sum byroctl docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env >SHA256SUMS )
+    mkdir -p "$SHIM_RAW/stable"
+    copy_artifacts "$SHIM_RAW/v2026.3.0/deploy"
+    cp "$DEPLOY_DIR/byroctl" "$SHIM_RAW/v2026.3.0/deploy/byroctl"
+    write_sha256sums "$SHIM_RAW/v2026.3.0/deploy" byroctl "${BYROCTL_ARTIFACTS[@]}"
     printf 'BYRO_RELEASE_VERSION=v2026.3.0\n' >"$SHIM_RAW/stable/stable.env"
     export BYROCTL_ADMIN_PASSWORD="Admin-Passw0rd"
     unset BYROCTL_SOURCE_DIR BYROCTL_STABLE_FILE
@@ -61,6 +61,16 @@ install_sh() { "$DEPLOY_DIR/install.sh" "$@"; }
     : >"$SHIM_RAW/stable/stable.env"
     run install_sh --root "$INSTALL_ROOT" --dry-run
     [ "$status" -ne 0 ]
+}
+
+@test "dry run mentions the plugin image when --plugin is passed through" {
+    run install_sh --root "$INSTALL_ROOT" --dry-run --plugin finance-import-bank-files
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"install --version v2026.3.0 --plugin finance-import-bank-files"* ]]
+    [[ "$output" == *"5. build a byro image with the plugins given via --plugin"* ]]
+    run install_sh --root "$INSTALL_ROOT" --dry-run
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"5. build a byro image"* ]]
 }
 
 @test "BYROCTL_STABLE_FILE replaces the download in tests" {

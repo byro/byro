@@ -7,6 +7,10 @@
 #   SHIM_HEALTH          health status reported by docker inspect
 #   SHIM_SUPERUSER_EXISTS  1 -> the superuser probe exits 0
 #   SHIM_SERVICES        services listed by compose config --services
+#   SHIM_RUNNING         0 -> compose ps lists no container (the stack is stopped)
+#   SHIM_APPLIED_PLUGINS content of /byro/plugins.txt inside the plugin image/container
+#                        (empty -> the file does not exist, cat exits 1)
+#   SHIM_LOADED_PLUGINS  what settings.PLUGINS prints inside web
 #   SHIM_FAIL            substring; if the invocation matches, exit 1
 set -u
 printf '%s\n' "docker $*" >>"${SHIM_LOG:-/dev/null}"
@@ -42,25 +46,40 @@ case "$1" in
         printf '%s\n' "${SHIM_HEALTH:-healthy}" ;;
     pull)
         exit 0 ;;
+    buildx)
+        echo "github.com/docker/buildx v0.19.0" ;;
     run)
         # docker run --rm -e PGPASSWORD postgres:X-alpine pg_dump ...
         if [[ "$*" == *"pg_dump"* ]]; then printf 'PGDMP-shim-external\n'; fi
+        # docker run --rm --entrypoint cat IMAGE /byro/plugins.txt
+        if [[ "$*" == *"/byro/plugins.txt"* ]]; then
+            [[ -n "${SHIM_APPLIED_PLUGINS:-}" ]] || { echo "cat: /byro/plugins.txt: No such file" >&2; exit 1; }
+            printf '%s\n' "$SHIM_APPLIED_PLUGINS"
+        fi
         exit 0 ;;
     compose)
         shift
         case "$1" in
             version) echo "v2.31.0" ;;
-            ps) echo "cid-${*: -1}" ;;
+            ps)
+                # SHIM_RUNNING=0: the byro services are stopped, the database keeps running
+                if [[ "${SHIM_RUNNING:-1}" == 0 && "${*: -1}" != db ]]; then :; else echo "cid-${*: -1}"; fi ;;
             config)
                 if [[ "$*" == *"--services"* ]]; then
                     for s in ${SHIM_SERVICES:-web periodic db}; do echo "$s"; done
                 fi ;;
+            build) : ;;   # compose build [--no-cache] web: succeeds unless SHIM_FAIL matches
             run)
                 if [[ "$*" == *"is_superuser=True"* ]]; then
                     [[ "${SHIM_SUPERUSER_EXISTS:-0}" == 1 ]] && exit 0 || exit 1
                 fi ;;
             exec)
                 if [[ "$*" == *"byro.__version__"* ]]; then echo "v9.9.9-shim"; fi
+                if [[ "$*" == *"settings.PLUGINS"* ]]; then echo "${SHIM_LOADED_PLUGINS-byro_testplugin}"; fi
+                if [[ "$*" == *"/byro/plugins.txt"* ]]; then
+                    [[ -n "${SHIM_APPLIED_PLUGINS:-}" ]] || { echo "cat: /byro/plugins.txt: No such file" >&2; exit 1; }
+                    printf '%s\n' "$SHIM_APPLIED_PLUGINS"
+                fi
                 if [[ "$*" == *"pg_dump"* ]]; then printf 'PGDMP-shim\n'; fi ;;
             *) : ;;
         esac ;;

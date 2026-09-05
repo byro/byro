@@ -15,7 +15,18 @@ load_byroctl() {
 make_root() {
     BYRO_ROOT="$(mktemp -d "$BATS_TEST_TMPDIR/root.XXXXXX")"
     CONF_FILE="$BYRO_ROOT/byro.conf"
-    export BYRO_ROOT CONF_FILE
+    PLUGINS_FILE="$BYRO_ROOT/plugins/plugins.txt"
+    export BYRO_ROOT CONF_FILE PLUGINS_FILE
+}
+
+# copy_artifacts DEST: every deploy artefact byroctl fetches (BYROCTL_ARTIFACTS
+# from the sourced byroctl), copied from deploy/ into a fake release tree.
+copy_artifacts() {
+    local relpath
+    for relpath in "${BYROCTL_ARTIFACTS[@]}"; do
+        mkdir -p "$1/$(dirname "$relpath")"
+        cp "$DEPLOY_DIR/$relpath" "$1/$relpath"
+    done
 }
 
 # Put the docker/curl shims first in PATH and reset their state.
@@ -29,6 +40,10 @@ use_shims() {
     export SHIM_HEALTH="${SHIM_HEALTH:-healthy}"
     export SHIM_SUPERUSER_EXISTS="${SHIM_SUPERUSER_EXISTS:-0}"   # 1 = superuser exists
     export SHIM_SERVICES="${SHIM_SERVICES:-web periodic db}"
+    export SHIM_RUNNING="${SHIM_RUNNING:-1}"                     # 0 = the stack is stopped
+    export SHIM_APPLIED_PLUGINS="${SHIM_APPLIED_PLUGINS:-}"      # /byro/plugins.txt in the plugin image
+    export SHIM_HTTP="${SHIM_HTTP:-$BATS_TEST_TMPDIR/http}"      # curl shim: https://host/path -> $SHIM_HTTP/host/path
+    mkdir -p "$SHIM_HTTP"
 }
 
 # run byroctl as a program (fresh process), with the shims.

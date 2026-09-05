@@ -12,6 +12,8 @@ What you get:
 * a PostgreSQL database (or a connection to your own),
 * optionally Caddy as a reverse proxy that obtains and renews TLS certificates,
 * one configuration file, ``byro.conf``,
+* plugins from a catalog or as pip requirements, built into the image for you
+  (:doc:`plugins`),
 * ``byroctl update`` with a safeguard copy of the database before every update.
 
 Everything byroctl starts is plain Docker Compose. You can always look at the
@@ -60,11 +62,14 @@ The installer asks a few questions, each with a sensible default:
 * whether to use the built-in PostgreSQL or an external database,
 * how to send mail: a mail server on the same machine, an external SMTP
   server, or later,
+* which plugins from the catalog to install (short names such as
+  ``finance-import-bank-files``; none by default, see :doc:`plugins`),
 * user name, e-mail address and password of the first administrator.
 
-Then it writes the configuration, downloads the images, creates the database
-schema, creates the administrator account and starts byro. At the end it
-prints the URL and the paths you need to know.
+Then it writes the configuration, downloads the images, builds the plugin image
+if you chose plugins, creates the database schema, creates the administrator
+account and starts byro. At the end it prints the URL and the paths you need to
+know.
 
 Unattended installation
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,9 +89,13 @@ shell history::
 
 ``BYROCTL_PROXY`` accepts ``caddy``, ``own`` or ``none``; ``BYROCTL_DB``
 accepts ``internal`` or ``external``; ``BYROCTL_MAIL`` accepts ``host``,
-``smtp`` or ``skip``. Passwords for an external database or an SMTP account
-come from ``BYROCTL_DB_PASSWORD`` and ``BYROCTL_MAIL_PASSWORD``. ``byroctl
-install --help`` lists all options.
+``smtp`` or ``skip``; ``BYROCTL_PLUGINS`` takes catalog short names separated
+by spaces (``--set BYROCTL_PLUGINS="finance-import-bank-files"``). Plugins
+given as pip requirements use ``--plugin`` instead, once per plugin:
+``--plugin 'byro-x==1.2.0'``.
+Passwords for an external database or an SMTP account come from
+``BYROCTL_DB_PASSWORD`` and ``BYROCTL_MAIL_PASSWORD``. ``byroctl install
+--help`` lists all options.
 
 If the installation stops halfway, for example because the administrator's
 e-mail address was rejected, fix the input and run ``byroctl install`` again.
@@ -104,11 +113,15 @@ By default everything lives in ``/opt/byro``::
     ├── docker-compose.yml          byro services (do not edit, byroctl replaces it on update)
     ├── compose/postgres.yml        add-on: built-in PostgreSQL
     ├── compose/caddy.yml           add-on: Caddy reverse proxy
+    ├── compose/plugins.yml         add-on: byro with plugins (active while plugins are listed)
     ├── Caddyfile
+    ├── plugin-catalog.conf         the plugin catalog of the installed release
+    ├── plugins/plugins.txt         your plugin list (pip requirements)
+    ├── plugins/Dockerfile          builds the image with plugins (do not edit)
     ├── data/                       documents, uploads, keys, the secret key, logs
     ├── db/                         PostgreSQL data
     ├── caddy/                      certificates (only with Caddy)
-    ├── backups/                    safeguard copies made before updates
+    ├── backups/                    safeguard copies made before updates and plugin changes
     └── .byroctl/                   internal state
 
 Local additions, for example extra labels for a reverse proxy, belong in a
@@ -148,7 +161,10 @@ Everyday commands
     $ byroctl restart                recreate the byro services (not the database)
     $ byroctl logs [-f] [web]        show (or follow) logs
     $ byroctl manage <command>       run a byro management command, e.g. createsuperuser
-    $ byroctl version                installed release, image digest and running version
+    $ byroctl plugin list|add|remove|update|rebuild   manage plugins (see below)
+    $ byroctl version                installed release, image digest, running version, plugins
+
+Plugins are described on their own page: :doc:`plugins`.
 
 Updates
 -------
@@ -163,11 +179,14 @@ and shows the link to the release notes. ``update`` then
 
 1. switches to the byroctl that belongs to the new release,
 2. writes a **pre-update safeguard** to ``backups/``: a dump of the database,
-   your ``byro.conf`` and the secret key file,
+   your ``byro.conf``, your ``plugins/plugins.txt`` and the secret key file,
 3. adds new configuration options with their defaults to ``byro.conf`` (nothing
    is removed or reordered),
 4. replaces the Compose files, pulls the new image and pins its digest,
-5. stops byro, applies the database migrations and starts the new release.
+5. rebuilds the plugin image on top of the new release if you use plugins
+   (with your pins unchanged; ``--update-plugins`` moves catalog plugins to
+   their current release in the same run, see :doc:`plugins`),
+6. stops byro, applies the database migrations and starts the new release.
 
 If a release is flagged as breaking, byroctl asks you to read the release
 notes and confirm (``--yes``). If a release changes files in ``data/``,

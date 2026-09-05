@@ -265,6 +265,8 @@ jobs:
           shellcheck -x deploy/byroctl deploy/install.sh deploy/entrypoint.sh .github/scripts/*.sh deploy/tests/helpers/bin/*
       - name: 🔎 SHA256SUMS is current
         run: .github/scripts/deploy-checksums.sh --check
+      - name: 🔎 plugin catalog is well-formed
+        run: .github/scripts/check-plugin-catalog.sh
       - name: 🏗 Install bats
         uses: bats-core/bats-action@3.0.1
         with:
@@ -316,21 +318,31 @@ jobs:
         run: .github/scripts/validate-compose.sh
       - name: 🔎 Smoke test Docker image
         run: .github/scripts/smoke-test-image.sh byro-ci:smoke
-      - name: 🧪 byroctl install/config/start against the image
+      - name: 🧪 byroctl install/plugins/update against the image
+        env:
+          # the plugin image is built FROM the daemon-local test image; only the
+          # docker-driver builder sees it, not the container builder of setup-buildx
+          BUILDX_BUILDER: default
         run: .github/scripts/byroctl-integration.sh byro-ci smoke "$RUNNER_TEMP/byro-it" 18345
-      - name: 🧪 install.sh bootstrap (dry run and real run from the local source)
+      - name: 🧪 install.sh bootstrap (dry run and real run from the local source, with a plugin)
         env:
           BYROCTL_SOURCE_DIR: ${{ github.workspace }}/deploy
           BYROCTL_ADMIN_PASSWORD: ci-only-Passw0rd
+          BUILDX_BUILDER: default
         run: |
           printf 'BYRO_RELEASE_VERSION=v0.0.0\n' > "$RUNNER_TEMP/stable.env"
-          BYROCTL_STABLE_FILE="$RUNNER_TEMP/stable.env" deploy/install.sh --root "$RUNNER_TEMP/byro-boot" --dry-run
+          BYROCTL_STABLE_FILE="$RUNNER_TEMP/stable.env" deploy/install.sh --root "$RUNNER_TEMP/byro-boot" --dry-run --plugin ./testplugin 2>&1 \
+            | tee /dev/stderr | grep -q "plugins given via --plugin"
+          mkdir -p "$RUNNER_TEMP/byro-boot/plugins"
+          cp -R deploy/tests/fixtures/byro-testplugin "$RUNNER_TEMP/byro-boot/plugins/testplugin"
           deploy/install.sh --root "$RUNNER_TEMP/byro-boot" --no-symlink --version smoke --non-interactive --no-pull \
-            --admin-user admin --admin-email admin@example.org \
+            --admin-user admin --admin-email admin@example.org --plugin ./testplugin \
             --set BYRO_DEPLOY_IMAGE_REPO=byro-ci --set COMPOSE_PROJECT_NAME=byro-boot \
             --set BYRO_SITE_URL=http://localhost --set BYRO_HTTPS=false --set BYROCTL_PROXY=none --set BYRO_DEPLOY_PORT=18346
           "$RUNNER_TEMP/byro-boot/byroctl" --root "$RUNNER_TEMP/byro-boot" config check
+          "$RUNNER_TEMP/byro-boot/byroctl" --root "$RUNNER_TEMP/byro-boot" plugin list | grep -q './testplugin'
           (cd "$RUNNER_TEMP/byro-boot" && docker compose down -v --remove-orphans)
+          docker rmi byro-boot-plugins:smoke
 
   push-docker-image:
     name: 🔨 Push Docker image to GitHub Packages

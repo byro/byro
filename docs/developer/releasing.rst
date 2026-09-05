@@ -145,6 +145,47 @@ flag, tell administrators in the release notes of the following releases what
 those who skipped the flagged release must do. Do not tag a hotfix from
 ``main`` while a flag is still ``1`` unless the hotfix needs it too.
 
+Plugin catalog
+--------------
+
+``deploy/plugin-catalog.conf`` is the list of plugins that ``byroctl plugin add
+<shortname>`` knows. It is a release artifact like the Compose files: versioned
+with the release, listed in ``deploy/SHA256SUMS``, downloaded and verified by
+byroctl. It carries **metadata only**, no versions:
+
+.. code-block:: ini
+
+    [finance-import-bank-files]
+    name=Bank file importers
+    description=Imports file-based bank statements
+    package=byro-finance-import-bank-files
+    source=github
+    repo=https://github.com/byro/byro-finance-import-bank-files
+
+byroctl resolves the version when an administrator adds or updates the plugin:
+for ``source=github`` the current regular GitHub release of ``repo``, installed
+by the commit its tag points to; for ``source=pypi`` the current release on
+PyPI. A new plugin release therefore needs no change in this repository.
+Whether a plugin release works with a byro release is declared by the plugin
+itself (``dependencies = ["byro>=2026.3"]`` in its ``pyproject.toml``); the
+image build checks it against the installed byro.
+
+To add a plugin:
+
+1. The plugin must have a ``byro.plugin`` entry point, an ``apps.py`` with
+   ``ByroPluginMeta`` and at least one regular GitHub release (or a release on
+   PyPI). Without a release ``byroctl plugin add`` fails with a clear message.
+2. Add a section with the five keys above. Section names are lower-case
+   letters, digits and hyphens; ``repo`` is ``https://github.com/<owner>/<repo>``
+   for GitHub plugins.
+3. Run ``.github/scripts/check-plugin-catalog.sh`` and
+   ``.github/scripts/deploy-checksums.sh --write``; both are enforced by CI
+   (job *[Deploy] shellcheck, checksums, bats*).
+
+Only plugins that work with the current byro release belong in the catalog.
+Candidates that still need work are tracked as issues, not as commented-out
+entries.
+
 Notes for administrators
 ------------------------
 
@@ -175,6 +216,8 @@ Before publishing:
 * ``deploy/release.env`` has the flags this release needs, and the release
   notes explain them,
 * the release notes tell administrators what to do,
+* ``deploy/plugin-catalog.conf`` lists only plugins that work with this release
+  and the catalog lint is green,
 * ``main`` is green; if *[Deploy] release flags* is red, the previous flag has
   not been reset yet, do that first.
 

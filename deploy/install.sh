@@ -15,7 +15,8 @@
 #   --dry-run           show what would happen, change nothing
 #   --no-symlink        do not link byroctl into /usr/local/bin or ~/.local/bin
 #   --non-interactive   passed on to byroctl install (also skips the terminal check)
-#   anything else is passed on to "byroctl install" (e.g. --set KEY=VALUE, --admin-user)
+#   anything else is passed on to "byroctl install" (e.g. --set KEY=VALUE, --admin-user,
+#   --plugin NAME|SPEC to install plugins right away)
 #
 # Environment (all optional)
 #   BYROCTL_RAW_BASE     https base for raw files (default https://raw.githubusercontent.com/byro/byro)
@@ -68,7 +69,8 @@ Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/
   --dry-run           show what would happen, change nothing
   --no-symlink        do not link byroctl into /usr/local/bin or ~/.local/bin
   --non-interactive   passed on to byroctl install (also skips the terminal check)
-  other options       passed on to "byroctl install" (e.g. --set KEY=VALUE, --admin-user)
+  other options       passed on to "byroctl install" (e.g. --set KEY=VALUE, --admin-user,
+                      --plugin NAME|SPEC)
 USAGE
 }
 
@@ -224,6 +226,9 @@ main() {
         log "  2. download $RAW_BASE/$VERSION/deploy/byroctl and verify it against SHA256SUMS of $VERSION"
         (( SYMLINK )) && log "  3. link byroctl into /usr/local/bin or ~/.local/bin"
         log "  4. run: byroctl --root $ROOT install --version $VERSION ${PASSTHRU[*]:-}"
+        if [[ " ${PASSTHRU[*]:-} " == *" --plugin"* ]]; then
+            log "  5. build a byro image with the plugins given via --plugin before the first start"
+        fi
         return 0
     fi
     prepare_root

@@ -19,18 +19,25 @@ constants() {
 make_release() {
     local tag="$1" breaking="${2:-0}" datamig="${3:-0}" d
     d="$SHIM_RAW/$tag/deploy"
-    rm -rf "$d"; mkdir -p "$d/compose"
-    for f in byroctl docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env; do
-        cp "$DEPLOY_DIR/$f" "$d/$f"
-    done
+    rm -rf "$d"
+    copy_artifacts "$d"
+    cp "$DEPLOY_DIR/byroctl" "$d/byroctl"
     if [[ "$tag" != "$OLD" ]]; then
         printf '\n# byroctl shipped with %s (test marker)\n' "$tag" >>"$d/byroctl"
         printf '\n# compose file of %s (test marker)\n' "$tag" >>"$d/docker-compose.yml"
         printf '\n# New in %s: an option byroctl did not know before.\n# Second comment line.\nBYRO_DEPLOY_NEW_OPTION=42\n' "$tag" >>"$d/byro.conf.example"
     fi
     printf 'BYRO_RELEASE_BREAKING=%s\nBYRO_RELEASE_DATA_MIGRATION=%s\n' "$breaking" "$datamig" >"$d/release.env"
-    ( cd "$d" && sha256sum byroctl docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env >SHA256SUMS )
+    write_sha256sums "$d" byroctl "${BYROCTL_ARTIFACTS[@]}"
 }
+
+# bank_files_release TAG SHA: the shipped catalog entry answered by the curl shim
+bank_files_release() {
+    mkdir -p "$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/releases" "$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/commits"
+    printf '{\n  "tag_name": "%s",\n  "prerelease": false\n}\n' "$1" >"$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/releases/latest"
+    printf '%s' "$2" >"$SHIM_HTTP/api.github.com/repos/byro/byro-finance-import-bank-files/commits/$1"
+}
+BANK_FILES_LINE() { printf 'byro-finance-import-bank-files @ git+https://github.com/byro/byro-finance-import-bank-files.git@%s  # byroctl:catalog=finance-import-bank-files version=%s' "$1" "$2"; }
 
 setup() {
     constants
@@ -112,6 +119,8 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     grep -q "^BYRO_DEPLOY_VERSION=$OLD$" "$dir/byro.conf"
     grep -q "^BYROCTL_PREVIOUS_VERSION=$OLD$" "$dir/META"
     grep -q "^BYROCTL_PREVIOUS_DIGEST=$OLD_DIGEST$" "$dir/META"
+    grep -q "^BYROCTL_KIND=pre-update$" "$dir/META"
+    [ -f "$dir/plugins.txt" ]
     # state and lock
     [ "$(conf_get BYROCTL_PREVIOUS_VERSION "$BYRO_ROOT/.byroctl/state")" = "$OLD" ]
     [ "$(conf_get BYROCTL_PREVIOUS_DIGEST "$BYRO_ROOT/.byroctl/state")" = "$OLD_DIGEST" ]
@@ -255,6 +264,82 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     [ "$status" -ne 0 ]
     [[ "$output" == *"checksum mismatch for byroctl"* ]]
     refute grep -q "tampered on the server" "$BYRO_ROOT/byroctl"
+}
+
+# --- plugins during an update
+
+@test "an update rebuilds the plugin image for the new base with the pins unchanged" {
+    run byroctl --root "$BYRO_ROOT" plugin add 'byro-x==1.0'
+    [ "$status" -eq 0 ]
+    : >"$SHIM_LOG"
+    update --check
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"plugins:        1 configured"* ]]
+    refute grep -q "compose build" "$SHIM_LOG"
+    : >"$SHIM_LOG"
+    update --yes --non-interactive
+    [ "$status" -eq 0 ]
+    grep -qxF 'byro-x==1.0' "$PLUGINS_FILE"
+    seq="$(grep -oE 'docker (pull ghcr.io/byro/byro:v2026.4.0|compose pull --ignore-buildable|image inspect|buildx version|compose build web|compose stop periodic web|compose run --rm -T manage migrate|compose up -d --remove-orphans)' "$SHIM_LOG" | tr '\n' '|')"
+    [ "$seq" = "docker pull ghcr.io/byro/byro:v2026.4.0|docker compose pull --ignore-buildable|docker image inspect|docker buildx version|docker compose build web|docker compose stop periodic web|docker compose run --rm -T manage migrate|docker compose up -d --remove-orphans|" ]
+    local dir; dir="$(ls -d "$BYRO_ROOT"/backups/pre-update-"$OLD"-*)"
+    grep -qxF 'byro-x==1.0' "$dir/plugins.txt"
+    [[ "$output" == *"plugins:        byro-x==1.0"* ]]
+    [[ "$output" == *"docker image rm byro-plugins:$OLD"* ]]
+}
+
+@test "--update-plugins moves catalog plugins to their current release during the update" {
+    bank_files_release v1.0.0 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    run byroctl --root "$BYRO_ROOT" plugin add finance-import-bank-files
+    [ "$status" -eq 0 ]
+    bank_files_release v1.1.0 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    : >"$SHIM_LOG"
+    update --yes --non-interactive
+    [ "$status" -eq 0 ]
+    grep -qxF "$(BANK_FILES_LINE aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa v1.0.0)" "$PLUGINS_FILE"
+    conf_set BYRO_DEPLOY_VERSION "$OLD"
+    make_release "$NEW"
+    : >"$SHIM_LOG"
+    update --yes --non-interactive --update-plugins
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"finance-import-bank-files: v1.0.0 -> v1.1.0"* ]]
+    grep -qxF "$(BANK_FILES_LINE bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb v1.1.0)" "$PLUGINS_FILE"
+    grep -q "curl .*$NEW/deploy/plugin-catalog.conf" "$SHIM_LOG"
+    local dir; dir="$(ls -dt "$BYRO_ROOT"/backups/pre-update-"$OLD"-* | head -n1)"
+    grep -qF "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" "$dir/plugins.txt"
+}
+
+@test "--update-plugins stops before any change when a release tag moved" {
+    bank_files_release v1.0.0 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    run byroctl --root "$BYRO_ROOT" plugin add finance-import-bank-files
+    [ "$status" -eq 0 ]
+    bank_files_release v1.0.0 cccccccccccccccccccccccccccccccccccccccc
+    before="$(cat "$PLUGINS_FILE")"; before_conf="$(cat "$CONF_FILE")"
+    : >"$SHIM_LOG"
+    update --yes --non-interactive --update-plugins
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"treated as immutable"* ]]
+    [[ "$output" == *"the update was not started"* ]]
+    [ "$(cat "$PLUGINS_FILE")" = "$before" ]
+    [ "$(cat "$CONF_FILE")" = "$before_conf" ]
+    [ "$(conf_get BYRO_DEPLOY_VERSION)" = "$OLD" ]
+    refute grep -qE "pg_dump|compose build|compose stop|compose up" "$SHIM_LOG"
+    [ -z "$(ls -d "$BYRO_ROOT"/backups/pre-update-* 2>/dev/null)" ]
+    refute grep -q "byroctl shipped with" "$BYRO_ROOT/byroctl"
+    [ ! -d "$BYRO_ROOT/.byroctl/lock" ]
+}
+
+@test "a failed plugin image build during the update prints the way back and never stops the stack" {
+    run byroctl --root "$BYRO_ROOT" plugin add 'byro-x==1.0'
+    [ "$status" -eq 0 ]
+    : >"$SHIM_LOG"
+    export SHIM_FAIL="compose build"
+    update --yes --non-interactive
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"building the image with plugins for $NEW failed"* ]]
+    [[ "$output" == *"Manual way back to byro $OLD"* ]]
+    [[ "$output" == *"3b. byroctl plugin rebuild"* ]]
+    refute grep -qE "compose stop|manage migrate" "$SHIM_LOG"
 }
 
 @test "--to with an invalid tag or an unknown image is refused" {
