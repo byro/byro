@@ -254,6 +254,27 @@ jobs:
         with:
           skip-existing: true
 
+  deploy-scripts:
+    name: "[Deploy] shellcheck, checksums, bats"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: 🔎 shellcheck
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q shellcheck
+          shellcheck -x deploy/byroctl deploy/install.sh deploy/entrypoint.sh .github/scripts/*.sh deploy/tests/helpers/bin/*
+      - name: 🔎 SHA256SUMS is current
+        run: .github/scripts/deploy-checksums.sh --check
+      - name: 🏗 Install bats
+        uses: bats-core/bats-action@3.0.1
+        with:
+          support-install: false
+          assert-install: false
+          detik-install: false
+          file-install: false
+      - name: 🧪 bats
+        run: bats --print-output-on-failure deploy/tests
+
   build-docker-image:
     name: 🔨 Build docker image
     needs: build-python-package
@@ -295,6 +316,21 @@ jobs:
         run: .github/scripts/validate-compose.sh
       - name: 🔎 Smoke test Docker image
         run: .github/scripts/smoke-test-image.sh byro-ci:smoke
+      - name: 🧪 byroctl install/config/start against the image
+        run: .github/scripts/byroctl-integration.sh byro-ci smoke "$RUNNER_TEMP/byro-it" 18345
+      - name: 🧪 install.sh bootstrap (dry run and real run from the local source)
+        env:
+          BYROCTL_SOURCE_DIR: ${{ github.workspace }}/deploy
+          BYROCTL_ADMIN_PASSWORD: ci-only-Passw0rd
+        run: |
+          printf 'BYRO_RELEASE_VERSION=v0.0.0\n' > "$RUNNER_TEMP/stable.env"
+          BYROCTL_STABLE_FILE="$RUNNER_TEMP/stable.env" deploy/install.sh --root "$RUNNER_TEMP/byro-boot" --dry-run
+          deploy/install.sh --root "$RUNNER_TEMP/byro-boot" --no-symlink --version smoke --non-interactive --no-pull \
+            --admin-user admin --admin-email admin@example.org \
+            --set BYRO_DEPLOY_IMAGE_REPO=byro-ci --set COMPOSE_PROJECT_NAME=byro-boot \
+            --set BYRO_SITE_URL=http://localhost --set BYRO_HTTPS=false --set BYROCTL_PROXY=none --set BYRO_DEPLOY_PORT=18346
+          "$RUNNER_TEMP/byro-boot/byroctl" --root "$RUNNER_TEMP/byro-boot" config check
+          (cd "$RUNNER_TEMP/byro-boot" && docker compose down -v --remove-orphans)
 
   push-docker-image:
     name: 🔨 Push Docker image to GitHub Packages
