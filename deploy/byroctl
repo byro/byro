@@ -1,0 +1,1085 @@
+#!/usr/bin/env bash
+# byroctl - install and manage a byro Docker Compose deployment.
+#
+# byroctl lives in the installation directory (BYRO_ROOT, default /opt/byro)
+# next to byro.conf and the Compose files it installed. Docker Compose remains
+# the source of truth at runtime: everything byroctl starts can be inspected and
+# operated with plain "docker compose" in that directory.
+#
+# Commands
+#   install      create byro.conf, fetch the Compose files, pull, migrate, start
+#   config       get | set | edit | check the configuration in byro.conf
+#   start | stop | restart | logs
+#   manage       run a byro/Django management command in a one-off container
+#   version      show the pinned byro version and the running one
+#   help
+#
+# Conventions inside this script
+#   * set -euo pipefail is enabled in main(), not at top level, so that the test
+#     suite can source the file and exercise single functions.
+#   * grep without a match returns 1; never use it unguarded in an assignment
+#     (append "|| true" or use "if grep -q").
+#   * Remote artefacts are downloaded only over https from BYROCTL_RAW_BASE.
+#     BYROCTL_SOURCE_DIR (a local deploy/ checkout) is the development and test
+#     path and is reported as an unverified source.
+#   * Secrets never travel on the command line; see ask_secret().
+
+if (( BASH_VERSINFO[0] < 4 )); then
+    printf 'byroctl: ERROR: bash >= 4 is required (found %s)\n' "$BASH_VERSION" >&2
+    exit 1
+fi
+
+BYROCTL_MIN_DOCKER="24.0.0"
+BYROCTL_MIN_COMPOSE="2.20.0"
+BYROCTL_DEFAULT_REPO="ghcr.io/byro/byro"
+: "${BYROCTL_RAW_BASE:=https://raw.githubusercontent.com/byro/byro}"
+: "${BYROCTL_SOURCE_DIR:=}"
+BYROCTL_ARTIFACTS=(docker-compose.yml compose/postgres.yml compose/caddy.yml Caddyfile byro.conf.example release.env)
+BYROCTL_WEB_HEALTH_TIMEOUT="${BYROCTL_WEB_HEALTH_TIMEOUT:-180}"
+BYROCTL_DB_HEALTH_TIMEOUT="${BYROCTL_DB_HEALTH_TIMEOUT:-120}"
+
+# State shared between functions (set in main / cmd_*).
+BYRO_ROOT=""
+CONF_FILE=""
+LOCK_DIR=""
+NONINTERACTIVE=0
+declare -A PRESET=()
+MISSING=()
+
+# --- output -------------------------------------------------------------------
+
+log()  { printf 'byroctl: %s\n' "$*" >&2; }
+warn() { printf 'byroctl: WARNING: %s\n' "$*" >&2; }
+# die MESSAGE [EXIT_CODE]
+die()  { printf 'byroctl: ERROR: %s\n' "$1" >&2; exit "${2:-1}"; }
+
+# --- validation ---------------------------------------------------------------
+
+valid_url()      { [[ "$1" =~ ^https?://[A-Za-z0-9.-]+(:[0-9]+)?$ ]]; }
+valid_email()    { [[ "$1" =~ ^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$ ]]; }
+valid_username() { [[ "$1" =~ ^[A-Za-z0-9@._+-]+$ ]]; }
+valid_version()  { [[ "$1" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; }
+valid_digest()   { [[ "$1" =~ ^sha256:[0-9a-f]{64}$ ]]; }
+valid_conf_key() { [[ "$1" =~ ^[A-Z][A-Z0-9_]*$ ]]; }
+is_secret_key()  { [[ "$1" == *PASS* || "$1" == *SECRET* ]]; }
+
+# version_ge A B: true if A >= B (dotted numbers)
+version_ge() { [[ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" == "$2" ]]; }
+
+# --- configuration file (KEY=VALUE, '#' comments) ------------------------------
+#
+# Quoting follows what Docker Compose does with .env and env_file values, which
+# was verified experimentally:
+#   * unquoted and double-quoted values are interpolated ($VAR, ${VAR}), and an
+#     unquoted " #" starts a comment;
+#   * single-quoted values are taken literally, the only escape is \' for an
+#     apostrophe; backslashes stay as they are.
+# byroctl therefore single-quotes every value that contains anything outside a
+# small safe character set. A value ending in a backslash would turn the closing
+# quote into \' and is rejected, as are newlines.
+
+conf_encode() {
+    local value="$1"
+    if [[ "$value" == *$'\n'* ]]; then
+        printf 'value must not contain newlines\n' >&2
+        return 1
+    fi
+    if [[ "$value" == *\\ ]]; then
+        printf 'value must not end with a backslash (ambiguous in .env quoting)\n' >&2
+        return 1
+    fi
+    if [[ -z "$value" || "$value" =~ ^[A-Za-z0-9_@%+=:,./-]+$ ]]; then
+        printf '%s' "$value"
+        return 0
+    fi
+    local bs="\\" q="'"
+    value="${value//"$q"/"$bs$q"}"
+    printf "'%s'" "$value"
+}
+
+conf_decode() {
+    local raw="$1" bs="\\" q="'"
+    if [[ ${#raw} -ge 2 && "$raw" == "'"*"'" ]]; then
+        raw="${raw:1:${#raw}-2}"
+        raw="${raw//"$bs$q"/"$q"}"
+    elif [[ ${#raw} -ge 2 && "$raw" == '"'*'"' ]]; then
+        raw="${raw:1:${#raw}-2}"
+    else
+        # unquoted: an inline comment starts at whitespace followed by '#'
+        if [[ "$raw" =~ ^(.*[^[:space:]])?[[:space:]]+#.*$ ]]; then
+            raw="${BASH_REMATCH[1]}"
+        fi
+        raw="${raw%"${raw##*[![:space:]]}"}"
+    fi
+    printf '%s' "$raw"
+}
+
+# conf_get KEY [FILE]: prints the decoded value of the last active definition;
+# returns 1 if the key is not set.
+conf_get() {
+    local key="$1" file="${2:-$CONF_FILE}" line value="" found=1
+    [[ -f "$file" ]] || return 1
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" == "$key="* ]] || continue
+        value="${line#"$key="}"
+        found=0
+    done <"$file"
+    (( found == 0 )) || return 1
+    conf_decode "$value"
+}
+
+# conf_has KEY [FILE]: true if the key has a non-empty value.
+conf_has() {
+    local value
+    value="$(conf_get "$1" "${2:-$CONF_FILE}" 2>/dev/null)" || return 1
+    [[ -n "$value" ]]
+}
+
+# conf_set KEY VALUE [FILE]: replaces the active or commented-out definition in
+# place (keeping comments and order), appends if missing. Atomic via temp file,
+# mode 0600.
+conf_set() {
+    local key="$1" value="$2" file="${3:-$CONF_FILE}" encoded tmp line replaced=0
+    valid_conf_key "$key" || die "invalid configuration key: $key"
+    encoded="$(conf_encode "$value")" || die "cannot store $key: $(conf_encode "$value" 2>&1 >/dev/null)"
+    tmp="$(mktemp "$file.XXXXXX")"
+    if [[ -f "$file" ]]; then
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            if [[ "$line" == "$key="* || "$line" == "#$key="* ]]; then
+                if (( replaced == 0 )); then
+                    printf '%s=%s\n' "$key" "$encoded" >>"$tmp"
+                    replaced=1
+                elif [[ "$line" == "#$key="* ]]; then
+                    printf '%s\n' "$line" >>"$tmp"
+                fi
+                # further active duplicates are dropped
+            else
+                printf '%s\n' "$line" >>"$tmp"
+            fi
+        done <"$file"
+    fi
+    if (( replaced == 0 )); then
+        printf '%s=%s\n' "$key" "$encoded" >>"$tmp"
+    fi
+    chmod 600 "$tmp"
+    mv "$tmp" "$file"
+}
+
+# conf_mask KEY VALUE: hides secrets for display.
+conf_mask() {
+    if is_secret_key "$1" && [[ -n "$2" ]]; then
+        printf '********'
+    else
+        printf '%s' "$2"
+    fi
+}
+
+# compose_files [FILE]: the COMPOSE_FILE list as separate lines.
+compose_files() {
+    local value
+    value="$(conf_get COMPOSE_FILE "${1:-$CONF_FILE}" 2>/dev/null || true)"
+    [[ -n "$value" ]] || value="docker-compose.yml"
+    tr ':' '\n' <<<"$value"
+}
+
+compose_file_active() { compose_files "${2:-$CONF_FILE}" | grep -qx -- "$1"; }
+
+# --- secrets and prompts --------------------------------------------------------
+
+# gen_password: 32 alphanumeric characters from /dev/urandom. head reads first,
+# so no SIGPIPE is raised under pipefail.
+gen_password() {
+    local pw=""
+    while (( ${#pw} < 32 )); do
+        pw+="$(head -c 48 /dev/urandom | base64 | tr -dc 'A-Za-z0-9')"
+    done
+    printf '%s' "${pw:0:32}"
+}
+
+# ask VAR PROMPT [DEFAULT] [VALIDATOR]
+# Order: --set preset, then interactive prompt. In --non-interactive mode a
+# missing value is recorded in MISSING instead of prompting.
+ask() {
+    local var="$1" prompt="$2" default="${3:-}" validator="${4:-}" value
+    if [[ -n "${PRESET[$var]+x}" ]]; then
+        value="${PRESET[$var]}"
+        if [[ -n "$validator" ]] && ! "$validator" "$value"; then
+            die "invalid value for $var: $value"
+        fi
+        printf -v "$var" '%s' "$value"
+        return 0
+    fi
+    if (( NONINTERACTIVE )); then
+        if [[ -n "$default" ]]; then
+            printf -v "$var" '%s' "$default"
+        else
+            MISSING+=("$var")
+        fi
+        return 0
+    fi
+    [[ -t 0 ]] || die "no terminal for interactive questions. Use --non-interactive with --set KEY=VALUE (secrets via BYROCTL_* environment variables)."
+    while true; do
+        if [[ -n "$default" ]]; then
+            read -r -p "$prompt [$default]: " value
+            [[ -n "$value" ]] || value="$default"
+        else
+            read -r -p "$prompt: " value
+        fi
+        if [[ -n "$validator" ]] && ! "$validator" "$value"; then
+            printf 'byroctl: invalid value, please try again.\n' >&2
+            continue
+        fi
+        break
+    done
+    printf -v "$var" '%s' "$value"
+}
+
+# ask_secret VAR ENVNAME PROMPT [CONFIRM]
+# Secrets come from the named environment variable or from a hidden prompt,
+# never from --set (command lines end up in ps and shell history).
+ask_secret() {
+    local var="$1" envname="$2" prompt="$3" confirm="${4:-}" value again
+    if [[ -n "${!envname:-}" ]]; then
+        printf -v "$var" '%s' "${!envname}"
+        return 0
+    fi
+    if (( NONINTERACTIVE )); then
+        MISSING+=("$envname (environment variable)")
+        return 0
+    fi
+    [[ -t 0 ]] || die "no terminal to ask for $prompt; set $envname in the environment."
+    while true; do
+        read -r -s -p "$prompt: " value; printf '\n' >&2
+        [[ -n "$value" ]] || { printf 'byroctl: a value is required.\n' >&2; continue; }
+        if [[ -n "$confirm" ]]; then
+            read -r -s -p "$prompt (again): " again; printf '\n' >&2
+            [[ "$value" == "$again" ]] || { printf 'byroctl: values do not match, please try again.\n' >&2; continue; }
+        fi
+        break
+    done
+    printf -v "$var" '%s' "$value"
+}
+
+confirm() { # confirm PROMPT [default y|n]
+    local prompt="$1" default="${2:-n}" answer
+    (( NONINTERACTIVE )) && [[ "$default" == y ]] && return 0
+    (( NONINTERACTIVE )) && return 1
+    [[ -t 0 ]] || return 1
+    read -r -p "$prompt [$([[ "$default" == y ]] && printf 'Y/n' || printf 'y/N')]: " answer
+    [[ -z "$answer" ]] && answer="$default"
+    [[ "$answer" =~ ^[YyJj] ]]
+}
+
+# --- lock ----------------------------------------------------------------------
+
+acquire_lock() {
+    local dir="$BYRO_ROOT/.byroctl/lock" pid
+    mkdir -p "$BYRO_ROOT/.byroctl"
+    if ! mkdir "$dir" 2>/dev/null; then
+        pid="$(cat "$dir/pid" 2>/dev/null || true)"
+        if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+            die "another byroctl process (pid $pid) is running in $BYRO_ROOT"
+        fi
+        warn "removing stale lock left by pid ${pid:-unknown}"
+        rm -rf "$dir"
+        mkdir "$dir" || die "cannot create lock $dir"
+    fi
+    printf '%s\n' "$$" >"$dir/pid"
+    LOCK_DIR="$dir"
+    trap release_lock EXIT
+}
+
+release_lock() {
+    if [[ -n "$LOCK_DIR" && -d "$LOCK_DIR" ]]; then
+        rm -rf "$LOCK_DIR"
+    fi
+    LOCK_DIR=""
+}
+
+# --- docker -----------------------------------------------------------------------
+
+need_docker() {
+    local dv cv
+    command -v docker >/dev/null 2>&1 || die "docker not found. Install Docker Engine >= $BYROCTL_MIN_DOCKER with the compose plugin."
+    if ! dv="$(docker version --format '{{.Server.Version}}' 2>/dev/null)"; then
+        die "cannot talk to the Docker daemon. Is Docker running and is your user in the docker group?"
+    fi
+    version_ge "${dv%%[-+]*}" "$BYROCTL_MIN_DOCKER" || die "Docker $dv is too old, byro needs >= $BYROCTL_MIN_DOCKER"
+    if ! cv="$(docker compose version --short 2>/dev/null)"; then
+        die "the docker compose plugin is missing (need >= $BYROCTL_MIN_COMPOSE)"
+    fi
+    version_ge "${cv#v}" "$BYROCTL_MIN_COMPOSE" || die "docker compose $cv is too old, byro needs >= $BYROCTL_MIN_COMPOSE"
+}
+
+# All compose calls run in BYRO_ROOT (main() changes into it), so COMPOSE_FILE
+# from .env resolves relative to the installation.
+compose() { docker compose "$@"; }
+
+image_exists() { docker manifest inspect "$1" >/dev/null 2>&1; }
+image_local()  { docker image inspect "$1" >/dev/null 2>&1; }
+
+# image_digest REPO REF: the index digest recorded for REPO when REF was pulled,
+# empty if none (locally built images have no RepoDigests).
+image_digest() {
+    local repo="$1" ref="$2" line
+    line="$(docker image inspect "$ref" --format '{{range .RepoDigests}}{{println .}}{{end}}' 2>/dev/null \
+        | grep -F -- "$repo@sha256:" | head -n1 || true)"
+    printf '%s' "${line#"$repo@"}"
+}
+
+container_id() { compose ps -q "$1" 2>/dev/null | head -n1 || true; }
+
+# wait_healthy SERVICE [TIMEOUT_SECONDS]
+wait_healthy() {
+    local service="$1" timeout="${2:-120}" waited=0 cid status
+    while true; do
+        cid="$(container_id "$service")"
+        if [[ -n "$cid" ]]; then
+            status="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$cid" 2>/dev/null || true)"
+            case "$status" in
+                healthy) return 0 ;;
+                running) return 0 ;;   # no health check defined
+                exited|dead) break ;;
+            esac
+        fi
+        if (( waited >= timeout )); then
+            break
+        fi
+        sleep 2; waited=$((waited + 2))
+    done
+    warn "service $service did not become healthy within ${timeout}s (status: ${status:-no container}); last log lines:"
+    compose logs --no-log-prefix --tail=40 "$service" >&2 2>/dev/null || true
+    return 1
+}
+
+# active_services: services of the active compose files without profile-only ones.
+active_services() { compose config --services 2>/dev/null || true; }
+
+# port_in_use PORT [HOST]: true if something accepts connections.
+port_in_use() {
+    local port="$1" host="${2:-127.0.0.1}"
+    (exec 3<>"/dev/tcp/$host/$port") 2>/dev/null
+}
+
+# --- artefacts --------------------------------------------------------------------
+
+require_https() { [[ "$1" == https://* ]] || die "$2 must use https:// (got: $1)"; }
+
+sha256_of() {
+    if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$1" | awk '{print $1}'
+    else
+        shasum -a 256 "$1" | awk '{print $1}'
+    fi
+}
+
+# fetch_artifact TAG RELPATH DEST: copy from BYROCTL_SOURCE_DIR or download from
+# the release tag over https only.
+fetch_artifact() {
+    local tag="$1" relpath="$2" dest="$3"
+    if [[ -n "$BYROCTL_SOURCE_DIR" ]]; then
+        [[ -f "$BYROCTL_SOURCE_DIR/$relpath" ]] || die "missing $relpath in BYROCTL_SOURCE_DIR=$BYROCTL_SOURCE_DIR"
+        cp "$BYROCTL_SOURCE_DIR/$relpath" "$dest"
+    else
+        require_https "$BYROCTL_RAW_BASE" "BYROCTL_RAW_BASE"
+        curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            -o "$dest" "$BYROCTL_RAW_BASE/$tag/deploy/$relpath" \
+            || die "download failed: $BYROCTL_RAW_BASE/$tag/deploy/$relpath"
+    fi
+}
+
+# verify_checksum SUMSFILE RELPATH FILE
+verify_checksum() {
+    local sums="$1" relpath="$2" file="$3" expected actual
+    expected="$(awk -v f="$relpath" '$2 == f {print $1}' "$sums" | head -n1)"
+    [[ -n "$expected" ]] || die "no checksum for $relpath in SHA256SUMS"
+    actual="$(sha256_of "$file")"
+    [[ "$actual" == "$expected" ]] || die "checksum mismatch for $relpath (expected $expected, got $actual)"
+}
+
+# install_artifacts TAG: fetch every deploy artefact of TAG into BYRO_ROOT,
+# verified against the SHA256SUMS of the same tag, byte-identical copies.
+install_artifacts() {
+    local tag="$1" relpath tmp sums=""
+    if [[ -n "$BYROCTL_SOURCE_DIR" ]]; then
+        log "copying deployment files from local source $BYROCTL_SOURCE_DIR (unverified development source)"
+    else
+        sums="$(mktemp "$BYRO_ROOT/.SHA256SUMS.XXXXXX")"
+        fetch_artifact "$tag" SHA256SUMS "$sums"
+    fi
+    for relpath in "${BYROCTL_ARTIFACTS[@]}"; do
+        mkdir -p "$BYRO_ROOT/$(dirname "$relpath")"
+        tmp="$(mktemp "$BYRO_ROOT/$relpath.XXXXXX")"
+        fetch_artifact "$tag" "$relpath" "$tmp"
+        if [[ -n "$sums" ]]; then
+            verify_checksum "$sums" "$relpath" "$tmp"
+        fi
+        chmod 644 "$tmp"
+        mv "$tmp" "$BYRO_ROOT/$relpath"
+    done
+    [[ -z "$sums" ]] || rm -f "$sums"
+}
+
+# --- root resolution ------------------------------------------------------------------
+
+script_dir() {
+    local src="${BASH_SOURCE[0]}" dir
+    while [[ -L "$src" ]]; do
+        dir="$(cd -P "$(dirname "$src")" && pwd)"
+        src="$(readlink "$src")"
+        [[ "$src" == /* ]] || src="$dir/$src"
+    done
+    cd -P "$(dirname "$src")" && pwd
+}
+
+# --- install ------------------------------------------------------------------------------
+
+valid_proxy_mode() { [[ "$1" =~ ^(caddy|own|none)$ ]]; }
+valid_db_mode()    { [[ "$1" =~ ^(internal|external)$ ]]; }
+valid_mail_mode()  { [[ "$1" =~ ^(host|smtp|skip)$ ]]; }
+valid_lang()       { [[ "$1" =~ ^(de|en)$ ]]; }
+valid_port()       { [[ "$1" =~ ^[0-9]{1,5}$ ]] && (( $1 >= 1 && $1 <= 65535 )); }
+valid_bool()       { [[ "$1" =~ ^(true|false)$ ]]; }
+valid_tz()         { [[ "$1" =~ ^[A-Za-z_]+(/[A-Za-z0-9_+-]+)*$ ]]; }
+valid_hostname()   { [[ "$1" =~ ^[A-Za-z0-9.-]+$ ]]; }
+valid_tag()        { [[ "$1" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; }
+valid_project()    { [[ "$1" =~ ^[a-z0-9][a-z0-9_-]*$ ]]; }
+
+# add_preset KEY=VALUE (from --set). Secrets are refused on the command line.
+add_preset() {
+    local kv="$1" key value
+    [[ "$kv" == *=* ]] || die "--set expects KEY=VALUE (got: $kv)" 64
+    key="${kv%%=*}"; value="${kv#*=}"
+    valid_conf_key "$key" || die "--set: invalid key $key" 64
+    if is_secret_key "$key"; then
+        die "--set: $key is a secret and must not be passed on the command line. Use the environment variables BYROCTL_DB_PASSWORD, BYROCTL_MAIL_PASSWORD, BYROCTL_OIDC_CLIENT_SECRET or BYROCTL_ADMIN_PASSWORD." 64
+    fi
+    PRESET["$key"]="$value"
+}
+
+detect_timezone() {
+    local tz=""
+    if [[ -r /etc/timezone ]]; then
+        tz="$(head -n1 /etc/timezone 2>/dev/null || true)"
+    fi
+    if [[ -z "$tz" ]] && command -v timedatectl >/dev/null 2>&1; then
+        tz="$(timedatectl show -p Timezone --value 2>/dev/null || true)"
+    fi
+    if [[ -z "$tz" && -L /etc/localtime ]]; then
+        tz="$(readlink /etc/localtime | sed 's#.*/zoneinfo/##')"
+    fi
+    valid_tz "$tz" || tz="UTC"
+    printf '%s' "$tz"
+}
+
+ensure_root_dir() {
+    if [[ ! -d "$BYRO_ROOT" ]] && ! mkdir -p "$BYRO_ROOT" 2>/dev/null; then
+        log "cannot create the installation directory $BYRO_ROOT."
+        log "Create it once with administrator rights and hand it to your user:"
+        log "    sudo mkdir -p '$BYRO_ROOT' && sudo chown '$(id -u):$(id -g)' '$BYRO_ROOT'"
+        log "then run the installation again, or choose a directory you own with --root (e.g. --root ~/byro)."
+        exit 1
+    fi
+    [[ -w "$BYRO_ROOT" ]] || die "installation directory $BYRO_ROOT is not writable by $(id -un)"
+}
+
+preflight_install() {
+    local arch free_kb
+    need_docker
+    arch="$(uname -m)"
+    case "$arch" in
+        x86_64|aarch64|arm64) ;;
+        *) die "unsupported architecture $arch (byro images exist for amd64 and arm64)" ;;
+    esac
+    free_kb="$(df -Pk "$BYRO_ROOT" 2>/dev/null | awk 'NR == 2 {print $4}')"
+    if [[ -n "$free_kb" ]] && (( free_kb < 2 * 1024 * 1024 )); then
+        die "less than 2 GB free in $BYRO_ROOT ($((free_kb / 1024)) MB); byro needs room for images and data"
+    fi
+    if [[ -z "$BYROCTL_SOURCE_DIR" ]]; then
+        require_https "$BYROCTL_RAW_BASE" "BYROCTL_RAW_BASE"
+    fi
+}
+
+# check_ports_free PORT...: every port must be free on 127.0.0.1.
+check_ports_free() {
+    local port busy=()
+    for port in "$@"; do
+        if port_in_use "$port"; then busy+=("$port"); fi
+    done
+    (( ${#busy[@]} == 0 )) && return 0
+    log "the following ports are already in use on this host: ${busy[*]}"
+    if [[ " ${busy[*]} " == *" 80 "* || " ${busy[*]} " == *" 443 "* ]]; then
+        log "another web server or reverse proxy seems to be running. Choose the reverse proxy mode 'own'"
+        log "(--set BYROCTL_PROXY=own) and forward it to byro, or stop the other service first."
+    else
+        log "choose another port with --set BYRO_DEPLOY_PORT=<port> or stop the service using it."
+    fi
+    exit 1
+}
+
+# write_state KEY VALUE: KEY=VALUE store for derived state (never configuration).
+write_state() {
+    local file="$BYRO_ROOT/.byroctl/state"
+    mkdir -p "$BYRO_ROOT/.byroctl"
+    touch "$file"
+    conf_set "$1" "$2" "$file"
+}
+
+# collect_config VERSION: ask the installation questions and write byro.conf.
+collect_config() {
+    local version="$1"
+    local BYRO_SITE_URL BYRO_LANGUAGE_CODE BYRO_TIME_ZONE BYROCTL_PROXY BYROCTL_DB BYROCTL_MAIL
+    local BYRO_DB_HOST BYRO_DB_PORT BYRO_DB_NAME BYRO_DB_USER BYRO_DB_PASS
+    local BYRO_MAIL_HOST BYRO_MAIL_PORT BYRO_MAIL_USER BYRO_MAIL_FROM BYRO_MAIL_TLS BYRO_MAIL_SSL BYRO_MAIL_PASSWORD
+    local BYRO_DEPLOY_PORT BYRO_DEPLOY_BIND COMPOSE_PROJECT_NAME
+    local https compose_file trust_proxy=false default_proxy tz key
+
+    log "No byro.conf yet - collecting the configuration for a new installation."
+    ask BYRO_SITE_URL "Public URL of your byro (e.g. https://byro.example.org, no path)" "" valid_url
+    if [[ "${BYRO_SITE_URL:-}" == https://* ]]; then https=true; default_proxy=caddy; else https=false; default_proxy=none; fi
+    ask BYROCTL_PROXY "Reverse proxy: caddy (byro obtains TLS certificates itself, ports 80/443 must be free), own (you run a reverse proxy), none (direct access, tests only)" "$default_proxy" valid_proxy_mode
+    ask BYRO_LANGUAGE_CODE "Language (de/en)" "de" valid_lang
+    tz="$(detect_timezone)"
+    ask BYRO_TIME_ZONE "Time zone" "$tz" valid_tz
+    ask BYROCTL_DB "Database: internal (PostgreSQL managed by byro) or external" "internal" valid_db_mode
+    if [[ "${BYROCTL_DB:-}" == external ]]; then
+        ask BYRO_DB_HOST "Database host" "" valid_hostname
+        ask BYRO_DB_PORT "Database port" "5432" valid_port
+        ask BYRO_DB_NAME "Database name" "byro"
+        ask BYRO_DB_USER "Database user" "byro"
+        ask_secret BYRO_DB_PASS BYROCTL_DB_PASSWORD "Database password"
+    fi
+    ask BYROCTL_MAIL "Outgoing mail: host (mail server on this machine), smtp (external SMTP server), skip (configure later)" "skip" valid_mail_mode
+    case "${BYROCTL_MAIL:-skip}" in
+        host)
+            BYRO_MAIL_HOST=host.docker.internal; BYRO_MAIL_PORT=25; BYRO_MAIL_TLS=false; BYRO_MAIL_SSL=false
+            ask BYRO_MAIL_FROM "Sender address" "" valid_email ;;
+        smtp)
+            ask BYRO_MAIL_HOST "SMTP host" "" valid_hostname
+            ask BYRO_MAIL_PORT "SMTP port" "587" valid_port
+            ask BYRO_MAIL_USER "SMTP user" ""
+            ask_secret BYRO_MAIL_PASSWORD BYROCTL_MAIL_PASSWORD "SMTP password"
+            ask BYRO_MAIL_FROM "Sender address" "" valid_email
+            ask BYRO_MAIL_TLS "Use STARTTLS (true/false)" "true" valid_bool
+            ask BYRO_MAIL_SSL "Use implicit TLS/SSL (true/false)" "false" valid_bool ;;
+    esac
+    ask BYRO_DEPLOY_PORT "Local port for the web service" "8345" valid_port
+    ask BYRO_DEPLOY_BIND "Bind address for the web service" "127.0.0.1"
+    ask COMPOSE_PROJECT_NAME "Compose project name" "byro" valid_project
+
+    if (( ${#MISSING[@]} > 0 )); then
+        die "missing values for a non-interactive installation: ${MISSING[*]} (use --set KEY=VALUE, secrets via environment variables)"
+    fi
+
+    # Ports must be free before anything is written.
+    local ports=("$BYRO_DEPLOY_PORT")
+    [[ "$BYROCTL_PROXY" == caddy ]] && ports+=(80 443)
+    check_ports_free "${ports[@]}"
+
+    [[ "$BYROCTL_PROXY" == own ]] && trust_proxy=true
+    compose_file="docker-compose.yml"
+    [[ "$BYROCTL_DB" == internal ]] && compose_file+=":compose/postgres.yml"
+    [[ "$BYROCTL_PROXY" == caddy ]] && compose_file+=":compose/caddy.yml"
+
+    install_artifacts "$version"
+    cp "$BYRO_ROOT/byro.conf.example" "$CONF_FILE"
+    chmod 600 "$CONF_FILE"
+
+    conf_set COMPOSE_PROJECT_NAME "$COMPOSE_PROJECT_NAME"
+    conf_set COMPOSE_FILE "$compose_file"
+    conf_set BYRO_DEPLOY_VERSION "$version"
+    conf_set BYRO_DEPLOY_PORT "$BYRO_DEPLOY_PORT"
+    conf_set BYRO_DEPLOY_BIND "$BYRO_DEPLOY_BIND"
+    conf_set BYRO_SITE_URL "$BYRO_SITE_URL"
+    conf_set BYRO_HTTPS "$https"
+    conf_set BYRO_TRUST_PROXY "$trust_proxy"
+    conf_set BYRO_LANGUAGE_CODE "$BYRO_LANGUAGE_CODE"
+    conf_set BYRO_TIME_ZONE "$BYRO_TIME_ZONE"
+    if [[ "$BYROCTL_DB" == internal ]]; then
+        conf_set BYRO_DB_HOST db
+        conf_set BYRO_DB_PORT 5432
+        conf_set BYRO_DB_NAME byro
+        conf_set BYRO_DB_USER byro
+        conf_set BYRO_DB_PASS "$(gen_password)"
+    else
+        conf_set BYRO_DB_HOST "$BYRO_DB_HOST"
+        conf_set BYRO_DB_PORT "$BYRO_DB_PORT"
+        conf_set BYRO_DB_NAME "$BYRO_DB_NAME"
+        conf_set BYRO_DB_USER "$BYRO_DB_USER"
+        conf_set BYRO_DB_PASS "$BYRO_DB_PASS"
+    fi
+    case "${BYROCTL_MAIL:-skip}" in
+        host|smtp)
+            conf_set BYRO_MAIL_HOST "$BYRO_MAIL_HOST"
+            conf_set BYRO_MAIL_PORT "$BYRO_MAIL_PORT"
+            conf_set BYRO_MAIL_FROM "$BYRO_MAIL_FROM"
+            conf_set BYRO_MAIL_TLS "$BYRO_MAIL_TLS"
+            conf_set BYRO_MAIL_SSL "$BYRO_MAIL_SSL"
+            if [[ -n "${BYRO_MAIL_USER:-}" ]]; then conf_set BYRO_MAIL_USER "$BYRO_MAIL_USER"; fi
+            if [[ -n "${BYRO_MAIL_PASSWORD:-}" ]]; then conf_set BYRO_MAIL_PASSWORD "$BYRO_MAIL_PASSWORD"; fi ;;
+    esac
+    # further non-secret --set values are configuration keys as well
+    for key in "${!PRESET[@]}"; do
+        case "$key" in
+            BYROCTL_*) ;;   # installer switches, not configuration
+            *) conf_set "$key" "${PRESET[$key]}" ;;
+        esac
+    done
+    ln -sfn byro.conf "$BYRO_ROOT/.env"
+    log "wrote $CONF_FILE"
+}
+
+# ensure_superuser ADMIN_USER ADMIN_EMAIL: creates the first superuser unless one exists.
+ensure_superuser() {
+    local admin_user="$1" admin_email="$2" ADMIN_USER ADMIN_EMAIL ADMIN_PASSWORD
+    if compose run --rm -T manage shell -c "import sys; from django.contrib.auth import get_user_model as g; sys.exit(0 if g().objects.filter(is_superuser=True).exists() else 1)" >/dev/null 2>&1; then
+        log "a superuser exists already, skipping account creation"
+        return 0
+    fi
+    if [[ -n "$admin_user" ]]; then PRESET[ADMIN_USER]="$admin_user"; fi
+    if [[ -n "$admin_email" ]]; then PRESET[ADMIN_EMAIL]="$admin_email"; fi
+    log "Creating the first administrator account."
+    ask ADMIN_USER "Administrator user name" "admin" valid_username
+    ask ADMIN_EMAIL "Administrator e-mail address" "" valid_email
+    ask_secret ADMIN_PASSWORD BYROCTL_ADMIN_PASSWORD "Administrator password" confirm
+    if (( ${#MISSING[@]} > 0 )); then
+        die "missing values for the administrator account: ${MISSING[*]} (--admin-user, --admin-email, BYROCTL_ADMIN_PASSWORD)"
+    fi
+    if ! DJANGO_SUPERUSER_PASSWORD="$ADMIN_PASSWORD" compose run --rm -T -e DJANGO_SUPERUSER_PASSWORD manage \
+            createsuperuser --noinput --username "$ADMIN_USER" --email "$ADMIN_EMAIL"; then
+        die "creating the administrator account failed (see the message above). Fix the input and run 'byroctl install' again; the installation resumes at this step."
+    fi
+    log "administrator account '$ADMIN_USER' created"
+}
+
+install_usage() {
+    cat >&2 <<'USAGE'
+Usage: byroctl install [options]
+
+  --version TAG        byro release tag to install (set by install.sh)
+  --set KEY=VALUE      preset an answer or configuration value (repeatable);
+                       secrets are not accepted here, see below
+  --admin-user NAME    user name of the first administrator
+  --admin-email MAIL   e-mail address of the first administrator
+  --skip-superuser     do not create an administrator account
+  --non-interactive    never prompt; fail if a required value is missing
+  --no-pull            use the locally present image, never pull (development)
+
+Secrets are read from the environment only: BYROCTL_ADMIN_PASSWORD,
+BYROCTL_DB_PASSWORD (external database), BYROCTL_MAIL_PASSWORD,
+BYROCTL_OIDC_CLIENT_SECRET.
+Installer switches usable with --set: BYROCTL_PROXY=caddy|own|none,
+BYROCTL_DB=internal|external, BYROCTL_MAIL=host|smtp|skip.
+USAGE
+}
+
+# install_missing_artifacts TAG: on a resumed installation only fetch what is absent.
+install_missing_artifacts() {
+    local tag="$1" relpath missing=0
+    for relpath in "${BYROCTL_ARTIFACTS[@]}"; do
+        [[ -f "$BYRO_ROOT/$relpath" ]] || missing=1
+    done
+    if (( missing )); then
+        install_artifacts "$tag"
+    fi
+}
+
+cmd_install() {
+    local no_pull=0 skip_superuser=0 version="" admin_user="" admin_email="" repo ref digest configured site_url now
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --non-interactive) NONINTERACTIVE=1; shift ;;
+            --no-pull) no_pull=1; shift ;;
+            --skip-superuser) skip_superuser=1; shift ;;
+            --version) [[ $# -ge 2 ]] || die "--version needs a tag" 64; version="$2"; shift 2 ;;
+            --version=*) version="${1#--version=}"; shift ;;
+            --admin-user) [[ $# -ge 2 ]] || die "--admin-user needs a value" 64; admin_user="$2"; shift 2 ;;
+            --admin-email) [[ $# -ge 2 ]] || die "--admin-email needs a value" 64; admin_email="$2"; shift 2 ;;
+            --set) [[ $# -ge 2 ]] || die "--set needs KEY=VALUE" 64; add_preset "$2"; shift 2 ;;
+            --set=*) add_preset "${1#--set=}"; shift ;;
+            -h|--help) install_usage; exit 0 ;;
+            *) die "unknown install option: $1 (see byroctl install --help)" 64 ;;
+        esac
+    done
+
+    ensure_root_dir
+    cd "$BYRO_ROOT"
+    acquire_lock
+    preflight_install
+
+    if [[ -f "$CONF_FILE" ]]; then
+        configured="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
+        [[ -n "$configured" ]] || die "$CONF_FILE has no BYRO_DEPLOY_VERSION; set it with: byroctl config set BYRO_DEPLOY_VERSION <tag>"
+        if [[ -n "$version" && "$version" != "$configured" ]]; then
+            warn "ignoring --version $version: byro.conf pins $configured (use byroctl update to change the version)"
+        fi
+        version="$configured"
+        log "byro.conf exists - resuming the installation for byro $version (use 'byroctl config' to change settings)"
+        install_missing_artifacts "$version"
+        ln -sfn byro.conf "$BYRO_ROOT/.env"
+    else
+        [[ -n "$version" ]] || die "no byro version given. install.sh passes --version <tag>; when running byroctl directly use --version vYYYY.M.P"
+        if [[ -z "$BYROCTL_SOURCE_DIR" ]]; then
+            valid_version "$version" || die "invalid byro release tag: $version (expected vYYYY.M.P)"
+        else
+            valid_tag "$version" || die "invalid image tag: $version"
+        fi
+        collect_config "$version"
+    fi
+    if [[ -n "${BYROCTL_OIDC_CLIENT_SECRET:-}" ]]; then
+        conf_set BYRO_OIDC_CLIENT_SECRET "$BYROCTL_OIDC_CLIENT_SECRET"
+    fi
+    mkdir -p data db caddy backups .byroctl
+
+    # --- image
+    repo="$(conf_get BYRO_DEPLOY_IMAGE_REPO 2>/dev/null || true)"
+    repo="${repo:-$BYROCTL_DEFAULT_REPO}"
+    ref="$repo:$version"
+    digest="$(conf_get BYRO_DEPLOY_IMAGE_DIGEST 2>/dev/null || true)"
+    if (( no_pull )); then
+        image_local "$ref" || die "--no-pull: image $ref is not present locally. Build or load it first, or run without --no-pull."
+        log "using the local image $ref (--no-pull); the digest stays ${digest:-unpinned}"
+    elif [[ -z "$digest" ]]; then
+        image_exists "$ref" || die "image $ref does not exist in the registry (is $version a published byro release?)"
+        log "pulling images for byro $version ..."
+        compose pull
+        digest="$(image_digest "$repo" "$ref")"
+        [[ -n "$digest" ]] || die "the pulled image $ref carries no digest for $repo; refusing to continue without a pin"
+        valid_digest "$digest" || die "unexpected digest format: $digest"
+        conf_set BYRO_DEPLOY_IMAGE_DIGEST "$digest"
+        log "pinned image digest $digest"
+    else
+        log "image is pinned to $digest; making sure all images are present ..."
+        compose pull
+    fi
+
+    # --- database and schema
+    if compose_file_active compose/postgres.yml; then
+        log "starting the database ..."
+        compose up -d db
+        wait_healthy db "$BYROCTL_DB_HEALTH_TIMEOUT" || die "the database did not become healthy"
+    fi
+    log "applying database migrations ..."
+    compose run --rm -T manage migrate --noinput
+
+    # --- administrator
+    if (( skip_superuser )); then
+        log "skipping the administrator account (--skip-superuser)"
+    else
+        ensure_superuser "$admin_user" "$admin_email"
+    fi
+
+    # --- start
+    log "starting byro ..."
+    compose up -d
+    wait_healthy web "$BYROCTL_WEB_HEALTH_TIMEOUT" || die "byro did not become healthy; check 'byroctl logs web'"
+
+    now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    if ! conf_has BYROCTL_INSTALLED_AT "$BYRO_ROOT/.byroctl/state"; then
+        write_state BYROCTL_INSTALLED_AT "$now"
+    fi
+    write_state BYROCTL_LAST_INSTALL_RUN "$now"
+
+    site_url="$(conf_get BYRO_SITE_URL 2>/dev/null || true)"
+    cat <<SUMMARY
+
+byro $version is installed and running.
+
+  URL:            ${site_url:-unknown}
+  directory:      $BYRO_ROOT
+  configuration:  $CONF_FILE  (change with: byroctl config set KEY VALUE --apply)
+
+Back up regularly: $BYRO_ROOT/data (documents, keys, .secret), $BYRO_ROOT/db (database)
+or your external database, and $BYRO_ROOT/byro.conf.
+SUMMARY
+}
+
+# --- config, start, stop, restart, logs, manage --------------------------------------------
+
+# enter_root: all commands except install need an existing installation.
+enter_root() {
+    [[ -d "$BYRO_ROOT" ]] || die "installation directory $BYRO_ROOT does not exist (run byroctl install first)"
+    cd "$BYRO_ROOT"
+    [[ -f "$CONF_FILE" ]] || die "no byro.conf in $BYRO_ROOT - not installed yet? (run byroctl install)"
+}
+
+# file_mode FILE: octal permission bits, GNU and BSD stat.
+file_mode() {
+    stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1" 2>/dev/null || true
+}
+
+# conf_lint_value KEY RAW: returns 1 and prints a reason if the raw file value
+# would be misread by Docker Compose.
+conf_lint_value() {
+    local key="$1" raw="$2" q="'"
+    if [[ "$raw" == "$q"* ]]; then
+        if [[ ${#raw} -lt 2 || "$raw" != *"$q" ]]; then
+            printf '%s: single-quoted value is not closed\n' "$key"; return 1
+        fi
+    elif [[ "$raw" == '"'* ]]; then
+        if [[ "$raw" == *'$'* ]]; then
+            printf '%s: double quotes do not protect $ from Compose interpolation, use single quotes\n' "$key"; return 1
+        fi
+    else
+        if [[ "$raw" == *'$'* ]]; then
+            printf '%s: unquoted value contains $ and would be interpolated by Compose, use single quotes\n' "$key"; return 1
+        fi
+        if [[ "$raw" =~ [[:space:]]# ]]; then
+            printf '%s: unquoted value contains " #", the rest would be treated as a comment, use single quotes\n' "$key"; return 1
+        fi
+        if [[ "$raw" == *"$q"* ]]; then
+            printf '%s: unquoted value contains an apostrophe, use single quotes (apostrophe inside as backslash-apostrophe)\n' "$key"; return 1
+        fi
+    fi
+    return 0
+}
+
+# config_check: validates byro.conf and the compose configuration. Prints every
+# problem, returns 1 if any error was found.
+config_check() {
+    local errors=0 warnings=0 line key raw mode f value repo digest version
+    err()  { printf 'byroctl: config check: ERROR: %s\n' "$*" >&2; errors=$((errors + 1)); }
+    note() { printf 'byroctl: config check: warning: %s\n' "$*" >&2; warnings=$((warnings + 1)); }
+
+    [[ -f "$CONF_FILE" ]] || { err "$CONF_FILE does not exist"; return 1; }
+    mode="$(file_mode "$CONF_FILE")"
+    [[ "$mode" == 600 ]] || err "$CONF_FILE has mode $mode, it contains passwords and must be 600 (chmod 600 byro.conf)"
+    [[ -L "$BYRO_ROOT/.env" || -f "$BYRO_ROOT/.env" ]] || err ".env is missing; docker compose needs it: ln -s byro.conf .env"
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" =~ ^[A-Z][A-Z0-9_]*= ]] || continue
+        key="${line%%=*}"; raw="${line#*=}"
+        if ! value="$(conf_lint_value "$key" "$raw")"; then
+            err "$value"
+        fi
+    done <"$CONF_FILE"
+
+    version="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
+    [[ -n "$version" ]] || err "BYRO_DEPLOY_VERSION is empty"
+    value="$(conf_get BYRO_SITE_URL 2>/dev/null || true)"
+    if [[ -z "$value" ]]; then
+        err "BYRO_SITE_URL is empty"
+    elif ! valid_url "$value"; then
+        err "BYRO_SITE_URL must be http(s)://host[:port] without a path (got: $value)"
+    fi
+    if compose_file_active compose/postgres.yml && ! conf_has BYRO_DB_PASS; then
+        err "BYRO_DB_PASS is empty but the built-in database (compose/postgres.yml) is active"
+    fi
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        [[ -f "$BYRO_ROOT/$f" ]] || err "COMPOSE_FILE names $f, but the file does not exist in $BYRO_ROOT"
+    done < <(compose_files)
+    if conf_has BYRO_DEBUG; then
+        note "BYRO_DEBUG is set - never run a production instance in debug mode"
+    fi
+    digest="$(conf_get BYRO_DEPLOY_IMAGE_DIGEST 2>/dev/null || true)"
+    if [[ -n "$digest" ]]; then
+        if ! valid_digest "$digest"; then
+            err "BYRO_DEPLOY_IMAGE_DIGEST has an unexpected format (expected sha256:<64 hex>): $digest"
+        elif command -v docker >/dev/null 2>&1; then
+            repo="$(conf_get BYRO_DEPLOY_IMAGE_REPO 2>/dev/null || true)"
+            repo="${repo:-$BYROCTL_DEFAULT_REPO}"
+            if ! image_exists "$repo@$digest"; then
+                note "could not confirm $repo@$digest in the registry (offline, or the digest is unknown there)"
+            fi
+        fi
+    fi
+    if command -v docker >/dev/null 2>&1; then
+        if ! compose config -q 2>"$BYRO_ROOT/.byroctl/compose-check.log"; then
+            err "docker compose config failed:"
+            sed 's/^/    /' "$BYRO_ROOT/.byroctl/compose-check.log" >&2 || true
+        fi
+        rm -f "$BYRO_ROOT/.byroctl/compose-check.log"
+    fi
+
+    if (( errors > 0 )); then
+        log "config check: $errors error(s), $warnings warning(s)"
+        return 1
+    fi
+    log "config check: OK ($warnings warning(s))"
+    return 0
+}
+
+cmd_config() {
+    local sub="${1:-}" key value apply=0 arg editor
+    [[ -n "$sub" ]] || die "usage: byroctl config get KEY | set KEY VALUE [--apply] | edit | check" 64
+    shift
+    enter_root
+    case "$sub" in
+        get)
+            key="${1:-}"; [[ -n "$key" ]] || die "usage: byroctl config get KEY" 64
+            valid_conf_key "$key" || die "invalid key: $key" 64
+            value="$(conf_get "$key")" || die "$key is not set in $CONF_FILE"
+            printf '%s\n' "$(conf_mask "$key" "$value")" ;;
+        set)
+            key="${1:-}"; [[ -n "$key" ]] || die "usage: byroctl config set KEY VALUE [--apply] (secrets: BYROCTL_VALUE=... byroctl config set KEY --apply)" 64
+            valid_conf_key "$key" || die "invalid key: $key" 64
+            shift
+            value=""; local have_value=0
+            for arg in "$@"; do
+                case "$arg" in
+                    --apply) apply=1 ;;
+                    *) if (( have_value )); then die "too many arguments for config set" 64; fi; value="$arg"; have_value=1 ;;
+                esac
+            done
+            if is_secret_key "$key"; then
+                (( have_value == 0 )) || die "$key is a secret; do not pass it on the command line. Use: BYROCTL_VALUE='...' byroctl config set $key" 64
+                [[ -n "${BYROCTL_VALUE:-}" ]] || die "$key is a secret; provide it in the environment variable BYROCTL_VALUE" 64
+                value="$BYROCTL_VALUE"
+            else
+                (( have_value )) || die "usage: byroctl config set KEY VALUE [--apply]" 64
+            fi
+            acquire_lock
+            conf_set "$key" "$value"
+            log "set $key=$(conf_mask "$key" "$value")"
+            if (( apply )); then
+                config_check || die "not applying a configuration with errors"
+                need_docker
+                log "applying: docker compose up -d"
+                compose up -d
+                wait_healthy web "$BYROCTL_WEB_HEALTH_TIMEOUT" || die "byro did not become healthy after the change; check 'byroctl logs web'"
+            else
+                log "run 'byroctl config check' and 'byroctl start' (docker compose up -d) to apply"
+            fi ;;
+        edit)
+            editor="${EDITOR:-nano}"
+            command -v "${editor%% *}" >/dev/null 2>&1 || die "editor '$editor' not found; set EDITOR"
+            acquire_lock
+            $editor "$CONF_FILE"
+            chmod 600 "$CONF_FILE"
+            config_check || die "fix the errors above (byroctl config edit)"
+            if confirm "Apply the configuration now (docker compose up -d)?" y; then
+                need_docker
+                compose up -d
+                wait_healthy web "$BYROCTL_WEB_HEALTH_TIMEOUT" || die "byro did not become healthy; check 'byroctl logs web'"
+            fi ;;
+        check)
+            config_check ;;
+        *)
+            die "unknown config subcommand: $sub (get | set | edit | check)" 64 ;;
+    esac
+}
+
+cmd_start() {
+    enter_root; need_docker; acquire_lock
+    log "starting: docker compose up -d"
+    compose up -d
+    wait_healthy web "$BYROCTL_WEB_HEALTH_TIMEOUT" || die "byro did not become healthy; check 'byroctl logs web'"
+    log "byro is up"
+}
+
+cmd_stop() {
+    enter_root; need_docker; acquire_lock
+    log "stopping the stack (containers and data are kept)"
+    compose stop
+}
+
+# restart: recreate the byro services only. The database keeps running, the
+# manage service is a profile-only one-off.
+cmd_restart() {
+    local services=() s
+    enter_root; need_docker; acquire_lock
+    while IFS= read -r s; do
+        [[ -n "$s" ]] || continue
+        case "$s" in db|manage) ;; *) services+=("$s") ;; esac
+    done < <(active_services)
+    (( ${#services[@]} > 0 )) || die "no services found in the compose configuration"
+    log "recreating: ${services[*]}"
+    compose up -d --force-recreate --no-deps "${services[@]}"
+    wait_healthy web "$BYROCTL_WEB_HEALTH_TIMEOUT" || die "byro did not become healthy; check 'byroctl logs web'"
+}
+
+cmd_logs() {
+    local follow=() arg services=()
+    enter_root; need_docker
+    for arg in "$@"; do
+        case "$arg" in
+            -f|--follow) follow=(--follow) ;;
+            -*) die "unknown logs option: $arg (byroctl logs [-f] [SERVICE...])" 64 ;;
+            *) services+=("$arg") ;;
+        esac
+    done
+    compose logs --tail=200 "${follow[@]}" "${services[@]}"
+}
+
+cmd_manage() {
+    local tty=()
+    enter_root; need_docker
+    [[ $# -gt 0 ]] || die "usage: byroctl manage <django command> [args...]" 64
+    [[ -t 0 && -t 1 ]] || tty=(-T)
+    compose run --rm "${tty[@]}" manage "$@"
+}
+
+# --- commands (filled in below) -----------------------------------------------------------
+
+usage() {
+    cat >&2 <<'USAGE'
+Usage: byroctl [--root DIR] <command> [options]
+
+Commands:
+  install      set up a new byro installation in the root directory
+  config       get KEY | set KEY VALUE [--apply] | edit | check
+  start        start the stack and wait for byro to become healthy
+  stop         stop the stack (data and containers are kept)
+  restart      recreate the byro services (web, periodic, caddy), not the database
+  logs         show logs: byroctl logs [-f] [SERVICE...]
+  manage       run a byro management command: byroctl manage migrate
+  version      show the installed and running byro version
+  help         this text
+
+Global options:
+  --root DIR   installation directory (default: directory of this script,
+               or BYRO_ROOT from the environment)
+USAGE
+}
+
+cmd_version() {
+    local version digest running
+    version="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
+    digest="$(conf_get BYRO_DEPLOY_IMAGE_DIGEST 2>/dev/null || true)"
+    printf 'byro version:   %s\n' "${version:-unset}"
+    printf 'image digest:   %s\n' "${digest:-not pinned}"
+    printf 'root:           %s\n' "$BYRO_ROOT"
+    printf 'compose files:  %s\n' "$(compose_files | tr '\n' ' ')"
+    if [[ -n "$(container_id web)" ]]; then
+        running="$(compose exec -T web python -c 'import byro; print(byro.__version__)' 2>/dev/null | tail -n1 || true)"
+        printf 'running byro:   %s\n' "${running:-unknown}"
+    else
+        printf 'running byro:   not running\n'
+    fi
+}
+
+main() {
+    set -euo pipefail
+    local root="${BYRO_ROOT:-}" cmd=""
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --root) [[ $# -ge 2 ]] || die "--root needs a directory" 64; root="$2"; shift 2 ;;
+            --root=*) root="${1#--root=}"; shift ;;
+            -h|--help|help) usage; exit 0 ;;
+            -*) die "unknown global option: $1" 64 ;;
+            *) cmd="$1"; shift; break ;;
+        esac
+    done
+    [[ -n "$cmd" ]] || { usage; exit 64; }
+    if [[ -z "$root" ]]; then
+        root="$(script_dir)"
+    fi
+    BYRO_ROOT="${root%/}"
+    CONF_FILE="$BYRO_ROOT/byro.conf"
+    case "$cmd" in
+        install) cmd_install "$@" ;;
+        config)  cmd_config "$@" ;;
+        start)   cmd_start "$@" ;;
+        stop)    cmd_stop "$@" ;;
+        restart) cmd_restart "$@" ;;
+        logs)    cmd_logs "$@" ;;
+        manage)  cmd_manage "$@" ;;
+        version) enter_root; cmd_version ;;
+        *) die "unknown command: $cmd (try byroctl help)" 64 ;;
+    esac
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi

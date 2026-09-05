@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Test shim for the docker CLI. Logs every invocation to $SHIM_LOG and answers
+# the subset of commands byroctl uses, driven by SHIM_* variables:
+#   SHIM_TAGS            refs that exist in the "registry" (docker manifest inspect)
+#   SHIM_LOCAL_IMAGES    refs that exist locally (docker image inspect exit code)
+#   SHIM_DIGESTS         lines "REF REPO@sha256:..." printed by image inspect
+#   SHIM_HEALTH          health status reported by docker inspect
+#   SHIM_SUPERUSER_EXISTS  1 -> the superuser probe exits 0
+#   SHIM_SERVICES        services listed by compose config --services
+#   SHIM_FAIL            substring; if the invocation matches, exit 1
+set -u
+printf '%s\n' "docker $*" >>"${SHIM_LOG:-/dev/null}"
+if [[ -n "${SHIM_FAIL:-}" && "docker $*" == *"$SHIM_FAIL"* ]]; then
+    echo "shim: simulated failure for: docker $*" >&2
+    exit 1
+fi
+case "$1" in
+    version)
+        echo "27.3.1" ;;
+    info)
+        exit 0 ;;
+    manifest)
+        # docker manifest inspect REF
+        ref="$3"
+        for t in ${SHIM_TAGS:-}; do [[ "$t" == "$ref" ]] && exit 0; done
+        echo "no such manifest: $ref" >&2; exit 1 ;;
+    image)
+        # docker image inspect REF [--format ...]
+        ref="$3"
+        found=0
+        for t in ${SHIM_LOCAL_IMAGES:-}; do [[ "$t" == "$ref" ]] && found=1; done
+        (( found )) || { echo "Error: No such image: $ref" >&2; exit 1; }
+        if [[ "$*" == *"--format"* ]]; then
+            while IFS= read -r line; do
+                [[ -n "$line" ]] || continue
+                [[ "${line%% *}" == "$ref" ]] && printf '%s\n' "${line#* }"
+            done <<<"${SHIM_DIGESTS:-}"
+        fi
+        exit 0 ;;
+    inspect)
+        # docker inspect --format ... CID
+        printf '%s\n' "${SHIM_HEALTH:-healthy}" ;;
+    compose)
+        shift
+        case "$1" in
+            version) echo "v2.31.0" ;;
+            ps) echo "cid-${*: -1}" ;;
+            config)
+                if [[ "$*" == *"--services"* ]]; then
+                    for s in ${SHIM_SERVICES:-web periodic db}; do echo "$s"; done
+                fi ;;
+            run)
+                if [[ "$*" == *"is_superuser=True"* ]]; then
+                    [[ "${SHIM_SUPERUSER_EXISTS:-0}" == 1 ]] && exit 0 || exit 1
+                fi ;;
+            exec)
+                if [[ "$*" == *"byro.__version__"* ]]; then echo "v9.9.9-shim"; fi ;;
+            *) : ;;
+        esac ;;
+    *) : ;;
+esac
+exit 0

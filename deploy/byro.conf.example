@@ -4,6 +4,12 @@
 # (BYRO_DEPLOY_*) and byro itself (BYRO_*). It is read by Docker Compose as
 # .env (symlink) for variable interpolation and passed to the byro containers
 # as env_file. Keep it at mode 0600: it contains passwords.
+#
+# Quoting: put values that contain $, #, spaces, quotes or backslashes in
+# SINGLE quotes, e.g. BYRO_DB_PASS='p$ss #1'. Compose interpolates $VAR inside
+# double quotes and unquoted values, and an unquoted " #" starts a comment.
+# Inside single quotes write an apostrophe as \' ; backslashes stay as they are.
+# byroctl config set applies these rules automatically.
 
 # ---------------------------------------------------------------------------
 # Docker Compose

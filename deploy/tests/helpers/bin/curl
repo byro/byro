@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Test shim for curl: serves files from $SHIM_RAW mapped by URL path.
+# https://host/<ref>/deploy/<path> -> $SHIM_RAW/<ref>/deploy/<path>
+set -u
+printf '%s\n' "curl $*" >>"${SHIM_LOG:-/dev/null}"
+out=""; url=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o) out="$2"; shift 2 ;;
+        --proto|--tlsv1.2|--fail|--silent|--show-error|--location) [[ "$1" == --proto ]] && shift; shift ;;
+        http*) url="$1"; shift ;;
+        *) shift ;;
+    esac
+done
+[[ -n "$url" ]] || { echo "shim curl: no url" >&2; exit 2; }
+path="${url#https://}"; path="${path#*/}"          # strip host
+src="${SHIM_RAW:?SHIM_RAW not set}/$path"
+[[ -f "$src" ]] || { echo "curl: (22) The requested URL returned error: 404 ($url)" >&2; exit 22; }
+if [[ -n "$out" ]]; then cp "$src" "$out"; else cat "$src"; fi
