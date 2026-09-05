@@ -105,12 +105,11 @@ We also need to create a data directory::
 
     $ mkdir -p /var/byro/data/media
 
-We compile static files and translation data and create the database structure::
+We create the database structure and compile static files and translation data (``rebuild``
+runs ``compilemessages``, ``collectstatic`` and ``compress`` for you)::
 
     $ python -m byro migrate
-    $ python -m byro compilemessages
-    $ python -m byro collectstatic
-    $ python -m byro compress
+    $ python -m byro rebuild
 
 Now, create an administrator user by running::
 
@@ -226,9 +225,7 @@ If you want to upgrade byro to a specific release, you can substitute
 
     $ pip3 install -U byro gunicorn
     $ python -m byro migrate
-    $ python -m byro compilemessages
-    $ python -m byro collectstatic
-    $ python -m byro compress
+    $ python -m byro rebuild
     # systemctl restart byro-web
 
 
