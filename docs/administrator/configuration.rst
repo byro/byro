@@ -7,12 +7,18 @@ is in this order:
 
 1. Environment variables
 2. Configuration files
-    - The configuration file in the environment variable ``BYRO_CONFIG_FILE`` if present, **or**:
-    - The following three configuration files in this order:
-       - The configuration file ``byro.cfg`` in the ``src`` directory, next to the ``byro.example.cfg`` file.
-       - The configuration file ``~/.byro.cfg`` in the home of the executing user.
-       - The configuration file ``/etc/byro/byro.cfg``
+    - Only the file named in the environment variable ``BYRO_CONFIG_FILE`` if that variable is set
+      (byro refuses to start if the file does not exist), **or**:
+    - The following three configuration files, where a later file overrides an earlier one:
+       - ``/etc/byro/byro.cfg``
+       - ``~/.byro.cfg`` in the home of the executing user
+       - ``byro.cfg`` in the current working directory of the byro process (for a development checkout
+         that is the ``src`` directory, next to ``byro.example.cfg``)
 3. Sensible defaults
+
+The container deployments (:doc:`installation-byroctl`, :doc:`installation-compose`) use the
+environment variables only, written as ``KEY=VALUE`` lines in ``byro.conf``. The plain installation
+uses the configuration file. Both forms describe the same options.
 
 This page explains the options by configuration file section and notes the corresponding environment
 variable next to it. A configuration file looks like this:
@@ -37,7 +43,7 @@ The filesystem section
 ~~~~~~~~~
 
 - The ``media`` option sets the media directory that contains user generated files. It needs to
-  be writeable by the byro process.
+  be writable by the byro process.
 - **Environment variable:** ``BYRO_FILESYSTEM_MEDIA``
 - **Default:** A directory called ``media`` in the ``data`` directory (see above).
 
@@ -45,7 +51,7 @@ The filesystem section
 ~~~~~~~~
 
 - The ``logs`` option sets the log directory that contains logged data. It needs to
-  be writeable by the byro process.
+  be writable by the byro process.
 - **Environment variable:** ``BYRO_FILESYSTEM_LOGS``
 - **Default:** A directory called ``logs`` in the ``data`` directory (see above).
 
@@ -53,7 +59,7 @@ The filesystem section
 ~~~~~~~~~~
 
 - The ``statics`` option sets the directory that contains static files. It needs to
-  be writeable by the byro process. byro will put files there during the
+  be writable by the byro process. byro will put files there during the
   ``collectstatic`` command.
 - **Environment variable:** ``BYRO_FILESYSTEM_STATIC``
 - **Default:** A directory called ``static.dist`` next to byro's ``manage.py``.

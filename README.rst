@@ -36,7 +36,10 @@ is still a work in progress, it is already usable and in active use.
 Development and Production Setup
 --------------------------------
 
-Please refer to the `development`_ or the `production documentation`_.
+Please refer to the `development`_ or the `production documentation`_. The
+recommended way to run byro is `byroctl`_, which installs and updates a
+Docker based deployment with one command; Docker Compose by hand and a plain
+installation from PyPI are documented as well.
 
 Features
 --------
@@ -77,3 +80,4 @@ GitHub. You can see all byro plugins on GitHub `here`_.
 .. _byro-gemeinnuetzigkeit: https://github.com/byro/byro-gemeinnuetzigkeit
 .. _byro-shackspace: https://github.com/byro/byro-shackspace
 .. _production documentation: https://byro.readthedocs.io/en/latest/administrator/
+.. _byroctl: https://byro.readthedocs.io/en/latest/administrator/installation-byroctl.html
