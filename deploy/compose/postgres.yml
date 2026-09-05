@@ -1,0 +1,40 @@
+# Add-on: built-in PostgreSQL (default). Include it via COMPOSE_FILE in
+# byro.conf. To use an external database instead, leave this file out and
+# point BYRO_DB_HOST / BYRO_DB_PORT / BYRO_DB_NAME / BYRO_DB_USER / BYRO_DB_PASS
+# at your server.
+#
+# The major version is pinned through BYRO_DEPLOY_POSTGRES_MAJOR and is never
+# changed implicitly by an update; a major upgrade is a separate procedure.
+# Note: postgres:18+ moved its data directory to /var/lib/postgresql, so the
+# volume target below is tied to the pinned major.
+services:
+  db:
+    image: postgres:${BYRO_DEPLOY_POSTGRES_MAJOR:-17}-alpine
+    environment:
+      POSTGRES_DB: ${BYRO_DB_NAME:-byro}
+      POSTGRES_USER: ${BYRO_DB_USER:-byro}
+      POSTGRES_PASSWORD: ${BYRO_DB_PASS:?set a database password (BYRO_DB_PASS) in byro.conf}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${BYRO_DB_USER:-byro} -d ${BYRO_DB_NAME:-byro}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  # The byro services wait for the built-in database.
+  web:
+    depends_on:
+      db:
+        condition: service_healthy
+  periodic:
+    depends_on:
+      db:
+        condition: service_healthy
+  manage:
+    depends_on:
+      db:
+        condition: service_healthy

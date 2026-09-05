@@ -1,0 +1,24 @@
+# Build context for deploy/Dockerfile is the repository root.
+# Everything is excluded except the two directories the image needs.
+*
+!src/
+!deploy/
+
+# Development and build artefacts inside src/
+src/data/
+src/build/
+src/dist/
+src/htmlcov/
+src/static.dist/
+src/*.egg-info/
+src/local/
+src/tests/
+src/coverage.xml
+src/.coverage
+src/byro.cfg
+src/byro.docker.cfg
+src/docker-compose.yml
+src/Dockerfile
+src/README.docker.md
+**/__pycache__/
+**/*.pyc

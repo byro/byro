@@ -1,0 +1,8 @@
+# byro reverse proxy. The site address comes from BYRO_SITE_URL (for example
+# https://byro.example.org); Caddy obtains and renews the certificate itself
+# and sets X-Forwarded-Proto for byro. With an http:// address automatic
+# HTTPS stays disabled.
+{$BYRO_SITE_URL} {
+	encode zstd gzip
+	reverse_proxy web:8345
+}

@@ -1,0 +1,100 @@
+# byro deployment configuration (KEY=VALUE, one per line, no inline comments).
+#
+# This single file configures Docker Compose (COMPOSE_*), the deployment
+# (BYRO_DEPLOY_*) and byro itself (BYRO_*). It is read by Docker Compose as
+# .env (symlink) for variable interpolation and passed to the byro containers
+# as env_file. Keep it at mode 0600: it contains passwords.
+
+# ---------------------------------------------------------------------------
+# Docker Compose
+# ---------------------------------------------------------------------------
+COMPOSE_PROJECT_NAME=byro
+# Which Compose files make up the stack. Add-ons are additive:
+#   compose/postgres.yml  built-in PostgreSQL (remove it to use an external DB)
+#   compose/caddy.yml     Caddy reverse proxy with automatic HTTPS
+# Example with Caddy:
+#   COMPOSE_FILE=docker-compose.yml:compose/postgres.yml:compose/caddy.yml
+COMPOSE_FILE=docker-compose.yml:compose/postgres.yml
+
+# ---------------------------------------------------------------------------
+# Deployment (ignored by byro itself)
+# ---------------------------------------------------------------------------
+# The byro release tag these files belong to, e.g. v2026.3.0. byroctl sets it;
+# for a manual setup enter the tag you downloaded the files from.
+BYRO_DEPLOY_VERSION=
+# Image digest pin written by byroctl (sha256:...). Leave empty for a manual
+# setup, and clear it whenever you change BYRO_DEPLOY_VERSION by hand.
+BYRO_DEPLOY_IMAGE_DIGEST=
+# Alternative image repository, e.g. a registry mirror.
+#BYRO_DEPLOY_IMAGE_REPO=ghcr.io/byro/byro
+# PostgreSQL major version of the built-in database. Never change this on an
+# existing installation without migrating the data (see documentation).
+BYRO_DEPLOY_POSTGRES_MAJOR=17
+# Where the web service listens on the host. Keep 127.0.0.1 behind a reverse proxy.
+BYRO_DEPLOY_BIND=127.0.0.1
+BYRO_DEPLOY_PORT=8345
+BYRO_DEPLOY_WEB_WORKERS=4
+# Interval in seconds between two runs of byro's periodic tasks.
+BYRO_DEPLOY_PERIODIC_INTERVAL=600
+BYRO_DEPLOY_CHANNEL=stable
+
+# ---------------------------------------------------------------------------
+# byro: site
+# ---------------------------------------------------------------------------
+# Public URL without a path. Determines allowed hosts and absolute links.
+BYRO_SITE_URL=https://byro.example.org
+BYRO_HTTPS=true
+# Trust X-Forwarded-Proto from a reverse proxy in front of byro. Set to true
+# when you run your own reverse proxy. compose/caddy.yml enables it automatically.
+BYRO_TRUST_PROXY=false
+BYRO_LANGUAGE_CODE=de
+BYRO_TIME_ZONE=Europe/Berlin
+
+# ---------------------------------------------------------------------------
+# byro: database
+# ---------------------------------------------------------------------------
+BYRO_DB_ENGINE=postgresql
+# "db" is the built-in PostgreSQL from compose/postgres.yml.
+BYRO_DB_HOST=db
+BYRO_DB_PORT=5432
+BYRO_DB_NAME=byro
+BYRO_DB_USER=byro
+# Required. The stack refuses to start while this is empty.
+BYRO_DB_PASS=
+
+# ---------------------------------------------------------------------------
+# byro: outgoing mail
+# ---------------------------------------------------------------------------
+# For a mail server running on the Docker host use host.docker.internal.
+BYRO_MAIL_HOST=
+BYRO_MAIL_PORT=587
+BYRO_MAIL_USER=
+BYRO_MAIL_PASSWORD=
+BYRO_MAIL_FROM=byro@example.org
+BYRO_MAIL_TLS=true
+BYRO_MAIL_SSL=false
+
+# ---------------------------------------------------------------------------
+# byro: PGP (mail signing and encryption)
+# ---------------------------------------------------------------------------
+BYRO_PGP_HOME=/var/byro/data/gnupg
+
+# ---------------------------------------------------------------------------
+# byro: OpenID Connect login (optional)
+# ---------------------------------------------------------------------------
+#BYRO_OIDC_ISSUER_URL=
+#BYRO_OIDC_CLIENT_ID=
+#BYRO_OIDC_CLIENT_SECRET=
+#BYRO_OIDC_ADMIN_GROUP=
+#BYRO_OIDC_AUTO_CREATE_ACCOUNT=false
+#BYRO_OIDC_USERNAME_FIELD=preferred_username
+
+# ---------------------------------------------------------------------------
+# Container behaviour (rarely needed)
+# ---------------------------------------------------------------------------
+# Run migrations automatically when the web service starts (default true).
+#BYRO_AUTO_MIGRATE=true
+# Run byro as a different uid/gid, e.g. to read files in data/ with your own
+# host user. Must be numeric, not 0 and not already in use inside the image.
+#BYRO_UID=1000
+#BYRO_GID=1000
