@@ -1,10 +1,11 @@
-Installation
-============
+Plain installation (without Docker)
+===================================
 
-This guide will help you to install byro on a Linux distribution, as long as
-the prerequisites are present.
-
-Note: there is also an experimental deployment available via `docker-compose`_.
+This guide will help you to install byro from PyPI on a Linux distribution,
+with your own database server, gunicorn, systemd and reverse proxy. It is the
+right choice for classic or individual deployments. If you would rather have
+containers do most of this for you, see :doc:`installation-byroctl`
+(recommended) or :doc:`installation-compose`.
 
 Step 0: Prerequisites
 ---------------------
@@ -99,7 +100,7 @@ Next, we will install byro – you can either install the latest PyPI release, o
 branch or commit::
 
     $ pip install --user -U byro  # OR, alternatively
-    $ pip install --user -U "git+git://github.com/byro/byro.git@main#egg=byro&subdirectory=src"
+    $ pip install --user -U "git+https://github.com/byro/byro.git@main#egg=byro&subdirectory=src"
 
 We also need to create a data directory::
 
@@ -145,11 +146,41 @@ system, especially the local Python version's)::
     WantedBy=multi-user.target
 
 
+byro also has periodic tasks (refreshing PGP keys, sending expiry reminders,
+cleaning up unfinished MFA enrolments). They only run if something calls
+``python -m byro runperiodic`` regularly. Create ``/etc/systemd/system/byro-periodic.service``::
+
+    [Unit]
+    Description=byro periodic tasks
+    After=network.target
+
+    [Service]
+    Type=oneshot
+    User=byro
+    Group=byro
+    WorkingDirectory=/var/byro
+    ExecStart=/var/byro/.local/bin/python -m byro runperiodic
+
+and ``/etc/systemd/system/byro-periodic.timer``::
+
+    [Unit]
+    Description=Run byro periodic tasks every 10 minutes
+
+    [Timer]
+    OnBootSec=5min
+    OnUnitActiveSec=10min
+
+    [Install]
+    WantedBy=timers.target
+
+If ``/var/byro/.local/bin/python`` does not exist, use the ``python3`` that has
+byro installed (``which python3`` as the byro user).
+
 You can now run the following commands to enable and start the services::
 
     # systemctl daemon-reload
-    # systemctl enable byro-web
-    # systemctl start byro-web
+    # systemctl enable --now byro-web
+    # systemctl enable --now byro-periodic.timer
 
 Step 7: SSL
 -----------
@@ -160,33 +191,37 @@ The following snippet is an example on how to configure a nginx proxy for byro::
         listen 80 default_server;
         listen [::]:80 ipv6only=on default_server;
         server_name byro.mydomain.com;
+        return 301 https://$host$request_uri;
     }
     server {
-        listen 443 default_server;
-        listen [::]:443 ipv6only=on default_server;
+        listen 443 ssl default_server;
+        listen [::]:443 ssl ipv6only=on default_server;
         server_name byro.mydomain.com;
 
-        ssl on;
         ssl_certificate /path/to/cert.chain.pem;
         ssl_certificate_key /path/to/key.pem;
 
-        add_header Referrer-Options same-origin;
+        add_header Referrer-Policy same-origin;
         add_header X-Content-Type-Options nosniff;
 
         location / {
-            proxy_pass http://localhost:8345/;
+            proxy_pass http://127.0.0.1:8345/;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto https;
             proxy_set_header Host $http_host;
         }
-
-        location /media/ {
-            alias /var/byro/data/media/;
-            add_header Content-Disposition 'attachment; filename="$1"';
-            expires 7d;
-            access_log off;
-        }
     }
+
+Because the proxy terminates TLS, byro must be told to trust the
+``X-Forwarded-Proto`` header it sends. Set ``trust_proxy = True`` in the
+``[site]`` section of ``/etc/byro/byro.cfg`` (see :doc:`configuration`);
+otherwise byro builds absolute URLs such as the OpenID Connect redirect with
+``http`` and considers requests insecure.
+
+Do not serve ``/media/`` with the web server: byro delivers documents itself
+after checking that the user is logged in. A ``location /media/`` alias, as
+older versions of this guide suggested, would expose every uploaded document to
+anyone who knows its URL.
 
 We recommend reading about setting `strong encryption settings`_ for your web server.
 
@@ -210,9 +245,10 @@ Next Steps: Updates
 
 .. warning:: While we try hard not to issue breaking updates, **please perform a backup before every upgrade**.
 
-To upgrade byro, please first read through our changelog and if
-available our release blog post to check for relevant update notes. Also, make
-sure you have a current backup.
+To upgrade byro, please first read through the `release notes`_ to check for
+relevant update notes. Also, make sure you have a current backup of the
+database, of ``/var/byro/data`` (it contains the secret key file ``.secret``,
+whose loss invalidates all sessions and MFA devices) and of your configuration.
 
 Next, please execute the following commands in the same environment (probably
 your virtualenv) to first update the byro source, then update the database
@@ -233,4 +269,4 @@ If you want to upgrade byro to a specific release, you can substitute
 .. _PostgreSQL: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-9-4-on-debian-8
 .. _ufw: https://en.wikipedia.org/wiki/Uncomplicated_Firewall
 .. _strong encryption settings: https://mozilla.github.io/server-side-tls/ssl-config-generator/
-.. _docker-compose: https://byro.readthedocs.io/en/latest/administrator/docker-compose.html
+.. _release notes: https://github.com/byro/byro/releases
