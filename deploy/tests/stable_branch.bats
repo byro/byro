@@ -4,15 +4,9 @@
 
 load helpers/common
 
-# Constants are set in setup(): top-level assignments are not reliably visible
-# inside bats test functions.
-constants() {
-    SCRIPT="$REPO_ROOT/.github/scripts/update-stable-branch.sh"
-    IMAGE="ghcr.io/byro/byro"
-}
-
-# make_tag TAG [MARKER]: a release commit with deploy/install.sh (the real file,
-# plus a visible marker) and a matching deploy/SHA256SUMS, tagged and pushed.
+# make_tag TAG [MARKER]: a release commit in $CLONE with deploy/install.sh (the
+# real file, plus a visible marker) and a matching deploy/SHA256SUMS, tagged and
+# pushed to origin.
 make_tag() {
     local tag="$1" marker="${2:-}"
     mkdir -p "$CLONE/deploy"
@@ -20,7 +14,7 @@ make_tag() {
     if [[ -n "$marker" ]]; then
         printf '\n# %s\n' "$marker" >>"$CLONE/deploy/install.sh"
     fi
-    ( cd "$CLONE/deploy" && sha256sum install.sh >SHA256SUMS )
+    write_sha256sums "$CLONE/deploy" install.sh
     git -C "$CLONE" add -A
     git -C "$CLONE" commit -q -m "release $tag"
     git -C "$CLONE" tag "$tag"
@@ -31,22 +25,30 @@ stable_file() { git -C "$ORIGIN" show "stable:$1"; }
 stable_count() { git -C "$ORIGIN" rev-list --count stable; }
 stable_exists() { git -C "$ORIGIN" rev-parse --verify -q refs/heads/stable >/dev/null; }
 
-setup() {
-    constants
-    use_shims
-    export HOME="$BATS_TEST_TMPDIR/home"
-    mkdir -p "$HOME"
-    export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null
-    export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=test@example.org
-    export GIT_COMMITTER_NAME=test GIT_COMMITTER_EMAIL=test@example.org
-    export SHIM_TAGS="$IMAGE:v2026.3.0 $IMAGE:v2026.4.0 $IMAGE:v2026.9.9 $IMAGE:v2026.10.0"
-    ORIGIN="$BATS_TEST_TMPDIR/origin.git"
-    CLONE="$BATS_TEST_TMPDIR/clone"
+# The fixture (bare origin plus a clone with two releases) is built once per file
+# and copied for every test, so each test may change its copy freely.
+setup_file() {
+    use_git "$BATS_FILE_TMPDIR"
+    ORIGIN="$BATS_FILE_TMPDIR/origin.git"
+    CLONE="$BATS_FILE_TMPDIR/clone"
     git init -q --bare "$ORIGIN"
     git -c init.defaultBranch=main init -q "$CLONE"
     git -C "$CLONE" remote add origin "$ORIGIN"
     make_tag v2026.3.0
     make_tag v2026.4.0 "changed in v2026.4.0"
+}
+
+setup() {
+    SCRIPT="$REPO_ROOT/.github/scripts/update-stable-branch.sh"
+    IMAGE="ghcr.io/byro/byro"
+    use_shims
+    use_git
+    export SHIM_TAGS="$IMAGE:v2026.3.0 $IMAGE:v2026.4.0 $IMAGE:v2026.9.9 $IMAGE:v2026.10.0"
+    ORIGIN="$BATS_TEST_TMPDIR/origin.git"
+    CLONE="$BATS_TEST_TMPDIR/clone"
+    cp -R "$BATS_FILE_TMPDIR/origin.git" "$ORIGIN"
+    cp -R "$BATS_FILE_TMPDIR/clone" "$CLONE"
+    git -C "$CLONE" remote set-url origin "$ORIGIN"
     cd "$CLONE"
 }
 
@@ -223,11 +225,15 @@ setup() {
     git -C "$ORIGIN" log --format=%s stable | tail -n1 | grep -qx 'stable: point to v2026.3.0'
 }
 
-@test "the generated stable.env is accepted by install.sh" {
+@test "the generated stable.env is accepted by install.sh and byroctl" {
     "$SCRIPT" v2026.3.0
     stable_file stable.env >"$BATS_TEST_TMPDIR/stable.env"
     export BYROCTL_RAW_BASE="https://example.test"
     BYROCTL_STABLE_FILE="$BATS_TEST_TMPDIR/stable.env" run "$DEPLOY_DIR/install.sh" --root "$BATS_TEST_TMPDIR/byro" --dry-run
     [ "$status" -eq 0 ]
     [[ "$output" == *"current stable byro release: v2026.3.0"* ]]
+    load_byroctl
+    BYROCTL_STABLE_FILE="$BATS_TEST_TMPDIR/stable.env" run resolve_stable_version
+    [ "$status" -eq 0 ]
+    [ "$output" = "v2026.3.0" ]
 }

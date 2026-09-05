@@ -4,23 +4,14 @@
 #
 #   .github/scripts/check-release-flags.sh [--warn-only]
 #
-# release.env carries two flags that byroctl reads before an update
-# (BYRO_RELEASE_BREAKING, BYRO_RELEASE_DATA_MIGRATION). Their process: both are
-# 0 on main; a flag is set to 1 in the pull request that prepares the release
-# needing it, and reset to 0 right after that release was published. This
-# script enforces two things:
-#
-#   1. Lint, always an error: each flag appears exactly once with the value 0 or
-#      1, and the file contains nothing else besides comments and blank lines.
-#      byroctl reads anything else as 0, so a typo such as "=true" would
-#      silently switch a flag off.
-#   2. Stale flag: a flag that is still 1 although the latest release tag
-#      reachable from HEAD already shipped with it, and deploy/release.env has
-#      not changed since. On main this is an error; with --warn-only (pull
-#      requests) it is a warning. A flag is not stale when there is no release
-#      tag yet, when HEAD is the release commit itself, when the tag predates
-#      release.env, or when release.env changed after the tag (it was reset
-#      and/or set again for the next release).
+# The two flags (BYRO_RELEASE_BREAKING, BYRO_RELEASE_DATA_MIGRATION) are 0 on
+# main, set to 1 in the pull request that prepares a release, and reset to 0
+# right after that release. Lint, always an error: each flag exactly once with
+# the value 0 or 1, nothing else besides comments and blank lines (byroctl reads
+# anything else as 0). Stale flag: 1 at HEAD although the latest release tag
+# reachable from HEAD already shipped with it and the file has not changed
+# since; an error, or a warning with --warn-only (pull requests). Process and
+# rationale: docs/developer/releasing.rst.
 #
 # Needs the full history and the tags (actions/checkout with fetch-depth: 0),
 # and runs against the repository that contains the current directory.
@@ -28,30 +19,29 @@
 FILE="deploy/release.env"
 FLAGS="BYRO_RELEASE_BREAKING BYRO_RELEASE_DATA_MIGRATION"
 WARN_ONLY=0
+SET_FLAGS=""   # the flags at 1, comma separated
 
+# Output: progress on stderr; results as GitHub Actions annotations on stdout
+# (harmless prefixes outside Actions).
 log() { printf '%s\n' "$*" >&2; }
 die() { printf '::error::%s\n' "$*"; exit 1; }
+warn() { printf '::warning::%s\n' "$*"; }
+error() { printf '::error::%s\n' "$*"; }
+ok() { log "release flags: $SET_FLAGS set; $*"; exit 0; }
 
 lint() {
-    local errors=0 flag count line ok
+    local errors=0 flag count line
     for flag in $FLAGS; do
         count="$(grep -cE "^$flag=(0|1)$" "$FILE" || true)"
         if [[ "$count" != "1" ]]; then
-            printf '::error::%s must contain exactly one line %s=0 or %s=1 (found %s)\n' "$FILE" "$flag" "$flag" "$count"
+            error "$FILE must contain exactly one line $flag=0 or $flag=1 (found $count)"
             grep -nE "^$flag=" "$FILE" >&2 || true
             errors=1
         fi
     done
     while IFS= read -r line || [[ -n "$line" ]]; do
-        if [[ -z "$line" || "$line" == \#* ]]; then
-            continue
-        fi
-        ok=0
-        for flag in $FLAGS; do
-            if [[ "$line" == "$flag=0" || "$line" == "$flag=1" ]]; then ok=1; fi
-        done
-        if (( ! ok )); then
-            printf '::error::unexpected line in %s: %s\n' "$FILE" "$line"
+        if [[ -n "$line" && "$line" != \#* && ! "$line" =~ ^(${FLAGS// /|})=[01]$ ]]; then
+            error "unexpected line in $FILE: $line"
             errors=1
         fi
     done <"$FILE"
@@ -67,46 +57,33 @@ main() {
     esac
     cd "$(git rev-parse --show-toplevel)" || die "run this inside a checkout of the byro repository"
     [[ -f "$FILE" ]] || die "$FILE is missing"
-    lint || die "$FILE is malformed (see above)"
+    lint || exit 1
 
-    local set_flags="" flag
+    local flag
     for flag in $FLAGS; do
         if grep -qxF "$flag=1" "$FILE"; then
-            set_flags="${set_flags:+$set_flags, }$flag"
+            SET_FLAGS="${SET_FLAGS:+$SET_FLAGS, }$flag"
         fi
     done
-    if [[ -z "$set_flags" ]]; then
+    if [[ -z "$SET_FLAGS" ]]; then
         log "release flags: both 0"
         exit 0
     fi
 
+    # the latest release tag reachable from HEAD; pre-release tags (v…-rc1) do not count
     local tag
-    tag="$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD 2>/dev/null || true)"
-    if [[ -z "$tag" ]]; then
-        log "release flags: $set_flags set; no release tag reachable from HEAD, nothing to compare"
-        exit 0
-    fi
-    if [[ "$(git rev-parse "$tag^{commit}")" == "$(git rev-parse HEAD)" ]]; then
-        log "release flags: $set_flags set; HEAD is the release commit $tag itself"
-        exit 0
-    fi
-    if ! git cat-file -e "$tag:$FILE" 2>/dev/null; then
-        log "release flags: $set_flags set; $tag predates $FILE"
-        exit 0
-    fi
-    if [[ -n "$(git log --oneline "$tag..HEAD" -- "$FILE")" ]]; then
-        log "release flags: $set_flags set; $FILE changed since $tag"
-        exit 0
-    fi
+    tag="$(git describe --tags --abbrev=0 --match 'v[0-9]*' --exclude '*-*' HEAD 2>/dev/null || true)"
+    [[ -n "$tag" ]] || ok "no release tag reachable from HEAD, nothing to compare"
+    [[ "$(git rev-parse "$tag^{commit}")" != "$(git rev-parse HEAD)" ]] || ok "HEAD is the release commit $tag itself"
+    git cat-file -e "$tag:$FILE" 2>/dev/null || ok "$tag predates $FILE"
+    [[ -z "$(git rev-list -n1 "$tag..HEAD" -- "$FILE")" ]] || ok "$FILE changed since $tag"
 
-    local message
-    message="release flag still 1 after $tag: $set_flags. It was published with $tag and $FILE has not changed since; reset it to 0 on main (see docs/developer/releasing.rst)."
+    local message="release flag still 1 after $tag: $SET_FLAGS. It was published with $tag and $FILE has not changed since; reset it to 0 on main (see docs/developer/releasing.rst)."
     if (( WARN_ONLY )); then
-        printf '::warning::%s\n' "$message"
+        warn "$message"
         exit 0
     fi
-    printf '::error::%s\n' "$message"
-    exit 1
+    die "$message"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

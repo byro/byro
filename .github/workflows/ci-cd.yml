@@ -276,6 +276,7 @@ jobs:
         run: bats --print-output-on-failure deploy/tests
 
   release-flags:
+    # its own job on purpose: a distinct status check in pull requests, and it needs the full history
     name: "[Deploy] release flags"
     runs-on: ubuntu-22.04
     steps:

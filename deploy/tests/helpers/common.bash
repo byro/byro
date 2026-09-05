@@ -39,3 +39,22 @@ byroctl() {
 have_real_docker() {
     command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1
 }
+
+# An isolated git environment for tests that create repositories: no user or
+# system configuration, a fixed test identity. DIR (default: the test's
+# temporary directory) receives the HOME.
+use_git() {
+    export HOME="${1:-$BATS_TEST_TMPDIR}/home"
+    mkdir -p "$HOME"
+    export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null
+    export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=test@example.org
+    export GIT_COMMITTER_NAME=test GIT_COMMITTER_EMAIL=test@example.org
+}
+
+# write_sha256sums DIR FILE...: SHA256SUMS in DIR for the given files, with the
+# same sha256sum/shasum fallback the production scripts use.
+write_sha256sums() {
+    local dir="$1"
+    shift
+    ( cd "$dir" && { if command -v sha256sum >/dev/null 2>&1; then sha256sum "$@"; else shasum -a 256 "$@"; fi; } >SHA256SUMS )
+}

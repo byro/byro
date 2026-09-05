@@ -1,21 +1,16 @@
 name: Stable pointer
 
-# Points the CI-managed branch "stable" at a release tag. The branch carries
-# install.sh and stable.env for the byro bootstrap
-# (bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)")
-# and is read by "byroctl update --check". It is written here and nowhere else:
-#   * by the release pipeline (ci-cd.yml) as its last step, after the image and
-#     the PyPI package were published, and
-#   * by hand through "Run workflow", for example to move the pointer away from
-#     a broken release ("force" allows moving to an older release).
-# The pointer only moves forward on its own; every change is a new commit on
-# top of the branch history. See docs/developer/releasing.rst.
+# Points the CI-managed branch "stable" (install.sh + stable.env for the byro
+# bootstrap and "byroctl update --check") at a release tag. Called by the
+# release pipeline (ci-cd.yml) after image and package were published, and run
+# by hand to move the pointer deliberately, e.g. away from a broken release
+# ("force" allows an older release). See docs/developer/releasing.rst.
 
 on:
   workflow_call:
     inputs:
       tag:
-        description: Release tag (vYYYY.M.P)
+        description: Release tag to point stable at (vYYYY.M.P)
         required: true
         type: string
       force:
@@ -48,8 +43,6 @@ jobs:
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - name: 🏗 Git identity
         run: |
           git config user.name "github-actions[bot]"
@@ -57,11 +50,4 @@ jobs:
       - name: ⬆ Update the stable branch
         env:
           TAG: ${{ inputs.tag }}
-          FORCE: ${{ inputs.force == true && '1' || '' }}
-          IMAGE_REPO: ghcr.io/${{ github.repository }}
-        run: |
-          args=("$TAG" --image-repo "$IMAGE_REPO")
-          if [[ -n "$FORCE" ]]; then
-            args+=(--force)
-          fi
-          .github/scripts/update-stable-branch.sh "${args[@]}"
+        run: .github/scripts/update-stable-branch.sh "$TAG" --image-repo "ghcr.io/${{ github.repository }}" ${{ inputs.force && '--force' || '' }}

@@ -1,7 +1,7 @@
 AcctSvcrRef
 Aegis
-authenticator
 Authenticator
+authenticator
 backend
 backticks
 Bitwarden
