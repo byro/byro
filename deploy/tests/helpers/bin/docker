@@ -40,6 +40,12 @@ case "$1" in
     inspect)
         # docker inspect --format ... CID
         printf '%s\n' "${SHIM_HEALTH:-healthy}" ;;
+    pull)
+        exit 0 ;;
+    run)
+        # docker run --rm -e PGPASSWORD postgres:X-alpine pg_dump ...
+        if [[ "$*" == *"pg_dump"* ]]; then printf 'PGDMP-shim-external\n'; fi
+        exit 0 ;;
     compose)
         shift
         case "$1" in
@@ -54,7 +60,8 @@ case "$1" in
                     [[ "${SHIM_SUPERUSER_EXISTS:-0}" == 1 ]] && exit 0 || exit 1
                 fi ;;
             exec)
-                if [[ "$*" == *"byro.__version__"* ]]; then echo "v9.9.9-shim"; fi ;;
+                if [[ "$*" == *"byro.__version__"* ]]; then echo "v9.9.9-shim"; fi
+                if [[ "$*" == *"pg_dump"* ]]; then printf 'PGDMP-shim\n'; fi ;;
             *) : ;;
         esac ;;
     *) : ;;

@@ -277,6 +277,12 @@ acquire_lock() {
     mkdir -p "$BYRO_ROOT/.byroctl"
     if ! mkdir "$dir" 2>/dev/null; then
         pid="$(cat "$dir/pid" 2>/dev/null || true)"
+        if [[ "$pid" == "$$" ]]; then
+            # same process after the stage-2 exec: keep the lock
+            LOCK_DIR="$dir"
+            trap release_lock EXIT
+            return 0
+        fi
         if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
             die "another byroctl process (pid $pid) is running in $BYRO_ROOT"
         fi
@@ -1010,6 +1016,437 @@ cmd_manage() {
     compose run --rm "${tty[@]}" manage "$@"
 }
 
+# --- update ---------------------------------------------------------------------------------
+
+release_notes_url() { printf 'https://github.com/byro/byro/releases/tag/%s' "$1"; }
+
+# resolve_stable_version: the release tag named in stable.env, or empty. Only a
+# line that exactly matches the expected form counts; the file is never sourced.
+resolve_stable_version() {
+    local content tmp url
+    if [[ -n "${BYROCTL_STABLE_FILE:-}" ]]; then
+        content="$(cat "$BYROCTL_STABLE_FILE")" || die "cannot read $BYROCTL_STABLE_FILE"
+    else
+        url="${BYROCTL_STABLE_URL:-$BYROCTL_RAW_BASE/stable/stable.env}"
+        require_https "$url" "BYROCTL_STABLE_URL"
+        tmp="$(mktemp)"
+        if ! curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 -o "$tmp" "$url"; then
+            rm -f "$tmp"
+            die "cannot download $url"
+        fi
+        content="$(cat "$tmp")"
+        rm -f "$tmp"
+    fi
+    grep -E '^BYRO_RELEASE_VERSION=v[0-9]+\.[0-9]+\.[0-9]+$' <<<"$content" | head -n1 | cut -d= -f2 || true
+}
+
+# read_release_flag FILE KEY: 0 or 1; anything else counts as 0.
+read_release_flag() {
+    local value
+    value="$(grep -E "^$2=(0|1)$" "$1" 2>/dev/null | head -n1 | cut -d= -f2 || true)"
+    printf '%s' "${value:-0}"
+}
+
+# version_relation CURRENT TARGET: same | newer | older | unordered
+version_relation() {
+    local current="$1" target="$2" first
+    [[ "$current" == "$target" ]] && { printf 'same'; return 0; }
+    if valid_version "$current" && valid_version "$target"; then
+        first="$(printf '%s\n%s\n' "$current" "$target" | sort -V | head -n1)"
+        if [[ "$first" == "$current" ]]; then printf 'newer'; else printf 'older'; fi
+    else
+        printf 'unordered'
+    fi
+}
+
+# fetch_sums TAG: prints the path of a temporary SHA256SUMS for TAG, or nothing
+# when the local development source is used.
+fetch_sums() {
+    local tag="$1" sums
+    [[ -z "$BYROCTL_SOURCE_DIR" ]] || return 0
+    sums="$(mktemp "$BYRO_ROOT/.byroctl/SHA256SUMS.XXXXXX")"
+    fetch_artifact "$tag" SHA256SUMS "$sums"
+    printf '%s' "$sums"
+}
+
+# fetch_verified TAG RELPATH DEST SUMS: fetch and verify (SUMS empty -> unverified local source)
+fetch_verified() {
+    local tag="$1" relpath="$2" dest="$3" sums="$4"
+    fetch_artifact "$tag" "$relpath" "$dest"
+    if [[ -n "$sums" ]]; then
+        verify_checksum "$sums" "$relpath" "$dest"
+    fi
+}
+
+# run_hook NAME FROM TO: runs .byroctl/hooks/NAME.sh if executable.
+run_hook() {
+    local hook="$BYRO_ROOT/.byroctl/hooks/$1.sh"
+    [[ -x "$hook" ]] || return 0
+    log "running hook $1"
+    BYRO_ROOT="$BYRO_ROOT" BYROCTL_FROM="$2" BYROCTL_TO="$3" "$hook" || die "hook $1 failed (exit $?)"
+}
+
+# migrate_conf EXAMPLE: append keys of the new example that byro.conf does not
+# know (active or commented), together with their comment block. Reports keys in
+# byro.conf that the example does not know. Never removes or reorders anything.
+migrate_conf() {
+    local example="$1" line key block=() added=() unknown=() known=()
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$line" =~ ^#?([A-Z][A-Z0-9_]*)= ]]; then
+            key="${BASH_REMATCH[1]}"
+            known+=("$key")
+            if ! grep -qE "^#?$key=" "$CONF_FILE"; then
+                {
+                    printf '\n'
+                    printf '%s\n' "${block[@]}"
+                    printf '%s\n' "$line"
+                } >>"$CONF_FILE"
+                added+=("$key")
+            fi
+            block=()
+        elif [[ "$line" == "#"* ]]; then
+            block+=("$line")
+        else
+            block=()
+        fi
+    done <"$example"
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" =~ ^([A-Z][A-Z0-9_]*)= ]] || continue
+        key="${BASH_REMATCH[1]}"
+        [[ " ${known[*]} " == *" $key "* ]] || unknown+=("$key")
+    done <"$CONF_FILE"
+    (( ${#added[@]} == 0 )) || log "added new configuration keys with defaults: ${added[*]}"
+    (( ${#unknown[@]} == 0 )) || warn "byro.conf contains keys the new release does not know: ${unknown[*]} (kept, please review)"
+    chmod 600 "$CONF_FILE"
+}
+
+# update_artifacts TAG SUMS: replace the compose files with those of TAG, showing a diff.
+update_artifacts() {
+    local tag="$1" sums="$2" relpath tmp
+    for relpath in "${BYROCTL_ARTIFACTS[@]}"; do
+        mkdir -p "$BYRO_ROOT/$(dirname "$relpath")"
+        tmp="$(mktemp "$BYRO_ROOT/$relpath.XXXXXX")"
+        fetch_verified "$tag" "$relpath" "$tmp" "$sums"
+        chmod 644 "$tmp"
+        if [[ -f "$BYRO_ROOT/$relpath" ]] && ! cmp -s "$BYRO_ROOT/$relpath" "$tmp"; then
+            log "changes in $relpath:"
+            diff -u "$BYRO_ROOT/$relpath" "$tmp" >&2 || true
+        fi
+        mv "$tmp" "$BYRO_ROOT/$relpath"
+    done
+}
+
+# pre_update_safeguard CURRENT DIGEST TARGET: dump + byro.conf + .secret + META
+pre_update_safeguard() {
+    local current="$1" digest="$2" target="$3" dir major db_user db_name db_host db_port
+    dir="$BYRO_ROOT/backups/pre-update-$current-$(date -u +%Y%m%d-%H%M%S)"
+    mkdir -p "$dir"
+    chmod 700 "$dir"
+    db_user="$(conf_get BYRO_DB_USER 2>/dev/null || true)"; db_user="${db_user:-byro}"
+    db_name="$(conf_get BYRO_DB_NAME 2>/dev/null || true)"; db_name="${db_name:-byro}"
+    log "pre-update safeguard: dumping the database to $dir/db.dump"
+    if compose_file_active compose/postgres.yml; then
+        compose up -d db
+        wait_healthy db "$BYROCTL_DB_HEALTH_TIMEOUT" || die "the database is not healthy; cannot create the pre-update dump"
+        compose exec -T db pg_dump -Fc -U "$db_user" "$db_name" >"$dir/db.dump"
+    else
+        db_host="$(conf_get BYRO_DB_HOST)" || die "BYRO_DB_HOST is not set"
+        db_port="$(conf_get BYRO_DB_PORT 2>/dev/null || true)"; db_port="${db_port:-5432}"
+        major="$(conf_get BYRO_DEPLOY_POSTGRES_MAJOR 2>/dev/null || true)"; major="${major:-17}"
+        PGPASSWORD="$(conf_get BYRO_DB_PASS 2>/dev/null || true)" \
+            docker run --rm -e PGPASSWORD "postgres:$major-alpine" \
+            pg_dump -h "$db_host" -p "$db_port" -U "$db_user" -Fc "$db_name" >"$dir/db.dump"
+    fi
+    [[ -s "$dir/db.dump" ]] || die "the database dump is empty; not continuing without a safeguard (use --skip-safeguard to override)"
+    cp "$CONF_FILE" "$dir/byro.conf"
+    chmod 600 "$dir/byro.conf"
+    if [[ -f "$BYRO_ROOT/data/.secret" ]]; then
+        cp "$BYRO_ROOT/data/.secret" "$dir/.secret"
+        chmod 600 "$dir/.secret"
+    else
+        warn "data/.secret not found; nothing to copy"
+    fi
+    {
+        printf 'BYROCTL_PREVIOUS_VERSION=%s\n' "$current"
+        printf 'BYROCTL_PREVIOUS_DIGEST=%s\n' "$digest"
+        printf 'BYROCTL_TARGET_VERSION=%s\n' "$target"
+        printf 'BYROCTL_CREATED_AT=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        printf 'BYROCTL_NOTE=%s\n' "'pre-update safeguard, not a full backup: documents and other files in data/ are not included'"
+    } >"$dir/META"
+    printf '%s' "$dir"
+}
+
+rollback_hint() {
+    local current="$1" digest="$2" safeguard="$3"
+    log "byro was NOT updated successfully. The stack is stopped (the database keeps running)."
+    log "Manual way back to byro $current:"
+    log "  1. byroctl config set BYRO_DEPLOY_VERSION $current"
+    if [[ -n "$digest" ]]; then
+        log "  2. byroctl config set BYRO_DEPLOY_IMAGE_DIGEST $digest"
+    else
+        log "  2. byroctl config set BYRO_DEPLOY_IMAGE_DIGEST ''"
+    fi
+    log "  3. fetch the compose files of $current again (deploy/ of that tag) or restore them from ${safeguard:-your backup}"
+    if [[ -n "$safeguard" ]]; then
+        log "  4. if the migration changed the database: restore $safeguard/db.dump with pg_restore, then"
+    fi
+    log "  5. byroctl start"
+}
+
+update_usage() {
+    cat >&2 <<'USAGE'
+Usage: byroctl update [options]
+
+  --check                 only report whether an update is available (exit 0) or not (exit 3)
+  --to TAG                update to this release instead of the current stable one
+  --prefetch              only download the target image, change nothing
+  --yes                   confirm the update (and a release flagged as breaking) without asking
+  --skip-safeguard        do not create the pre-update safeguard (database dump, byro.conf, .secret)
+  --data-safeguard-done   confirm that a full backup of data/ exists (required when the
+                          release changes persistent files)
+  --non-interactive       never prompt
+  --no-pull               use the locally present target image (development)
+USAGE
+}
+
+cmd_update() {
+    local check=0 prefetch=0 skip_safeguard=0 data_ok=0 yes=0 no_pull=0 stage2=0 target=""
+    local current repo digest relation sums="" relenv breaking datamig notes next flags=() safeguard="" now new_digest
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --check) check=1; shift ;;
+            --to) [[ $# -ge 2 ]] || die "--to needs a tag" 64; target="$2"; shift 2 ;;
+            --to=*) target="${1#--to=}"; shift ;;
+            --prefetch) prefetch=1; shift ;;
+            --skip-safeguard) skip_safeguard=1; shift ;;
+            --data-safeguard-done) data_ok=1; shift ;;
+            --yes) yes=1; shift ;;
+            --no-pull) no_pull=1; shift ;;
+            --non-interactive) NONINTERACTIVE=1; shift ;;
+            --stage2) stage2=1; shift ;;
+            -h|--help) update_usage; exit 0 ;;
+            *) die "unknown update option: $1 (see byroctl update --help)" 64 ;;
+        esac
+    done
+    enter_root
+    need_docker
+    acquire_lock
+    if [[ -z "$BYROCTL_SOURCE_DIR" ]]; then
+        require_https "$BYROCTL_RAW_BASE" "BYROCTL_RAW_BASE"
+    fi
+
+    current="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
+    [[ -n "$current" ]] || die "byro.conf has no BYRO_DEPLOY_VERSION"
+    repo="$(conf_get BYRO_DEPLOY_IMAGE_REPO 2>/dev/null || true)"
+    repo="${repo:-$BYROCTL_DEFAULT_REPO}"
+    digest="$(conf_get BYRO_DEPLOY_IMAGE_DIGEST 2>/dev/null || true)"
+
+    # --- target version
+    if [[ -z "$target" ]]; then
+        target="$(resolve_stable_version)"
+        [[ -n "$target" ]] || die "stable.env does not name a valid release (expected BYRO_RELEASE_VERSION=vYYYY.M.P); use --to TAG to choose one explicitly"
+    fi
+    if [[ -z "$BYROCTL_SOURCE_DIR" ]]; then
+        valid_version "$target" || die "invalid byro release tag: $target (expected vYYYY.M.P)"
+    else
+        valid_tag "$target" || die "invalid image tag: $target"
+    fi
+    relation="$(version_relation "$current" "$target")"
+    case "$relation" in
+        same)
+            log "byro $current is the current release, nothing to do"
+            (( check )) && exit 3
+            return 0 ;;
+        older)
+            die "byro $target is older than the installed $current. A downgrade is not an update: Django migrations do not run backwards. Restore a pre-update safeguard instead (see byroctl update --help)." ;;
+        unordered)
+            warn "cannot order $current and $target (not release tags); continuing" ;;
+    esac
+
+    # --- gate and release metadata
+    if (( no_pull )); then
+        image_local "$repo:$target" || die "--no-pull: image $repo:$target is not present locally"
+    else
+        image_exists "$repo:$target" || die "image $repo:$target does not exist in the registry (not a published release, or no registry access)"
+    fi
+    sums="$(fetch_sums "$target")"
+    relenv="$(mktemp "$BYRO_ROOT/.byroctl/release.env.XXXXXX")"
+    fetch_verified "$target" release.env "$relenv" "$sums"
+    breaking="$(read_release_flag "$relenv" BYRO_RELEASE_BREAKING)"
+    datamig="$(read_release_flag "$relenv" BYRO_RELEASE_DATA_MIGRATION)"
+    rm -f "$relenv"
+    notes="$(release_notes_url "$target")"
+
+    if (( check )); then
+        printf 'installed:      %s\n' "$current"
+        printf 'available:      %s\n' "$target"
+        printf 'release notes:  %s\n' "$notes"
+        printf 'breaking:       %s\n' "$([[ "$breaking" == 1 ]] && printf 'yes - read the release notes and confirm with --yes' || printf 'no')"
+        printf 'file migration: %s\n' "$([[ "$datamig" == 1 ]] && printf 'yes - a full backup of data/ is required (--data-safeguard-done)' || printf 'no')"
+        [[ -z "$sums" ]] || rm -f "$sums"
+        return 0
+    fi
+    if (( prefetch )); then
+        [[ -z "$sums" ]] || rm -f "$sums"
+        if (( no_pull )); then
+            log "--prefetch with --no-pull: nothing to download"
+        else
+            log "prefetching $repo:$target ..."
+            docker pull "$repo:$target"
+        fi
+        return 0
+    fi
+
+    # --- decisions before anything changes
+    if [[ "$datamig" == 1 && $data_ok -eq 0 ]]; then
+        [[ -z "$sums" ]] || rm -f "$sums"
+        log "byro $target changes persistent files in data/ (documents, uploads, keys)."
+        log "The regular pre-update safeguard (database dump, byro.conf, .secret) is NOT sufficient for this release."
+        log "Create a full backup of $BYRO_ROOT/data first, read $notes,"
+        log "then run: byroctl update --to $target --data-safeguard-done"
+        exit 1
+    fi
+    if [[ "$breaking" == 1 && $yes -eq 0 ]]; then
+        log "byro $target is flagged as breaking: read $notes before updating."
+        if (( NONINTERACTIVE )) || ! confirm "Continue with the update to $target?" n; then
+            [[ -z "$sums" ]] || rm -f "$sums"
+            die "update not confirmed (use --yes after reading the release notes)"
+        fi
+        yes=1
+    fi
+    if (( yes == 0 && stage2 == 0 )); then
+        if (( NONINTERACTIVE )); then
+            [[ -z "$sums" ]] || rm -f "$sums"
+            die "use --yes to run a non-interactive update from $current to $target"
+        fi
+        if ! confirm "Update byro $current -> $target now?" y; then
+            [[ -z "$sums" ]] || rm -f "$sums"
+            die "update aborted"
+        fi
+        yes=1
+    fi
+
+    # --- stage 2: continue with the byroctl of the target release
+    if (( stage2 == 0 )); then
+        next="$BYRO_ROOT/.byroctl/byroctl.next"
+        fetch_verified "$target" byroctl "$next" "$sums"
+        bash -n "$next" || die "byroctl of $target does not parse; not switching"
+        chmod 755 "$next"
+        [[ -z "$sums" ]] || rm -f "$sums"
+        flags=(--yes)
+        (( skip_safeguard )) && flags+=(--skip-safeguard)
+        (( data_ok )) && flags+=(--data-safeguard-done)
+        (( no_pull )) && flags+=(--no-pull)
+        (( NONINTERACTIVE )) && flags+=(--non-interactive)
+        log "switching to byroctl of $target and continuing the update"
+        exec bash "$next" --root "$BYRO_ROOT" update --stage2 --to "$target" "${flags[@]}"
+    fi
+
+    # ------------------------------------------------------------------ stage 2
+    log "updating byro $current -> $target"
+    local free_kb
+    free_kb="$(df -Pk "$BYRO_ROOT" 2>/dev/null | awk 'NR == 2 {print $4}')"
+    if [[ -n "$free_kb" ]] && (( free_kb < 2 * 1024 * 1024 )); then
+        die "less than 2 GB free in $BYRO_ROOT; free some space before updating"
+    fi
+    compose config -q || die "the current compose configuration is invalid; fix it (byroctl config check) before updating"
+    run_hook pre-update "$current" "$target"
+
+    if (( skip_safeguard )); then
+        warn "skipping the pre-update safeguard (--skip-safeguard)"
+    else
+        safeguard="$(pre_update_safeguard "$current" "$digest" "$target")"
+        log "safeguard written to $safeguard"
+    fi
+
+    # configuration and compose files of the target release
+    local example
+    example="$(mktemp "$BYRO_ROOT/.byroctl/byro.conf.example.XXXXXX")"
+    fetch_verified "$target" byro.conf.example "$example" "$sums"
+    migrate_conf "$example"
+    rm -f "$example"
+    conf_set BYRO_DEPLOY_VERSION "$target"
+    conf_set BYRO_DEPLOY_IMAGE_DIGEST ""
+    update_artifacts "$target" "$sums"
+    [[ -z "$sums" ]] || rm -f "$sums"
+    compose config -q || { rollback_hint "$current" "$digest" "$safeguard"; die "the compose files of $target do not validate with your byro.conf (see above)"; }
+
+    # images
+    if (( no_pull )); then
+        image_local "$repo:$target" || die "--no-pull: image $repo:$target disappeared"
+        log "using the local image $repo:$target (--no-pull); the digest stays unpinned"
+    else
+        log "pulling images for byro $target ..."
+        compose pull
+        new_digest="$(image_digest "$repo" "$repo:$target")"
+        [[ -n "$new_digest" ]] || { rollback_hint "$current" "$digest" "$safeguard"; die "the pulled image $repo:$target carries no digest for $repo"; }
+        valid_digest "$new_digest" || die "unexpected digest format: $new_digest"
+        conf_set BYRO_DEPLOY_IMAGE_DIGEST "$new_digest"
+        log "pinned image digest $new_digest"
+    fi
+
+    # switch over
+    log "stopping byro services (the database keeps running) ..."
+    compose stop periodic web
+    log "applying database migrations ..."
+    if ! compose run --rm -T manage migrate --noinput; then
+        rollback_hint "$current" "$digest" "$safeguard"
+        die "database migration to $target failed"
+    fi
+    log "starting byro $target ..."
+    compose up -d --remove-orphans
+    if ! wait_healthy web "$BYROCTL_WEB_HEALTH_TIMEOUT"; then
+        rollback_hint "$current" "$digest" "$safeguard"
+        die "byro $target did not become healthy; check 'byroctl logs web'"
+    fi
+    run_hook post-update "$current" "$target"
+
+    now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    write_state BYROCTL_PREVIOUS_VERSION "$current"
+    write_state BYROCTL_PREVIOUS_DIGEST "$digest"
+    write_state BYROCTL_LAST_UPDATE "$now"
+    if [[ -f "$BYRO_ROOT/.byroctl/byroctl.next" ]]; then
+        mv "$BYRO_ROOT/.byroctl/byroctl.next" "$BYRO_ROOT/byroctl"
+        chmod 755 "$BYRO_ROOT/byroctl"
+    fi
+    cat <<SUMMARY
+
+byro updated: $current -> $target
+
+  release notes:  $notes
+  safeguard:      ${safeguard:-skipped}
+  previous image: ${digest:-unpinned}
+
+Old images are kept (docker image prune removes them when you no longer need a way back).
+SUMMARY
+}
+
+cmd_self_update() {
+    local version sums tmp
+    [[ $# -eq 0 ]] || die "self-update takes no arguments" 64
+    enter_root
+    acquire_lock
+    version="$(conf_get BYRO_DEPLOY_VERSION 2>/dev/null || true)"
+    [[ -n "$version" ]] || die "byro.conf has no BYRO_DEPLOY_VERSION"
+    if [[ -z "$BYROCTL_SOURCE_DIR" ]]; then
+        require_https "$BYROCTL_RAW_BASE" "BYROCTL_RAW_BASE"
+        valid_version "$version" || die "invalid byro release tag in byro.conf: $version"
+    fi
+    sums="$(fetch_sums "$version")"
+    tmp="$(mktemp "$BYRO_ROOT/.byroctl/byroctl.self.XXXXXX")"
+    fetch_verified "$version" byroctl "$tmp" "$sums"
+    [[ -z "$sums" ]] || rm -f "$sums"
+    bash -n "$tmp" || die "byroctl of $version does not parse; keeping the current script"
+    if cmp -s "$tmp" "$BYRO_ROOT/byroctl"; then
+        rm -f "$tmp"
+        log "byroctl is already the version shipped with byro $version"
+        return 0
+    fi
+    chmod 755 "$tmp"
+    mv "$tmp" "$BYRO_ROOT/byroctl"
+    log "byroctl replaced with the version shipped with byro $version"
+}
+
 # --- commands (filled in below) -----------------------------------------------------------
 
 usage() {
@@ -1024,6 +1461,8 @@ Commands:
   restart      recreate the byro services (web, periodic, caddy), not the database
   logs         show logs: byroctl logs [-f] [SERVICE...]
   manage       run a byro management command: byroctl manage migrate
+  update       update to the current stable release: byroctl update [--check] [--to TAG]
+  self-update  re-fetch byroctl for the installed release (repair)
   version      show the installed and running byro version
   help         this text
 
@@ -1075,6 +1514,8 @@ main() {
         restart) cmd_restart "$@" ;;
         logs)    cmd_logs "$@" ;;
         manage)  cmd_manage "$@" ;;
+        update)  cmd_update "$@" ;;
+        self-update) cmd_self_update "$@" ;;
         version) enter_root; cmd_version ;;
         *) die "unknown command: $cmd (try byroctl help)" 64 ;;
     esac
