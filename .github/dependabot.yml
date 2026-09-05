@@ -18,6 +18,10 @@ updates:
     directory: "/src"
     schedule:
       interval: daily
+  - package-ecosystem: docker
+    directory: "/deploy"
+    schedule:
+      interval: daily
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

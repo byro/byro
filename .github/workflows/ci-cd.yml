@@ -5,11 +5,17 @@ on:
     branches: [ main ]
     paths:
       - 'src/**'
+      - 'deploy/**'
+      - '.dockerignore'
+      - '.github/scripts/**'
       - '.github/workflows/ci-cd.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'src/**'
+      - 'deploy/**'
+      - '.dockerignore'
+      - '.github/scripts/**'
       - '.github/workflows/ci-cd.yml'
   release:
     types: [published]
@@ -271,17 +277,24 @@ jobs:
       - name: 🏗 Build Docker image
         uses: docker/build-push-action@v7
         with:
-          context: src
+          context: .
+          file: deploy/Dockerfile
           platforms: linux/amd64
           push: false
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: byro-ci:smoke
           labels: ${{ steps.meta.outputs.labels }}
-      - name: 🔎 Inspect Docker image
-        if: false
-        run: docker image inspect ${{ steps.meta.outputs.tags }}
+      - name: 🔎 Lint deployment scripts
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q shellcheck
+          shellcheck deploy/entrypoint.sh .github/scripts/*.sh
+          python3 -m py_compile deploy/healthcheck.py
+      - name: 🔎 Validate Compose files
+        run: .github/scripts/validate-compose.sh
+      - name: 🔎 Smoke test Docker image
+        run: .github/scripts/smoke-test-image.sh byro-ci:smoke
 
   push-docker-image:
     name: 🔨 Push Docker image to GitHub Packages
@@ -317,7 +330,8 @@ jobs:
       - name: 🏗 Build container image
         uses: docker/build-push-action@v7
         with:
-          context: src
+          context: .
+          file: deploy/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           cache-from: type=gha
