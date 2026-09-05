@@ -1,0 +1,160 @@
+Releasing byro
+==============
+
+This page is for byro maintainers. It describes how a release is produced,
+what the release pipeline does, and the two duties that come with the
+deployment tooling: the ``stable`` pointer and the release flags in
+``deploy/release.env``.
+
+How a release is made
+---------------------
+
+1. `Release Drafter`_ keeps a draft release up to date on GitHub. Every merged
+   pull request adds a line under the category of its label
+   (``breaking-change``, ``enhancement``, ``bug``/``fix``, ``maintenance``,
+   ``dependencies``, ``documentation``); the labels also decide the next
+   version number (``vYYYY.MINOR.PATCH``).
+2. Before publishing, edit the draft: write the introduction (the placeholder
+   at the top) and go through the checklist at the end of this page.
+3. Publish the release. GitHub creates the tag, and the tag starts the release
+   pipeline (``.github/workflows/ci-cd.yml``, event ``release: published``):
+
+   * style checks and the test matrix,
+   * the Python package, uploaded to PyPI (environment ``pypi``),
+   * the container image ``ghcr.io/byro/byro:vYYYY.M.P`` for ``linux/amd64`` and
+     ``linux/arm64``, also tagged ``latest``,
+   * and, only after both uploads succeeded, the ``stable`` pointer (see
+     below).
+
+   The run takes about half an hour; the multi-platform image build is the
+   slow part. Watch it under *Actions*.
+
+A release marked as *pre-release* runs the same pipeline but does not move the
+``stable`` pointer.
+
+The stable pointer
+------------------
+
+The byroctl bootstrap (:doc:`/administrator/installation-byroctl`) starts
+with::
+
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)"
+
+and ``byroctl update --check`` asks the same place which release is current.
+``stable`` is a branch of this repository with exactly three files, written by
+CI and by nothing else:
+
+* ``stable.env`` with one line ``BYRO_RELEASE_VERSION=vYYYY.M.P``,
+* ``install.sh``, a byte-identical copy of ``deploy/install.sh`` from that
+  release tag,
+* a ``README.md`` that explains the branch.
+
+Everything else (byroctl, the Compose files, the image) is fetched from the
+immutable release tag, so the branch only says *which* release is current. The
+job *Point stable at the release* runs as the last step of the pipeline and
+calls ``.github/scripts/update-stable-branch.sh`` through the workflow
+``.github/workflows/stable.yml``. The script
+
+* refuses anything that is not a ``vYYYY.M.P`` tag,
+* checks that the tag contains ``deploy/install.sh`` matching its
+  ``SHA256SUMS`` and that the image exists in the registry,
+* compares versions numerically and never moves the pointer to an older
+  release on its own (the job then ends green with a notice),
+* appends a commit to the branch history and pushes it as a fast-forward;
+  the branch is never force-pushed.
+
+``raw.githubusercontent.com`` caches files for a few minutes, so installers
+may still see the previous release for up to about five minutes after the
+pointer moved.
+
+Moving the pointer by hand
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Do not edit or push the ``stable`` branch directly. If a release turns out to
+be broken, point ``stable`` back at the previous release: *Actions* → *Stable
+pointer* → *Run workflow*, enter the tag and tick *force* (moving to an older
+release is refused otherwise). Then fix the problem and publish a new release;
+the pipeline moves the pointer forward again. Consider yanking the broken
+version on PyPI as well. The image tag stays available, because byroctl
+installations pin the release they installed. byroctl does not downgrade:
+installations that already updated to the broken release wait for the fix and
+run ``byroctl update`` (or ``byroctl update --to vX.Y.Z``).
+
+The workflow pushes with the repository's ``GITHUB_TOKEN``. If ``stable`` is
+covered by a branch protection rule or a ruleset, that automation actor needs
+push or bypass permission for the branch. People do not need it: changes to
+the pointer go through the workflow, never through a direct push.
+
+Release flags
+-------------
+
+``deploy/release.env`` carries two flags that ``byroctl update`` reads from
+the *target* release before it changes anything:
+
+``BYRO_RELEASE_BREAKING=1``
+    Administrators must read the release notes and confirm the update
+    explicitly (``byroctl update`` asks, ``--yes`` confirms). Use it only when
+    an administrator has to act or decide before updating: a configuration
+    that must change, a service that goes away, a manual step. It is not a
+    synonym for the ``breaking-change`` label, which also covers code and
+    plugin API changes that need no action from administrators.
+
+``BYRO_RELEASE_DATA_MIGRATION=1``
+    The release changes files outside the database (documents, uploads,
+    GnuPG home). The regular pre-update safeguard does not cover them, so
+    ``byroctl update`` refuses to continue until the administrator confirms a
+    full backup of ``data/`` with ``--data-safeguard-done``.
+
+Both flags are ``0`` on ``main``. For a release that needs one:
+
+1. In the pull request that prepares the release, set the flag to ``1`` and
+   write the release-notes section that explains what administrators must do.
+2. Publish the release. The flag is part of the tag, and byroctl reads it
+   there.
+3. Right afterwards, open a pull request that resets the flag to ``0``.
+
+The CI check *[Deploy] release flags* enforces the format of the file (each
+flag exactly once, only ``0`` or ``1``, nothing else) and reminds you of step
+3: on ``main`` it fails as long as a flag that was published with the latest
+release tag is still ``1`` and ``deploy/release.env`` has not been touched
+since; in pull requests it only warns.
+
+Notes for administrators
+------------------------
+
+The pipeline publishes the release, but only you can tell administrators what
+to do. Check before publishing:
+
+* Does the release change configuration options, the Compose files or the
+  behavior of the image? Describe the steps for byroctl users
+  (``byroctl update`` takes care of new options and Compose files), for
+  ``docker compose`` users and for plain installations (``pip install -U
+  byro``, ``migrate``, ``rebuild``, restart).
+* Users of the deprecated ``production/`` setup pull
+  ``ghcr.io/byro/byro:latest`` and get the new image without pinning. Mention
+  anything that affects them and point to ``production/DEPRECATED.md``.
+
+The first release that ships ``deploy/`` deserves an explicit section for
+``production/`` users, because it is the first time the published image
+changes its default behavior. It does not need ``BYRO_RELEASE_BREAKING=1``:
+no byroctl installation exists yet that could read the flag.
+
+Checklist
+---------
+
+Before publishing:
+
+* the draft is reviewed, the introduction is written, the categories are
+  complete,
+* ``deploy/release.env`` has the flags this release needs, and the release
+  notes explain them,
+* the release notes tell administrators what to do,
+* ``main`` is green.
+
+After publishing:
+
+* the pipeline run is green, including *Point stable at the release*,
+* ``stable`` names the new release (``stable.env`` on the branch),
+* a flag that was set is reset to ``0`` in a follow-up pull request.
+
+.. _Release Drafter: https://github.com/release-drafter/release-drafter
