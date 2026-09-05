@@ -12,8 +12,13 @@ How a release is made
 1. `Release Drafter`_ keeps a draft release up to date on GitHub. Every merged
    pull request adds a line under the category of its label
    (``breaking-change``, ``enhancement``, ``bug``/``fix``, ``maintenance``,
-   ``dependencies``, ``documentation``); the labels also decide the next
-   version number (``vYYYY.MINOR.PATCH``).
+   ``dependencies``, ``documentation``). The drafter also proposes the next
+   tag, but with semantic-versioning rules: ``breaking-change`` bumps the first
+   field, ``enhancement`` the second, everything else the third. byro's scheme
+   is ``vYYYY.MINOR.PATCH``, so check the proposed tag and edit it by hand when
+   needed: the first field is always the current year, the first release of a
+   year is ``vYYYY.1.0``, and a ``breaking-change`` label must not bump the
+   year.
 2. Before publishing, edit the draft: write the introduction (the placeholder
    at the top) and go through the checklist at the end of this page.
 3. Publish the release. GitHub creates the tag, and the tag starts the release
@@ -29,8 +34,13 @@ How a release is made
    The run takes about half an hour; the multi-platform image build is the
    slow part. Watch it under *Actions*.
 
-A release marked as *pre-release* runs the same pipeline but does not move the
-``stable`` pointer.
+byro has not published pre-releases so far. If you mark a release as
+*pre-release*, the pipeline still runs: package and image are published, and
+the image also receives the ``latest`` tag, which the deprecated
+``production/`` setup pulls unpinned. Only the ``stable`` pointer is not moved.
+Turning the pre-release into a release later does not run the pipeline again
+(GitHub sends ``released``, not ``published``); move ``stable`` by hand with
+the *Stable pointer* workflow in that case.
 
 The stable pointer
 ------------------
@@ -77,8 +87,11 @@ release is refused otherwise). Then fix the problem and publish a new release;
 the pipeline moves the pointer forward again. Consider yanking the broken
 version on PyPI as well. The image tag stays available, because byroctl
 installations pin the release they installed. byroctl does not downgrade:
-installations that already updated to the broken release wait for the fix and
-run ``byroctl update`` (or ``byroctl update --to vX.Y.Z``).
+while ``stable`` names an older release than the installed one,
+``byroctl update`` and ``byroctl update --check`` on the broken release exit
+with an error that names both versions. Those installations wait for the fixed
+release and update to it (``byroctl update --to vX.Y.Z`` until ``stable`` has
+moved there).
 
 The workflow pushes with the repository's ``GITHUB_TOKEN``. If ``stable`` is
 covered by a branch protection rule or a ruleset, that automation actor needs
@@ -107,17 +120,30 @@ the *target* release before it changes anything:
 
 Both flags are ``0`` on ``main``. For a release that needs one:
 
-1. In the pull request that prepares the release, set the flag to ``1`` and
-   write the release-notes section that explains what administrators must do.
+1. In the pull request that prepares the release, set the flag to ``1``, run
+   ``.github/scripts/deploy-checksums.sh --write`` (``release.env`` is on the
+   checksum list that CI enforces) and write the release-notes section that
+   explains what administrators must do.
 2. Publish the release. The flag is part of the tag, and byroctl reads it
    there.
-3. Right afterwards, open a pull request that resets the flag to ``0``.
+3. Right afterwards, open a pull request that resets the flag to ``0``, again
+   with a regenerated ``SHA256SUMS``.
 
-The CI check *[Deploy] release flags* enforces the format of the file (each
+The CI check *[Deploy] release flags* (workflow ``release-flags.yml``, every
+push to ``main`` and every pull request) enforces the format of the file (each
 flag exactly once, only ``0`` or ``1``, nothing else) and reminds you of step
-3: on ``main`` it fails as long as a flag that was published with the latest
-release tag is still ``1`` and ``deploy/release.env`` has not been touched
-since; in pull requests it only warns.
+3: on ``main`` it fails as long as a flag is ``1``, the latest release tag
+shipped it at ``1`` and no commit since that release changed the flag's line;
+in pull requests it only warns. This red phase between publishing and the
+reset pull request is intended.
+
+byroctl reads the flags of the release it updates *to*, nothing else. An
+installation that skips a flagged release (from ``v2026.2.0`` straight to
+``v2026.4.0`` when ``v2026.3.0`` carried ``BYRO_RELEASE_DATA_MIGRATION=1``) is
+not stopped by that flag, although the migration still runs. When you set a
+flag, tell administrators in the release notes of the following releases what
+those who skipped the flagged release must do. Do not tag a hotfix from
+``main`` while a flag is still ``1`` unless the hotfix needs it too.
 
 Notes for administrators
 ------------------------
@@ -149,7 +175,8 @@ Before publishing:
 * ``deploy/release.env`` has the flags this release needs, and the release
   notes explain them,
 * the release notes tell administrators what to do,
-* ``main`` is green.
+* ``main`` is green; if *[Deploy] release flags* is red, the previous flag has
+  not been reset yet, do that first.
 
 After publishing:
 

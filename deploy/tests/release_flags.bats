@@ -51,7 +51,7 @@ setup() {
     published_release v2026.3.0
     run "$SCRIPT"
     [ "$status" -eq 1 ]
-    [[ "$output" == *"::error::release flag still 1 after v2026.3.0: BYRO_RELEASE_BREAKING"* ]]
+    [[ "$output" == *"::error::release flag still 1 after v2026.3.0: BYRO_RELEASE_BREAKING."* ]]
 }
 
 @test "the same situation is only a warning with --warn-only" {
@@ -59,7 +59,7 @@ setup() {
     published_release v2026.3.0
     run "$SCRIPT" --warn-only
     [ "$status" -eq 0 ]
-    [[ "$output" == *"::warning::release flag still 1 after v2026.3.0: BYRO_RELEASE_DATA_MIGRATION"* ]]
+    [[ "$output" == *"::warning::release flag still 1 after v2026.3.0: BYRO_RELEASE_DATA_MIGRATION."* ]]
 }
 
 @test "both flags stale are named together" {
@@ -68,6 +68,27 @@ setup() {
     run "$SCRIPT"
     [ "$status" -eq 1 ]
     [[ "$output" == *"BYRO_RELEASE_BREAKING, BYRO_RELEASE_DATA_MIGRATION"* ]]
+}
+
+@test "a comment-only edit after the release does not hide a stale flag" {
+    flags 1 0
+    published_release v2026.3.0
+    printf '# a note added later\n' >>deploy/release.env
+    commit "tidy the comments"
+    run "$SCRIPT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"release flag still 1 after v2026.3.0: BYRO_RELEASE_BREAKING."* ]]
+}
+
+@test "resetting one of two flags leaves the other one stale" {
+    flags 1 1
+    published_release v2026.3.0
+    flags 1 0
+    commit "reset only the data migration flag"
+    run "$SCRIPT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"release flag still 1 after v2026.3.0: BYRO_RELEASE_BREAKING."* ]]
+    [[ "$output" != *"DATA_MIGRATION"* ]]
 }
 
 @test "HEAD being the release commit itself passes" {
@@ -87,7 +108,7 @@ setup() {
     commit "prepare the next release"
     run "$SCRIPT"
     [ "$status" -eq 0 ]
-    [[ "$output" == *"changed since v2026.3.0"* ]]
+    [[ "$output" == *"set or changed after v2026.3.0"* ]]
 }
 
 @test "a flag reset and set again after the release passes" {
@@ -100,7 +121,7 @@ setup() {
     commit "prepare the next release"
     run "$SCRIPT"
     [ "$status" -eq 0 ]
-    [[ "$output" == *"changed since v2026.3.0"* ]]
+    [[ "$output" == *"set or changed after v2026.3.0"* ]]
 }
 
 @test "a release tag from before release.env existed passes" {
@@ -114,6 +135,17 @@ setup() {
     [[ "$output" == *"v2026.2.0 predates deploy/release.env"* ]]
 }
 
+@test "the latest release is the highest version, not the nearest tag" {
+    # a hotfix of an older line tagged after the release with the stale flag
+    flags 1 0
+    published_release v2026.3.0
+    git tag v2026.2.1
+    commit "later"
+    run "$SCRIPT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"release flag still 1 after v2026.3.0: BYRO_RELEASE_BREAKING."* ]]
+}
+
 @test "tags that are not release tags are ignored" {
     flags 1 0
     commit "prepare"
@@ -124,12 +156,26 @@ setup() {
     [[ "$output" == *"no release tag reachable"* ]]
 }
 
-@test "pre-release tags do not count as the latest release" {
+@test "pre-release tags of any spelling do not count as the latest release" {
     flags 1 0
     published_release v2026.3.0-rc1
+    git tag v2026.3.0rc2
+    git tag v2026.3
+    git tag v2026.03.0
+    commit "later"
     run "$SCRIPT"
     [ "$status" -eq 0 ]
     [[ "$output" == *"no release tag reachable"* ]]
+}
+
+@test "a shallow checkout is refused instead of passing silently" {
+    flags 1 0
+    published_release v2026.3.0
+    git clone -q --depth 1 "file://$REPO" "$BATS_TEST_TMPDIR/shallow"
+    cd "$BATS_TEST_TMPDIR/shallow"
+    run "$SCRIPT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"shallow checkout"* ]]
 }
 
 @test "the script works from a subdirectory" {
@@ -138,6 +184,13 @@ setup() {
     cd deploy
     run "$SCRIPT"
     [ "$status" -eq 0 ]
+}
+
+@test "outside a repository is an error" {
+    cd "$BATS_TEST_TMPDIR"
+    run "$SCRIPT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"run this inside a checkout"* ]]
 }
 
 @test "a value other than 0 or 1 is an error, also with --warn-only" {
@@ -189,10 +242,15 @@ setup() {
 }
 
 @test "the real deploy/release.env of this repository passes the lint" {
-    cd "$REPO_ROOT"
-    run "$SCRIPT" --warn-only
+    # the real file in a throwaway history: the lint must hold whatever the
+    # flags currently are, and byroctl must read the same values
+    cp "$DEPLOY_DIR/release.env" deploy/release.env
+    commit "the real release.env"
+    run "$SCRIPT"
     [ "$status" -eq 0 ]
     load_byroctl
-    [ "$(read_release_flag deploy/release.env BYRO_RELEASE_BREAKING)" = 0 ]
-    [ "$(read_release_flag deploy/release.env BYRO_RELEASE_DATA_MIGRATION)" = 0 ]
+    local flag
+    for flag in BYRO_RELEASE_BREAKING BYRO_RELEASE_DATA_MIGRATION; do
+        [ "$(read_release_flag deploy/release.env "$flag")" = "$(grep -E "^$flag=" deploy/release.env | cut -d= -f2)" ]
+    done
 }

@@ -119,7 +119,6 @@ setup() {
     [ "$(calver_cmp v2026.3.10 v2026.3.9)" = 1 ]
     [ "$(calver_cmp v2026.3.9 v2026.3.10)" = -1 ]
     [ "$(calver_cmp v2026.3.0 v2026.3.0)" = 0 ]
-    [ "$(calver_cmp v2026.03.0 v2026.3.0)" = 0 ]
 }
 
 @test "the pointer moves from v2026.9.9 to v2026.10.0 but not back" {
@@ -137,6 +136,45 @@ setup() {
     [ "$(stable_count)" -eq 2 ]
 }
 
+@test "a re-created tag with changed content refreshes stable at the same version" {
+    "$SCRIPT" v2026.3.0
+    git tag -d v2026.3.0 >/dev/null
+    printf '\n# re-released v2026.3.0\n' >>deploy/install.sh
+    write_sha256sums deploy install.sh
+    git commit -q -am "re-release v2026.3.0"
+    git tag v2026.3.0
+    git push -q -f origin main refs/tags/v2026.3.0
+    run "$SCRIPT" v2026.3.0
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"refreshing stable at v2026.3.0"* ]]
+    [ "$(stable_count)" -eq 2 ]
+    stable_file install.sh | grep -q 're-released v2026.3.0'
+    stable_file stable.env | grep -qx 'BYRO_RELEASE_VERSION=v2026.3.0'
+}
+
+@test "a stable branch without stable.env is continued and gets the files" {
+    # a branch created by hand, e.g. to attach a ruleset before the first release
+    local blob tree commit
+    blob="$(printf 'placeholder\n' | git hash-object -w --stdin)"
+    tree="$(printf '100644 blob %s\tREADME.md\n' "$blob" | git mktree)"
+    commit="$(git commit-tree "$tree" -m "placeholder")"
+    git push -q origin "$commit:refs/heads/stable"
+    run "$SCRIPT" v2026.3.0
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"exists but has no valid stable.env; replacing its content"* ]]
+    [[ "$output" == *"stable now points to v2026.3.0 (was none)"* ]]
+    [ "$(stable_count)" -eq 2 ]
+    stable_file stable.env | grep -qx 'BYRO_RELEASE_VERSION=v2026.3.0'
+}
+
+@test "an unreachable remote is an error, not a missing branch" {
+    git remote set-url origin "$BATS_TEST_TMPDIR/does-not-exist.git"
+    run "$SCRIPT" v2026.3.0
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"cannot query origin for branch stable"* ]]
+    [[ "$output" != *"creating it"* ]]
+}
+
 @test "a tag without deploy/install.sh is refused and nothing is pushed" {
     # a release from before byroctl: no deploy/ directory at all
     git rm -q -r deploy
@@ -147,18 +185,21 @@ setup() {
     run "$SCRIPT" v2026.5.0
     [ "$status" -ne 0 ]
     [[ "$output" == *"has no deploy/install.sh"* ]]
-    ! stable_exists
+    refute stable_exists
 }
 
-@test "pre-release tags and other names are refused before anything happens" {
+@test "pre-release tags, leading zeros and other names are refused before anything happens" {
     run "$SCRIPT" v2026.3.0-rc1
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"not a release tag"* ]]
+    run "$SCRIPT" v2026.03.0
     [ "$status" -ne 0 ]
     [[ "$output" == *"not a release tag"* ]]
     run "$SCRIPT" latest
     [ "$status" -ne 0 ]
     run "$SCRIPT" 2026.3.0
     [ "$status" -ne 0 ]
-    ! stable_exists
+    refute stable_exists
     [ ! -s "$SHIM_LOG" ]
 }
 
@@ -167,7 +208,7 @@ setup() {
     run "$SCRIPT" v2026.3.0
     [ "$status" -ne 0 ]
     [[ "$output" == *"is not available in the registry"* ]]
-    ! stable_exists
+    refute stable_exists
     grep -q "docker manifest inspect $IMAGE:v2026.3.0" "$SHIM_LOG"
 }
 
@@ -183,7 +224,7 @@ setup() {
     export SHIM_TAGS=""
     run "$SCRIPT" v2026.3.0 --no-image-check
     [ "$status" -eq 0 ]
-    ! grep -q "manifest" "$SHIM_LOG"
+    refute grep -q "manifest" "$SHIM_LOG"
     stable_exists
 }
 
@@ -196,7 +237,7 @@ setup() {
     run "$SCRIPT" v2026.6.0
     [ "$status" -ne 0 ]
     [[ "$output" == *"does not match its SHA256SUMS"* ]]
-    ! stable_exists
+    refute stable_exists
 }
 
 @test "--dry-run shows the commit and pushes nothing" {
@@ -204,7 +245,7 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"dry run: would push"* ]]
     [[ "$output" == *"install.sh"* ]]
-    ! stable_exists
+    refute stable_exists
 }
 
 @test "a tag that is missing locally is fetched from the remote" {

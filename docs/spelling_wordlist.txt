@@ -32,6 +32,7 @@ GitHub
 GnuPG
 gunicorn
 healthcheck
+hotfix
 html
 HTTPS
 IBAN

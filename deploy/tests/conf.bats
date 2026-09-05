@@ -127,26 +127,26 @@ PY
 @test "validators accept and reject as intended" {
     valid_url https://byro.example.org
     valid_url http://localhost:8345
-    ! valid_url https://byro.example.org/path
-    ! valid_url byro.example.org
+    refute valid_url https://byro.example.org/path
+    refute valid_url byro.example.org
     valid_email admin@example.org
-    ! valid_email a@b
+    refute valid_email a@b
     valid_username admin.user+1
-    ! valid_username 'bad user'
+    refute valid_username 'bad user'
     valid_version v2026.3.0
-    ! valid_version 2026.3.0
-    ! valid_version latest
+    refute valid_version 2026.3.0
+    refute valid_version latest
     valid_digest sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-    ! valid_digest sha256:short
+    refute valid_digest sha256:short
     is_secret_key BYRO_DB_PASS
     is_secret_key BYRO_OIDC_CLIENT_SECRET
-    ! is_secret_key BYRO_SITE_URL
+    refute is_secret_key BYRO_SITE_URL
 }
 
 @test "version_ge compares dotted versions" {
     version_ge 24.0.7 24.0.0
     version_ge 2.31.0 2.20.0
-    ! version_ge 2.19.9 2.20.0
+    refute version_ge 2.19.9 2.20.0
     version_ge 27.1 24.0.0
 }
 
@@ -160,7 +160,7 @@ PY
     printf 'COMPOSE_FILE=docker-compose.yml:compose/postgres.yml\n' >"$CONF_FILE"
     [ "$(compose_files | tr '\n' ' ')" = "docker-compose.yml compose/postgres.yml " ]
     compose_file_active compose/postgres.yml
-    ! compose_file_active compose/caddy.yml
+    refute compose_file_active compose/caddy.yml
     : >"$CONF_FILE"
     [ "$(compose_files)" = "docker-compose.yml" ]
 }

@@ -40,6 +40,16 @@ have_real_docker() {
     command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1
 }
 
+# refute COMMAND...: the assertion that COMMAND fails. A plain "! command" in
+# the middle of a test is ignored by bats' errexit (bash exempts inverted
+# statuses from set -e), so negative assertions go through this function.
+refute() {
+    if "$@"; then
+        echo "expected to fail but succeeded: $*" >&2
+        return 1
+    fi
+}
+
 # An isolated git environment for tests that create repositories: no user or
 # system configuration, a fixed test identity. DIR (default: the test's
 # temporary directory) receives the HOME.

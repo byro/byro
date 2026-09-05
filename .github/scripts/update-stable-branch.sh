@@ -9,9 +9,10 @@
 # bootstrap and "byroctl update --check" read them. The release pipeline runs
 # this script as its last step, the workflow "Stable pointer" runs it by hand.
 # The pointer only moves forward on its own (numeric CalVer comparison), --force
-# allows an older release. Every change is a new commit on top of the branch
-# history, built with git plumbing (no checkout, no index) and pushed as a
-# fast-forward. Process and rationale: docs/developer/releasing.rst.
+# allows an older release; a re-created tag with changed content refreshes the
+# branch. Every change is a new commit on top of the branch history, built with
+# git plumbing (no checkout, no index) and pushed as a fast-forward. Process and
+# rationale: docs/developer/releasing.rst.
 #
 # Options:
 #   --force             allow pointing stable at an older release
@@ -47,8 +48,9 @@ usage() {
     sed -n '2,/^$/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
-# valid_version TAG: a release tag vYYYY.M.P (the same rule as in byroctl and install.sh)
-valid_version() { [[ "$1" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; }
+# valid_version TAG: a release tag vYYYY.M.P. Stricter than the consumers' rule
+# in byroctl (no leading zeros in a field), so that one release has one spelling.
+valid_version() { [[ "$1" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; }
 
 # calver_cmp A B: compare two release tags vYYYY.M.P field by field as integers
 # and print -1 (A older), 0 (same) or 1 (A newer). Spelled out on purpose so
@@ -74,7 +76,7 @@ sha256_of() {
 
 # stable_version: reads a stable.env on stdin and prints the release it names,
 # or nothing. Only a line that exactly matches the expected form counts; this is
-# the same rule install.sh and byroctl apply.
+# the consumers' rule from install.sh and byroctl, kept identical on purpose.
 stable_version() {
     grep -E '^BYRO_RELEASE_VERSION=v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 | cut -d= -f2 || true
 }
@@ -131,7 +133,8 @@ parse_args() {
 main() {
     set -euo pipefail
     parse_args "$@"
-    valid_version "$TAG" || die "not a release tag: $TAG (expected vYYYY.M.P; pre-release tags never move stable)"
+    valid_version "$TAG" \
+        || die "not a release tag: $TAG (expected vYYYY.M.P without leading zeros; pre-release tags never move stable)"
     git rev-parse --git-dir >/dev/null 2>&1 || die "run this inside a checkout of the byro repository"
 
     # 1. the release tag; its install.sh blob is reused as it is
@@ -149,17 +152,36 @@ main() {
     [[ "$actual" == "$expected" ]] \
         || die "deploy/install.sh of $TAG does not match its SHA256SUMS ($actual, expected $expected)"
 
-    # 2. the current pointer; the cases that change nothing end here
-    local base="" current=""
-    if git fetch --quiet --no-tags "$REMOTE" "refs/heads/$BRANCH" 2>/dev/null; then
-        base="$(git rev-parse FETCH_HEAD)"
-        current="$(git show "FETCH_HEAD:stable.env" 2>/dev/null | stable_version)"
+    # 2. the current pointer: a missing branch is fine, a failing remote is not
+    local rc=0 base="" current=""
+    git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null 2>&1 || rc=$?
+    case "$rc" in
+        0)
+            git fetch --quiet --no-tags "$REMOTE" "refs/heads/$BRANCH" || die "cannot fetch $BRANCH from $REMOTE"
+            base="$(git rev-parse FETCH_HEAD)"
+            current="$(git show "FETCH_HEAD:stable.env" 2>/dev/null | stable_version || true)" ;;
+        2)
+            log "branch $BRANCH does not exist yet on $REMOTE; creating it" ;;
+        *)
+            die "cannot query $REMOTE for branch $BRANCH (git ls-remote failed with exit $rc); stable is not moved" ;;
+    esac
+
+    # 3. the new tree, built from blobs without touching the working copy
+    local blob_env blob_readme tree
+    blob_env="$(stable_env "$TAG" | git hash-object -w --stdin)"
+    blob_readme="$(readme | git hash-object -w --stdin)"
+    tree="$(printf '100644 blob %s\tREADME.md\n100755 blob %s\tinstall.sh\n100644 blob %s\tstable.env\n' \
+        "$blob_readme" "$blob_install" "$blob_env" | git mktree)"
+    if [[ -n "$base" && "$(git rev-parse "$base^{tree}")" == "$tree" ]]; then
+        notice "stable already points to $TAG with this content; nothing to do"
+        exit 0
     fi
+
+    # 4. stable only moves forward; the same release with changed content is refreshed
     if [[ -n "$current" ]]; then
         case "$(calver_cmp "$current" "$TAG")" in
             0)
-                notice "stable already points to $TAG; nothing to do"
-                exit 0 ;;
+                log "refreshing stable at $TAG: the content of the tag changed" ;;
             1)
                 if (( ! FORCE )); then
                     notice "stable stays at $current: $TAG is an older release. To move it back on purpose, run the workflow 'Stable pointer' with force."
@@ -171,11 +193,9 @@ main() {
         esac
     elif [[ -n "$base" ]]; then
         log "branch $BRANCH exists but has no valid stable.env; replacing its content"
-    else
-        log "branch $BRANCH does not exist yet on $REMOTE; creating it"
     fi
 
-    # 3. the image gate, the same check install.sh performs
+    # 5. the image gate, the same check install.sh performs
     if (( IMAGE_CHECK )); then
         docker manifest inspect "$IMAGE_REPO:$TAG" >/dev/null 2>&1 \
             || die "the image $IMAGE_REPO:$TAG is not available in the registry; stable is not moved"
@@ -183,23 +203,13 @@ main() {
         log "skipping the image check (--no-image-check)"
     fi
 
-    # 4. the new tree and commit, built from blobs without touching the working copy
-    local blob_env blob_readme tree commit
-    blob_env="$(stable_env "$TAG" | git hash-object -w --stdin)"
-    blob_readme="$(readme | git hash-object -w --stdin)"
-    tree="$(printf '100644 blob %s\tREADME.md\n100755 blob %s\tinstall.sh\n100644 blob %s\tstable.env\n' \
-        "$blob_readme" "$blob_install" "$blob_env" | git mktree)"
-    if [[ -n "$base" && "$(git rev-parse "$base^{tree}")" == "$tree" ]]; then
-        notice "stable already has this content; nothing to do"
-        exit 0
-    fi
+    # 6. the commit on top of the branch history, and the fast-forward push
+    local commit
     # ${base:+-p "$base"} adds the parent only when the branch exists (word splitting intended)
     # shellcheck disable=SC2086
     commit="$(git commit-tree "$tree" ${base:+-p "$base"} -m "stable: point to $TAG" \
         -m "$(printf 'Previous: %s\nImage: %s:%s\ninstall.sh: deploy/install.sh from tag %s (sha256 %s)' \
             "${current:-none}" "$IMAGE_REPO" "$TAG" "$TAG" "$actual")")"
-
-    # 5. the fast-forward push
     if (( DRY_RUN )); then
         log "dry run: would push commit $commit to $REMOTE $BRANCH"
         git show --stat --format='%s' "$commit" >&2

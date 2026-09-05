@@ -275,18 +275,6 @@ jobs:
       - name: 🧪 bats
         run: bats --print-output-on-failure deploy/tests
 
-  release-flags:
-    # its own job on purpose: a distinct status check in pull requests, and it needs the full history
-    name: "[Deploy] release flags"
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: 🔎 release.env is well-formed and no flag stayed at 1 after a release
-        # pull requests only get a warning, main fails until the flag is reset
-        run: .github/scripts/check-release-flags.sh ${{ github.event_name == 'pull_request' && '--warn-only' || '' }}
-
   build-docker-image:
     name: 🔨 Build docker image
     needs: build-python-package

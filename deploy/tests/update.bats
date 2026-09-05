@@ -72,7 +72,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     [[ "$output" == *"breaking:       no"* ]]
     grep -q "docker manifest inspect ghcr.io/byro/byro:$NEW" "$SHIM_LOG"
     grep -q "curl .*$NEW/deploy/release.env" "$SHIM_LOG"
-    ! grep -q "compose" "$SHIM_LOG"
+    refute grep -qE "compose (pull|stop|up|run|exec)" "$SHIM_LOG"
     [ "$(conf_get BYRO_DEPLOY_VERSION)" = "$OLD" ]
 }
 
@@ -126,7 +126,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     [ "$status" -ne 0 ]
     [[ "$output" == *"flagged as breaking"* ]]
     [ "$(conf_get BYRO_DEPLOY_VERSION)" = "$OLD" ]
-    ! grep -q "compose stop" "$SHIM_LOG"
+    refute grep -q "compose stop" "$SHIM_LOG"
     update --check
     [[ "$output" == *"breaking:       yes"* ]]
     : >"$SHIM_LOG"
@@ -143,7 +143,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     [[ "$output" == *"full backup of $BYRO_ROOT/data"* ]]
     [[ "$output" == *"--data-safeguard-done"* ]]
     [ "$(cat "$BYRO_ROOT/byro.conf")" = "$before" ]
-    ! grep -qE "compose (pull|stop|up|exec)" "$SHIM_LOG"
+    refute grep -qE "compose (pull|stop|up|exec)" "$SHIM_LOG"
     [ ! -e "$BYRO_ROOT/.byroctl/byroctl.next" ]
     update --yes --non-interactive --data-safeguard-done
     [ "$status" -eq 0 ]
@@ -170,7 +170,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     update --prefetch
     [ "$status" -eq 0 ]
     grep -q "^docker pull ghcr.io/byro/byro:$NEW$" "$SHIM_LOG"
-    ! grep -q "compose" "$SHIM_LOG"
+    refute grep -qE "compose (pull|stop|up|run|exec)" "$SHIM_LOG"
     [ "$(cat "$BYRO_ROOT/byro.conf")" = "$before" ]
     [ ! -e "$BYRO_ROOT/.byroctl/byroctl.next" ]
 }
@@ -178,7 +178,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
 @test "--skip-safeguard skips the dump" {
     update --yes --non-interactive --skip-safeguard
     [ "$status" -eq 0 ]
-    ! grep -q "pg_dump" "$SHIM_LOG"
+    refute grep -q "pg_dump" "$SHIM_LOG"
     [ -z "$(ls -A "$BYRO_ROOT/backups")" ]
     [[ "$output" == *"skipping the pre-update safeguard"* ]]
 }
@@ -190,8 +190,8 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     [ "$status" -ne 0 ]
     [[ "$output" == *"checksum mismatch for byroctl"* ]]
     [ "$(cat "$BYRO_ROOT/byro.conf")" = "$before" ]
-    ! grep -q "compose stop" "$SHIM_LOG"
-    ! grep -q "byroctl shipped with" "$BYRO_ROOT/byroctl"
+    refute grep -q "compose stop" "$SHIM_LOG"
+    refute grep -q "byroctl shipped with" "$BYRO_ROOT/byroctl"
 }
 
 @test "a failed migration leaves the stack stopped and prints the way back" {
@@ -202,8 +202,8 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     [[ "$output" == *"Manual way back to byro $OLD"* ]]
     [[ "$output" == *"BYRO_DEPLOY_IMAGE_DIGEST $OLD_DIGEST"* ]]
     ls -d "$BYRO_ROOT"/backups/pre-update-"$OLD"-* >/dev/null
-    ! grep -q "compose up -d --remove-orphans" "$SHIM_LOG"
-    ! conf_has BYROCTL_PREVIOUS_VERSION "$BYRO_ROOT/.byroctl/state"
+    refute grep -q "compose up -d --remove-orphans" "$SHIM_LOG"
+    refute conf_has BYROCTL_PREVIOUS_VERSION "$BYRO_ROOT/.byroctl/state"
     [ ! -d "$BYRO_ROOT/.byroctl/lock" ]
 }
 
@@ -214,11 +214,11 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     update --yes --non-interactive
     [ "$status" -eq 0 ]
     grep -q "^docker run --rm -e PGPASSWORD postgres:17-alpine pg_dump -h db.example.org -p 5433 -U byro -Fc byro$" "$SHIM_LOG"
-    ! grep -q "compose up -d db" "$SHIM_LOG"
+    refute grep -q "compose up -d db" "$SHIM_LOG"
     local dir; dir="$(ls -d "$BYRO_ROOT"/backups/pre-update-"$OLD"-*)"
     [ "$(cat "$dir/db.dump")" = "PGDMP-shim-external" ]
     # the password travelled through the environment only
-    ! grep -q "$(conf_get BYRO_DB_PASS)" "$SHIM_LOG"
+    refute grep -q "$(conf_get BYRO_DB_PASS)" "$SHIM_LOG"
 }
 
 @test "pre- and post-update hooks run in order with the versions in the environment" {
@@ -238,7 +238,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     update --yes --non-interactive
     [ "$status" -ne 0 ]
     [[ "$output" == *"hook pre-update failed"* ]]
-    ! grep -q "pg_dump" "$SHIM_LOG"
+    refute grep -q "pg_dump" "$SHIM_LOG"
 }
 
 @test "self-update restores the script of the installed release and refuses a bad checksum" {
@@ -246,7 +246,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     run byroctl --root "$BYRO_ROOT" self-update
     [ "$status" -eq 0 ]
     [[ "$output" == *"replaced with the version shipped with byro $OLD"* ]]
-    ! grep -q "local modification" "$BYRO_ROOT/byroctl"
+    refute grep -q "local modification" "$BYRO_ROOT/byroctl"
     run byroctl --root "$BYRO_ROOT" self-update
     [ "$status" -eq 0 ]
     [[ "$output" == *"already the version"* ]]
@@ -254,7 +254,7 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     run byroctl --root "$BYRO_ROOT" self-update
     [ "$status" -ne 0 ]
     [[ "$output" == *"checksum mismatch for byroctl"* ]]
-    ! grep -q "tampered on the server" "$BYRO_ROOT/byroctl"
+    refute grep -q "tampered on the server" "$BYRO_ROOT/byroctl"
 }
 
 @test "--to with an invalid tag or an unknown image is refused" {

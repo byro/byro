@@ -35,7 +35,7 @@ setup() {
     run byroctl --root "$BYRO_ROOT" config set BYRO_MAIL_HOST mail.example.org
     [ "$status" -eq 0 ]
     [ "$(conf_get BYRO_MAIL_HOST)" = "mail.example.org" ]
-    ! grep -q "compose up" "$SHIM_LOG"
+    refute grep -q "compose up" "$SHIM_LOG"
     run byroctl --root "$BYRO_ROOT" config set BYRO_MAIL_PORT 465 --apply
     [ "$status" -eq 0 ]
     [ "$(conf_get BYRO_MAIL_PORT)" = "465" ]
@@ -51,7 +51,7 @@ setup() {
     [ "$status" -eq 0 ]
     [ "$(conf_get BYRO_MAIL_PASSWORD)" = 'se$cret #x' ]
     [[ "$output" == *"********"* ]]
-    ! grep -q 'se$cret' "$SHIM_LOG"
+    refute grep -q 'se$cret' "$SHIM_LOG"
 }
 
 @test "config check passes for a fresh installation" {
@@ -101,7 +101,7 @@ setup() {
     EDITOR=true run byroctl --root "$BYRO_ROOT" config edit
     [ "$status" -eq 0 ]
     [[ "$output" == *"config check: OK"* ]]
-    ! grep -q "compose up" "$SHIM_LOG"
+    refute grep -q "compose up" "$SHIM_LOG"
     EDITOR=/nonexistent/editor run byroctl --root "$BYRO_ROOT" config edit
     [ "$status" -ne 0 ]
 }

@@ -1,0 +1,27 @@
+name: Release flags
+
+# Lints deploy/release.env and reminds maintainers to reset a release flag after
+# the release that needed it was published. Runs on every push to main and every
+# pull request without a path filter: a forgotten reset has to show up even when
+# nothing below deploy/ changes. See docs/developer/releasing.rst.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  release-flags:
+    name: "[Deploy] release flags"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # the check compares against the latest release tag
+      - name: 🔎 release.env is well-formed and no flag stayed at 1 after a release
+        # pull requests only get a warning, main fails until the flag is reset
+        run: .github/scripts/check-release-flags.sh ${{ github.event_name == 'pull_request' && '--warn-only' || '' }}

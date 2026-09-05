@@ -59,7 +59,7 @@ run_install() {
     seq="$(grep -oE 'docker (manifest inspect|compose pull|image inspect|compose up -d db|compose run --rm -T manage migrate|compose run --rm -T manage shell|compose run --rm -T -e DJANGO_SUPERUSER_PASSWORD manage createsuperuser|compose up -d$)' "$SHIM_LOG" | tr '\n' '|')"
     [ "$seq" = "docker manifest inspect|docker compose pull|docker image inspect|docker compose up -d db|docker compose run --rm -T manage migrate|docker compose run --rm -T manage shell|docker compose run --rm -T -e DJANGO_SUPERUSER_PASSWORD manage createsuperuser|docker compose up -d|" ]
     # the password never appears on a docker command line
-    ! grep -q "Admin-Passw0rd" "$SHIM_LOG"
+    refute grep -q "Admin-Passw0rd" "$SHIM_LOG"
     grep -q "createsuperuser --noinput --username admin --email admin@example.org" "$SHIM_LOG"
 }
 
@@ -68,7 +68,7 @@ run_install() {
     run_install
     [ "$status" -ne 0 ]
     [[ "$output" == *"carries no digest"* ]]
-    ! grep -q "compose up -d db" "$SHIM_LOG"
+    refute grep -q "compose up -d db" "$SHIM_LOG"
 }
 
 @test "install refuses a version whose image is missing in the registry" {
@@ -81,8 +81,8 @@ run_install() {
 @test "--no-pull uses a local image and never pulls; a missing local image is an error" {
     run_install --no-pull --set BYRO_DEPLOY_IMAGE_REPO=byro-local --version dev
     [ "$status" -eq 0 ]
-    ! grep -q "compose pull" "$SHIM_LOG"
-    ! grep -q "manifest inspect" "$SHIM_LOG"
+    refute grep -q "compose pull" "$SHIM_LOG"
+    refute grep -q "manifest inspect" "$SHIM_LOG"
     [ "$(conf_get BYRO_DEPLOY_IMAGE_DIGEST)" = "" ]
     make_root
     : >"$SHIM_LOG"
@@ -91,20 +91,20 @@ run_install() {
         --set BYRO_SITE_URL=https://byro.example.org --set BYROCTL_PROXY=none --set BYRO_DEPLOY_IMAGE_REPO=byro-local
     [ "$status" -ne 0 ]
     [[ "$output" == *"not present locally"* ]]
-    ! grep -q "compose up" "$SHIM_LOG"
+    refute grep -q "compose up" "$SHIM_LOG"
 }
 
 @test "an existing superuser skips account creation, --skip-superuser too" {
     export SHIM_SUPERUSER_EXISTS=1
     run_install
     [ "$status" -eq 0 ]
-    ! grep -q createsuperuser "$SHIM_LOG"
+    refute grep -q createsuperuser "$SHIM_LOG"
     [[ "$output" == *"superuser exists already"* ]]
     make_root; : >"$SHIM_LOG"; export SHIM_SUPERUSER_EXISTS=0
     run_install --skip-superuser
     [ "$status" -eq 0 ]
-    ! grep -q "manage shell" "$SHIM_LOG"
-    ! grep -q createsuperuser "$SHIM_LOG"
+    refute grep -q "manage shell" "$SHIM_LOG"
+    refute grep -q createsuperuser "$SHIM_LOG"
 }
 
 @test "a second run resumes without questions, copies nothing twice and re-asks only the admin data" {
@@ -190,7 +190,7 @@ run_install() {
     [ "$(conf_get COMPOSE_FILE)" = "docker-compose.yml" ]
     [ "$(conf_get BYRO_DB_HOST)" = "db.example.org" ]
     [ "$(conf_get BYRO_DB_PASS)" = 'ext$pass #1' ]
-    ! grep -q "compose up -d db" "$SHIM_LOG"
+    refute grep -q "compose up -d db" "$SHIM_LOG"
     grep -q "^BYRO_DB_PASS='ext\$pass #1'$" "$BYRO_ROOT/byro.conf"
 }
 

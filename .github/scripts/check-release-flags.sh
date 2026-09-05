@@ -8,16 +8,19 @@
 # main, set to 1 in the pull request that prepares a release, and reset to 0
 # right after that release. Lint, always an error: each flag exactly once with
 # the value 0 or 1, nothing else besides comments and blank lines (byroctl reads
-# anything else as 0). Stale flag: 1 at HEAD although the latest release tag
-# reachable from HEAD already shipped with it and the file has not changed
-# since; an error, or a warning with --warn-only (pull requests). Process and
-# rationale: docs/developer/releasing.rst.
+# anything else as 0). Stale flag: a flag at 1 whose line has not changed since
+# the latest release, although that release already shipped it at 1; an error,
+# or a warning with --warn-only (pull requests). The latest release is the
+# highest vYYYY.M.P tag reachable from HEAD. Process and rationale:
+# docs/developer/releasing.rst.
 #
 # Needs the full history and the tags (actions/checkout with fetch-depth: 0),
-# and runs against the repository that contains the current directory.
+# refuses shallow checkouts, and runs against the repository that contains the
+# current directory.
 
 FILE="deploy/release.env"
 FLAGS="BYRO_RELEASE_BREAKING BYRO_RELEASE_DATA_MIGRATION"
+RELEASE_TAG='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
 WARN_ONLY=0
 SET_FLAGS=""   # the flags at 1, comma separated
 
@@ -48,6 +51,14 @@ lint() {
     return "$errors"
 }
 
+# latest_release_tag: the highest release tag reachable from HEAD, compared
+# numerically per field; tags of any other shape are not releases.
+latest_release_tag() {
+    local version
+    version="$(git tag --merged HEAD | grep -E "$RELEASE_TAG" | sed 's/^v//' | sort -t. -k1,1n -k2,2n -k3,3n | tail -n1 || true)"
+    [[ -z "$version" ]] || printf 'v%s' "$version"
+}
+
 main() {
     set -euo pipefail
     case "${1:-}" in
@@ -55,7 +66,11 @@ main() {
         --warn-only) WARN_ONLY=1 ;;
         *) log "usage: $0 [--warn-only]"; exit 64 ;;
     esac
-    cd "$(git rev-parse --show-toplevel)" || die "run this inside a checkout of the byro repository"
+    local top
+    top="$(git rev-parse --show-toplevel 2>/dev/null)" || die "run this inside a checkout of the byro repository"
+    cd "$top"
+    [[ "$(git rev-parse --is-shallow-repository)" != "true" ]] \
+        || die "shallow checkout: the stale flag check needs the full history and the tags (actions/checkout with fetch-depth: 0)"
     [[ -f "$FILE" ]] || die "$FILE is missing"
     lint || exit 1
 
@@ -70,15 +85,25 @@ main() {
         exit 0
     fi
 
-    # the latest release tag reachable from HEAD; pre-release tags (v…-rc1) do not count
     local tag
-    tag="$(git describe --tags --abbrev=0 --match 'v[0-9]*' --exclude '*-*' HEAD 2>/dev/null || true)"
+    tag="$(latest_release_tag)"
     [[ -n "$tag" ]] || ok "no release tag reachable from HEAD, nothing to compare"
     [[ "$(git rev-parse "$tag^{commit}")" != "$(git rev-parse HEAD)" ]] || ok "HEAD is the release commit $tag itself"
     git cat-file -e "$tag:$FILE" 2>/dev/null || ok "$tag predates $FILE"
-    [[ -z "$(git rev-list -n1 "$tag..HEAD" -- "$FILE")" ]] || ok "$FILE changed since $tag"
 
-    local message="release flag still 1 after $tag: $SET_FLAGS. It was published with $tag and $FILE has not changed since; reset it to 0 on main (see docs/developer/releasing.rst)."
+    # a flag is stale when the latest release shipped it at 1 and no commit since
+    # then touched that flag's line (neither a reset nor a reset and a new setting)
+    local stale="" shipped
+    for flag in $FLAGS; do
+        grep -qxF "$flag=1" "$FILE" || continue
+        shipped="$(git show "$tag:$FILE" | grep -E "^$flag=(0|1)$" | cut -d= -f2 || true)"
+        [[ "$shipped" == "1" ]] || continue
+        [[ -z "$(git log -n1 --format=%H -G "^$flag=" "$tag..HEAD" -- "$FILE")" ]] || continue
+        stale="${stale:+$stale, }$flag"
+    done
+    [[ -n "$stale" ]] || ok "every flag at 1 was set or changed after $tag"
+
+    local message="release flag still 1 after $tag: $stale. It was published with $tag and not changed since; reset it to 0 on main (see docs/developer/releasing.rst)."
     if (( WARN_ONLY )); then
         warn "$message"
         exit 0

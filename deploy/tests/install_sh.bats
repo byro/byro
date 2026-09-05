@@ -67,7 +67,7 @@ install_sh() { "$DEPLOY_DIR/install.sh" "$@"; }
     printf 'BYRO_RELEASE_VERSION=v2026.3.0\n' >"$BATS_TEST_TMPDIR/stable.env"
     BYROCTL_STABLE_FILE="$BATS_TEST_TMPDIR/stable.env" run install_sh --root "$INSTALL_ROOT" --dry-run
     [ "$status" -eq 0 ]
-    ! grep -q "stable.env" "$SHIM_LOG"
+    refute grep -q "stable.env" "$SHIM_LOG"
 }
 
 @test "a missing image stops the installer before anything is written" {
