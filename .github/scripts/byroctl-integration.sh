@@ -38,6 +38,7 @@ cleanup() {
         (cd "$root" && docker compose down -v --remove-orphans >/dev/null 2>&1) || true
     fi
     rm -rf "$root"
+    docker rmi "$repo:${tag}2" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
@@ -94,6 +95,26 @@ echo "--- second install run is idempotent"
 before="$(cat "$root/byro.conf")"
 check "re-run install" "$byroctl" --root "$root" install --non-interactive --no-pull --admin-user admin --admin-email admin@example.org
 check "byro.conf unchanged by re-run" [ "$(cat "$root/byro.conf")" = "$before" ]
+
+echo "--- update to a second tag of the same image (stage 2, safeguard, migration)"
+docker tag "$repo:$tag" "$repo:${tag}2"
+check "update --check reports the new tag" "$byroctl" --root "$root" update --check --to "${tag}2" --no-pull
+check "update --to ${tag}2" "$byroctl" --root "$root" update --to "${tag}2" --no-pull --yes --non-interactive
+check "version pinned to ${tag}2" grep -q "^BYRO_DEPLOY_VERSION=${tag}2$" "$root/byro.conf"
+safeguard="$(find "$root/backups" -mindepth 1 -maxdepth 1 -type d -name "pre-update-$tag-*" | head -n1 || true)"
+has_safeguard_files() { [ -f "$1/byro.conf" ] && [ -f "$1/.secret" ]; }
+check "safeguard directory exists" [ -n "$safeguard" ]
+check "safeguard has a non-empty database dump" [ -s "$safeguard/db.dump" ]
+check "safeguard has byro.conf and .secret" has_safeguard_files "$safeguard"
+check "state records the previous version" grep -q "^BYROCTL_PREVIOUS_VERSION=$tag$" "$root/.byroctl/state"
+code="$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: localhost' "http://$http_host:$port/login/")"
+check "GET /login/ -> 200 after update (got $code)" [ "$code" = 200 ]
+set +e
+"$byroctl" --root "$root" update --check --to "${tag}2" --no-pull >/dev/null 2>&1
+rc=$?
+set -e
+check "update --check exits 3 when current (got $rc)" [ "$rc" = 3 ]
+check "self-update keeps an identical script" "$byroctl" --root "$root" self-update
 
 echo "--- secrets"
 not_in_tree() { ! grep -rq -- "$1" "$2"; }
