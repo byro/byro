@@ -165,3 +165,50 @@ install_sh() { "$DEPLOY_DIR/install.sh" "$@"; }
     [ "$status" -eq 0 ]
     [[ "$output" == *"--dry-run"* ]]
 }
+
+@test "a relative --root is resolved against the current directory" {
+    local phys; phys="$(cd -P "$BYRO_ROOT" && pwd)"
+    cd "$BYRO_ROOT"
+    run install_sh --root ./byro --dry-run
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"into $phys/byro"* ]]
+    [[ "$output" == *"byroctl --root $phys/byro install"* ]]
+    # parse_args already holds the absolute path, so the symlink created later
+    # points at an absolute target as well
+    # shellcheck disable=SC1091
+    source "$DEPLOY_DIR/install.sh"
+    parse_args --root byro/
+    [ "$ROOT" = "$phys/byro" ]
+    parse_args --root=.
+    [ "$ROOT" = "$phys" ]
+}
+
+@test "the full bootstrap with a relative --root installs into that directory" {
+    cd "$BYRO_ROOT"
+    run install_sh --root ./byro --non-interactive --no-symlink \
+        --admin-user admin --admin-email admin@example.org \
+        --set BYRO_SITE_URL=https://byro.example.org --set BYROCTL_PROXY=none --set BYRO_DEPLOY_PORT=18997
+    [ "$status" -eq 0 ]
+    [ -x "$INSTALL_ROOT/byroctl" ]
+    [ -f "$INSTALL_ROOT/byro.conf" ]
+    [ -f "$INSTALL_ROOT/docker-compose.yml" ]
+    [ "$(readlink "$INSTALL_ROOT/.env")" = "byro.conf" ]
+    [ ! -e "$INSTALL_ROOT/byro" ]
+    [[ "$output" == *"is installed and running"* ]]
+}
+
+@test "--non-interactive without --root stops with a hint before anything is written" {
+    run install_sh --non-interactive --no-symlink
+    [ "$status" -eq 64 ]
+    [[ "$output" == *"--root"* ]]
+    [ -z "$(ls -A "$BYRO_ROOT")" ]
+}
+
+@test "a dry run without --root names the current directory" {
+    local phys; phys="$(cd -P "$BYRO_ROOT" && pwd)"
+    cd "$BYRO_ROOT"
+    run install_sh --dry-run
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"into $phys (the current directory"* ]]
+    [ -z "$(ls -A "$BYRO_ROOT")" ]
+}
