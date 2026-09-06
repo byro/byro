@@ -20,20 +20,33 @@ nav = [
   { "Start" = "index.md" },
   { "Installation" = [
     "installation/index.md",
+    { "Mit byroctl (empfohlen)" = "installation/byroctl.md" },
+    { "Mit Docker Compose" = "installation/docker-compose.md" },
+    { "Bare Metal" = "installation/bare-metal.md" },
+    { "Legacy: production/ (veraltet)" = "installation/legacy-production.md" },
   ] },
   { "Administration" = [
     "administration/index.md",
+    { "Mehr-Faktor-Authentifizierung" = "administration/mfa.md" },
+    { "PGP-Mailverschlüsselung" = "administration/pgp.md" },
+    { "Plugins" = "administration/plugins.md" },
   ] },
-  { "Konfiguration" = [
-    "configuration/index.md",
-  ] },
-  { "Benutzung" = [
-    "usage/index.md",
-  ] },
+  { "Konfiguration" = "configuration/index.md" },
+  { "Benutzung" = "usage/index.md" },
   { "Entwicklung & API" = [
     "development/index.md",
+    { "Entwicklungs-Setup" = "development/setup.md" },
+    { "Mitwirken" = "development/contributing.md" },
+    { "An der Dokumentation arbeiten" = "development/documentation.md" },
+    { "byro veröffentlichen" = "development/releasing.md" },
+    { "Plugin-Entwicklung" = [
+      "development/plugins/index.md",
+      { "Ein Plugin erstellen" = "development/plugins/creating-a-plugin.md" },
+      { "Eigene Mitgliedsdaten" = "development/plugins/member-data.md" },
+      { "Bankimporter" = "development/plugins/bank-transaction-importers.md" },
+    ] },
+    { "Signalliste" = "development/signals.md" },
   ] },
-  { "Smoke-Test (vorläufig)" = "smoke-test.md" },
 ]
 
 [project.validation]

@@ -1,12 +1,67 @@
 # byro documentation
 
-!!! warning "Preliminary page"
-    This page is a placeholder from the migration phase (AP02). It only shows the planned structure; the content is written in the following work packages. The published documentation is still at <https://byro.readthedocs.io/>.
+![byro](img/logo/byro_128.png){ width="128" }
 
-byro is a membership administration tool for small and medium sized associations.
+byro is a membership administration tool. byro is best suited to small and
+medium sized clubs/NGOs/associations of all kinds, with a focus on the DACH
+region. byro is heavily plugin based to help fit it to different requirements
+in different situations and countries.
 
-- [Installation](installation/index.md): run byro on your own server.
-- [Administration](administration/index.md): manage byro after the installation.
-- [Configuration](configuration/index.md): reference of all settings.
-- [Usage](usage/index.md): day-to-day work with byro.
-- [Development & API](development/index.md): extend byro and write plugins.
+byro is stable and in active use in several communities. It is currently under
+active development.
+
+- [Installation](installation/index.md): run byro on your own server with
+  byroctl, Docker Compose or bare metal.
+- [Administration](administration/index.md): MFA, PGP and plugins in a running
+  instance.
+- [Configuration](configuration/index.md): reference of all configuration
+  options.
+- [Usage](usage/index.md): day-to-day work with byro (being written).
+- [Development & API](development/index.md): develop byro or a plugin.
+
+## Features
+
+As byro is under active development, this feature list can become outdated.
+Please [open issues](https://github.com/byro/byro/issues/new) for features you
+are missing!
+
+- **Member management:** Add, and edit members and their data.
+- **Membership management:** Add and change the membership fees a member should
+  pay.
+- **Add custom member data:** Track non-standard member data by adding a plugin
+  to byro. There are plenty of example plugins and developer documentation to
+  help you.
+- **Import payment data:** Inbuilt support for CSV imports.
+  <!-- migration note (AP01 GAPS A1): the core has no CSV importer; imports come from plugins. Rewritten in AP07/AP10. -->
+- **Import and match payment data** to members via custom methods, added by
+  plugins.
+- **Send mails:** All mails can be reviewed before they are sent out. You can
+  also edit the default mail templates and add new ones.
+- **See member balances**. You can also check every single transaction at any
+  time.
+- **Upload member specific documents:** (either for or by them); optionally
+  send them per mail automatically.
+- **Multi-factor authentication:** Backend users can protect their account with
+  an authenticator app (TOTP); administrators can require this for everybody.
+- **Let members interact:** Members can choose to make their data (which parts
+  is their decision) visible to other members. Having a look at the member
+  directory helps them interact directly with other members.
+
+Please note that byro is a tool for tracking member data and payments, and the
+administrative acts around it. byro does support bookkeeping and transactions,
+but it is not a complete bookkeeping tool (yet).
+
+## License
+
+byro is licensed under the GNU Affero General Public License, version 3.0 only
+(`AGPL-3.0-only`). Older versions of byro were released under the Apache
+License 2.0.
+
+This documentation is licensed under the
+[Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/)
+(`CC-BY-SA-4.0`). You may share and adapt it as long as you give appropriate
+credit and distribute your adaptations under the same license.
+
+See the [LICENSE](https://github.com/byro/byro/blob/main/LICENSE) file in the
+byro repository for details, including the licensing history and the licenses
+of bundled third-party components.

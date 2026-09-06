@@ -1,14 +1,11 @@
 # Working on the byro documentation
 
-The documentation is being migrated from Sphinx to [Zensical](https://zensical.org/).
-During the migration both toolchains live side by side:
-
-- `docs/*.rst`, `conf.py`, `Makefile`, `requirements.txt`: the published Sphinx
-  documentation (see `developer/documentation.rst`).
-- `docs/de/`, `docs/en/`, `zensical.de.toml`, `zensical.en.toml`,
-  `requirements-zensical.txt`: the new Zensical documentation, one source tree
-  per language with identical relative paths. German is the leading language,
-  English is complete as well.
+The documentation is built with [Zensical](https://zensical.org/) from
+Markdown sources: `docs/de/` and `docs/en/` are one source tree per language
+with identical relative paths (German is the leading language, English is
+complete as well), configured by `zensical.de.toml` and `zensical.en.toml`,
+with dependencies pinned in `requirements-zensical.txt`. The contributor-facing
+version of this page is `docs/<lang>/development/documentation.md`.
 
 ## Building the Zensical documentation
 
@@ -72,4 +69,3 @@ tool: codespell's dictionary is English and flags ordinary German words.
   always build from the repository root.
 - Zensical is pinned exactly in `requirements-zensical.txt`. Upgrading it is a
   deliberate change: bump the pin, rebuild both languages, review the output.
-- The Sphinx toolchain is removed only after every page has been migrated.

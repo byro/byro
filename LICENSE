@@ -22,12 +22,13 @@ LICENSES/CC-BY-SA-4.0.txt.
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 
-This covers the documentation sources (the reStructuredText files and their
-translations in docs/locale/) as well as the screenshots and other images in
-docs/img/, with the exception of the byro logo in docs/img/logo/ (see "Logo"
-below). The build tooling in docs/ (conf.py, Makefile, requirements.txt,
-pytest.ini and the spelling word list) is part of the byro source code and
-remains licensed under the AGPL-3.0-only.
+This covers the documentation sources (the Markdown files in docs/de/ and
+docs/en/) as well as the screenshots and other images in docs/de/img/ and
+docs/en/img/, with the exception of the byro logo in docs/*/img/logo/ (see
+"Logo" below). The build tooling for the documentation (zensical.de.toml,
+zensical.en.toml, docs/rtd_build.py, docs/check_site.py, docs/README.md,
+docs/requirements-zensical.txt and docs/codespell-ignore.txt) is part of the
+byro source code and remains licensed under the AGPL-3.0-only.
 
 Older versions of the documentation were released together with the byro
 source code under the Apache License 2.0 (full text in
@@ -74,8 +75,8 @@ Logo
 The byro logo was contributed by an external designer; see the "About byro"
 page in the byro backend for attribution. Its license is not stated in this
 repository. Please contact the byro maintainers before using the logo outside
-of byro. This also applies to the copies of the logo in docs/img/logo/, which
-are not covered by the documentation license above.
+of byro. This also applies to the copies of the logo in docs/de/img/logo/ and
+docs/en/img/logo/, which are not covered by the documentation license above.
 
 
 Contributions
@@ -84,4 +85,4 @@ Contributions
 Unless explicitly stated otherwise, contributions submitted for inclusion in
 byro are licensed under the GNU Affero General Public License version 3.0 only
 (AGPL-3.0-only), and contributions to the documentation in docs/ are licensed
-under the CC-BY-SA-4.0. See docs/developer/contributing.rst for details.
+under the CC-BY-SA-4.0. See docs/en/development/contributing.md for details.

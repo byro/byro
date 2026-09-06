@@ -12,7 +12,7 @@
 # the latest release, although that release already shipped it at 1; an error,
 # or a warning with --warn-only (pull requests). The latest release is the
 # highest vYYYY.M.P tag reachable from HEAD. Process and rationale:
-# docs/developer/releasing.rst.
+# docs/en/development/releasing.md.
 #
 # Needs the full history and the tags (actions/checkout with fetch-depth: 0),
 # refuses shallow checkouts, and runs against the repository that contains the
@@ -103,7 +103,7 @@ main() {
     done
     [[ -n "$stale" ]] || ok "every flag at 1 was set or changed after $tag"
 
-    local message="release flag still 1 after $tag: $stale. It was published with $tag and not changed since; reset it to 0 on main (see docs/developer/releasing.rst)."
+    local message="release flag still 1 after $tag: $stale. It was published with $tag and not changed since; reset it to 0 on main (see docs/en/development/releasing.md)."
     if (( WARN_ONLY )); then
         warn "$message"
         exit 0

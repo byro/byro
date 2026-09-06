@@ -1,8 +1,0 @@
-sphinx>=7,<8
-sphinx-autobuild
-sphinx-intl
-sphinx_rtd_theme
-selenium
-pytest-selenium
-sphinxcontrib-spelling
--e src/

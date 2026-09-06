@@ -31,7 +31,7 @@ byro_ is a membership administration tool for small and medium sized
 clubs/NGOs/associations of all kinds, with a focus on the DACH region. While it
 is still a work in progress, it is already usable and in active use.
 
-.. image:: https://raw.githubusercontent.com/byro/byro/main/docs/img/screenshots/office_dashboard.png
+.. image:: https://raw.githubusercontent.com/byro/byro/main/docs/en/img/screenshots/office_dashboard.png
 
 Development and Production Setup
 --------------------------------
@@ -79,18 +79,18 @@ Commons Attribution-ShareAlike 4.0 International License (``CC-BY-SA-4.0``).
 See the `LICENSE`_ file for details, including the licensing history and the
 licenses of bundled third-party components.
 
-.. |byro| image:: https://raw.githubusercontent.com/byro/byro/main/docs/img/logo/byro_128.png
+.. |byro| image:: https://raw.githubusercontent.com/byro/byro/main/docs/en/img/logo/byro_128.png
    :alt: byro
 .. _developer documentation: http://byro.readthedocs.io/en/latest/
-.. _development: https://byro.readthedocs.io/en/latest/developer/setup.html
+.. _development: https://byro.readthedocs.io/en/latest/development/setup/
 .. _byro: https://byro.cloud
 .. _here: https://github.com/topics/byro-plugin
 .. _plugin catalog: https://github.com/byro/byro/blob/main/deploy/plugin-catalog.conf
-.. _plugin documentation: https://byro.readthedocs.io/en/latest/administrator/plugins.html
+.. _plugin documentation: https://byro.readthedocs.io/en/latest/administration/plugins/
 .. _byro-finance-import-bank-files: https://github.com/byro/byro-finance-import-bank-files
 .. _byro-mailman: https://github.com/byro/byro-mailman
 .. _byro-gemeinnuetzigkeit: https://github.com/byro/byro-gemeinnuetzigkeit
 .. _byro-shackspace: https://github.com/byro/byro-shackspace
-.. _production documentation: https://byro.readthedocs.io/en/latest/administrator/
-.. _byroctl: https://byro.readthedocs.io/en/latest/administrator/installation-byroctl.html
+.. _production documentation: https://byro.readthedocs.io/en/latest/installation/
+.. _byroctl: https://byro.readthedocs.io/en/latest/installation/byroctl/
 .. _LICENSE: https://github.com/byro/byro/blob/main/LICENSE

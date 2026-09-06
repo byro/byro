@@ -20,20 +20,33 @@ nav = [
   { "Getting started" = "index.md" },
   { "Installation" = [
     "installation/index.md",
+    { "With byroctl (recommended)" = "installation/byroctl.md" },
+    { "With Docker Compose" = "installation/docker-compose.md" },
+    { "Bare metal" = "installation/bare-metal.md" },
+    { "Legacy: production/ (deprecated)" = "installation/legacy-production.md" },
   ] },
   { "Administration" = [
     "administration/index.md",
+    { "Multi-factor authentication" = "administration/mfa.md" },
+    { "PGP email encryption" = "administration/pgp.md" },
+    { "Plugins" = "administration/plugins.md" },
   ] },
-  { "Configuration" = [
-    "configuration/index.md",
-  ] },
-  { "Usage" = [
-    "usage/index.md",
-  ] },
+  { "Configuration" = "configuration/index.md" },
+  { "Usage" = "usage/index.md" },
   { "Development & API" = [
     "development/index.md",
+    { "Development setup" = "development/setup.md" },
+    { "Contributing" = "development/contributing.md" },
+    { "Working on the documentation" = "development/documentation.md" },
+    { "Releasing byro" = "development/releasing.md" },
+    { "Plugin development" = [
+      "development/plugins/index.md",
+      { "Creating a plugin" = "development/plugins/creating-a-plugin.md" },
+      { "Custom member data" = "development/plugins/member-data.md" },
+      { "Bank transaction importers" = "development/plugins/bank-transaction-importers.md" },
+    ] },
+    { "Signal list" = "development/signals.md" },
   ] },
-  { "Smoke test (preliminary)" = "smoke-test.md" },
 ]
 
 [project.validation]
