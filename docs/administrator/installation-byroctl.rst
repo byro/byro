@@ -27,8 +27,10 @@ Prerequisites
 * Docker Engine 24 or newer with the Compose plugin 2.20 or newer. Your user
   must be allowed to use Docker (member of the ``docker`` group). Note that
   membership in that group is equivalent to root access on the machine.
-* ``bash`` 4 or newer and ``curl``. Both are present on every current
-  distribution.
+* ``bash`` 4 or newer and ``curl``. Both are present on every current Linux
+  distribution. macOS still ships bash 3.2, so to try the installer on a Mac
+  install a current bash first (``brew install bash``) and run the commands
+  below with that bash (``/opt/homebrew/bin/bash``) or a Linux VM.
 * Free ports 80 and 443 if Caddy should terminate TLS for you, otherwise a
   reverse proxy of your own that forwards to byro.
 * An SMTP server to send mail. It can be configured later.
