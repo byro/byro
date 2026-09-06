@@ -1137,6 +1137,8 @@ cmd_manage() {
 
 # --- catalog: [shortname] sections with key=value lines; default file in BYRO_ROOT
 catalog_file() { printf '%s' "${1:-$BYRO_ROOT/plugin-catalog.conf}"; }
+# catalog_names [FILE]: byroctl always uses the default file, the tests pass one
+# shellcheck disable=SC2120
 catalog_names() {
     local file; file="$(catalog_file "${1:-}")"
     [[ -f "$file" ]] || return 0
@@ -1269,10 +1271,9 @@ PLUGIN_ENTRY_AWK='
         gsub(/^[ \t]+|[ \t]+$/, "", line)
         if (line != "") printf "%s\t%s\t%s\n", line, name, version
     }'
-plugin_entries() { # [FILE]
-    local file="${1:-$PLUGINS_FILE}"
-    [[ -f "$file" ]] || return 0
-    awk "$PLUGIN_ENTRY_AWK" "$file"
+plugin_entries() {
+    [[ -f "$PLUGINS_FILE" ]] || return 0
+    awk "$PLUGIN_ENTRY_AWK" "$PLUGINS_FILE"
 }
 plugin_parse_line() { awk "$PLUGIN_ENTRY_AWK" <<<"$1"; }   # one raw line -> entry or nothing
 entry_spec()    { printf '%s' "${1%%$'\t'*}"; }

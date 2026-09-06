@@ -1,4 +1,4 @@
-Ja bitt#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Container health check for the byro image (standard library plus, as a
 fallback, the byro settings).
 
