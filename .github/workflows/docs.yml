@@ -17,6 +17,14 @@ on:
       - '.github/workflows/docs.yml'
 
 jobs:
+  parity:
+    name: "[Docs] German/English page parity"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check that docs/de and docs/en cover the same pages
+        run: python3 docs/check_parity.py docs
+
   zensical:
     name: "[Docs] Zensical build ${{ matrix.language }}"
     runs-on: ubuntu-latest

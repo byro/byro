@@ -55,13 +55,18 @@ Conventions:
 - The German and English trees must contain the same files. If you cannot
   write the other language, say so in your pull request.
 
-`docs/README.md` in the repository describes the tooling in more detail.
+How a page should be written — target audiences, terminology, tone,
+Diátaxis, front matter, headings, links, admonitions, code examples,
+screenshots, version and deprecation notices, license and a review checklist
+— is in the "Editorial standard" section of `docs/README.md` in the
+repository; the tooling is also described there in more detail.
 
 ## Checking documentation
 
 Every pull request that touches the documentation runs the checks in
-`.github/workflows/docs.yml`: a strict build of both languages as Read the Docs
-would run it, a check of all local links and images in the built site
-(`python docs/check_site.py`), an external link check and a spell check of the
-English tree with `codespell`. Words that codespell must accept, for example
-product names, go into `docs/codespell-ignore.txt`.
+`.github/workflows/docs.yml`: a check that `docs/de` and `docs/en` cover the
+same pages (`python docs/check_parity.py`), a strict build of both languages
+as Read the Docs would run it, a check of all local links and images in the
+built site (`python docs/check_site.py`), an external link check and a spell
+check of the English tree with `codespell`. Words that codespell must accept,
+for example product names, go into `docs/codespell-ignore.txt`.

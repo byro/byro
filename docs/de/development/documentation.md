@@ -56,14 +56,20 @@ Konventionen:
 - Der deutsche und der englische Baum müssen dieselben Dateien enthalten. Kannst
   du die andere Sprache nicht schreiben, sag das in deinem Pull Request.
 
-`docs/README.md` im Repository beschreibt das Tooling ausführlicher.
+Wie eine Seite geschrieben sein soll – Zielgruppen, Terminologie, Ton,
+Diátaxis, Front Matter, Überschriften, Links, Admonitions, Codebeispiele,
+Screenshots, Versions- und Deprecation-Hinweise, Lizenz und eine
+Review-Checkliste – steht im Abschnitt „Editorial standard“ in
+`docs/README.md` im Repository; das Tooling ist dort ebenfalls ausführlicher
+beschrieben.
 
 ## Dokumentation prüfen
 
 Jeder Pull Request, der die Dokumentation berührt, durchläuft die Prüfungen in
-`.github/workflows/docs.yml`: einen strict Build beider Sprachen so, wie Read
-the Docs ihn ausführt, eine Prüfung aller lokalen Links und Bilder in der
-gebauten Site (`python docs/check_site.py`), eine Prüfung externer Links und
-eine Rechtschreibprüfung des englischen Baums mit `codespell`. Wörter, die
-codespell akzeptieren muss, etwa Produktnamen, gehören in
-`docs/codespell-ignore.txt`.
+`.github/workflows/docs.yml`: einen Abgleich, dass `docs/de` und `docs/en`
+dieselben Seiten enthalten (`python docs/check_parity.py`), einen strict Build
+beider Sprachen so, wie Read the Docs ihn ausführt, eine Prüfung aller lokalen
+Links und Bilder in der gebauten Site (`python docs/check_site.py`), eine
+Prüfung externer Links und eine Rechtschreibprüfung des englischen Baums mit
+`codespell`. Wörter, die codespell akzeptieren muss, etwa Produktnamen,
+gehören in `docs/codespell-ignore.txt`.
