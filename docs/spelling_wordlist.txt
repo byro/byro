@@ -44,3 +44,4 @@ matchers
 memos
 Mustermann
 SEPA
+ShareAlike

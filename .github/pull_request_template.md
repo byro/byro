@@ -19,4 +19,4 @@
 
 ## Licensing
 
-By submitting this pull request, you agree that your contribution is provided under the project's AGPL-3.0-only license unless explicitly stated otherwise. See [LICENSE](https://github.com/byro/byro/blob/main/LICENSE) and the [contributing guide](https://byro.readthedocs.io/en/latest/developer/contributing.html) for details.
+By submitting this pull request, you agree that your contribution is provided under the project's AGPL-3.0-only license, or under the CC-BY-SA-4.0 license for changes to the documentation in docs/, unless explicitly stated otherwise. See [LICENSE](https://github.com/byro/byro/blob/main/LICENSE) and the [contributing guide](https://byro.readthedocs.io/en/latest/developer/contributing.html) for details.
