@@ -5,12 +5,38 @@
 #   docker build -f deploy/Dockerfile -t ghcr.io/byro/byro:<tag> .
 #
 # The development image used by src/docker-compose.yml lives in src/Dockerfile.
+#
+# Two stages: the builder installs byro and its dependencies into a virtualenv
+# and carries the C toolchain that some of them need - libsass (via
+# django-libsass) publishes no linux/arm64 wheel and is compiled from source
+# there. The runtime image copies the finished virtualenv and never sees a
+# compiler.
+FROM python:3.12-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# byro is installed editable from /byro; the runtime stage copies the source to
+# the same path so that the editable finder in the virtualenv keeps resolving.
+COPY src/ /byro/
+WORKDIR /byro
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install -e . gunicorn
+
 FROM python:3.12-slim
 
 LABEL org.opencontainers.image.source="https://github.com/byro/byro" \
       org.opencontainers.image.authors="byro team"
 
-ENV PYTHONUNBUFFERED=1 \
+# /opt/venv first in PATH: python, pip and gunicorn resolve to the virtualenv
+# for the entrypoint, the healthcheck and the plugin image built on top.
+ENV PATH=/opt/venv/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     DJANGO_SETTINGS_MODULE=byro.settings \
@@ -34,10 +60,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && command -v bash setpriv usermod groupmod >/dev/null
 
+COPY --from=builder /opt/venv /opt/venv
 COPY src/ /byro/
 WORKDIR /byro
-RUN pip install --upgrade pip \
-    && pip install -e . gunicorn
 
 # Translations and static assets are built into the image. BYRO_DATA_DIR points
 # at a throw-away directory for this step so that importing the settings does
