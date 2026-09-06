@@ -1,0 +1,23 @@
+# Add-on: byro with plugins. byroctl puts this file into COMPOSE_FILE while
+# plugins/plugins.txt names at least one plugin and removes it when the list
+# becomes empty ("byroctl plugin add|remove|update|rebuild").
+#
+# web, periodic and manage then run an image built locally from
+# plugins/Dockerfile, which installs plugins/plugins.txt on top of the pinned
+# release image. The image name carries the Compose project and the byro
+# version: two installations on one host never share an image, and every byro
+# update rebuilds it (byroctl update does that). Managed by byroctl - do not edit.
+x-plugins: &plugins
+  image: ${COMPOSE_PROJECT_NAME:-byro}-plugins:${BYRO_DEPLOY_VERSION:?set BYRO_DEPLOY_VERSION in byro.conf}
+  build:
+    context: ./plugins
+    args:
+      BYRO_BASE_IMAGE: ${BYRO_DEPLOY_IMAGE_REPO:-ghcr.io/byro/byro}:${BYRO_DEPLOY_VERSION:?set BYRO_DEPLOY_VERSION in byro.conf}${BYRO_DEPLOY_IMAGE_DIGEST:+@${BYRO_DEPLOY_IMAGE_DIGEST}}
+
+services:
+  web:
+    <<: *plugins
+  periodic:
+    <<: *plugins
+  manage:
+    <<: *plugins

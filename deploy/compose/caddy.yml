@@ -1,0 +1,28 @@
+# Add-on: Caddy reverse proxy with automatic HTTPS (Let's Encrypt).
+# Requires ports 80 and 443 to be free on the host and BYRO_SITE_URL to be the
+# public URL without a path (e.g. https://byro.example.org). With an http://
+# URL Caddy serves plain HTTP (for tests and LANs).
+services:
+  caddy:
+    image: caddy:2.10
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      BYRO_SITE_URL: ${BYRO_SITE_URL:?set BYRO_SITE_URL in byro.conf}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    depends_on:
+      - web
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  web:
+    environment:
+      # Caddy terminates TLS and sets X-Forwarded-Proto, so byro may trust it.
+      # This overrides BYRO_TRUST_PROXY from byro.conf on purpose.
+      BYRO_TRUST_PROXY: "true"

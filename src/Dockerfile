@@ -1,3 +1,5 @@
+# Development image only (used by src/docker-compose.yml).
+# The production image is built from deploy/Dockerfile with the repository root as context.
 FROM python:3.12
 LABEL org.opencontainers.image.authors="byro team"
 

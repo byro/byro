@@ -15,6 +15,9 @@ If you want to develop (or improve) a plugin, have a look at our
 :doc:`plugin development guides </developer/plugins/index>`:
 They show how to develop a byro plugin with some hopefully easy-to-follow example plugins.
 
+If you maintain byro and prepare a release, :doc:`/developer/releasing` describes the release
+pipeline, the ``stable`` pointer for byroctl and the release flags.
+
 If any part of the documentation is unclear, please head over to the
 :doc:`documentation setup </developer/documentation>` to learn how to improve it, and then
 follow the :doc:`contributor documentation </developer/contributing>` to create a pull request.
@@ -26,4 +29,5 @@ follow the :doc:`contributor documentation </developer/contributing>` to create 
    setup
    contributing
    documentation
+   releasing
    plugins/index

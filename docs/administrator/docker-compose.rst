@@ -1,5 +1,13 @@
-Installation via docker-compose
-===============================
+Legacy setup: docker-compose files in ``production/`` (deprecated)
+===================================================================
+
+.. warning:: This setup is **deprecated**. It keeps working with the current
+             byro image, but it receives no new features and will be removed in a
+             later release. New installations should use
+             :doc:`installation-byroctl` (recommended) or
+             :doc:`installation-compose`. ``production/DEPRECATED.md`` in the
+             repository explains how to move an existing installation over
+             and lists the known problems of this setup.
 
 In the folder `production/` of the byro repository, you can find setup scripts
 and a `docker-compose.yml`, which will help you set up a production deployment of byro using docker.

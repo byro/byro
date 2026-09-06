@@ -1,0 +1,51 @@
+# byro - base Compose file: the byro services only (web, periodic, manage).
+#
+# Add-ons are separate, purely additive files selected through COMPOSE_FILE in
+# byro.conf (symlinked as .env):
+#   compose/postgres.yml   built-in PostgreSQL (default)
+#   compose/caddy.yml      Caddy reverse proxy with automatic HTTPS
+#
+# Managed by byroctl - do not edit. Put local changes into
+# docker-compose.override.yml, which byroctl never touches.
+
+x-byro: &byro
+  image: ${BYRO_DEPLOY_IMAGE_REPO:-ghcr.io/byro/byro}:${BYRO_DEPLOY_VERSION:?set BYRO_DEPLOY_VERSION in byro.conf}${BYRO_DEPLOY_IMAGE_DIGEST:+@${BYRO_DEPLOY_IMAGE_DIGEST}}
+  env_file: byro.conf
+  volumes:
+    - ./data:/var/byro/data
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  web:
+    <<: *byro
+    command: web
+    ports:
+      - "${BYRO_DEPLOY_BIND:-127.0.0.1}:${BYRO_DEPLOY_PORT:-8345}:8345"
+    restart: unless-stopped
+
+  periodic:
+    <<: *byro
+    command: periodic
+    environment:
+      # web migrates; periodic only waits for a healthy web service.
+      BYRO_AUTO_MIGRATE: "false"
+    # The image health check probes gunicorn, which does not run here.
+    healthcheck:
+      disable: true
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # One-off management commands: docker compose run --rm manage <command>
+  manage:
+    <<: *byro
+    profiles: [tools]
+    entrypoint: ["/usr/local/bin/byro-entrypoint", "manage"]
+    command: help
+    healthcheck:
+      disable: true
+    restart: "no"

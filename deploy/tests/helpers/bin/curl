@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Test shim for curl: serves files mapped by URL.
+#   SHIM_HTTP  directory mirroring host and path: https://host/p/a/t/h -> $SHIM_HTTP/host/p/a/t/h
+#              (takes precedence; used for the GitHub and PyPI resolution)
+#   SHIM_RAW   the raw.githubusercontent.com layout without the host:
+#              https://host/<ref>/deploy/<path> -> $SHIM_RAW/<ref>/deploy/<path>
+set -u
+printf '%s\n' "curl $*" >>"${SHIM_LOG:-/dev/null}"
+out=""; url=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o|-H) out_or_header="$1"; [[ "$out_or_header" == -o ]] && out="$2"; shift 2 ;;
+        --proto|--tlsv1.2|--fail|--silent|--show-error|--location) [[ "$1" == --proto ]] && shift; shift ;;
+        http*) url="$1"; shift ;;
+        *) shift ;;
+    esac
+done
+[[ -n "$url" ]] || { echo "shim curl: no url" >&2; exit 2; }
+hostpath="${url#https://}"
+src=""
+if [[ -n "${SHIM_HTTP:-}" && -f "$SHIM_HTTP/$hostpath" ]]; then
+    src="$SHIM_HTTP/$hostpath"
+else
+    path="${hostpath#*/}"          # strip host
+    [[ -n "${SHIM_RAW:-}" && -f "$SHIM_RAW/$path" ]] && src="$SHIM_RAW/$path"
+fi
+[[ -n "$src" ]] || { echo "curl: (22) The requested URL returned error: 404 ($url)" >&2; exit 22; }
+if [[ -n "$out" ]]; then cp "$src" "$out"; else cat "$src"; fi

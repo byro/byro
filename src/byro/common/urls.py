@@ -1,9 +1,17 @@
 from django.urls import path
 
-from .views import LogInfoView, LoginView, OIDCCallbackView, OIDCLoginView, logout_view
+from .views import (
+    HealthView,
+    LogInfoView,
+    LoginView,
+    OIDCCallbackView,
+    OIDCLoginView,
+    logout_view,
+)
 
 app_name = "common"
 urlpatterns = [
+    path("healthz", HealthView.as_view(), name="healthz"),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", logout_view, name="logout"),
     path("log/info", LogInfoView.as_view(), name="log.info"),

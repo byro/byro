@@ -8,7 +8,12 @@ from byro.common.signals import unauthenticated_urls
 
 
 class SettingsMiddleware:
-    ALLOWED_URLS = ("settings.registration", "settings.initial", "settings.plugins")
+    ALLOWED_URLS = (
+        "settings.registration",
+        "settings.initial",
+        "settings.plugins",
+        "healthz",
+    )
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -58,6 +63,7 @@ class PermissionMiddleware:
         "log.info",
         "oidc-login",
         "oidc-callback",
+        "healthz",
     )
 
     def __init__(self, get_response):

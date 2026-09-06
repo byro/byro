@@ -3,12 +3,15 @@ import urllib
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.http import Http404, HttpRequest, HttpResponseRedirect
+from django.db import connection
+from django.http import Http404, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
+from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 
 from byro.common.models import LogEntry
@@ -20,6 +23,25 @@ from byro.common.oidc import (
     is_oidc_configured,
     validate_id_token,
 )
+
+
+@method_decorator(never_cache, name="dispatch")
+class HealthView(View):
+    """Unauthenticated health probe for container orchestration and monitoring.
+
+    Answers ``200 {"status": "ok"}`` when the database connection works and
+    ``503`` otherwise. Deliberately exposes nothing else (no version, no
+    configuration). Listed in ``PermissionMiddleware.UNAUTHENTICATED_URLS``;
+    the host header check (``ALLOWED_HOSTS``) still applies, so callers must
+    send the configured site host.
+    """
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
+        try:
+            connection.ensure_connection()
+        except Exception:
+            return JsonResponse({"status": "error"}, status=503)
+        return JsonResponse({"status": "ok"})
 
 
 class LoginView(TemplateView):

@@ -97,6 +97,25 @@ installed it, e.g. through ``pip``. During development, install your plugin in
 editable mode with ``pip install -e .`` inside your plugin source directory to
 make it discoverable.
 
+Getting listed in the plugin catalog
+------------------------------------
+
+Administrators install plugins with ``byroctl plugin add <shortname>`` from a
+small catalog that ships with every byro release (see
+:doc:`/administrator/plugins`). To get your plugin listed:
+
+* publish regular GitHub releases (or releases on PyPI): byroctl installs the
+  current release and pins the commit its tag points to, so a plain tag is not
+  enough and a moved tag is treated as an integrity error;
+* declare the byro versions you support as a dependency, for example
+  ``dependencies = ["byro>=2026.3"]``, so that an incompatible combination
+  fails at build time instead of at runtime;
+* keep the ``AppConfig`` in ``apps.py`` (see the warning above) and ship your
+  translations as ``.po`` files; the image build compiles them;
+* open a pull request against ``deploy/plugin-catalog.conf`` in the byro
+  repository with your plugin's short name, display name, description, package
+  name, source and repository (maintainers: :doc:`/developer/releasing`).
+
 Signals
 -------
 

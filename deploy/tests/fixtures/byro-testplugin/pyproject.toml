@@ -1,0 +1,21 @@
+# Fixture plugin for the byroctl tests: the smallest plugin that exercises the
+# entry point, a migration, a translation and a static file. Not a real plugin.
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "byro-testplugin"
+version = "0.0.1"
+description = "byroctl test fixture plugin"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.entry-points."byro.plugin"]
+byro_testplugin = "byro_testplugin:ByroPluginMeta"
+
+[tool.setuptools.packages.find]
+include = ["byro_testplugin", "byro_testplugin.*"]
+
+[tool.setuptools.package-data]
+byro_testplugin = ["locale/*/LC_MESSAGES/*.po", "static/byro_testplugin/*"]
