@@ -93,6 +93,18 @@ scheme = "slate"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to system preference"
 
+[project.plugins.mkdocstrings]
+handlers.python.paths = ["src"]
+handlers.python.options.docstring_style = "sphinx"
+handlers.python.options.show_source = false
+handlers.python.options.show_root_heading = true
+handlers.python.options.show_root_full_path = true
+handlers.python.options.heading_level = 3
+handlers.python.options.members_order = "source"
+handlers.python.options.separate_signature = true
+handlers.python.options.show_signature_annotations = true
+handlers.python.options.docstring_section_style = "table"
+
 [project.markdown_extensions]
 admonition = {}
 attr_list = {}

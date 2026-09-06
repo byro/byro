@@ -69,3 +69,15 @@ tool: codespell's dictionary is English and flags ordinary German words.
   always build from the repository root.
 - Zensical is pinned exactly in `requirements-zensical.txt`. Upgrading it is a
   deliberate change: bump the pin, rebuild both languages, review the output.
+- The Python API reference (signals, the bank import errors) is generated
+  with [mkdocstrings](https://mkdocstrings.github.io/) using static analysis
+  (Griffe), not a Django import: no `DJANGO_SETTINGS_MODULE` is needed to
+  build the docs. mkdocstrings depends on the `mkdocs` package itself even
+  though Zensical does not use it; that transitive weight is accepted.
+  `byro.common` has no `__init__.py`, unlike every other byro app, which
+  blocks static analysis of `byro.common.signals`; that page documents those
+  three signals by hand instead (see the note on the page and the product
+  finding in the migration report).
+  Dataclass field comments (`#:` above a field) are not extracted by Griffe
+  either, so `ImportedBankTransaction`'s fields stay hand-written prose next
+  to a generated, member-less class block.

@@ -101,13 +101,18 @@ sie werden im Browser angezeigt.
 
 ## `ImportedBankTransaction`
 
-!!! info "Generierte Referenz"
-    Die Attribute und Docstrings von
-    `byro.bookkeeping.bank_import.ImportedBankTransaction` wurden in der
-    Sphinx-Dokumentation aus dem Quellcode erzeugt. Die generierte Referenz
-    wird mit mkdocstrings neu aufgesetzt (Doku-Arbeitspaket AP05); bis dahin
-    sind die Beschreibung unten und die Quelldatei
-    `src/byro/bookkeeping/bank_import/api.py` maßgeblich.
+::: byro.bookkeeping.bank_import.ImportedBankTransaction
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: []
+
+!!! note
+    Die Feldbeschreibungen unten sind von Hand gepflegt: Es sind
+    Dokumentationskommentare im Quellcode (`#:` über jedem Feld), eine
+    Konvention, die Griffe für Dataclass-Felder nicht ausliest; mkdocstrings
+    rendert oben deshalb nur die Klasse selbst. Prüfe
+    `src/byro/bookkeeping/bank_import/api.py`, wenn sich ein Feld ändert.
 
 `booking_date`
 :   Das Datum, an dem die Bank die Transaktion gebucht hat (Pflicht).
@@ -215,13 +220,20 @@ verschlucken.
 
 ## Fehler
 
-!!! info "Generierte Referenz"
-    Die Fehlerklassen von `byro.bookkeeping.bank_import.api`
-    (`BankTransactionImportError`, `UnknownImporter`, `InvalidImportFile`,
-    `ImporterError`, `InvalidBankTransaction`, `UnsupportedCurrency`) wurden
-    in der Sphinx-Dokumentation aus dem Quellcode erzeugt. Die generierte
-    Referenz wird mit mkdocstrings neu aufgesetzt (AP05); bis dahin siehe
-    `src/byro/bookkeeping/bank_import/api.py`.
+::: byro.bookkeeping.bank_import.api
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members:
+        - BankTransactionImportError
+        - UnknownImporter
+        - InvalidImportFile
+        - ImporterError
+        - InvalidBankTransaction
+        - UnsupportedCurrency
+
+`UnknownImporter` und `UnsupportedCurrency` haben keinen Klassen-Docstring im
+Quellcode; ihre `default_message` ist der nutzersichtbare Text.
 
 `str(error)` ist immer eine für Benutzer geeignete Meldung; technische Details
 gehen an den Logger `byro.bookkeeping.bank_import`. Der Kern loggt Beginn,

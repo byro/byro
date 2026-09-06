@@ -96,13 +96,18 @@ browser.
 
 ## `ImportedBankTransaction`
 
-!!! info "Generated reference"
-    The attributes and docstrings of
-    `byro.bookkeeping.bank_import.ImportedBankTransaction` were generated from
-    the source code in the Sphinx documentation. The generated reference is
-    being set up with mkdocstrings (documentation work package AP05); until
-    then the description below and the source file
-    `src/byro/bookkeeping/bank_import/api.py` are authoritative.
+::: byro.bookkeeping.bank_import.ImportedBankTransaction
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: []
+
+!!! note
+    The per-field descriptions below are maintained by hand: they are
+    documentation comments in the source (`#:` above each field), a
+    convention Griffe does not extract for dataclass fields, so mkdocstrings
+    only renders the class itself above. Check
+    `src/byro/bookkeeping/bank_import/api.py` when changing a field.
 
 `booking_date`
 :   The date the bank booked the transaction (required). `value_date` defaults
@@ -200,13 +205,20 @@ additional transaction is preferable to silently swallowing a payment.
 
 ## Errors
 
-!!! info "Generated reference"
-    The error classes of `byro.bookkeeping.bank_import.api`
-    (`BankTransactionImportError`, `UnknownImporter`, `InvalidImportFile`,
-    `ImporterError`, `InvalidBankTransaction`, `UnsupportedCurrency`) were
-    generated from the source code in the Sphinx documentation. The generated
-    reference is being set up with mkdocstrings (AP05); until then see
-    `src/byro/bookkeeping/bank_import/api.py`.
+::: byro.bookkeeping.bank_import.api
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members:
+        - BankTransactionImportError
+        - UnknownImporter
+        - InvalidImportFile
+        - ImporterError
+        - InvalidBankTransaction
+        - UnsupportedCurrency
+
+`UnknownImporter` and `UnsupportedCurrency` have no class docstring in the
+source; their `default_message` is the user-facing text.
 
 `str(error)` is always a message suitable for the user; technical details go to
 the `byro.bookkeeping.bank_import` logger. The core logs the start, completion
