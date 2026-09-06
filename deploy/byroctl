@@ -1923,6 +1923,29 @@ update_artifacts() {
     done
 }
 
+# safeguard_secret DEST: copy data/.secret into the safeguard. The file is 0600
+# and owned by the container user, so a byroctl that does not run as root
+# cannot read it directly; then it is read through the image, whose entrypoint
+# is bypassed and which therefore runs as root. Fails closed on every error
+# and only tolerates a missing file (byro has not started yet).
+safeguard_secret() {
+    local src="$BYRO_ROOT/data/.secret"
+    [[ -r "$BYRO_ROOT/data" && -x "$BYRO_ROOT/data" ]] \
+        || die "cannot look into $BYRO_ROOT/data; run byroctl as a user who can (or use --skip-safeguard)"
+    if [[ ! -e "$src" ]]; then
+        warn "data/.secret not found; nothing to copy"
+        return 0
+    fi
+    if [[ -r "$src" ]]; then
+        cp "$src" "$1" || die "cannot copy data/.secret into the safeguard"
+    else
+        compose run --rm -T --no-deps --entrypoint cat manage /var/byro/data/.secret >"$1" \
+            || { rm -f "$1"; die "cannot read data/.secret, neither directly nor through the image; not continuing without a complete safeguard (use --skip-safeguard to override)"; }
+        [[ -s "$1" ]] || die "data/.secret read through the image is empty; not continuing without a complete safeguard"
+    fi
+    chmod 600 "$1" || die "cannot protect $1"
+}
+
 # pre_update_safeguard CURRENT DIGEST TARGET [PREFIX] [SNAPSHOT]: dump + byro.conf
 # + plugins.txt + .secret + META in backups/PREFIX-CURRENT-<timestamp>/. With a
 # SNAPSHOT directory (plugin commands), byro.conf and plugins.txt are taken from
@@ -1963,18 +1986,15 @@ pre_update_safeguard() {
             pg_dump -h "$db_host" -p "$db_port" -U "$db_user" -Fc "$db_name" >"$dir/db.dump"
     fi
     [[ -s "$dir/db.dump" ]] || die "the database dump is empty; not continuing without a safeguard (use --skip-safeguard to override)"
-    cp "$conf_src" "$dir/byro.conf"
-    chmod 600 "$dir/byro.conf"
+    # this function runs inside $(...), where errexit is not inherited: every
+    # step checks itself so that an incomplete safeguard never passes silently
+    cp "$conf_src" "$dir/byro.conf" || die "cannot copy byro.conf into the safeguard $dir"
+    chmod 600 "$dir/byro.conf" || die "cannot protect $dir/byro.conf"
     if [[ -n "$plugins_src" ]]; then
-        cp "$plugins_src" "$dir/plugins.txt"
-        chmod 644 "$dir/plugins.txt"
+        cp "$plugins_src" "$dir/plugins.txt" || die "cannot copy plugins.txt into the safeguard $dir"
+        chmod 644 "$dir/plugins.txt" || die "cannot set the mode of $dir/plugins.txt"
     fi
-    if [[ -f "$BYRO_ROOT/data/.secret" ]]; then
-        cp "$BYRO_ROOT/data/.secret" "$dir/.secret"
-        chmod 600 "$dir/.secret"
-    else
-        warn "data/.secret not found; nothing to copy"
-    fi
+    safeguard_secret "$dir/.secret"
     {
         printf 'BYROCTL_KIND=%s\n' "$prefix"
         printf 'BYROCTL_PREVIOUS_VERSION=%s\n' "$current"

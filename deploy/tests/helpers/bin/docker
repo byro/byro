@@ -72,6 +72,11 @@ case "$1" in
             run)
                 if [[ "$*" == *"is_superuser=True"* ]]; then
                     [[ "${SHIM_SUPERUSER_EXISTS:-0}" == 1 ]] && exit 0 || exit 1
+                fi
+                # compose run --rm -T --no-deps --entrypoint cat manage /var/byro/data/.secret:
+                # the container runs as root and reads what the host user cannot
+                if [[ "$*" == *"/var/byro/data/.secret"* ]]; then
+                    printf '%s\n' "${SHIM_SECRET_IN_IMAGE:-the-secret-key}"
                 fi ;;
             exec)
                 if [[ "$*" == *"byro.__version__"* ]]; then echo "v9.9.9-shim"; fi

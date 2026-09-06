@@ -192,6 +192,7 @@ jobs:
       - style-black
       - style-djhtml
       - testing
+      - deploy-scripts
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
@@ -309,11 +310,9 @@ jobs:
           cache-to: type=gha,mode=max
           tags: byro-ci:smoke
           labels: ${{ steps.meta.outputs.labels }}
-      - name: 🔎 Lint deployment scripts
-        run: |
-          sudo apt-get update -q && sudo apt-get install -y -q shellcheck
-          shellcheck deploy/entrypoint.sh .github/scripts/*.sh
-          python3 -m py_compile deploy/healthcheck.py
+      - name: 🔎 healthcheck.py parses
+        # the shell scripts are linted in deploy-scripts, which this job depends on
+        run: python3 -m py_compile deploy/healthcheck.py
       - name: 🔎 Validate Compose files
         run: .github/scripts/validate-compose.sh
       - name: 🔎 Smoke test Docker image

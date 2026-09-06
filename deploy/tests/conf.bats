@@ -3,6 +3,7 @@
 # validation, password generation. No docker needed except for the round-trip
 # test, which is skipped when docker compose is unavailable.
 
+bats_require_minimum_version 1.5.0
 load helpers/common
 
 setup() {
@@ -97,22 +98,18 @@ services:
     environment:
       INTERPOLATED: ${PW}
 YML
+    compose_q() { docker compose --project-directory "$proj" --project-name byroctl-quoting "$@"; }
     for v in 'p$a${b}s' 'p#a #b' 'has space' "it's" 'a\b' 'say "hi"' 'mix$1 #c '"'"'q'"'"' "d" \z'; do
         conf_set PW "$v"
-        run docker compose --project-directory "$proj" --project-name byroctl-quoting config --format json
+        # what the container sees is what counts; "compose config" is not
+        # comparable across versions (newer ones print $ as $$ in its output)
+        run --separate-stderr compose_q run --rm -T --no-deps --quiet-pull t sh -c 'printf "%s\n%s\n" "$PW" "$INTERPOLATED"'
         [ "$status" -eq 0 ]
-        # both the interpolated and the env_file value must equal the input
-        printf '%s' "$output" >"$proj/config.json"
-        python3 - "$v" "$proj/config.json" <<'PY'
-import json, sys
-value = sys.argv[1]
-with open(sys.argv[2], encoding="utf-8") as f:
-    cfg = json.load(f)
-env = cfg["services"]["t"]["environment"]
-assert env["INTERPOLATED"] == value, (env["INTERPOLATED"], value)
-assert env["PW"] == value, (env["PW"], value)
-PY
+        # both the env_file and the interpolated value must equal the input
+        [ "${lines[0]}" = "$v" ]
+        [ "${lines[1]}" = "$v" ]
     done
+    compose_q down --remove-orphans >/dev/null 2>&1 || true
 }
 
 @test "gen_password yields 32 alphanumeric characters under pipefail" {

@@ -33,9 +33,15 @@ install_sh() { "$DEPLOY_DIR/install.sh" "$@"; }
 }
 
 @test "missing docker is reported" {
-    PATH="$(dirname "$(command -v bash)"):/usr/bin:/bin" run install_sh --dry-run
+    # a PATH that holds bash and curl but no docker, whatever the host has in
+    # /usr/bin (the GitHub runners keep docker there)
+    local bin; bin="$BATS_TEST_TMPDIR/nodocker-bin"
+    mkdir -p "$bin"
+    ln -s "$(command -v bash)" "$bin/bash"
+    ln -s "$SHIM_BIN/curl" "$bin/curl"
+    PATH="$bin" run install_sh --dry-run
     [ "$status" -ne 0 ]
-    [[ "$output" == *"docker not found"* ]] || [[ "$output" == *"curl is required"* ]]
+    [[ "$output" == *"docker not found"* ]]
 }
 
 @test "dry run resolves the stable version, checks the image and writes nothing" {

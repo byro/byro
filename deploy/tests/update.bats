@@ -192,6 +192,29 @@ update() { run byroctl --root "$BYRO_ROOT" update "$@"; }
     [[ "$output" == *"skipping the pre-update safeguard"* ]]
 }
 
+@test "an unreadable data/.secret is read through the image" {
+    [ "$(id -u)" -ne 0 ] || skip "root can read everything"
+    # owned by the container user and 0600 on a real installation; the host
+    # user cannot read it, the byro image (running as root) can
+    chmod 000 "$BYRO_ROOT/data/.secret"
+    export SHIM_SECRET_IN_IMAGE="from-the-image"
+    update --yes --non-interactive
+    [ "$status" -eq 0 ]
+    local dir; dir="$(ls -d "$BYRO_ROOT"/backups/pre-update-"$OLD"-*)"
+    [ "$(cat "$dir/.secret")" = "from-the-image" ]
+    [ "$(stat -c %a "$dir/.secret" 2>/dev/null || stat -f %Lp "$dir/.secret")" = "600" ]
+    grep -q -- "--entrypoint cat manage /var/byro/data/.secret" "$SHIM_LOG"
+}
+
+@test "a missing data/.secret is only a warning" {
+    rm -f "$BYRO_ROOT/data/.secret"
+    update --yes --non-interactive
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"data/.secret not found"* ]]
+    local dir; dir="$(ls -d "$BYRO_ROOT"/backups/pre-update-"$OLD"-*)"
+    [ ! -e "$dir/.secret" ]
+}
+
 @test "a tampered byroctl of the target release aborts before anything changes" {
     printf '\n# tampered\n' >>"$SHIM_RAW/$NEW/deploy/byroctl"
     before="$(cat "$BYRO_ROOT/byro.conf")"
