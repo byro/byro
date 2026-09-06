@@ -40,16 +40,32 @@ check() {
 }
 compose_id() { (cd "$root" && docker compose ps -q "$1"); }
 
+# Run COMMAND... as root inside the test image with the root directory bind
+# mounted at /mnt. The containers write data/ (byro user) and db/ (postgres
+# user) with their own ids, so the host user can neither read nor remove those
+# files directly. The image's entrypoint is bypassed; it would drop privileges.
+in_root_container() {
+    docker run --rm --entrypoint "$1" -v "$root:/mnt" "$repo:$tag" "${@:2}"
+}
+
 cleanup() {
     if [[ -f "$root/byro.conf" ]]; then
         (cd "$root" && docker compose down -v --remove-orphans >/dev/null 2>&1) || true
     fi
-    rm -rf "$root"
+    if [[ -d "$root" ]]; then
+        # hand the tree back to us before removing it; best effort, a leftover
+        # directory must not turn a passed run into a failed one
+        in_root_container chown -R "$(id -u):$(id -g)" /mnt >/dev/null 2>&1 || true
+        rm -rf "$root" || true
+    fi
     docker rmi "$repo:${tag}2" "$plugin_image:$tag" "$plugin_image:${tag}2" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
-rm -rf "$root"
+if [[ -d "$root" ]]; then
+    in_root_container chown -R "$(id -u):$(id -g)" /mnt >/dev/null 2>&1 || true
+    rm -rf "$root"
+fi
 # a local plugin checkout inside the build context, referenced as ./testplugin
 mkdir -p "$root/plugins"
 cp -R "$fixture" "$root/plugins/testplugin"
@@ -177,8 +193,14 @@ code="$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: localhost' "http://$htt
 check "GET /login/ -> 200 after the failed add (got $code)" [ "$code" = 200 ]
 
 echo "--- secrets"
-not_in_tree() { ! grep -rq -- "$1" "$2"; }
-check "admin password not stored in root" not_in_tree "$BYROCTL_ADMIN_PASSWORD" "$root"
+# grep as root in a container so .secret and db/ are actually read; only a
+# clean "no match" (exit 1) passes, an unreadable file (exit 2) fails the check
+not_in_tree() {
+    local rc=0
+    in_root_container grep -rq -- "$1" /mnt || rc=$?
+    [[ "$rc" -eq 1 ]]
+}
+check "admin password not stored in root" not_in_tree "$BYROCTL_ADMIN_PASSWORD"
 
 if (( failures > 0 )); then
     printf '\n%d check(s) failed\n' "$failures" >&2
