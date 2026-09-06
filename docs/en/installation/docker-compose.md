@@ -61,6 +61,50 @@ All values come from one file, `byro.conf`, which Docker Compose reads as
 --8<-- "deploy/byro.conf.example"
 ```
 
+The `BYRO_DEPLOY_*` variables in it control the deployment, not byro itself
+(byro only reads the `BYRO_*` variables without `DEPLOY`):
+
+* `COMPOSE_PROJECT_NAME` - Compose project name, among other things it names
+  the plugin image (`<name>-plugins:<version>`).
+* `BYRO_DEPLOY_VERSION` / `BYRO_DEPLOY_IMAGE_DIGEST` - installed release tag
+  and the image digest pinned to it.
+* `BYRO_DEPLOY_IMAGE_REPO` - alternative image registry, for example a
+  registry mirror, default `ghcr.io/byro/byro`.
+* `BYRO_DEPLOY_POSTGRES_MAJOR` - major version of the built-in PostgreSQL.
+  Never change it on an existing installation without migrating the data
+  separately.
+* `BYRO_DEPLOY_BIND` / `BYRO_DEPLOY_PORT` - where the web service listens on
+  the host (default `127.0.0.1:8345`, behind a reverse proxy).
+* `BYRO_DEPLOY_WEB_WORKERS` - number of gunicorn workers (default 4).
+* `BYRO_DEPLOY_PERIODIC_INTERVAL` - seconds between two runs of the periodic
+  tasks (default 600).
+* `BYRO_DEPLOY_CHANNEL` - release channel used by byroctl.
+
+## How the container starts
+
+The container starts as root, remaps `BYRO_UID`/`BYRO_GID` if requested
+(fixed ids that must not already be taken), and fixes the ownership of the
+data directory, then drops privileges and runs as an unprivileged user from
+then on. The image also carries a compatibility account `uid1000` for the
+deprecated `production/` setup (see [Legacy setup](legacy-production.md)),
+which this entrypoint never uses itself: if `BYRO_UID`/`BYRO_GID` claim
+exactly that id, the entrypoint frees it instead of aborting with an id
+conflict. After that:
+
+* `web` waits for the database, applies migrations (unless
+  `BYRO_AUTO_MIGRATE=false`) and starts gunicorn on port 8345.
+* `periodic` waits until `web` is healthy, then calls `runperiodic` every
+  `BYRO_DEPLOY_PERIODIC_INTERVAL` seconds (PGP refresh, expiry reminders,
+  cleaning up unfinished MFA enrollments).
+* `manage` runs a single management command and then exits (see
+  [Management commands](../administration/management-commands.md)).
+
+The container health check queries `/healthz` on the web service, which
+answers unauthenticated with `200 {"status": "ok"}` when the database
+connection works, `503` otherwise; `byroctl start`/`update` wait for it. More
+on this in
+[Monitoring, logging and troubleshooting](../administration/troubleshooting.md).
+
 ## Set up
 
 Create a directory, download the files of the release you want (replace the
@@ -68,7 +112,7 @@ tag), and link the configuration as `.env`:
 
 ```console
 $ sudo mkdir -p /opt/byro && sudo chown "$(id -u):$(id -g)" /opt/byro && cd /opt/byro
-$ T=v2026.3.0
+$ T=v2026.3.1   # replace with the release you want, see github.com/byro/byro/releases
 $ R="https://raw.githubusercontent.com/byro/byro/$T/deploy"
 $ curl -fsSLO "$R/docker-compose.yml"
 $ mkdir -p compose && curl -fsSL -o compose/postgres.yml "$R/compose/postgres.yml"
@@ -78,7 +122,7 @@ $ curl -fsSL -o byro.conf "$R/byro.conf.example" && chmod 600 byro.conf && ln -s
 
 Edit `byro.conf`:
 
-* `BYRO_DEPLOY_VERSION`: the tag you downloaded, e.g. `v2026.3.0`. The image
+* `BYRO_DEPLOY_VERSION`: the tag you downloaded, e.g. `v2026.3.1`. The image
   `ghcr.io/byro/byro:<tag>` is pulled from GitHub's container registry.
 * `COMPOSE_FILE`: `docker-compose.yml:compose/postgres.yml` for the built-in
   database, append `:compose/caddy.yml` for Caddy. For an external database
@@ -170,13 +214,18 @@ directory:
     $ docker compose up -d
     ```
 
-Downgrades are not supported: restore the dump and the previous files instead.
+[Downgrades are not supported](../administration/updating.md#downgrade-limits):
+restore the dump and the previous files instead (see
+[Restore](../administration/backup-restore.md#restore)).
 
 ## Backups
 
 Back up `data/` (documents, uploads, keys and `.secret`), the database (`db/`
 while stopped, or a `pg_dump`) and `byro.conf`. Losing `data/.secret`
 invalidates all sessions and MFA devices.
+
+Restoring from this backup, and moving to a new host, are described in
+[Backup and restore](../administration/backup-restore.md).
 
 ## Custom Compose settings
 

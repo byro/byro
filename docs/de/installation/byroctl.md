@@ -57,8 +57,11 @@ Release, prüft es und startet die Installation:
 $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)"
 ```
 
-Hänge `-- --root /pfad` an, um woanders zu installieren, oder `-- --dry-run`,
-um zu sehen, was das Skript tun würde, ohne etwas zu ändern.
+Hänge `-- --root /pfad` an, um woanders zu installieren, `-- --dry-run`, um zu
+sehen, was das Skript tun würde, ohne etwas zu ändern, `-- --version vYYYY.M.P`,
+um statt des aktuellen stabilen Release eine bestimmte Version zu installieren,
+oder `-- --no-symlink`, wenn `byroctl` nicht nach `/usr/local/bin` oder
+`~/.local/bin` verlinkt werden soll.
 
 Der Installer stellt ein paar Fragen, jede mit einem sinnvollen Standard:
 
@@ -103,6 +106,9 @@ $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/insta
 pip-Requirement verwenden stattdessen `--plugin`, einmal je Plugin:
 `--plugin 'byro-x==1.2.0'`. Passwörter für eine externe Datenbank oder ein
 SMTP-Konto kommen aus `BYROCTL_DB_PASSWORD` und `BYROCTL_MAIL_PASSWORD`.
+`--skip-superuser` legt kein Administratorkonto an (lege es später mit
+`byroctl manage createsuperuser` an); `--no-pull` verwendet ein bereits lokal
+vorhandenes Image, statt es zu laden (nur für Entwicklung sinnvoll).
 `byroctl install --help` listet alle Optionen.
 
 Bleibt die Installation auf halbem Weg stehen, etwa weil die E-Mail-Adresse
@@ -172,13 +178,37 @@ Anführungszeichen, und ein `#` nach einem Leerzeichen beginnt einen Kommentar.
 $ byroctl start                  Stack starten und warten, bis byro gesund ist
 $ byroctl stop                   Container stoppen, alle Daten behalten
 $ byroctl restart                byro-Dienste neu erstellen (nicht die Datenbank)
-$ byroctl logs [-f] [web]        Logs anzeigen (oder verfolgen)
-$ byroctl manage <befehl>        einen byro-Management-Befehl ausführen, z. B. createsuperuser
+$ byroctl logs [-f] [web db …]   Logs eines oder mehrerer Dienste anzeigen (oder verfolgen)
+$ byroctl manage <befehl>        einen byro-Management-Befehl ausführen, siehe unten
 $ byroctl plugin list|add|remove|update|rebuild   Plugins verwalten (siehe unten)
 $ byroctl version                installiertes Release, Image-Digest, laufende Version, Plugins
+$ byroctl self-update            byroctl für das installierte Release neu laden (Reparatur)
 ```
 
-Plugins haben eine eigene Seite: [Plugins](../administration/plugins.md).
+Plugins haben eine eigene Seite: [Plugins](../administration/plugins.md);
+alle Management-Befehle stehen unter
+[Management-Befehle](../administration/management-commands.md).
+
+### Umgebungsvariablen
+
+Diese Variablen wirken auf byroctl und `install.sh` selbst, nicht auf byro
+(das über `byro.conf` konfiguriert wird), und sind für den Normalbetrieb nicht
+nötig:
+
+* `BYRO_ROOT` – Installationsverzeichnis, alternativ zu `byroctl --root DIR`.
+* `BYROCTL_WEB_HEALTH_TIMEOUT` – Sekunden, die `start`/`update`/`config set
+  --apply` maximal auf einen gesunden Web-Dienst warten (Standard 180).
+* `BYROCTL_OIDC_CLIENT_SECRET` – OIDC-Client-Secret für `byroctl install`,
+  falls du OIDC-Login direkt bei der Installation setzt (siehe
+  [Konfiguration](../configuration/index.md)).
+* `BYROCTL_RAW_BASE`, `BYROCTL_SOURCE_DIR` – abweichende Quelle für
+  Deployment-Dateien und byroctl selbst (Registry-Mirror bzw. lokaler
+  `deploy/`-Checkout); nur für Entwicklung und Tests, nicht für den
+  Produktivbetrieb gedacht.
+* `BYROCTL_STABLE_URL`, `BYROCTL_STABLE_FILE` – wirken nur auf `install.sh`
+  und ersetzen die URL bzw. die lokale Datei, aus der es das aktuelle stabile
+  Release ermittelt (Standard: `$BYROCTL_RAW_BASE/stable/stable.env`); auch
+  das nur für Entwicklung und Tests.
 
 ## Updates
 
@@ -207,11 +237,25 @@ Ist ein Release als breaking markiert, bittet byroctl dich, die Release Notes
 zu lesen und zu bestätigen (`--yes`). Ändert ein Release Dateien in `data/`,
 verweigert byroctl den Fortgang, bis du mit `--data-safeguard-done`
 bestätigst, dass du ein vollständiges Backup dieses Verzeichnisses hast.
-Downgrades werden nicht unterstützt.
+[Downgrades werden nicht unterstützt](../administration/updating.md#downgrade-grenzen).
 
 Schlägt eine Migration fehl, bleiben die byro-Dienste gestoppt und byroctl gibt
 den Weg zurück zum vorherigen Release aus, inklusive des Speicherorts der
 Sicherheitskopie.
+
+Weitere Optionen von `byroctl update`:
+
+* `--check` meldet nur, ob ein Update verfügbar ist, ändert nichts. Endet mit
+  Exit-Code 0, wenn ein Update ansteht, mit 3, wenn bereits die aktuelle
+  Version läuft – nützlich für Skripte und Monitoring.
+* `--to TAG` aktualisiert auf ein bestimmtes Release statt auf das aktuelle
+  stabile.
+* `--prefetch` lädt nur das Ziel-Image herunter, ändert sonst nichts.
+* `--skip-safeguard` überspringt die Pre-Update-Sicherheitskopie (nicht
+  empfohlen).
+* `--non-interactive` fragt nie nach; zusammen mit `--yes` (und
+  `--data-safeguard-done`, falls nötig) für unbeaufsichtigte Updates.
+* `--no-pull` verwendet das lokal vorhandene Ziel-Image (nur für Entwicklung).
 
 !!! note
     Die Pre-Update-Sicherheitskopie ist **kein Backup**. Sie enthält die
@@ -232,6 +276,10 @@ einem konsistenten Datenbank-Dump:
     ```
 
 * `byro.conf` – sie enthält deine Passwörter, halte die Kopie geheim.
+
+Eine Wiederherstellung aus diesem Backup sowie der Umzug auf einen neuen Host
+sind unter [Backup und Restore](../administration/backup-restore.md)
+beschrieben.
 
 ## Reverse Proxy
 
@@ -258,3 +306,6 @@ wenn byro direkt erreichbar ist, weil Clients den Header fälschen könnten.
   `BYRO_DEPLOY_PORT`.
 * `byroctl self-update` lädt byroctl für das installierte Release neu, falls
   das Skript beschädigt wurde.
+
+Health-Checks, Log-Speicherorte und weitere Fehlerbilder stehen unter
+[Monitoring, Logging und Fehlersuche](../administration/troubleshooting.md).

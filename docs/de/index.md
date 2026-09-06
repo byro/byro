@@ -11,10 +11,38 @@ anpassen lässt.
 byro ist stabil und in mehreren Communities im Einsatz. Es wird aktiv
 weiterentwickelt.
 
+byro ist (noch) keine vollständige Buchhaltungssoftware und kein
+Veranstaltungs- oder Ticketing-Tool; es bringt auch keine gehostete
+Standardinstanz mit, die du ohne eigenen Server nutzen könntest – byro wird
+selbst betrieben (siehe [Installation](installation/index.md)) oder von
+jemandem in deiner Organisation oder deinem Umfeld für dich betrieben.
+
+## Wie du hier anfängst
+
+**Dein Verein hat bereits ein laufendes byro** und du sollst es benutzen, zum
+Beispiel als Vorstand oder Kassenwart: Ein Administrator oder eine
+Administratorin bei dir hat den Zugang eingerichtet; die [Benutzung](usage/index.md)
+beschreibt die tägliche Arbeit mit Mitgliedern, Beiträgen und Finanzen (dieser
+Bereich entsteht gerade). Fragen zu Login, Zwei-Faktor-Anmeldung oder Rechten
+beantwortet zunächst deine Administration, technische Hintergründe stehen unter
+[Administration](administration/index.md).
+
+**Du richtest byro für eine Organisation neu ein**, als technisch versierter
+Administrator oder Administratorin: Beginne bei
+[Installation](installation/index.md), das die drei unterstützten Wege
+(byroctl, Docker Compose, Bare Metal) und die Entscheidung dazwischen erklärt.
+[Konfiguration](configuration/index.md) ist die Referenz aller
+Einstellungen, [Administration](administration/index.md) beschreibt Update,
+Backup, Plugins und laufenden Betrieb.
+
+**Du willst byro erweitern oder daran mitarbeiten**: Start ist
+[Entwicklung & API](development/index.md).
+
 - [Installation](installation/index.md): byro auf dem eigenen Server betreiben,
   mit byroctl, Docker Compose oder Bare Metal.
-- [Administration](administration/index.md): MFA, PGP und Plugins in einer
-  laufenden Installation.
+- [Administration](administration/index.md): MFA, PGP, Plugins, Update, Backup
+  und Restore, sowie Monitoring und Fehlersuche in einer laufenden
+  Installation.
 - [Konfiguration](configuration/index.md): Referenz aller
   Konfigurationsoptionen.
 - [Benutzung](usage/index.md): die tägliche Arbeit mit byro (entsteht).
@@ -32,10 +60,11 @@ die dir fehlen!
   anlegen und ändern.
 - **Eigene Mitgliedsdaten:** Zusätzliche Daten über ein Plugin erfassen. Es gibt
   viele Beispiel-Plugins und eine Entwicklerdokumentation.
-- **Zahlungsdaten importieren:** Eingebaute Unterstützung für CSV-Importe.
-  <!-- migration note (AP01 GAPS A1): der Core hat keinen CSV-Importer; Importe kommen aus Plugins. Wird in AP07/AP10 neu geschrieben. -->
-- **Zahlungen importieren und zuordnen:** Zuordnung zu Mitgliedern über
-  eigene Verfahren, die Plugins beisteuern.
+- **Zahlungen importieren und zuordnen:** Bankdaten kommen über ein Plugin
+  hinein (der Core selbst bringt keinen Importer mit); das offizielle Plugin
+  [`finance-import-bank-files`](administration/plugins.md) unterstützt
+  CAMT.053. Die Zuordnung zu Mitgliedern läuft über eigene Verfahren, die
+  Plugins beisteuern.
 - **Mails versenden:** Alle Mails können vor dem Versand geprüft werden. Die
   Standardvorlagen lassen sich bearbeiten und erweitern.
 - **Mitgliedssalden einsehen:** Jede einzelne Transaktion ist jederzeit

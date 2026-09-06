@@ -61,6 +61,50 @@ zur Interpolation liest und den Containern als `env_file` übergibt:
 --8<-- "deploy/byro.conf.example"
 ```
 
+Die `BYRO_DEPLOY_*`-Variablen darin steuern das Deployment, nicht byro selbst
+(byro liest nur die `BYRO_*`-Variablen ohne `DEPLOY`):
+
+* `COMPOSE_PROJECT_NAME` – Compose-Projektname, bestimmt u. a. den Namen des
+  Plugin-Images (`<name>-plugins:<version>`).
+* `BYRO_DEPLOY_VERSION` / `BYRO_DEPLOY_IMAGE_DIGEST` – installierter
+  Release-Tag und der dazu gepinnte Image-Digest.
+* `BYRO_DEPLOY_IMAGE_REPO` – abweichende Image-Registry, zum Beispiel ein
+  Registry-Mirror, Standard `ghcr.io/byro/byro`.
+* `BYRO_DEPLOY_POSTGRES_MAJOR` – Major-Version der eingebauten PostgreSQL.
+  Ändere sie nie bei einer bestehenden Installation, ohne die Daten separat zu
+  migrieren.
+* `BYRO_DEPLOY_BIND` / `BYRO_DEPLOY_PORT` – wo der Web-Dienst auf dem Host
+  lauscht (Standard `127.0.0.1:8345`, hinter einem Reverse Proxy).
+* `BYRO_DEPLOY_WEB_WORKERS` – Anzahl gunicorn-Worker (Standard 4).
+* `BYRO_DEPLOY_PERIODIC_INTERVAL` – Sekunden zwischen zwei Läufen der
+  periodischen Aufgaben (Standard 600).
+* `BYRO_DEPLOY_CHANNEL` – von byroctl verwendeter Release-Kanal.
+
+## Wie der Container startet
+
+Der Container startet als root, remappt bei Bedarf `BYRO_UID`/`BYRO_GID` (fest
+verdrahtete IDs, die nicht bereits vergeben sein dürfen) und passt die
+Eigentümerschaft des Datenverzeichnisses an, dann legt er die Rechte ab und
+läuft ab dort als unprivilegierter Benutzer. Das Image enthält außerdem ein
+Kompatibilitätskonto `uid1000` für das veraltete `production/`-Setup (siehe
+[Legacy-Setup](legacy-production.md)), das dieser Entrypoint nie verwendet:
+verlangen `BYRO_UID`/`BYRO_GID` genau diese ID, gibt der Entrypoint sie frei,
+statt mit einem ID-Konflikt abzubrechen. Danach:
+
+* `web` wartet auf die Datenbank, führt Migrationen aus (außer
+  `BYRO_AUTO_MIGRATE=false`) und startet gunicorn auf Port 8345.
+* `periodic` wartet, bis `web` gesund ist, und ruft dann alle
+  `BYRO_DEPLOY_PERIODIC_INTERVAL` Sekunden `runperiodic` auf (PGP-Refresh,
+  Ablauferinnerungen, Aufräumen unvollendeter MFA-Einrichtungen).
+* `manage` führt einen einzelnen Management-Befehl aus und beendet sich danach
+  (siehe [Management-Befehle](../administration/management-commands.md)).
+
+Der Container-Healthcheck fragt `/healthz` beim Web-Dienst ab, das
+unauthentifiziert `200 {"status": "ok"}` liefert, wenn die
+Datenbankverbindung funktioniert, sonst `503`; `byroctl start`/`update` warten
+darauf. Mehr dazu unter
+[Monitoring, Logging und Fehlersuche](../administration/troubleshooting.md).
+
 ## Einrichtung
 
 Lege ein Verzeichnis an, lade die Dateien des gewünschten Release (Tag
@@ -68,7 +112,7 @@ ersetzen) und verlinke die Konfiguration als `.env`:
 
 ```console
 $ sudo mkdir -p /opt/byro && sudo chown "$(id -u):$(id -g)" /opt/byro && cd /opt/byro
-$ T=v2026.3.0
+$ T=v2026.3.1   # das gewünschte Release ersetzen, siehe github.com/byro/byro/releases
 $ R="https://raw.githubusercontent.com/byro/byro/$T/deploy"
 $ curl -fsSLO "$R/docker-compose.yml"
 $ mkdir -p compose && curl -fsSL -o compose/postgres.yml "$R/compose/postgres.yml"
@@ -78,7 +122,7 @@ $ curl -fsSL -o byro.conf "$R/byro.conf.example" && chmod 600 byro.conf && ln -s
 
 Bearbeite `byro.conf`:
 
-* `BYRO_DEPLOY_VERSION`: der geladene Tag, z. B. `v2026.3.0`. Das Image
+* `BYRO_DEPLOY_VERSION`: der geladene Tag, z. B. `v2026.3.1`. Das Image
   `ghcr.io/byro/byro:<tag>` wird aus GitHubs Container-Registry geladen.
 * `COMPOSE_FILE`: `docker-compose.yml:compose/postgres.yml` für die eingebaute
   Datenbank, für Caddy `:compose/caddy.yml` anhängen. Für eine externe
@@ -171,14 +215,19 @@ Installationsverzeichnis:
     $ docker compose up -d
     ```
 
-Downgrades werden nicht unterstützt: Spiele stattdessen den Dump und die
-vorherigen Dateien zurück.
+[Downgrades werden nicht unterstützt](../administration/updating.md#downgrade-grenzen):
+Spiele stattdessen den Dump und die vorherigen Dateien zurück (siehe
+[Restore](../administration/backup-restore.md#restore)).
 
 ## Backups
 
 Sichere `data/` (Dokumente, Uploads, Schlüssel und `.secret`), die Datenbank
 (`db/` bei gestopptem Stack, oder ein `pg_dump`) und `byro.conf`. Der Verlust
 von `data/.secret` macht alle Sitzungen und MFA-Geräte ungültig.
+
+Eine Wiederherstellung aus diesem Backup sowie der Umzug auf einen neuen Host
+sind unter [Backup und Restore](../administration/backup-restore.md)
+beschrieben.
 
 ## Eigene Compose-Einstellungen
 

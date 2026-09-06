@@ -15,11 +15,11 @@ see these links for external installation guides):
   `pip3 -V` to check.
 * An SMTP server to send out mails
 * An HTTP reverse proxy, e.g. nginx or Apache to allow HTTPS connections
-* A database server: MySQL 5.7+ or MariaDB 10.2+ or PostgreSQL 9.6+. You can
-  use SQLite, but we strongly recommend not to run SQLite in production. Given
-  the choice, we'd recommend to use PostgreSQL.
-
-<!-- migration note (AP01 GAPS A6): the database minimum versions above predate Django 5.2 and are rewritten in AP07. -->
+* A database server: PostgreSQL 14+, MariaDB 10.5+ or MySQL 8.0.11+ (the
+  minimum versions supported by Django 5.2; byro's CI tests against
+  PostgreSQL 14 and MariaDB 10.7). You can use SQLite, but we strongly
+  recommend not to run SQLite in production. Given the choice, we'd recommend
+  to use PostgreSQL.
 
 We also recommend that you use a firewall, although this is not a byro-specific
 recommendation. If you're new to Linux and firewalls, we recommend that you
@@ -301,6 +301,8 @@ To upgrade byro, please first read through the
 update notes. Also, make sure you have a current backup of the database, of
 `/var/byro/data` (it contains the secret key file `.secret`, whose loss
 invalidates all sessions and MFA devices) and of your configuration.
+Restoring from such a backup, and moving to a new host, are described in
+[Backup and restore](../administration/backup-restore.md).
 
 Next, please execute the following commands in the same environment (probably
 your virtualenv) to first update the byro source, then update the database if

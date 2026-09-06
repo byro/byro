@@ -181,11 +181,13 @@ der Befehl sagt dir, wenn das nicht der Fall ist.
 - **TOTP-Geheimnisse werden verschlüsselt gespeichert.** Der
   Verschlüsselungsschlüssel wird aus Djangos `SECRET_KEY` abgeleitet (siehe
   [Konfiguration](../configuration/index.md)). Halte den Secret Key stabil und
-  sichere ihn zusammen mit der Datenbank: Geht er verloren, kann kein Benutzer
-  mehr den MFA-Schritt bestehen, und jedes Konto muss mit `mfa_reset`
-  zurückgesetzt werden. Beim Rotieren des Schlüssels trage den vorherigen in
-  `SECRET_KEY_FALLBACKS` ein, damit bestehende Geräte weiter funktionieren.
-  <!-- migration note (AP01 GAPS A12): byro bietet keine Konfigurationsoption für SECRET_KEY_FALLBACKS; wird in AP08 neu geschrieben. -->
+  sichere ihn zusammen mit der Datenbank (siehe
+  [Backup und Restore](backup-restore.md)): Geht er verloren, kann kein
+  Benutzer mehr den MFA-Schritt bestehen, und jedes Konto muss mit `mfa_reset`
+  zurückgesetzt werden. byro bietet **keine Konfigurationsoption, um einen
+  vorherigen Secret Key als Fallback anzugeben**; ein Wechsel des Secret Keys
+  ist also gleichbedeutend mit dem Verlust aller bestehenden Sitzungen und
+  MFA-Geräte, nicht mit einer nahtlosen Rotation.
 - **Wiederherstellungscodes werden als Passwort-Hashes gespeichert** und sind
   nur einmal verwendbar.
 - **Brute-Force-Schutz:** Nach jedem falschen Code wird die MFA des Kontos für

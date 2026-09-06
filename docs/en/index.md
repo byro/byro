@@ -10,10 +10,35 @@ in different situations and countries.
 byro is stable and in active use in several communities. It is currently under
 active development.
 
+byro is not (yet) a complete bookkeeping tool and not an event or ticketing
+tool; it also does not come with a hosted default instance you could use
+without your own server – byro is either self-hosted (see
+[Installation](installation/index.md)) or run for you by someone in your
+organization or community.
+
+## Where to start
+
+**Your association already has a running byro** and you are meant to use it,
+for example as a board member or treasurer: an administrator on your side has
+set up your access; [Usage](usage/index.md) describes day-to-day work with
+members, fees and finances (this section is being written). Ask your
+administration about login, two-factor sign-in or permissions; technical
+background is in [Administration](administration/index.md).
+
+**You are setting up byro for an organization**, as a technically minded
+administrator: start at [Installation](installation/index.md), which explains
+the three supported paths (byroctl, Docker Compose, bare metal) and how to
+choose between them. [Configuration](configuration/index.md) is the reference
+of all settings, [Administration](administration/index.md) covers updating,
+backup, plugins and day-to-day operation.
+
+**You want to extend byro or contribute to it**: start at
+[Development & API](development/index.md).
+
 - [Installation](installation/index.md): run byro on your own server with
   byroctl, Docker Compose or bare metal.
-- [Administration](administration/index.md): MFA, PGP and plugins in a running
-  instance.
+- [Administration](administration/index.md): MFA, PGP, plugins, updating,
+  backup and restore, and monitoring and troubleshooting a running instance.
 - [Configuration](configuration/index.md): reference of all configuration
   options.
 - [Usage](usage/index.md): day-to-day work with byro (being written).
@@ -31,9 +56,10 @@ are missing!
 - **Add custom member data:** Track non-standard member data by adding a plugin
   to byro. There are plenty of example plugins and developer documentation to
   help you.
-- **Import payment data:** Inbuilt support for CSV imports.
-  <!-- migration note (AP01 GAPS A1): the core has no CSV importer; imports come from plugins. Rewritten in AP07/AP10. -->
-- **Import and match payment data** to members via custom methods, added by
+- **Import and match payment data** to members: bank data comes in through a
+  plugin (the core itself ships no importer); the official
+  [`finance-import-bank-files`](administration/plugins.md) plugin supports
+  CAMT.053. Matching to members runs through custom methods contributed by
   plugins.
 - **Send mails:** All mails can be reviewed before they are sent out. You can
   also edit the default mail templates and add new ones.

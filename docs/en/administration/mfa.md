@@ -172,11 +172,12 @@ command tells you if that is not the case.
 
 - **TOTP secrets are stored encrypted.** The encryption key is derived from
   Django's `SECRET_KEY` (see [Configuration](../configuration/index.md)). Keep
-  the secret key stable and back it up together with the database: if it is
-  lost, no user can pass the MFA step any more and every account has to be
-  reset with `mfa_reset`. When rotating the key, list the previous key in
-  `SECRET_KEY_FALLBACKS` so existing devices keep working.
-  <!-- migration note (AP01 GAPS A12): byro offers no configuration option for SECRET_KEY_FALLBACKS; rewritten in AP08. -->
+  the secret key stable and back it up together with the database (see
+  [Backup and restore](backup-restore.md)): if it is lost, no user can pass
+  the MFA step any more and every account has to be reset with `mfa_reset`.
+  byro offers **no configuration option to list a previous secret key as a
+  fallback**; changing the secret key is therefore equivalent to losing all
+  existing sessions and MFA devices, not a seamless rotation.
 - **Recovery codes are stored as password hashes** and are single use.
 - **Brute force protection:** after every failed code, the account's MFA is
   locked for an exponentially growing time (1, 2, 4, 8, … seconds), for

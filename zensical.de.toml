@@ -17,7 +17,7 @@ use_directory_urls = true
 strict = true
 
 nav = [
-  { "Start" = "index.md" },
+  { "Erste Schritte" = "index.md" },
   { "Installation" = [
     "installation/index.md",
     { "Mit byroctl (empfohlen)" = "installation/byroctl.md" },
@@ -30,6 +30,11 @@ nav = [
     { "Mehr-Faktor-Authentifizierung" = "administration/mfa.md" },
     { "PGP-Mailverschlüsselung" = "administration/pgp.md" },
     { "Plugins" = "administration/plugins.md" },
+    { "Update" = "administration/updating.md" },
+    { "Backup und Restore" = "administration/backup-restore.md" },
+    { "Management-Befehle" = "administration/management-commands.md" },
+    { "Monitoring, Logging und Fehlersuche" = "administration/troubleshooting.md" },
+    { "Sicherheits-Baseline" = "administration/security-baseline.md" },
   ] },
   { "Konfiguration" = "configuration/index.md" },
   { "Benutzung" = "usage/index.md" },

@@ -224,9 +224,9 @@ so aus:
 
 - Standardsprache des Systems.
 - **Umgebungsvariable:** `BYRO_LANGUAGE_CODE`
-- **Standard:** `'de'`
-
-<!-- migration note (AP01 GAPS A2): der Standard im Code ist 'en'; wird in AP07 korrigiert. -->
+- **Standard:** `'en'`. Setze sie explizit auf `de`, wenn deine Mitglieder
+  Deutsch erwarten; die Container-Installationen tun das bereits in ihrer
+  mitgelieferten `byro.conf.example`.
 
 ### `time_zone`
 

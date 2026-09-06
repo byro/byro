@@ -225,9 +225,9 @@ this:
 
 - The system's default locale.
 - **Environment variable:** `BYRO_LANGUAGE_CODE`
-- **Default:** `'de'`
-
-<!-- migration note (AP01 GAPS A2): the code's default is 'en'; corrected in AP07. -->
+- **Default:** `'en'`. Set it explicitly to `de` if your members expect
+  German; the container installations already do this in their bundled
+  `byro.conf.example`.
 
 ### `time_zone`
 
