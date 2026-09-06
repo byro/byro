@@ -1,0 +1,14 @@
+# Documentation build (Zensical). Exact pins: Zensical is pre-1.0 and releases
+# weekly, so every upgrade is a deliberate change. Regenerate with
+#   python -m venv /tmp/zv && /tmp/zv/bin/pip install zensical==<version> && /tmp/zv/bin/pip freeze
+# The Sphinx toolchain in docs/requirements.txt stays until the migration is complete.
+click==8.5.0
+deepmerge==3.0.1
+Jinja2==3.1.6
+Markdown==3.10.3
+MarkupSafe==3.0.3
+Pygments==2.21.0
+pymdown-extensions==11.0.2
+PyYAML==6.0.3
+tomli==2.4.1
+zensical==0.0.59

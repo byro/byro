@@ -1,0 +1,3 @@
+# Words codespell must not flag in the English documentation (one per line, lower case).
+byro
+byroctl
