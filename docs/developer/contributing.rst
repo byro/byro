@@ -38,7 +38,28 @@ any issues (breaking tests, code style issues, documentation style issues, …).
 Please give us five to seven days to get back to you with a review or a direct merge.
 
 
+Licensing of contributions
+==========================
+
+byro is licensed under the GNU Affero General Public License, version 3.0 only
+(``AGPL-3.0-only``). The documentation in the ``docs/`` directory is licensed
+under the Creative Commons Attribution-ShareAlike 4.0 International License
+(``CC-BY-SA-4.0``). The `LICENSE`_ file explains the details, including the
+licensing history of older, Apache-2.0 licensed versions and the licenses of
+bundled third-party components.
+
+Unless explicitly stated otherwise, contributions submitted for inclusion in
+byro are licensed under the AGPL-3.0-only, and contributions to the
+documentation in ``docs/`` are licensed under the CC-BY-SA-4.0. By submitting
+a contribution, for example by opening a pull request, you confirm that you
+have the necessary rights to submit it under the respective license. If your
+contribution includes code, text, images or other material from other
+projects, make sure that its license is compatible with the AGPL-3.0-only or
+the CC-BY-SA-4.0 respectively, keep the original copyright and license notices
+intact, and point this out in your pull request.
+
 .. _GitHub: https://github.com
+.. _LICENSE: https://github.com/byro/byro/blob/main/LICENSE
 .. _open an issue: https://github.com/byro/byro/issues/new
 .. _open issues: https://github.com/byro/byro/issues
 .. _fork byor: https://github.com/byro/byro/fork

@@ -69,6 +69,16 @@ all byro plugins on GitHub `here`_; byroctl never installs anything from that li
 `byro-shackspace`_ is an example for how a group can extend or modify byro to fit their purpose,
 e.g. add custom mechanisms and save additional data.
 
+License
+-------
+
+byro is licensed under the GNU Affero General Public License, version 3.0 only
+(``AGPL-3.0-only``). Older versions of byro were released under the Apache
+License 2.0. The documentation in ``docs/`` is licensed under the Creative
+Commons Attribution-ShareAlike 4.0 International License (``CC-BY-SA-4.0``).
+See the `LICENSE`_ file for details, including the licensing history and the
+licenses of bundled third-party components.
+
 .. |byro| image:: https://raw.githubusercontent.com/byro/byro/main/docs/img/logo/byro_128.png
    :alt: byro
 .. _developer documentation: http://byro.readthedocs.io/en/latest/
@@ -83,3 +93,4 @@ e.g. add custom mechanisms and save additional data.
 .. _byro-shackspace: https://github.com/byro/byro-shackspace
 .. _production documentation: https://byro.readthedocs.io/en/latest/administrator/
 .. _byroctl: https://byro.readthedocs.io/en/latest/administrator/installation-byroctl.html
+.. _LICENSE: https://github.com/byro/byro/blob/main/LICENSE

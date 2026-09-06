@@ -64,7 +64,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "byro"
-copyright = "2024"
+copyright = "the byro contributors. The byro documentation is licensed under CC BY-SA 4.0"
 author = ""
 
 # The version info for the project you're documenting, acts as replacement for
