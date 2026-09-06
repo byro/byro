@@ -39,6 +39,16 @@ Please note that byro is a tool for tracking member data and payments, and the
 administrative acts around it. byro does support bookkeeping and transactions,
 but it is not a complete bookkeeping tool (yet).
 
+License
+=======
+
+byro is licensed under the GNU Affero General Public License, version 3.0 only
+(``AGPL-3.0-only``). Older versions of byro were released under the Apache
+License 2.0. See the `LICENSE`_ file in the byro repository for details,
+including the licensing history and the licenses of bundled third-party
+components.
+
+.. _LICENSE: https://github.com/byro/byro/blob/main/LICENSE
 .. _open issues: https://github.com/byro/byro/issues/new
 .. |byro| image:: img/logo/byro_128.png
    :alt: byro
