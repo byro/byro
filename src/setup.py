@@ -42,7 +42,7 @@ cmdclass = {"build_py": CustomBuild}
 setup(
     name="byro",
     version=byro_version,
-    license="Apache License 2.0",
+    license="AGPL-3.0-only",
     python_requires=">=3.12",
     description="Membership and fees management for associations, clubs and groups",
     long_description=long_description,
@@ -57,7 +57,7 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Other Audience",
         "License :: OSI Approved",
-        "License :: OSI Approved :: Apache Software License",
+        "License :: OSI Approved :: GNU Affero General Public License v3",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
