@@ -11,7 +11,7 @@
 # django-libsass) publishes no linux/arm64 wheel and is compiled from source
 # there. The runtime image copies the finished virtualenv and never sees a
 # compiler.
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1
@@ -28,7 +28,7 @@ RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip install --upgrade pip \
     && /opt/venv/bin/pip install -e . gunicorn
 
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 LABEL org.opencontainers.image.source="https://github.com/byro/byro" \
       org.opencontainers.image.authors="byro team"
