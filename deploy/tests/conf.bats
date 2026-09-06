@@ -161,3 +161,16 @@ YML
     : >"$CONF_FILE"
     [ "$(compose_files)" = "docker-compose.yml" ]
 }
+
+@test "absolute_dir anchors relative paths at the current directory and resolves existing ones" {
+    local phys; phys="$(cd -P "$BYRO_ROOT" && pwd)"
+    cd "$BYRO_ROOT"
+    [ "$(absolute_dir ./x)" = "$phys/x" ]
+    [ "$(absolute_dir x/)" = "$phys/x" ]
+    [ "$(absolute_dir .)" = "$phys" ]
+    [ "$(absolute_dir /opt/byro)" = "/opt/byro" ]
+    [ "$(absolute_dir /opt/byro/)" = "/opt/byro" ]
+    mkdir real; ln -s real link
+    [ "$(absolute_dir link)" = "$phys/real" ]
+    [ "$(absolute_dir "$BYRO_ROOT/link/")" = "$phys/real" ]
+}
