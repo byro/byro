@@ -12,6 +12,30 @@ exceptions under Section 7 of the license. Unless stated otherwise below or
 in the respective file, this applies to all files in this repository.
 
 
+Documentation
+-------------
+
+The byro documentation in the docs/ directory is licensed under the Creative
+Commons Attribution-ShareAlike 4.0 International License (CC-BY-SA-4.0). The
+full license text is included in this repository as
+LICENSES/CC-BY-SA-4.0.txt.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+This covers the documentation sources (the reStructuredText files and their
+translations in docs/locale/) as well as the screenshots and other images in
+docs/img/, with the exception of the byro logo in docs/img/logo/ (see "Logo"
+below). The build tooling in docs/ (conf.py, Makefile, requirements.txt,
+pytest.ini and the spelling word list) is part of the byro source code and
+remains licensed under the AGPL-3.0-only.
+
+Older versions of the documentation were released together with the byro
+source code under the Apache License 2.0 (full text in
+LICENSES/Apache-2.0.txt). This version may still contain contributions
+licensed by their respective copyright owners under the terms of the Apache
+License 2.0.
+
+
 Historical licensing
 --------------------
 
@@ -50,7 +74,8 @@ Logo
 The byro logo was contributed by an external designer; see the "About byro"
 page in the byro backend for attribution. Its license is not stated in this
 repository. Please contact the byro maintainers before using the logo outside
-of byro.
+of byro. This also applies to the copies of the logo in docs/img/logo/, which
+are not covered by the documentation license above.
 
 
 Contributions
@@ -58,4 +83,5 @@ Contributions
 
 Unless explicitly stated otherwise, contributions submitted for inclusion in
 byro are licensed under the GNU Affero General Public License version 3.0 only
-(AGPL-3.0-only). See docs/developer/contributing.rst for details.
+(AGPL-3.0-only), and contributions to the documentation in docs/ are licensed
+under the CC-BY-SA-4.0. See docs/developer/contributing.rst for details.

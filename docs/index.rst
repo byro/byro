@@ -44,11 +44,18 @@ License
 
 byro is licensed under the GNU Affero General Public License, version 3.0 only
 (``AGPL-3.0-only``). Older versions of byro were released under the Apache
-License 2.0. See the `LICENSE`_ file in the byro repository for details,
-including the licensing history and the licenses of bundled third-party
-components.
+License 2.0.
+
+This documentation is licensed under the `Creative Commons Attribution-ShareAlike
+4.0 International License`_ (``CC-BY-SA-4.0``). You may share and adapt it as
+long as you give appropriate credit and distribute your adaptations under the
+same license.
+
+See the `LICENSE`_ file in the byro repository for details, including the
+licensing history and the licenses of bundled third-party components.
 
 .. _LICENSE: https://github.com/byro/byro/blob/main/LICENSE
+.. _Creative Commons Attribution-ShareAlike 4.0 International License: https://creativecommons.org/licenses/by-sa/4.0/
 .. _open issues: https://github.com/byro/byro/issues/new
 .. |byro| image:: img/logo/byro_128.png
    :alt: byro
