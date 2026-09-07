@@ -39,7 +39,12 @@ nav = [
     { "Security baseline" = "administration/security-baseline.md" },
   ] },
   { "Configuration" = "configuration/index.md" },
-  { "Usage" = "usage/index.md" },
+  { "Usage" = [
+    "usage/index.md",
+    { "Members" = "usage/members.md" },
+    { "Memberships and fees" = "usage/memberships-and-fees.md" },
+    { "Member page" = "usage/member-page.md" },
+  ] },
   { "Development & API" = [
     "development/index.md",
     { "Development setup" = "development/setup.md" },

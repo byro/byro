@@ -39,7 +39,12 @@ nav = [
     { "Sicherheits-Baseline" = "administration/security-baseline.md" },
   ] },
   { "Konfiguration" = "configuration/index.md" },
-  { "Benutzung" = "usage/index.md" },
+  { "Benutzung" = [
+    "usage/index.md",
+    { "Mitglieder" = "usage/members.md" },
+    { "Mitgliedschaften und Beiträge" = "usage/memberships-and-fees.md" },
+    { "Mitgliederseite" = "usage/member-page.md" },
+  ] },
   { "Entwicklung & API" = [
     "development/index.md",
     { "Entwicklungs-Setup" = "development/setup.md" },
