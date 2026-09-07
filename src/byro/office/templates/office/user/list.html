@@ -6,11 +6,13 @@
 {% block headline %}{% trans "Users" %}{% endblock %}
 
 {% block content %}
-    <p>
-        <a href="{% url "office:settings.users.add" %}" class="btn btn-success">
-            <span class="fa fa-plus"></span> {% trans "Add new user" %}
-        </a>
-    </p>
+    {% if request.user.is_superuser %}
+        <p>
+            <a href="{% url "office:settings.users.add" %}" class="btn btn-success">
+                <span class="fa fa-plus"></span> {% trans "Add new user" %}
+            </a>
+        </p>
+    {% endif %}
     <table class="table table-sm">
         <thead>
             <tr>
@@ -43,9 +45,15 @@
                             {% endif %}
                         {% endif %}
                     </td>
-                    <td><a href="{% url "office:settings.users.detail" pk=user.pk %}">
-                        {{ user.username }}
-                    </a></td>
+                    <td>
+                        {% if request.user.is_superuser or user.pk == request.user.pk %}
+                            <a href="{% url "office:settings.users.detail" pk=user.pk %}">
+                                {{ user.username }}
+                            </a>
+                        {% else %}
+                            {{ user.username }}
+                        {% endif %}
+                    </td>
                     <td>
                         {{ user.last_name }}
                     </td>
