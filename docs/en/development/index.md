@@ -11,12 +11,12 @@ with the [development setup](setup.md). It contains the contributing
 guidelines, an explanation on how to build a pull request, which style
 guidelines to follow, and an internal API documentation.
 
-If you want to develop (or improve) a plugin, have a look at our
-[plugin development guides](plugins/index.md): They show how to develop a byro
-plugin with some hopefully easy-to-follow example plugins. The
-[signal list](signals.md) documents the hooks byro offers, and the
+The [signal list](signals.md) documents the hooks byro offers, and the
 [REST API](api.md) describes the programmatic interface for members and
-memberships.
+memberships. Plugin development guides are under
+[Plugins](../administration/plugins.md), in
+[Plugin development](plugins/index.md): they show how to develop a byro
+plugin with some hopefully easy-to-follow example plugins.
 
 If you maintain byro and prepare a release, [Releasing byro](releasing.md)
 describes the release pipeline, the `stable` pointer for byroctl and the

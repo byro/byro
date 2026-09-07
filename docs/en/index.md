@@ -32,7 +32,7 @@ the three supported installation paths.
 afterwards (updating, backup, monitoring),
 [Configuration](administration/index.md) what you set up *inside* byro (user
 accounts, login, MFA, settings) plus the `byro.cfg`/`BYRO_*` reference, and
-[Plugins & integrations](administration/plugins.md) shows what byro can be
+[Plugins](administration/plugins.md) shows what byro can be
 extended with.
 
 **You want to extend byro or contribute to it**: start at
@@ -47,7 +47,7 @@ extended with.
   and settings in a running instance, plus the configuration reference.
 - [User guide](usage/index.md): day-to-day work with byro - members,
   memberships and fees, finances, documents, communication.
-- [Plugins & integrations](administration/plugins.md): what byro can be
+- [Plugins](administration/plugins.md): what byro can be
   extended with.
 - [Development & API](development/index.md): develop byro or a plugin.
 

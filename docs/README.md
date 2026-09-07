@@ -71,20 +71,32 @@ such notes already exist from the Sphinx migration (see
 annotates is rewritten with real content, do not carry it forward.
 
 **Audience and structure.** The navigation has seven top-level tabs
-(Zensical's `navigation.tabs`, with `navigation.sections` rendering each
-tab's own tree in the sidebar), aimed at a role each, in this order:
+(Zensical's `navigation.tabs`), aimed at a role each, in this order:
 *Getting started* (the start page, a single page); *Installation* (the three
 installation methods only — byroctl, Docker Compose, bare metal); *Administration*
 (day-2 server operation regardless of install method: updating, backup/restore,
 management commands, monitoring/troubleshooting, security baseline);
 *Configuration* (what you set up *inside* byro through the Office — users/login,
 MFA, PGP, settings — plus the `byro.cfg`/`BYRO_*` configuration reference);
-*User guide* (day-to-day work in a running byro); *Plugins & integrations*
-(what byro can be extended with); and *Development & API*. Pick the page for
-the role doing the task, not the page that already exists and is closest.
-Describe one topic in one place; link to it from other pages instead of
-repeating it (an install method's own update procedure is not a repeat, since
-the steps differ per method — a concept like "what a plugin is" would be).
+*User guide* (day-to-day work in a running byro, split into *Member
+management*, *Finance*, *Member area* and *My account*); *Plugins* (which
+plugins exist, and how to build one); and *Development & API* (developing
+byro itself). Pick the page for the role doing the task, not the page that
+already exists and is closest. Describe one topic in one place; link to it
+from other pages instead of repeating it (an install method's own update
+procedure is not a repeat, since the steps differ per method — a concept like
+"what a plugin is" would be).
+
+Every tab's own tree renders in the sidebar as a nested group
+(`navigation.sections`) named after the tab itself, so even a single-topic
+tab like *Installation* or *Administration* gets a bold sidebar heading
+instead of a bare page list. Where a group's first entry is a bare page path
+(not a `{Label = path}` table) whose own `#`-heading matches the group name,
+`navigation.indexes` also makes that heading clickable to the page (for
+example *Plugins* → *Plugin-Entwicklung*, or *Benutzerhandbuch* →
+*Finanzen*/*Mein Konto*); a group with no matching landing page (*Mitgliederverwaltung*,
+*Mitgliederbereich*) stays a plain, non-clickable bold label, which is normal
+Material/mkdocs behaviour for a section without an index page.
 
 Installation, Administration and Configuration look similar (all three are
 "for administrators"), but split on three different axes: Installation is
@@ -95,7 +107,10 @@ about keeping an already-running instance alive — update, backup, monitoring
 is about what happens *inside* byro through the Office UI (or the `byro.cfg`
 file/`BYRO_*` variables that back it), regardless of how or where byro is
 hosted. A page that would answer the same way no matter who's hosting the
-instance belongs in Configuration, not Installation or Administration.
+instance belongs in Configuration, not Installation or Administration. Plugins
+and Development & API split similarly: Plugins is about using and choosing
+plugins, and about building one yourself; Development & API is about working
+on byro's own core (setup, contributing, releasing, signals, the REST API).
 
 **Diátaxis, applied quietly.** Within a page, keep tutorial ("do this to
 learn"), how-to ("do this to get a result"), reference ("look this up
@@ -263,6 +278,19 @@ it are secured; otherwise rewrite the passage from the code and known facts.
   `operations.md`) live under the *Administration* tab; `users-and-login.md`,
   `mfa.md`, `pgp.md`, `settings.md` (plus the existing `index.md` and
   `configuration/index.md`, physically outside `administration/`) live under
-  *Configuration*; `plugins.md` is its own tab, *Plugins & integrations*. Only
-  rename a directory or file when the page's own topic changes, not to make
-  it match its current tab.
+  *Configuration*; `plugins.md` lives under *Plugins* together with
+  `development/plugins/index.md` and its subpages, even though those are
+  physically under `development/`, not `administration/`. Only rename a
+  directory or file when the page's own topic changes, not to make it match
+  its current tab.
+- Every top-level tab wraps its own page tree in one nested `nav` group named
+  after the tab (for example `{ "Plugins" = [ { "Plugins" = [...] }, {
+  "Plugin-Entwicklung" = [...] } ] }`), so the sidebar always shows a bold
+  section heading, even for a tab with only one topic. A group's first entry
+  can be a bare page path instead of a `{Label = path}` table; if that page's
+  `#`-heading matches the group name exactly, `navigation.indexes` turns the
+  otherwise plain heading into a link to that page (`development/plugins/index.md`'s
+  `# Plugin-Entwicklung` heading against the `"Plugin-Entwicklung"` group, or
+  `usage/finances.md`'s `# Finanzen` against the `"Finanzen"` group). Don't use
+  a bare first entry unless the heading text matches the group label exactly —
+  otherwise the sidebar shows the wrong label for that heading.

@@ -21,4 +21,4 @@ from your user menu, not from this page - see
 updating, backup and restore, monitoring and the security baseline belong to
 technical self-hosting and live under [Administration](operations.md); which
 plugins exist and how they are installed is under
-[Plugins & integrations](plugins.md).
+[Plugins](plugins.md).

@@ -7,9 +7,11 @@ they are written). A plugin runs with the same privileges as byro itself and
 has full access to your database, so install only plugins you trust.
 
 This page describes plugins in a byroctl installation. The sections at the end
-cover the manual Docker Compose setup and the bare metal installation. Other
-integrations (SMTP mail delivery, OIDC/SSO) are not a plugin mechanism and
-live under [Configuration](../configuration/index.md) and
+cover the manual Docker Compose setup and the bare metal installation. How a
+plugin is built is under
+[Plugin development](../development/plugins/index.md) in the same section.
+Integrations that are not plugins (SMTP mail delivery, OIDC/SSO) live under
+[Configuration](../configuration/index.md) and
 [Users and login](users-and-login.md) respectively.
 
 ## Official plugins

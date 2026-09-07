@@ -11,12 +11,12 @@ Wenn du am Code von byro arbeiten willst (egal an welchem Teil), fang mit dem
 eine Erklärung, wie ein Pull Request entsteht, welche Stilregeln gelten, und
 eine interne API-Dokumentation.
 
-Wenn du ein Plugin entwickeln (oder verbessern) willst, sieh dir unsere
-[Anleitungen zur Plugin-Entwicklung](plugins/index.md) an: Sie zeigen anhand
-hoffentlich leicht nachvollziehbarer Beispiel-Plugins, wie ein byro-Plugin
-entsteht. Die [Signalliste](signals.md) dokumentiert die Hooks, die byro
-anbietet, und die [REST-API](api.md) beschreibt die programmatische
-Schnittstelle für Mitglieder und Mitgliedschaften.
+Die [Signalliste](signals.md) dokumentiert die Hooks, die byro anbietet, und
+die [REST-API](api.md) beschreibt die programmatische Schnittstelle für
+Mitglieder und Mitgliedschaften. Anleitungen zur Plugin-Entwicklung stehen im
+Bereich [Plugins](../administration/plugins.md) unter
+[Plugin-Entwicklung](plugins/index.md): Sie zeigen anhand hoffentlich leicht
+nachvollziehbarer Beispiel-Plugins, wie ein byro-Plugin entsteht.
 
 Wenn du byro betreust und ein Release vorbereitest, beschreibt
 [byro veröffentlichen](releasing.md) die Release-Pipeline, den

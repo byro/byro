@@ -34,7 +34,7 @@ Installationswege beschreibt. [Administration](administration/operations.md)
 beschreibt den laufenden Betrieb danach (Update, Backup, Monitoring),
 [Konfiguration](administration/index.md), was du *in* byro einrichtest
 (Benutzerkonten, Login, MFA, Einstellungen) sowie die
-`byro.cfg`/`BYRO_*`-Referenz, und [Plugins & Integrationen](administration/plugins.md)
+`byro.cfg`/`BYRO_*`-Referenz, und [Plugins](administration/plugins.md)
 zeigt, womit sich byro erweitern lässt.
 
 **Du willst byro erweitern oder daran mitarbeiten**: Start ist
@@ -50,7 +50,7 @@ zeigt, womit sich byro erweitern lässt.
 - [Benutzerhandbuch](usage/index.md): die tägliche Arbeit mit byro –
   Mitglieder, Mitgliedschaften und Beiträge, Finanzen, Dokumente,
   Kommunikation.
-- [Plugins & Integrationen](administration/plugins.md): womit sich byro
+- [Plugins](administration/plugins.md): womit sich byro
   erweitern lässt.
 - [Entwicklung & API](development/index.md): byro oder ein Plugin
   weiterentwickeln.

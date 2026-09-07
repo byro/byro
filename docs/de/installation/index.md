@@ -26,7 +26,7 @@ Es gibt drei Wege, byro zu installieren:
 
 Alle drei Wege teilen dieselben Konfigurationsoptionen
 ([Konfiguration](../configuration/index.md)), denselben Weg zu Plugins
-([Plugins & Integrationen](../administration/plugins.md)), dieselben
+([Plugins](../administration/plugins.md)), dieselben
 Wartungsaufgaben (siehe [Administration](../administration/operations.md)) und
 denselben Rat: byro nur hinter HTTPS betreiben und Daten sichern.
 

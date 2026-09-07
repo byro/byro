@@ -24,4 +24,4 @@ sind über dein Benutzermenü erreichbar, nicht über diese Seite – siehe
 Backup und Restore, Monitoring und die Sicherheits-Baseline gehören zum
 technischen Selbst-Hosting und stehen unter [Administration](operations.md);
 welche Plugins es gibt und wie sie installiert werden, steht unter
-[Plugins & Integrationen](plugins.md).
+[Plugins](plugins.md).

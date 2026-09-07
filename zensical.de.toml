@@ -19,54 +19,74 @@ strict = true
 nav = [
   { "Erste Schritte" = "index.md" },
   { "Installation" = [
-    "installation/index.md",
-    { "Mit byroctl (empfohlen)" = "installation/byroctl.md" },
-    { "Mit Docker Compose" = "installation/docker-compose.md" },
-    { "Bare Metal" = "installation/bare-metal.md" },
-    { "Legacy: production/ (veraltet)" = "installation/legacy-production.md" },
+    { "Installation" = [
+      "installation/index.md",
+      { "Mit byroctl (empfohlen)" = "installation/byroctl.md" },
+      { "Mit Docker Compose" = "installation/docker-compose.md" },
+      { "Bare Metal" = "installation/bare-metal.md" },
+      { "Legacy: production/ (veraltet)" = "installation/legacy-production.md" },
+    ] },
   ] },
   { "Administration" = [
-    "administration/operations.md",
-    { "Update" = "administration/updating.md" },
-    { "Backup und Restore" = "administration/backup-restore.md" },
-    { "Management-Befehle" = "administration/management-commands.md" },
-    { "Monitoring, Logging und Fehlersuche" = "administration/troubleshooting.md" },
-    { "Sicherheits-Baseline" = "administration/security-baseline.md" },
+    { "Administration" = [
+      "administration/operations.md",
+      { "Update" = "administration/updating.md" },
+      { "Backup und Restore" = "administration/backup-restore.md" },
+      { "Management-Befehle" = "administration/management-commands.md" },
+      { "Monitoring, Logging und Fehlersuche" = "administration/troubleshooting.md" },
+      { "Sicherheits-Baseline" = "administration/security-baseline.md" },
+    ] },
   ] },
   { "Konfiguration" = [
-    "administration/index.md",
-    { "Benutzer und Login" = "administration/users-and-login.md" },
-    { "Mehr-Faktor-Authentifizierung" = "administration/mfa.md" },
-    { "PGP-Mailverschlüsselung" = "administration/pgp.md" },
-    { "Einstellungen" = "administration/settings.md" },
-    { "Konfigurationsreferenz" = "configuration/index.md" },
+    { "Konfiguration" = [
+      "administration/index.md",
+      { "Benutzer und Login" = "administration/users-and-login.md" },
+      { "Mehr-Faktor-Authentifizierung" = "administration/mfa.md" },
+      { "PGP-Mailverschlüsselung" = "administration/pgp.md" },
+      { "Einstellungen" = "administration/settings.md" },
+      { "Konfigurationsreferenz" = "configuration/index.md" },
+    ] },
   ] },
   { "Benutzerhandbuch" = [
     "usage/index.md",
-    { "Mitglieder" = "usage/members.md" },
-    { "Mitgliedschaften und Beiträge" = "usage/memberships-and-fees.md" },
-    { "Mitgliederseite" = "usage/member-page.md" },
-    { "Finanzen" = "usage/finances.md" },
-    { "Dokumente" = "usage/documents.md" },
-    { "Kommunikation" = "usage/mails.md" },
-    { "Mein Konto" = "usage/account.md" },
-    { "Mehr-Faktor-Authentifizierung" = "usage/mfa.md" },
+    { "Mitgliederverwaltung" = [
+      { "Mitglieder" = "usage/members.md" },
+      { "Mitgliedschaften und Beiträge" = "usage/memberships-and-fees.md" },
+    ] },
+    { "Finanzen" = [
+      "usage/finances.md",
+      { "Dokumente" = "usage/documents.md" },
+      { "Kommunikation" = "usage/mails.md" },
+    ] },
+    { "Mitgliederbereich" = [
+      { "Mitgliederseite" = "usage/member-page.md" },
+    ] },
+    { "Mein Konto" = [
+      "usage/account.md",
+      { "Mehr-Faktor-Authentifizierung" = "usage/mfa.md" },
+    ] },
   ] },
-  { "Plugins & Integrationen" = "administration/plugins.md" },
-  { "Entwicklung & API" = [
-    "development/index.md",
-    { "Entwicklungs-Setup" = "development/setup.md" },
-    { "Mitwirken" = "development/contributing.md" },
-    { "An der Dokumentation arbeiten" = "development/documentation.md" },
-    { "byro veröffentlichen" = "development/releasing.md" },
+  { "Plugins" = [
+    { "Plugins" = [
+      "administration/plugins.md",
+    ] },
     { "Plugin-Entwicklung" = [
       "development/plugins/index.md",
       { "Ein Plugin erstellen" = "development/plugins/creating-a-plugin.md" },
       { "Eigene Mitgliedsdaten" = "development/plugins/member-data.md" },
       { "Bankimporter" = "development/plugins/bank-transaction-importers.md" },
     ] },
-    { "Signalliste" = "development/signals.md" },
-    { "REST-API" = "development/api.md" },
+  ] },
+  { "Entwicklung & API" = [
+    { "Entwicklung & API" = [
+      "development/index.md",
+      { "Entwicklungs-Setup" = "development/setup.md" },
+      { "Mitwirken" = "development/contributing.md" },
+      { "An der Dokumentation arbeiten" = "development/documentation.md" },
+      { "byro veröffentlichen" = "development/releasing.md" },
+      { "Signalliste" = "development/signals.md" },
+      { "REST-API" = "development/api.md" },
+    ] },
   ] },
 ]
 
