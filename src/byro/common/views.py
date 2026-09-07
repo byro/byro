@@ -72,7 +72,19 @@ class LoginView(TemplateView):
             )
             return redirect("common:login")
 
+        if not user.is_staff:
+            messages.error(request, _("This account does not have office access."))
+            LogEntry.objects.create(
+                content_object=user,
+                user=user,
+                action_type="byro.common.login.not_staff",
+            )
+            return redirect("common:login")
+
         login(request, user)
+        # Password logins are always subject to byro's own MFA policy, even
+        # if a previous session in this browser was OIDC-exempted.
+        request.session["oidc_login"] = False
         LogEntry.objects.create(
             content_object=user, user=user, action_type="byro.common.login.success"
         )
@@ -162,8 +174,20 @@ class OIDCCallbackView(View):
                 messages.error(request, _("User account is deactivated."))
                 return redirect("common:login")
 
+            if not user.is_staff:
+                messages.error(request, _("This account does not have office access."))
+                LogEntry.objects.create(
+                    content_object=user,
+                    user=user,
+                    action_type="byro.common.login.not_staff",
+                )
+                return redirect("common:login")
+
             user.backend = "django.contrib.auth.backends.ModelBackend"
             login(request, user)
+            # Marks this session as OIDC-authenticated so the MFA middleware
+            # can honour OIDC_MFA_EXEMPT; irrelevant while that setting is off.
+            request.session["oidc_login"] = True
             LogEntry.objects.create(
                 content_object=user,
                 user=user,

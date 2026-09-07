@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.sessions.models import Session
 from django.db import transaction
@@ -93,9 +94,18 @@ def is_verified(request):
     return isinstance(device, TOTPDevice) and device.confirmed
 
 
+def is_oidc_mfa_exempt(request):
+    """True if this session was authenticated via OIDC and OIDC_MFA_EXEMPT is
+    enabled, on the assumption that the identity provider already enforces
+    its own MFA. Password-authenticated sessions are never exempt."""
+    return bool(settings.OIDC_MFA_EXEMPT and request.session.get("oidc_login"))
+
+
 def needs_verification(request):
     user = request.user
-    return user.is_authenticated and mfa_required_for(user) and not is_verified(request)
+    if not user.is_authenticated or is_oidc_mfa_exempt(request):
+        return False
+    return mfa_required_for(user) and not is_verified(request)
 
 
 def get_verification_url(request, next_url=None):

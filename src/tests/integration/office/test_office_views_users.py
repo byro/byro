@@ -240,3 +240,50 @@ def test_staff_user_can_regenerate_own_token(client, configuration, user, login_
 
     assert not Token.objects.filter(pk=old_token.pk).exists()
     assert Token.objects.filter(user=user).exists()
+
+
+@pytest.mark.django_db
+def test_superuser_cannot_remove_own_superuser_status(
+    client, configuration, superuser, login_user
+):
+    login_user(client, superuser)
+
+    response = client.post(
+        reverse("office:settings.users.detail", kwargs={"pk": superuser.pk}),
+        {
+            "username": superuser.username,
+            "last_name": "",
+            "email": "",
+            "password": "test_password",
+        },
+        follow=True,
+    )
+    assert response.status_code == 200
+
+    superuser.refresh_from_db()
+    assert superuser.is_superuser
+    assert superuser.is_staff
+
+
+@pytest.mark.django_db
+def test_superuser_can_remove_others_superuser_status(
+    client, configuration, user, superuser, login_user
+):
+    user.is_superuser = True
+    user.save()
+    login_user(client, superuser)
+
+    response = client.post(
+        reverse("office:settings.users.detail", kwargs={"pk": user.pk}),
+        {
+            "username": user.username,
+            "last_name": "",
+            "email": "",
+            "password": "test_password",
+        },
+        follow=True,
+    )
+    assert response.status_code == 200
+
+    user.refresh_from_db()
+    assert not user.is_superuser

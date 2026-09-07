@@ -16,11 +16,15 @@ class UserForm(forms.ModelForm):
     def __init__(self, *args, request_user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["last_name"].label = _("Name")
-        # Only superusers may grant or revoke staff/superuser rights. This
-        # also stops a staff-only user from escalating their own account
-        # (or anyone else's) to superuser by tampering with the submitted
-        # form, since a field removed here is dropped from cleaned_data too.
-        if request_user is None or not request_user.is_superuser:
+        # Only superusers may grant or revoke staff/superuser rights, and
+        # never on their own account -- otherwise the last superuser could
+        # demote themselves and leave nobody able to grant the role back.
+        # This also stops a staff-only user from escalating their own
+        # account (or anyone else's) to superuser by tampering with the
+        # submitted form, since a field removed here is dropped from
+        # cleaned_data too.
+        is_self = request_user is not None and self.instance.pk == request_user.pk
+        if request_user is None or not request_user.is_superuser or is_self:
             del self.fields["is_superuser"]
             del self.fields["is_staff"]
 

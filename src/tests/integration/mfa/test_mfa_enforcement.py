@@ -190,10 +190,10 @@ def test_policy_user_with_mfa_gets_challenge(
 
 @pytest.mark.django_db
 def test_policy_applies_to_every_backend_user(client, mfa_policy, login_user):
-    # byro's office does not use the staff flag; every user who can log in
-    # has full access, so every user is covered by the policy.
+    # The policy is not limited to superusers: any staff user with office
+    # access is covered.
     plain = get_user_model().objects.create(
-        username="plain_user", is_staff=False, is_superuser=False
+        username="plain_user", is_staff=True, is_superuser=False
     )
     plain.set_password("test_password")
     plain.save()

@@ -20,9 +20,10 @@ MFA only concerns the interactive backend login. It does not change
   token's user or of the global policy. API requests are never redirected to
   an MFA page.
 
-.. note:: byro grants access to the complete backend to every active user
-   account, there are no separate roles or a "staff" flag for the office.
-   The MFA policy therefore applies to *every* user who can log in.
+.. note:: byro grants access to the complete backend to every user account
+   with the "staff" flag set, regardless of whether they are also a
+   superuser. The MFA policy therefore applies to *every* user who can log
+   in to the backend, not just superusers.
 
 For backend users
 -----------------
@@ -103,9 +104,12 @@ Enabling it has the following effects:
   the backend (only the setup itself and logout).
 - Sessions that were already logged in without MFA are treated the same
   way: the next request is redirected to the setup.
-- The setting applies to logins via single sign-on (OIDC) as well. byro does
-  not evaluate MFA information from the identity provider; OIDC users have
-  to complete the byro TOTP step, too.
+- The setting applies to logins via single sign-on (OIDC) as well by default:
+  byro does not evaluate MFA information from the identity provider, so OIDC
+  users have to complete the byro TOTP step, too. If the identity provider
+  already enforces its own MFA, this can be turned off for OIDC sessions with
+  the ``mfa_exempt`` OIDC option (see :doc:`configuration`) – password logins
+  are never affected by that setting.
 - Enabling the option does not require that everybody has set up MFA
   already. Nobody is locked out – but every user has to enroll at their
   next login.
