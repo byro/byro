@@ -45,6 +45,26 @@ your changes for any issues (breaking tests, code style issues, documentation
 style issues, …). Please give us five to seven days to get back to you with a
 review or a direct merge.
 
+## Documentation
+
+If your pull request changes visible behavior (a new setting, a new workflow,
+a changed command), a matching documentation change belongs in the same pull
+request, not a later one. New or changed documentation content is written in
+German first (the leading language) and carried over into English in the
+same pull request; `docs/check_parity.py` fails CI if a page exists in only
+one language. The full editorial standard (terminology, tone, links,
+license) is described in
+[Working on the documentation](documentation.md).
+
+## New plugins
+
+This workflow is for changes **to byro itself**. A new plugin is not
+submitted as a pull request against this repository, but published as its
+own Python package with its own release (see
+[Creating a plugin](plugins/creating-a-plugin.md)). If you want your plugin
+listed in the catalog `byroctl plugin add` knows about,
+[Plugin catalog](releasing.md#plugin-catalog) describes how.
+
 ## Licensing of contributions
 
 byro is licensed under the GNU Affero General Public License, version 3.0 only

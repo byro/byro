@@ -149,19 +149,24 @@ Before you check in your code into git, always run the static checkers and unit
 tests:
 
 ```console
-(env)$ isort -c -rc .
+(env)$ isort .
 (env)$ black .
 (env)$ flake8 .
-(env)$ python manage.py check
-(env)$ py.test tests
+(env)$ djhtml byro/
+(env)$ python manage.py check --deploy
+(env)$ python -m pytest tests
 ```
 
-<!-- migration note (AP01 GAPS A8): CI runs isort -c ., black --check ., flake8 ., djhtml byro/, manage.py check --deploy and python -m pytest; rewritten in AP11. -->
+CI runs the same checks, but without auto-formatting: `isort -c .` and
+`black --check .` (check only, never write), and the test run is
+parallelized with automatic reruns for flaky tests:
+`python -m pytest --reruns=3 -nauto -p no:sugar --maxfail=100 tests`. Read
+`.github/workflows/ci-cd.yml` if you need the exact CI commands.
 
 !!! note
-    If you have more than one CPU core and want to speed up the test suite, you
-    can run `py.test -n NUM` with `NUM` being the number of threads you want to
-    use.
+    If you have more than one CPU core and want to speed up the test suite,
+    run `python -m pytest -n auto tests` (`pytest-xdist` is already part of
+    the development dependencies).
 
 It's a good idea to put the style checks into your git hook
 `.git/hooks/pre-commit`, for example:
@@ -171,9 +176,10 @@ It's a good idea to put the style checks into your git hook
 set -e
 cd $GIT_DIR/../src
 source ../env/bin/activate
-isort -c -rc .
+isort .
 black .
 flake8 .
+djhtml byro/
 ```
 
 ### Working with translations

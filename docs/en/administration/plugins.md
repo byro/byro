@@ -9,6 +9,35 @@ has full access to your database, so install only plugins you trust.
 This page describes plugins in a byroctl installation. The sections at the end
 cover the manual Docker Compose setup and the bare metal installation.
 
+## Official plugins
+
+**Bundled** (every byro installation, not individually installable or
+removable): `byro.plugins.profile` (additional personal member data such as
+nickname, birth date, phone number) and `byro.plugins.sepa` (SEPA direct
+debit data per member).
+
+**Catalog** (individually installable via `byroctl plugin add`, see below):
+
+| Plugin | Description | Repository |
+|---|---|---|
+| `finance-import-bank-files` | File-based bank import (currently CAMT.053) | [byro/byro-finance-import-bank-files](https://github.com/byro/byro-finance-import-bank-files) |
+
+That is the complete catalog as of this page - not a made-up example, but
+`deploy/plugin-catalog.conf` of this release. Two more plugins maintained by
+the byro organization exist, but are **not compatible** with the current
+byro version and therefore not in the catalog:
+[byro-mailman](https://github.com/byro/byro-mailman) (mailing list
+integration) and
+[byro-gemeinnuetzigkeit](https://github.com/byro/byro-gemeinnuetzigkeit)
+(donation receipts for German non-profits).
+
+Further, not officially vetted plugins are listed under the GitHub topic
+[byro-plugin](https://github.com/topics/byro-plugin) - a place to look, not a
+recommendation; byroctl never installs anything from there automatically.
+How a plugin gets added to the catalog is described in
+[Plugin catalog](../development/releasing.md#plugin-catalog) in the
+developer documentation.
+
 ## How byroctl installs plugins
 
 byro finds plugins among the Python packages installed next to it. In a

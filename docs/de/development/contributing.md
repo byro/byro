@@ -45,6 +45,26 @@ und eröffne einen Pull Request. Unsere Continuous Integration prüft deine
 der Dokumentation, …). Gib uns bitte fünf bis sieben Tage für ein Review oder
 einen direkten Merge.
 
+## Dokumentation
+
+Ändert dein Pull Request sichtbares Verhalten (eine neue Einstellung, ein
+neuer Workflow, ein geänderter Befehl), gehört eine passende Doku-Änderung
+zum selben Pull Request, nicht zu einem späteren. Neue oder geänderte
+Doku-Inhalte entstehen auf Deutsch (die redaktionell führende Sprache) und
+werden im selben Pull Request ins Englische übertragen; `docs/check_parity.py`
+schlägt in CI fehl, wenn eine Seite nur in einer Sprache existiert. Den
+vollständigen Redaktionsstandard (Terminologie, Ton, Links, Lizenz)
+beschreibt [An der Dokumentation arbeiten](documentation.md).
+
+## Neue Plugins
+
+Dieser Ablauf ist für Änderungen **an byro selbst**. Ein neues Plugin wird
+nicht als Pull Request gegen dieses Repository eingereicht, sondern als
+eigenes Python-Paket mit eigenem Release veröffentlicht (siehe
+[Ein Plugin erstellen](plugins/creating-a-plugin.md)). Willst du dein Plugin
+im Katalog gelistet haben, den `byroctl plugin add` kennt, beschreibt
+[Plugin-Katalog](releasing.md#plugin-katalog), wie das geht.
+
 ## Lizenzierung von Beiträgen
 
 byro steht unter der GNU Affero General Public License, Version 3.0 only

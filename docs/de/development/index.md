@@ -15,7 +15,8 @@ Wenn du ein Plugin entwickeln (oder verbessern) willst, sieh dir unsere
 [Anleitungen zur Plugin-Entwicklung](plugins/index.md) an: Sie zeigen anhand
 hoffentlich leicht nachvollziehbarer Beispiel-Plugins, wie ein byro-Plugin
 entsteht. Die [Signalliste](signals.md) dokumentiert die Hooks, die byro
-anbietet.
+anbietet, und die [REST-API](api.md) beschreibt die programmatische
+Schnittstelle für Mitglieder und Mitgliedschaften.
 
 Wenn du byro betreust und ein Release vorbereitest, beschreibt
 [byro veröffentlichen](releasing.md) die Release-Pipeline, den

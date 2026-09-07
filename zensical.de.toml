@@ -61,6 +61,7 @@ nav = [
       { "Bankimporter" = "development/plugins/bank-transaction-importers.md" },
     ] },
     { "Signalliste" = "development/signals.md" },
+    { "REST-API" = "development/api.md" },
   ] },
 ]
 

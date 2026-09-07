@@ -35,16 +35,23 @@ how its ORM works, etc.).
 ## Plugin metadata
 
 The plugin metadata lives inside a `ByroPluginMeta` class inside your app's
-configuration class. The metadata class must define the following attributes:
+configuration class. byro itself reads three attributes from it and shows
+them unchanged on the "About byro" page (see
+[Settings](../../administration/settings.md#about-byro)):
 
 | Attribute   | Type   | Description                                         |
 |-------------|--------|-----------------------------------------------------|
 | name        | string | The human-readable name of your plugin              |
-| author      | string | Your name                                           |
 | version     | string | A human-readable version code of your plugin        |
 | description | string | A more verbose description of what your plugin does |
 
-<!-- migration note (AP01 GAPS A13): byro reads name, version, description and document_categories; author and visible are not evaluated. Rewritten in AP11. -->
+byro additionally reads `document_categories` (a dict mapping a category id
+to a human-readable name) if your plugin wants to contribute its own
+document categories (see [Documents](../../usage/documents.md#categories)).
+
+**`author` and `visible` are convention only**, from the cookiecutter
+template below - byro itself never reads or evaluates them. Fill them in if
+it helps document your plugin, but do not expect any effect inside byro.
 
 A working example, living in `byro_irc/apps.py`, would be:
 
@@ -59,10 +66,11 @@ class IRCApp(AppConfig):
 
     class ByroPluginMeta:
         name = _("IRC")
-        author = _("irclover")
         version = '1.0.0'
-        visible = True
         description = _("This plugin sends notifications via IRC.")
+        # Convention, not evaluated by byro:
+        author = _("irclover")
+        visible = True
 ```
 
 Django picks up the single `AppConfig` subclass in your `apps` submodule

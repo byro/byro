@@ -34,17 +34,24 @@ Vorkenntnisse in Django (View-Schicht, ORM usw.).
 ## Plugin-Metadaten
 
 Die Plugin-Metadaten leben in einer Klasse `ByroPluginMeta` innerhalb der
-Konfigurationsklasse deiner App. Die Metadatenklasse muss folgende Attribute
-definieren:
+Konfigurationsklasse deiner App. byro selbst liest daraus drei Attribute und
+zeigt sie unverändert auf der Seite „Über byro“ (siehe
+[Einstellungen](../../administration/settings.md#uber-byro)):
 
 | Attribut    | Typ    | Beschreibung                                        |
 |-------------|--------|-----------------------------------------------------|
 | name        | string | Der lesbare Name deines Plugins                     |
-| author      | string | Dein Name                                           |
 | version     | string | Eine lesbare Versionsangabe deines Plugins          |
 | description | string | Eine ausführlichere Beschreibung des Plugins        |
 
-<!-- migration note (AP01 GAPS A13): byro liest name, version, description und document_categories; author und visible werden nicht ausgewertet. Wird in AP11 neu geschrieben. -->
+Zusätzlich liest byro `document_categories` (ein Dict von Kategorie-ID auf
+lesbaren Namen), falls dein Plugin eigene Dokumentkategorien anbieten will
+(siehe [Dokumente](../../usage/documents.md#kategorien)).
+
+**`author` und `visible` sind reine Konvention** aus der Cookiecutter-Vorlage
+unten – byro selbst liest oder wertet sie an keiner Stelle aus. Trag sie ein,
+wenn es dir hilft, dein Plugin zu dokumentieren, aber erwarte keine Wirkung
+in byro.
 
 Ein funktionierendes Beispiel in `byro_irc/apps.py`:
 
@@ -59,10 +66,11 @@ class IRCApp(AppConfig):
 
     class ByroPluginMeta:
         name = _("IRC")
-        author = _("irclover")
         version = '1.0.0'
-        visible = True
         description = _("This plugin sends notifications via IRC.")
+        # Konvention, nicht von byro ausgewertet:
+        author = _("irclover")
+        visible = True
 ```
 
 Django findet die einzige `AppConfig`-Unterklasse in deinem Submodul `apps`

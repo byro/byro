@@ -148,19 +148,24 @@ Bevor du Code in git eincheckst, führe immer die statischen Prüfungen und
 Unit-Tests aus:
 
 ```console
-(env)$ isort -c -rc .
+(env)$ isort .
 (env)$ black .
 (env)$ flake8 .
-(env)$ python manage.py check
-(env)$ py.test tests
+(env)$ djhtml byro/
+(env)$ python manage.py check --deploy
+(env)$ python -m pytest tests
 ```
 
-<!-- migration note (AP01 GAPS A8): CI führt isort -c ., black --check ., flake8 ., djhtml byro/, manage.py check --deploy und python -m pytest aus; wird in AP11 neu geschrieben. -->
+CI führt dieselben Prüfungen aus, aber ohne automatisch zu formatieren:
+`isort -c .` und `black --check .` (nur prüfen, nicht schreiben), außerdem
+parallelisiert und mit automatischen Wiederholungen bei geflakten Tests:
+`python -m pytest --reruns=3 -nauto -p no:sugar --maxfail=100 tests`. Lies
+`.github/workflows/ci-cd.yml`, wenn du die exakten CI-Kommandos brauchst.
 
 !!! note
     Hast du mehr als einen CPU-Kern und willst die Testsuite beschleunigen,
-    kannst du `py.test -n NUM` verwenden, wobei `NUM` die Anzahl der Threads
-    ist.
+    verwende `python -m pytest -n auto tests` (`pytest-xdist` ist bereits Teil
+    der Entwicklungsabhängigkeiten).
 
 Es empfiehlt sich, die Stilprüfungen in den git-Hook `.git/hooks/pre-commit`
 zu legen, zum Beispiel:
@@ -170,9 +175,10 @@ zu legen, zum Beispiel:
 set -e
 cd $GIT_DIR/../src
 source ../env/bin/activate
-isort -c -rc .
+isort .
 black .
 flake8 .
+djhtml byro/
 ```
 
 ### Mit Übersetzungen arbeiten
