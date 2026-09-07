@@ -140,7 +140,7 @@ Local additions, for example extra labels for a reverse proxy, belong in a
 ## Configuration
 
 `byro.conf` holds the settings of byro itself (`BYRO_*`, see
-[Configuration](../configuration/index.md) for every option), the deployment
+[Configuration](../configuration/reference.md) for every option), the deployment
 settings (`BYRO_DEPLOY_*`) and the list of Compose files (`COMPOSE_FILE`). Read
 and change it with byroctl:
 
@@ -191,7 +191,7 @@ configured through `byro.conf`), and are not needed for normal operation:
   wait at most for a healthy web service (default 180).
 * `BYROCTL_OIDC_CLIENT_SECRET` - OIDC client secret for `byroctl install`, if
   you set up OIDC login right at installation time (see
-  [Configuration](../configuration/index.md)).
+  [Configuration](../configuration/reference.md)).
 * `BYROCTL_RAW_BASE`, `BYROCTL_SOURCE_DIR` - alternative source for deployment
   files and byroctl itself (a registry mirror, or a local `deploy/` checkout);
   for development and testing only, not meant for production use.

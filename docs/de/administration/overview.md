@@ -15,7 +15,7 @@ wird.
   Mitglieder mit OpenPGP verschlüsseln.
 - [Einstellungen](settings.md): Vereinskonfiguration, Registrierungsformular,
   Über byro und das Audit-Log.
-- [Konfigurationsreferenz](../configuration/index.md): alle Optionen aus
+- [Konfigurationsreferenz](../configuration/reference.md): alle Optionen aus
   `byro.cfg`/den `BYRO_*`-Umgebungsvariablen.
 
 Dein eigenes Profil, deine persönliche MFA-Einrichtung und dein API-Token

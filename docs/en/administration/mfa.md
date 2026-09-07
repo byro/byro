@@ -121,7 +121,7 @@ command tells you if that is not the case.
 ## Security notes
 
 - **TOTP secrets are stored encrypted.** The encryption key is derived from
-  Django's `SECRET_KEY` (see [Configuration](../configuration/index.md)). Keep
+  Django's `SECRET_KEY` (see [Configuration](../configuration/reference.md)). Keep
   the secret key stable and back it up together with the database (see
   [Backup and restore](backup-restore.md)): if it is lost, no user can pass
   the MFA step any more and every account has to be reset with `mfa_reset`.

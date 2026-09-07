@@ -5,7 +5,7 @@ betreiben und Änderungen dort zu testen. Zuerst musst du einige Pakete auf
 deinem Betriebssystem installieren.
 
 Wenn du byro auf einem Server für den echten Einsatz installieren willst, geh
-stattdessen zur [Installationsdokumentation](../installation/index.md).
+stattdessen zur [Installationsdokumentation](../installation/overview.md).
 
 Stelle sicher, dass folgende Abhängigkeiten installiert sind:
 
@@ -206,4 +206,4 @@ Willst du die Dokumentation verbessern, geh zu
 [An der Dokumentation arbeiten](documentation.md).
 
 Willst du an Plugins arbeiten, geh zu den
-[Plugin-Anleitungen](plugins/index.md).
+[Plugin-Anleitungen](plugins/overview.md).

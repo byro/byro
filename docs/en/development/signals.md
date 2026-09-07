@@ -1,7 +1,7 @@
 # Signal list
 
 This page lists the signals and hooks that are available in byro. The
-[plugin guides](plugins/index.md) give examples on how to use these signals.
+[plugin guides](plugins/overview.md) give examples on how to use these signals.
 
 ## Member management
 

@@ -20,7 +20,7 @@ nav = [
   { "Erste Schritte" = "index.md" },
   { "Installation" = [
     { "Installation" = [
-      "installation/index.md",
+      { "Überblick" = "installation/overview.md" },
       { "Mit byroctl (empfohlen)" = "installation/byroctl.md" },
       { "Mit Docker Compose" = "installation/docker-compose.md" },
       { "Bare Metal" = "installation/bare-metal.md" },
@@ -29,7 +29,7 @@ nav = [
   ] },
   { "Administration" = [
     { "Administration" = [
-      "administration/operations.md",
+      { "Überblick" = "administration/operations.md" },
       { "Update" = "administration/updating.md" },
       { "Backup und Restore" = "administration/backup-restore.md" },
       { "Management-Befehle" = "administration/management-commands.md" },
@@ -39,22 +39,23 @@ nav = [
   ] },
   { "Konfiguration" = [
     { "Konfiguration" = [
-      "administration/index.md",
+      { "Überblick" = "administration/overview.md" },
       { "Benutzer und Login" = "administration/users-and-login.md" },
       { "Mehr-Faktor-Authentifizierung" = "administration/mfa.md" },
       { "PGP-Mailverschlüsselung" = "administration/pgp.md" },
       { "Einstellungen" = "administration/settings.md" },
-      { "Konfigurationsreferenz" = "configuration/index.md" },
+      { "Konfigurationsreferenz" = "configuration/reference.md" },
     ] },
   ] },
   { "Benutzerhandbuch" = [
-    "usage/index.md",
+    { "Überblick" = "usage/overview.md" },
     { "Mitgliederverwaltung" = [
+      { "Überblick" = "usage/member-management.md" },
       { "Mitglieder" = "usage/members.md" },
       { "Mitgliedschaften und Beiträge" = "usage/memberships-and-fees.md" },
     ] },
     { "Finanzen" = [
-      "usage/finances.md",
+      { "Überblick" = "usage/finances.md" },
       { "Dokumente" = "usage/documents.md" },
       { "Kommunikation" = "usage/mails.md" },
     ] },
@@ -62,16 +63,16 @@ nav = [
       { "Mitgliederseite" = "usage/member-page.md" },
     ] },
     { "Mein Konto" = [
-      "usage/account.md",
+      { "Überblick" = "usage/account.md" },
       { "Mehr-Faktor-Authentifizierung" = "usage/mfa.md" },
     ] },
   ] },
   { "Plugins" = [
     { "Plugins" = [
-      "administration/plugins.md",
+      { "Überblick" = "administration/plugins.md" },
     ] },
     { "Plugin-Entwicklung" = [
-      "development/plugins/index.md",
+      { "Überblick" = "development/plugins/overview.md" },
       { "Ein Plugin erstellen" = "development/plugins/creating-a-plugin.md" },
       { "Eigene Mitgliedsdaten" = "development/plugins/member-data.md" },
       { "Bankimporter" = "development/plugins/bank-transaction-importers.md" },
@@ -79,7 +80,7 @@ nav = [
   ] },
   { "Entwicklung & API" = [
     { "Entwicklung & API" = [
-      "development/index.md",
+      { "Überblick" = "development/overview.md" },
       { "Entwicklungs-Setup" = "development/setup.md" },
       { "Mitwirken" = "development/contributing.md" },
       { "An der Dokumentation arbeiten" = "development/documentation.md" },

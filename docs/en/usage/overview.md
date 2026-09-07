@@ -2,9 +2,9 @@
 
 This section is for everyone who works with an already running byro
 day to day - board members, treasurers, staff - not for administrators who
-install or operate byro (see [Installation](../installation/index.md),
+install or operate byro (see [Installation](../installation/overview.md),
 [Administration](../administration/operations.md) and
-[Configuration](../administration/index.md) for that).
+[Configuration](../administration/overview.md) for that).
 
 ### Member management
 

@@ -24,14 +24,14 @@ header (your `BYRO_SITE_URL` or `[site] url`) is enough, since byro's
   `docker compose logs [-f] [SERVICE...]` show the container logs (byro
   writes to stdout/stderr, not to files inside the container). byro also
   writes log files into `BYRO_FILESYSTEM_LOGS` inside the data directory
-  (see [Configuration](../configuration/index.md#the-filesystem-section)).
+  (see [Configuration](../configuration/reference.md#the-filesystem-section)).
 * **Bare metal:** `journalctl -u byro-web` and `journalctl -u byro-periodic`
   show the systemd logs; the log directory from `[filesystem] logs` also
   holds byro's own log files. byro's startup output names this directory.
 * **Errors by mail:** the `[logging]` section (`BYRO_LOGGING_EMAIL`,
   `BYRO_LOGGING_EMAIL_LEVEL`) mails log messages from a configurable severity
   onward, regardless of the installation path (see
-  [Configuration](../configuration/index.md#the-logging-section)). Useful to
+  [Configuration](../configuration/reference.md#the-logging-section)). Useful to
   learn about server errors without actively watching the logs.
 
 ## Resources and scaling

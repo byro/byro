@@ -25,7 +25,7 @@ Es gibt drei Wege, byro zu installieren:
    individuelle Installationen: [Bare-Metal-Installation](bare-metal.md).
 
 Alle drei Wege teilen dieselben Konfigurationsoptionen
-([Konfiguration](../configuration/index.md)), denselben Weg zu Plugins
+([Konfiguration](../configuration/reference.md)), denselben Weg zu Plugins
 ([Plugins](../administration/plugins.md)), dieselben
 Wartungsaufgaben (siehe [Administration](../administration/operations.md)) und
 denselben Rat: byro nur hinter HTTPS betreiben und Daten sichern.

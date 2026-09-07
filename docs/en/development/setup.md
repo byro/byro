@@ -5,7 +5,7 @@ can test your changes. First of all, you need install some packages on your
 operating system:
 
 If you want to install byro on a server for actual usage, go to the
-[installation documentation](../installation/index.md) instead.
+[installation documentation](../installation/overview.md) instead.
 
 Please make sure you have the following dependencies installed:
 
@@ -208,4 +208,4 @@ Head over to [Working on the documentation](documentation.md) if you want to
 improve the documentation.
 
 If you want to work on plugins, please go to the
-[plugin guides](plugins/index.md).
+[plugin guides](plugins/overview.md).

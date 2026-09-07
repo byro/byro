@@ -90,13 +90,14 @@ procedure is not a repeat, since the steps differ per method — a concept like
 Every tab's own tree renders in the sidebar as a nested group
 (`navigation.sections`) named after the tab itself, so even a single-topic
 tab like *Installation* or *Administration* gets a bold sidebar heading
-instead of a bare page list. Where a group's first entry is a bare page path
-(not a `{Label = path}` table) whose own `#`-heading matches the group name,
-`navigation.indexes` also makes that heading clickable to the page (for
-example *Plugins* → *Plugin-Entwicklung*, or *Benutzerhandbuch* →
-*Finanzen*/*Mein Konto*); a group with no matching landing page (*Mitgliederverwaltung*,
-*Mitgliederbereich*) stays a plain, non-clickable bold label, which is normal
-Material/mkdocs behaviour for a section without an index page.
+instead of a bare page list. Every such heading is a plain, non-clickable
+bold label, and every group's first entry is an explicit `{"Overview" =
+path}` link to that group's landing page (for example *Plugin
+development* → *Overview*, or *User guide* → *Finance* → *Overview*) —
+never a bare, unlabelled page path. Only *Member management* has no
+existing landing page of its own, so it got a new short one
+(`usage/member-management.md`); *Member area* has a single labelled child
+page and needs no separate overview.
 
 Installation, Administration and Configuration look similar (all three are
 "for administrators"), but split on three different axes: Installation is
@@ -161,7 +162,7 @@ that is linked from elsewhere without checking `docs/check_site.py` output
 and other pages' links.
 
 **Links.** Link to other pages with a relative Markdown link to the `.md`
-file (`[Configuration](../configuration/index.md)`), not an absolute URL;
+file (`[Configuration](../administration/overview.md)`), not an absolute URL;
 Zensical resolves and validates these in strict mode
 (`invalid_links`/`invalid_link_anchors`) and rewrites them to the built HTML
 paths. Link to a heading with `#anchor-slug`. Only link to
@@ -274,23 +275,34 @@ it are secured; otherwise rewrite the passage from the code and known facts.
   URL). This is used deliberately: every page physically under
   `administration/` is split across three different tabs by topic, not by
   directory — `updating.md`, `backup-restore.md`, `management-commands.md`,
-  `troubleshooting.md`, `security-baseline.md` (plus a new landing page,
-  `operations.md`) live under the *Administration* tab; `users-and-login.md`,
-  `mfa.md`, `pgp.md`, `settings.md` (plus the existing `index.md` and
-  `configuration/index.md`, physically outside `administration/`) live under
-  *Configuration*; `plugins.md` lives under *Plugins* together with
-  `development/plugins/index.md` and its subpages, even though those are
+  `troubleshooting.md`, `security-baseline.md` (plus a landing page,
+  `operations.md`) live under the *Administration* tab; `overview.md`,
+  `users-and-login.md`, `mfa.md`, `pgp.md`, `settings.md` (plus
+  `configuration/reference.md`, physically outside `administration/`) live
+  under *Configuration*; `plugins.md` lives under *Plugins* together with
+  `development/plugins/overview.md` and its subpages, even though those are
   physically under `development/`, not `administration/`. Only rename a
   directory or file when the page's own topic changes, not to make it match
   its current tab.
 - Every top-level tab wraps its own page tree in one nested `nav` group named
   after the tab (for example `{ "Plugins" = [ { "Plugins" = [...] }, {
   "Plugin-Entwicklung" = [...] } ] }`), so the sidebar always shows a bold
-  section heading, even for a tab with only one topic. A group's first entry
-  can be a bare page path instead of a `{Label = path}` table; if that page's
-  `#`-heading matches the group name exactly, `navigation.indexes` turns the
-  otherwise plain heading into a link to that page (`development/plugins/index.md`'s
-  `# Plugin-Entwicklung` heading against the `"Plugin-Entwicklung"` group, or
-  `usage/finances.md`'s `# Finanzen` against the `"Finanzen"` group). Don't use
-  a bare first entry unless the heading text matches the group label exactly —
-  otherwise the sidebar shows the wrong label for that heading.
+  section heading, even for a tab with only one topic. Every group's own
+  section heading stays a plain, non-clickable bold label, and its first
+  child is always an explicit `{"Überblick" = path}`/`{"Overview" = path}`
+  entry linking to that group's landing page. Getting this right takes two
+  things, not one: the entry must be *labelled* (never a bare, unlabelled
+  page path), **and** the landing page's file must *not* be literally named
+  `index.md`/`README.md` anywhere in that section's subtree. `navigation.indexes`
+  (the mkdocs-material feature that turns a section heading into a link)
+  triggers on the second condition alone, regardless of nav labels or
+  `#`-heading text — it scans the whole section for a page file named
+  `index.md`/`README.md` and links the heading to whichever one it finds
+  first, which is precisely why `docs/de/configuration/reference.md` (the
+  `byro.cfg`/`BYRO_*` reference nested inside the *Konfiguration* tab) had to
+  be renamed away from `index.md` too, even though it already had an
+  explicit `Konfigurationsreferenz` label. Landing pages in this project are
+  therefore deliberately never named `index.md`/`README.md` (`overview.md`,
+  `operations.md`, `plugins.md`, `finances.md`, `account.md`, `reference.md`,
+  …), so no section heading is ever clickable by accident of a filename (see
+  the AP11b migration report, Nachtrag 4, for the full investigation).

@@ -15,7 +15,7 @@ Die [Signalliste](signals.md) dokumentiert die Hooks, die byro anbietet, und
 die [REST-API](api.md) beschreibt die programmatische Schnittstelle für
 Mitglieder und Mitgliedschaften. Anleitungen zur Plugin-Entwicklung stehen im
 Bereich [Plugins](../administration/plugins.md) unter
-[Plugin-Entwicklung](plugins/index.md): Sie zeigen anhand hoffentlich leicht
+[Plugin-Entwicklung](plugins/overview.md): Sie zeigen anhand hoffentlich leicht
 nachvollziehbarer Beispiel-Plugins, wie ein byro-Plugin entsteht.
 
 Wenn du byro betreust und ein Release vorbereitest, beschreibt

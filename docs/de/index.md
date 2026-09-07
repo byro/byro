@@ -14,7 +14,7 @@ weiterentwickelt.
 byro ist (noch) keine vollständige Buchhaltungssoftware und kein
 Veranstaltungs- oder Ticketing-Tool; es bringt auch keine gehostete
 Standardinstanz mit, die du ohne eigenen Server nutzen könntest – byro wird
-selbst betrieben (siehe [Installation](installation/index.md)) oder von
+selbst betrieben (siehe [Installation](installation/overview.md)) oder von
 jemandem in deiner Organisation oder deinem Umfeld für dich betrieben.
 
 ## Wie du hier anfängst
@@ -22,37 +22,37 @@ jemandem in deiner Organisation oder deinem Umfeld für dich betrieben.
 **Dein Verein hat bereits ein laufendes byro** und du sollst es benutzen, zum
 Beispiel als Vorstand oder Kassenwart: Ein Administrator oder eine
 Administratorin bei dir hat den Zugang eingerichtet; das
-[Benutzerhandbuch](usage/index.md) beschreibt die tägliche Arbeit mit
+[Benutzerhandbuch](usage/overview.md) beschreibt die tägliche Arbeit mit
 Mitgliedern, Beiträgen, Finanzen und Kommunikation. Fragen zu Login,
 Zwei-Faktor-Anmeldung oder Rechten beantwortet zunächst deine Administration,
-technische Hintergründe stehen unter [Konfiguration](administration/index.md).
+technische Hintergründe stehen unter [Konfiguration](administration/overview.md).
 
 **Du richtest byro für eine Organisation neu ein**, als technisch versierter
 Administrator oder Administratorin: Beginne bei
-[Installation](installation/index.md), das die drei unterstützten
+[Installation](installation/overview.md), das die drei unterstützten
 Installationswege beschreibt. [Administration](administration/operations.md)
 beschreibt den laufenden Betrieb danach (Update, Backup, Monitoring),
-[Konfiguration](administration/index.md), was du *in* byro einrichtest
+[Konfiguration](administration/overview.md), was du *in* byro einrichtest
 (Benutzerkonten, Login, MFA, Einstellungen) sowie die
 `byro.cfg`/`BYRO_*`-Referenz, und [Plugins](administration/plugins.md)
 zeigt, womit sich byro erweitern lässt.
 
 **Du willst byro erweitern oder daran mitarbeiten**: Start ist
-[Entwicklung & API](development/index.md).
+[Entwicklung & API](development/overview.md).
 
-- [Installation](installation/index.md): byro auf dem eigenen Server
+- [Installation](installation/overview.md): byro auf dem eigenen Server
   betreiben, mit byroctl, Docker Compose oder Bare Metal.
 - [Administration](administration/operations.md): der laufende Betrieb einer
   Installation – Update, Backup und Restore, Monitoring, Sicherheits-Baseline.
-- [Konfiguration](administration/index.md): Benutzerkonten und Login, MFA,
+- [Konfiguration](administration/overview.md): Benutzerkonten und Login, MFA,
   PGP und Einstellungen in einer laufenden Installation, dazu die
   Konfigurationsreferenz.
-- [Benutzerhandbuch](usage/index.md): die tägliche Arbeit mit byro –
+- [Benutzerhandbuch](usage/overview.md): die tägliche Arbeit mit byro –
   Mitglieder, Mitgliedschaften und Beiträge, Finanzen, Dokumente,
   Kommunikation.
 - [Plugins](administration/plugins.md): womit sich byro
   erweitern lässt.
-- [Entwicklung & API](development/index.md): byro oder ein Plugin
+- [Entwicklung & API](development/overview.md): byro oder ein Plugin
   weiterentwickeln.
 
 ## Funktionen

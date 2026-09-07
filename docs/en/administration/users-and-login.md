@@ -29,7 +29,7 @@ in with a password - only with one of the other enabled methods.
 ## OIDC/SSO login
 
 If `[oidc] issuer_url` is set (see
-[Configuration](../configuration/index.md#the-oidc-section)), the login page
+[Configuration](../configuration/reference.md#the-oidc-section)), the login page
 also shows an SSO button. The flow:
 
 1. byro redirects to the OIDC provider (authorization code flow with `state`
@@ -68,7 +68,7 @@ new ones and edit existing ones. Each account has:
 
 - **Username**, **name**, **e-mail address**,
 - **`is_staff`**: a prerequisite for REST API access (see
-  [Development & API](../development/index.md)). Has **no** other effect on
+  [Development & API](../development/overview.md)). Has **no** other effect on
   the Office itself.
 - **`is_superuser`**: byro **never** evaluates this field itself (no Django
   admin site is wired in). It appears in the audit log but has no practical

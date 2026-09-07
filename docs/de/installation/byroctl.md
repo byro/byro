@@ -147,7 +147,7 @@ fasst sie nie an.
 ## Konfiguration
 
 `byro.conf` enthält die Einstellungen von byro selbst (`BYRO_*`, alle Optionen
-unter [Konfiguration](../configuration/index.md)), die
+unter [Konfiguration](../configuration/reference.md)), die
 Deployment-Einstellungen (`BYRO_DEPLOY_*`) und die Liste der Compose-Dateien
 (`COMPOSE_FILE`). Lies und ändere sie mit byroctl:
 
@@ -200,7 +200,7 @@ nötig:
   --apply` maximal auf einen gesunden Web-Dienst warten (Standard 180).
 * `BYROCTL_OIDC_CLIENT_SECRET` – OIDC-Client-Secret für `byroctl install`,
   falls du OIDC-Login direkt bei der Installation setzt (siehe
-  [Konfiguration](../configuration/index.md)).
+  [Konfiguration](../configuration/reference.md)).
 * `BYROCTL_RAW_BASE`, `BYROCTL_SOURCE_DIR` – abweichende Quelle für
   Deployment-Dateien und byroctl selbst (Registry-Mirror bzw. lokaler
   `deploy/`-Checkout); nur für Entwicklung und Tests, nicht für den

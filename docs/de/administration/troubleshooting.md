@@ -27,7 +27,7 @@ richtigen `Host`-Header (deine `BYRO_SITE_URL` bzw. `[site] url`), da byros
   `docker compose logs [-f] [SERVICE...]` zeigt die Container-Logs (byro
   schreibt nach stdout/stderr, nicht in Dateien im Container). Zusätzlich
   legt byro Logdateien in `BYRO_FILESYSTEM_LOGS` innerhalb des
-  Datenverzeichnisses an (siehe [Konfiguration](../configuration/index.md#abschnitt-filesystem)).
+  Datenverzeichnisses an (siehe [Konfiguration](../configuration/reference.md#abschnitt-filesystem)).
 * **Bare Metal:** `journalctl -u byro-web` bzw. `journalctl -u
   byro-periodic` zeigen die systemd-Logs; das Logverzeichnis aus
   `[filesystem] logs` enthält zusätzlich byros eigene Logdateien. Die
@@ -35,7 +35,7 @@ richtigen `Host`-Header (deine `BYRO_SITE_URL` bzw. `[site] url`), da byros
 * **Fehler per Mail:** Der Abschnitt `[logging]` (`BYRO_LOGGING_EMAIL`,
   `BYRO_LOGGING_EMAIL_LEVEL`) schickt Log-Meldungen ab einem einstellbaren
   Schweregrad per Mail, unabhängig vom Installationsweg (siehe
-  [Konfiguration](../configuration/index.md#abschnitt-logging)). Das ist
+  [Konfiguration](../configuration/reference.md#abschnitt-logging)). Das ist
   sinnvoll, um von Serverfehlern zu erfahren, ohne die Logs aktiv zu
   beobachten.
 

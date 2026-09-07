@@ -2,7 +2,7 @@
 
 Your user menu (your username in the top right of the Office) bundles three
 actions for your **own** account - unlike "Settings → Users" in
-[Configuration](../administration/index.md), where accounts are managed
+[Configuration](../administration/overview.md), where accounts are managed
 (including other people's, as long as you are signed in, see the security
 notes there).
 

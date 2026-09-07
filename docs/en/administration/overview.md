@@ -12,7 +12,7 @@ through the Office - regardless of how or where byro is hosted.
   members with OpenPGP.
 - [Settings](settings.md): association configuration, registration form,
   about byro and the audit log.
-- [Configuration reference](../configuration/index.md): every option from
+- [Configuration reference](../configuration/reference.md): every option from
   `byro.cfg`/the `BYRO_*` environment variables.
 
 Your own profile, your personal MFA setup and your API token are reachable

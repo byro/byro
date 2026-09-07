@@ -9,9 +9,9 @@ has full access to your database, so install only plugins you trust.
 This page describes plugins in a byroctl installation. The sections at the end
 cover the manual Docker Compose setup and the bare metal installation. How a
 plugin is built is under
-[Plugin development](../development/plugins/index.md) in the same section.
+[Plugin development](../development/plugins/overview.md) in the same section.
 Integrations that are not plugins (SMTP mail delivery, OIDC/SSO) live under
-[Configuration](../configuration/index.md) and
+[Configuration](../configuration/reference.md) and
 [Users and login](users-and-login.md) respectively.
 
 ## Official plugins

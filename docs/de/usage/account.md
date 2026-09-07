@@ -2,7 +2,7 @@
 
 Dein Benutzermenü (dein Benutzername oben rechts im Office) bündelt drei
 Aktionen für dein **eigenes** Konto – anders als „Einstellungen → Benutzer“
-in der [Administration](../administration/index.md), wo Konten verwaltet
+in der [Administration](../administration/overview.md), wo Konten verwaltet
 werden (auch fremde, sofern du angemeldet bist, siehe die Sicherheitshinweise
 dort).
 

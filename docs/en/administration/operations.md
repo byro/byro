@@ -2,9 +2,9 @@
 
 What applies across installation paths for the day-to-day operation of a
 byro installation - regardless of whether it was set up with byroctl, Docker
-Compose or bare metal (see [Installation](../installation/index.md)). What
+Compose or bare metal (see [Installation](../installation/overview.md)). What
 you set up *inside* byro afterwards (user accounts, login, MFA, settings) is
-under [Configuration](index.md).
+under [Configuration](overview.md).
 
 - [Updating](updating.md): what applies to an update, and the limits of
   downgrades.

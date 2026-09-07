@@ -264,7 +264,7 @@ server {
 
 Weil der Proxy TLS terminiert, muss byro dem Header `X-Forwarded-Proto`
 vertrauen. Setze `trust_proxy = True` im Abschnitt `[site]` von
-`/etc/byro/byro.cfg` (siehe [Konfiguration](../configuration/index.md)); sonst
+`/etc/byro/byro.cfg` (siehe [Konfiguration](../configuration/reference.md)); sonst
 erzeugt byro absolute URLs wie den OpenID-Connect-Redirect mit `http` und hält
 Anfragen für unsicher.
 

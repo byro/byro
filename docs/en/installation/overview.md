@@ -23,7 +23,7 @@ There are three ways to install byro:
    server, gunicorn, systemd and your own reverse proxy. For classic or
    individual deployments: [Bare metal installation](bare-metal.md).
 
-All three share the same configuration options ([Configuration](../configuration/index.md)),
+All three share the same configuration options ([Configuration](../configuration/reference.md)),
 the same way to add plugins ([Plugins](../administration/plugins.md)),
 the same maintenance tasks (see [Administration](../administration/operations.md))
 and the same advice: run byro behind HTTPS only, and back up your data.

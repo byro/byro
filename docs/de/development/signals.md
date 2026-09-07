@@ -1,7 +1,7 @@
 # Signalliste
 
 Diese Seite listet die Signale und Hooks, die byro anbietet. Die
-[Plugin-Anleitungen](plugins/index.md) zeigen Beispiele für ihre Verwendung.
+[Plugin-Anleitungen](plugins/overview.md) zeigen Beispiele für ihre Verwendung.
 
 !!! info "Docstrings auf Englisch"
     Die generierten Beschreibungen unten kommen unverändert aus den

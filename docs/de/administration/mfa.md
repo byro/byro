@@ -128,7 +128,7 @@ der Befehl sagt dir, wenn das nicht der Fall ist.
 
 - **TOTP-Geheimnisse werden verschlüsselt gespeichert.** Der
   Verschlüsselungsschlüssel wird aus Djangos `SECRET_KEY` abgeleitet (siehe
-  [Konfiguration](../configuration/index.md)). Halte den Secret Key stabil und
+  [Konfiguration](../configuration/reference.md)). Halte den Secret Key stabil und
   sichere ihn zusammen mit der Datenbank (siehe
   [Backup und Restore](backup-restore.md)): Geht er verloren, kann kein
   Benutzer mehr den MFA-Schritt bestehen, und jedes Konto muss mit `mfa_reset`

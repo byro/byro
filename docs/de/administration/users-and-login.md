@@ -32,7 +32,7 @@ Methoden.
 ## OIDC/SSO-Login
 
 Ist `[oidc] issuer_url` gesetzt (siehe
-[Konfiguration](../configuration/index.md#abschnitt-oidc)), zeigt die
+[Konfiguration](../configuration/reference.md#abschnitt-oidc)), zeigt die
 Login-Seite zusätzlich einen SSO-Button. Der Ablauf:
 
 1. byro leitet zum OIDC-Anbieter weiter (Authorization-Code-Flow mit `state`
@@ -73,7 +73,7 @@ legst neue an und bearbeitest bestehende. Jedes Konto hat:
 
 - **Benutzername**, **Name**, **E-Mail-Adresse**,
 - **`is_staff`**: Voraussetzung für Zugriff auf die REST-API (siehe
-  [Entwicklung & API](../development/index.md)). Hat **keine** weitere
+  [Entwicklung & API](../development/overview.md)). Hat **keine** weitere
   Wirkung auf das Office selbst.
 - **`is_superuser`**: byro wertet dieses Feld **an keiner Stelle** selbst aus
   (kein Django-Admin-Interface eingebunden). Es erscheint im Audit-Log, hat

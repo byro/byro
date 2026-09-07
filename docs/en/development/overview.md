@@ -15,7 +15,7 @@ The [signal list](signals.md) documents the hooks byro offers, and the
 [REST API](api.md) describes the programmatic interface for members and
 memberships. Plugin development guides are under
 [Plugins](../administration/plugins.md), in
-[Plugin development](plugins/index.md): they show how to develop a byro
+[Plugin development](plugins/overview.md): they show how to develop a byro
 plugin with some hopefully easy-to-follow example plugins.
 
 If you maintain byro and prepare a release, [Releasing byro](releasing.md)

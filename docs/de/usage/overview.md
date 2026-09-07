@@ -3,8 +3,8 @@
 Dieser Bereich richtet sich an alle, die mit einem bereits laufenden byro
 tagtäglich arbeiten – Vorstand, Kassenwart, Sachbearbeitung – nicht an
 Administratoren, die byro installieren oder betreiben (siehe dafür
-[Installation](../installation/index.md), [Administration](../administration/operations.md)
-und [Konfiguration](../administration/index.md)).
+[Installation](../installation/overview.md), [Administration](../administration/operations.md)
+und [Konfiguration](../administration/overview.md)).
 
 ### Mitgliederverwaltung
 

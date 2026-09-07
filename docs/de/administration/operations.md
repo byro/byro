@@ -2,9 +2,9 @@
 
 Was installationswegübergreifend für den laufenden Betrieb einer
 byro-Installation gilt – unabhängig davon, ob sie mit byroctl, Docker Compose
-oder Bare Metal aufgesetzt wurde (siehe [Installation](../installation/index.md)).
+oder Bare Metal aufgesetzt wurde (siehe [Installation](../installation/overview.md)).
 Was du danach *in* byro einrichtest (Benutzerkonten, Login, MFA, Einstellungen)
-steht unter [Konfiguration](index.md).
+steht unter [Konfiguration](overview.md).
 
 - [Update](updating.md): was für ein Update gilt, und die Grenzen von
   Downgrades.
