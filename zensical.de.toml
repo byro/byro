@@ -44,6 +44,9 @@ nav = [
     { "Mitglieder" = "usage/members.md" },
     { "Mitgliedschaften und Beiträge" = "usage/memberships-and-fees.md" },
     { "Mitgliederseite" = "usage/member-page.md" },
+    { "Finanzen" = "usage/finances.md" },
+    { "Dokumente" = "usage/documents.md" },
+    { "Kommunikation" = "usage/mails.md" },
   ] },
   { "Entwicklung & API" = [
     "development/index.md",
