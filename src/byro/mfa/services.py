@@ -73,9 +73,10 @@ def policy_requires_mfa():
 
 
 def is_backend_user(user):
-    """byro grants office access to every authenticated, active Django user
-    (see ``PermissionMiddleware``); there is no separate staff flag for the
-    backend. The MFA policy therefore applies to exactly these users."""
+    """Only ``is_staff`` or ``is_superuser`` accounts can log in to the
+    office backend at all (see ``LoginView``/``OIDCCallbackView``), so any
+    authenticated, active user reaching this point already is one. The MFA
+    policy applies to exactly these users."""
     return bool(getattr(user, "is_authenticated", False) and user.is_active)
 
 

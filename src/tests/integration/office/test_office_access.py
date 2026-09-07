@@ -97,6 +97,24 @@ def test_office_login_client_non_staff_user(client, user):
 
 
 @pytest.mark.django_db
+def test_office_login_client_superuser_without_staff(client, user):
+    """is_staff and is_superuser are independent: a superuser can log in
+    even without is_staff."""
+    user.set_password("thepassword")
+    user.is_staff = False
+    user.is_superuser = True
+    user.save()
+
+    response = client.post(
+        reverse("common:login"),
+        {"username": user.username, "password": "thepassword"},
+        follow=True,
+    )
+    assert response.status_code == 200
+    assert response.wsgi_request.user.is_authenticated
+
+
+@pytest.mark.django_db
 def test_office_oidc_login_non_staff_user(client, user, configuration, monkeypatch):
     user.is_staff = False
     user.save()
@@ -131,6 +149,41 @@ def test_office_oidc_login_non_staff_user(client, user, configuration, monkeypat
         LogEntry.objects.filter(action_type="byro.common.login.not_staff").count() == 1
     )
     assert LogEntry.objects.count() == log_count + 1
+
+
+@pytest.mark.django_db
+def test_office_oidc_login_superuser_without_staff(
+    client, user, configuration, monkeypatch
+):
+    user.is_staff = False
+    user.is_superuser = True
+    user.save()
+
+    monkeypatch.setattr(common_views, "is_oidc_configured", lambda: True)
+    monkeypatch.setattr(
+        common_views,
+        "exchange_code",
+        lambda code, redirect_uri: {"id_token": "id", "access_token": "at"},
+    )
+    monkeypatch.setattr(
+        common_views,
+        "validate_id_token",
+        lambda id_token, nonce: {"preferred_username": user.username},
+    )
+    monkeypatch.setattr(
+        common_views, "get_or_create_user", lambda claims, access_token: user
+    )
+
+    session = client.session
+    session["oidc_state"] = "state123"
+    session["oidc_nonce"] = "nonce123"
+    session.save()
+    response = client.get(
+        reverse("common:oidc-callback") + "?state=state123&code=abc", follow=True
+    )
+
+    assert response.status_code == 200
+    assert response.wsgi_request.user.is_authenticated
 
 
 @pytest.mark.django_db

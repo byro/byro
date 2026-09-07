@@ -156,6 +156,38 @@ def test_superuser_can_grant_superuser(
 
 
 @pytest.mark.django_db
+def test_staff_and_superuser_are_independent_flags(
+    client, configuration, user, superuser, login_user
+):
+    """is_staff and is_superuser are not coupled: granting one does not
+    imply or force the other. Both simply grant login; superuser
+    additionally grants user management."""
+    login_user(client, superuser)
+    assert not user.is_superuser
+    assert user.is_staff
+    user.is_staff = False
+    user.save()
+
+    response = client.post(
+        reverse("office:settings.users.detail", kwargs={"pk": user.pk}),
+        {
+            "username": user.username,
+            "last_name": "",
+            "email": "",
+            "password": "test_password",
+            "is_superuser": "on",
+            # is_staff intentionally left unchecked
+        },
+        follow=True,
+    )
+    assert response.status_code == 200
+
+    user.refresh_from_db()
+    assert user.is_superuser
+    assert not user.is_staff
+
+
+@pytest.mark.django_db
 def test_disabling_password_revokes_api_token(
     client, configuration, user, superuser, login_user
 ):
