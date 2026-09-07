@@ -26,11 +26,14 @@ Es gibt drei Wege, byro zu installieren:
 
 Alle drei Wege teilen dieselben Konfigurationsoptionen
 ([Konfiguration](../configuration/index.md)), denselben Weg zu Plugins
-([Plugins](../administration/plugins.md)), dieselben Wartungsaufgaben und
+([Plugins & Integrationen](../administration/plugins.md)), dieselben
+Wartungsaufgaben (siehe [Administration](../administration/operations.md)) und
 denselben Rat: byro nur hinter HTTPS betreiben und Daten sichern.
 
 Die folgenden Seiten beschreiben eine geradlinige Einrichtung, ohne auf
-Grundlagen wie Serverhärtung oder Backups im Allgemeinen einzugehen.
+Grundlagen wie Serverhärtung oder Backups im Allgemeinen einzugehen. Update,
+Backup und Restore, Monitoring und die Sicherheits-Baseline stehen unter
+[Administration](../administration/operations.md), sobald byro läuft.
 
 Das veraltete `production/`-Setup hat eine eigene Seite:
 [Legacy-Setup mit den production/-Dateien](legacy-production.md).

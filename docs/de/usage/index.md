@@ -1,10 +1,10 @@
-# Benutzung
+# Benutzerhandbuch
 
 Dieser Bereich richtet sich an alle, die mit einem bereits laufenden byro
 tagtäglich arbeiten – Vorstand, Kassenwart, Sachbearbeitung – nicht an
 Administratoren, die byro installieren oder betreiben (siehe dafür
-[Installation](../installation/index.md) und
-[Administration](../administration/index.md)).
+[Installation](../installation/index.md), [Administration](../administration/operations.md)
+und [Konfiguration](../administration/index.md)).
 
 - [Mitglieder](members.md): suchen, anlegen, bearbeiten, Ein- und Austritt,
   Dokumente, Export/Import, Massenaktionen.
@@ -13,8 +13,11 @@ Administratoren, die byro installieren oder betreiben (siehe dafür
 - [Mitgliederseite](member-page.md): der Zugang, den Mitglieder selbst ohne
   Login bekommen – ihre Daten, die Mitgliederliste, Änderungsvorschläge und
   Datenschutzeinstellungen.
-
-Finanzen (Konten, Transaktionen, Bankimport), Dokumente außerhalb der
-Mitgliedsansicht und Kommunikation (Mailvorlagen, Postausgang) entstehen noch;
-bis dahin listet die [Funktionsübersicht](../index.md#funktionen) auf der
-Startseite, was byro kann.
+- [Finanzen](finances.md): Konten, Transaktionen und Bankimport.
+- [Dokumente](documents.md): Kategorien und wo Dokumente hochgeladen werden.
+- [Kommunikation](mails.md): Mailvorlagen, Verfassen, Postausgang und PGP aus
+  Nutzersicht.
+- [Mein Konto](account.md): eigenes Profil, persönlicher API-Token – erreichbar
+  über dein Benutzermenü, nicht über die Administration.
+- [Mehr-Faktor-Authentifizierung](mfa.md): MFA für dein eigenes Konto
+  einrichten, anmelden, Wiederherstellungscodes.

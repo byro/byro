@@ -21,8 +21,8 @@ Schema nicht von selbst auffallen.
 ## Authentifizierung
 
 Die API verwendet Token-Authentifizierung: Jedes Office-Konto hat einen
-eigenen Token unter „Einstellungen → API-Token“ (siehe
-[Einstellungen](../administration/settings.md#api-token)), gesendet als
+eigenen Token im Benutzermenü unter *API-Token* (siehe
+[Mein Konto](../usage/account.md#api-token)), gesendet als
 Header `Authorization: Token <dein-token>`. Der Token funktioniert nur,
 solange das zugehörige Konto `is_staff` ist (siehe
 [Benutzer und Login](../administration/users-and-login.md#benutzerkonten-verwalten));

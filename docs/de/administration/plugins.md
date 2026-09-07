@@ -9,7 +9,10 @@ deine Datenbank, installiere also nur Plugins, denen du vertraust.
 
 Diese Seite beschreibt Plugins in einer byroctl-Installation. Die Abschnitte
 am Ende behandeln das manuelle Docker-Compose-Setup und die
-Bare-Metal-Installation.
+Bare-Metal-Installation. Andere Integrationen (SMTP-Mailversand, OIDC/SSO)
+sind kein Plugin-Mechanismus und stehen bei
+[Konfiguration](../configuration/index.md) beziehungsweise
+[Benutzer und Login](users-and-login.md).
 
 ## Offizielle Plugins
 

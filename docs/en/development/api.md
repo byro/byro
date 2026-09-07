@@ -20,9 +20,9 @@ the schema by themselves.
 
 ## Authentication
 
-The API uses token authentication: every Office account has its own token
-under "Settings → API token" (see
-[Settings](../administration/settings.md#api-token)), sent as the header
+The API uses token authentication: every Office account has its own token in
+the user menu under *API token* (see
+[My account](../usage/account.md#api-token)), sent as the header
 `Authorization: Token <your-token>`. The token only works while the account
 is `is_staff` (see
 [Users and login](../administration/users-and-login.md#managing-user-accounts));

@@ -39,7 +39,10 @@ Die folgenden Beispiele zeigen die byroctl-Form; ersetze sie nach Bedarf.
   (siehe [Konto-Wiederherstellung](troubleshooting.md#konto-wiederherstellung)).
 * `mfa_status <benutzername oder e-mail>` und
   `mfa_reset <benutzername oder e-mail>` – MFA-Status abfragen bzw. alle
-  MFA-Geräte eines Kontos entfernen (siehe [MFA](mfa.md#fur-administratoren)).
+  MFA-Geräte eines Kontos entfernen (siehe
+  [MFA-Status eines Benutzers prüfen](mfa.md#mfa-status-eines-benutzers-prufen)
+  und
+  [MFA eines Benutzers zurücksetzen](mfa.md#mfa-eines-benutzers-zurucksetzen-notfallwiederherstellung)).
 
 ## Prüfung und Export
 

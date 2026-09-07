@@ -40,7 +40,8 @@ The examples below show the byroctl form; substitute as needed.
   [Account recovery](troubleshooting.md#account-recovery)).
 * `mfa_status <username or e-mail>` and `mfa_reset <username or e-mail>` -
   check MFA status, or remove all MFA devices of an account (see
-  [MFA](mfa.md#for-administrators)).
+  [Checking a user's MFA status](mfa.md#checking-a-users-mfa-status) and
+  [Resetting the MFA of a user](mfa.md#resetting-the-mfa-of-a-user-break-glass-recovery)).
 
 ## Auditing and export
 

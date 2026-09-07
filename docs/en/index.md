@@ -20,28 +20,35 @@ organization or community.
 
 **Your association already has a running byro** and you are meant to use it,
 for example as a board member or treasurer: an administrator on your side has
-set up your access; [Usage](usage/index.md) describes day-to-day work with
-members, fees and finances (this section is being written). Ask your
-administration about login, two-factor sign-in or permissions; technical
-background is in [Administration](administration/index.md).
+set up your access; the [user guide](usage/index.md) describes day-to-day
+work with members, fees, finances and communication. Ask your administration
+about login, two-factor sign-in or permissions; technical background is in
+[Configuration](administration/index.md).
 
 **You are setting up byro for an organization**, as a technically minded
-administrator: start at [Installation](installation/index.md), which explains
-the three supported paths (byroctl, Docker Compose, bare metal) and how to
-choose between them. [Configuration](configuration/index.md) is the reference
-of all settings, [Administration](administration/index.md) covers updating,
-backup, plugins and day-to-day operation.
+administrator: start at [Installation](installation/index.md), which covers
+the three supported installation paths.
+[Administration](administration/operations.md) covers day-to-day operation
+afterwards (updating, backup, monitoring),
+[Configuration](administration/index.md) what you set up *inside* byro (user
+accounts, login, MFA, settings) plus the `byro.cfg`/`BYRO_*` reference, and
+[Plugins & integrations](administration/plugins.md) shows what byro can be
+extended with.
 
 **You want to extend byro or contribute to it**: start at
 [Development & API](development/index.md).
 
 - [Installation](installation/index.md): run byro on your own server with
   byroctl, Docker Compose or bare metal.
-- [Administration](administration/index.md): MFA, PGP, plugins, updating,
-  backup and restore, and monitoring and troubleshooting a running instance.
-- [Configuration](configuration/index.md): reference of all configuration
-  options.
-- [Usage](usage/index.md): day-to-day work with byro (being written).
+- [Administration](administration/operations.md): day-to-day operation of an
+  installation - updating, backup and restore, monitoring, security
+  baseline.
+- [Configuration](administration/index.md): user accounts and login, MFA, PGP
+  and settings in a running instance, plus the configuration reference.
+- [User guide](usage/index.md): day-to-day work with byro - members,
+  memberships and fees, finances, documents, communication.
+- [Plugins & integrations](administration/plugins.md): what byro can be
+  extended with.
 - [Development & API](development/index.md): develop byro or a plugin.
 
 ## Features

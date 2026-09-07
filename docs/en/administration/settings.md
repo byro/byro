@@ -2,7 +2,9 @@
 
 This page describes the application-internal settings under "Settings" in
 the Office. User accounts and login have their own page:
-[Users and login](users-and-login.md).
+[Users and login](users-and-login.md). Your personal API token and your own
+MFA setup are not part of "Settings" - they are reachable from your user
+menu instead, see [My account](../usage/account.md) in the user guide.
 
 ## Initial setup
 
@@ -69,15 +71,6 @@ plus the PGP fingerprint entry. For each field you can set:
 
 With no saved configuration, byro shows a sensible default (member number,
 name, address, e-mail, fee start, interval, amount).
-
-## API token
-
-Every account has its own REST API token under "Settings → API token" (see
-[Development & API](../development/index.md)); "Regenerate" deletes the old
-one and creates a new one. The token only works while the account is
-`is_staff` (see
-[Managing user accounts](users-and-login.md#managing-user-accounts)); without
-`is_staff` the token can still be displayed, but the API rejects it.
 
 ## About byro
 

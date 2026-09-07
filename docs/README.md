@@ -70,15 +70,32 @@ such notes already exist from the Sphinx migration (see
 `grep -rn "migration note" docs/de docs/en`); remove one once the page it
 annotates is rewritten with real content, do not carry it forward.
 
-**Audience and structure.** The navigation has six areas, aimed at a role
-each: people who install byro (*Installation*), people who run and configure
-an existing instance (*Administration*, *Configuration*), people who use byro
-day to day (*Usage*), and people who develop byro or a plugin
-(*Development & API*). Pick the page for the role doing the task, not the
-page that already exists and is closest. Describe one topic in one place; link
-to it from other pages instead of repeating it (an install method's own update
-procedure is not a repeat, since the steps differ per method — a concept like
-"what a plugin is" would be).
+**Audience and structure.** The navigation has seven top-level tabs
+(Zensical's `navigation.tabs`, with `navigation.sections` rendering each
+tab's own tree in the sidebar), aimed at a role each, in this order:
+*Getting started* (the start page, a single page); *Installation* (the three
+installation methods only — byroctl, Docker Compose, bare metal); *Administration*
+(day-2 server operation regardless of install method: updating, backup/restore,
+management commands, monitoring/troubleshooting, security baseline);
+*Configuration* (what you set up *inside* byro through the Office — users/login,
+MFA, PGP, settings — plus the `byro.cfg`/`BYRO_*` configuration reference);
+*User guide* (day-to-day work in a running byro); *Plugins & integrations*
+(what byro can be extended with); and *Development & API*. Pick the page for
+the role doing the task, not the page that already exists and is closest.
+Describe one topic in one place; link to it from other pages instead of
+repeating it (an install method's own update procedure is not a repeat, since
+the steps differ per method — a concept like "what a plugin is" would be).
+
+Installation, Administration and Configuration look similar (all three are
+"for administrators"), but split on three different axes: Installation is
+about first getting a byro instance running — a page whose steps depend on
+byroctl vs. Docker Compose vs. bare metal belongs there. Administration is
+about keeping an already-running instance alive — update, backup, monitoring
+— regardless of which of the three installation methods was used. Configuration
+is about what happens *inside* byro through the Office UI (or the `byro.cfg`
+file/`BYRO_*` variables that back it), regardless of how or where byro is
+hosted. A page that would answer the same way no matter who's hosting the
+instance belongs in Configuration, not Installation or Administration.
 
 **Diátaxis, applied quietly.** Within a page, keep tutorial ("do this to
 learn"), how-to ("do this to get a result"), reference ("look this up
@@ -235,3 +252,17 @@ it are secured; otherwise rewrite the passage from the code and known facts.
   Dataclass field comments (`#:` above a field) are not extracted by Griffe
   either, so `ImportedBankTransaction`'s fields stay hand-written prose next
   to a generated, member-less class block.
+- The `nav` tree in `zensical.de.toml`/`zensical.en.toml` is independent of
+  the file layout under `docs/de/`/`docs/en/`: a page's directory does not
+  have to match which top-level tab it appears under, and moving a page
+  between tabs is a `nav` edit, not a file move (no broken links, no new
+  URL). This is used deliberately: every page physically under
+  `administration/` is split across three different tabs by topic, not by
+  directory — `updating.md`, `backup-restore.md`, `management-commands.md`,
+  `troubleshooting.md`, `security-baseline.md` (plus a new landing page,
+  `operations.md`) live under the *Administration* tab; `users-and-login.md`,
+  `mfa.md`, `pgp.md`, `settings.md` (plus the existing `index.md` and
+  `configuration/index.md`, physically outside `administration/`) live under
+  *Configuration*; `plugins.md` is its own tab, *Plugins & integrations*. Only
+  rename a directory or file when the page's own topic changes, not to make
+  it match its current tab.

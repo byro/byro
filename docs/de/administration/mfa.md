@@ -1,5 +1,10 @@
 # Mehr-Faktor-Authentifizierung (MFA)
 
+Diese Seite behandelt die MFA-**Richtlinie und -Verwaltung** für Administration
+und Server-Zugang. Wie ein einzelnes Konto MFA einrichtet, sich damit anmeldet
+oder Wiederherstellungscodes verwendet, steht im Benutzerhandbuch:
+[Mehr-Faktor-Authentifizierung](../usage/mfa.md).
+
 byro unterstützt Mehr-Faktor-Authentifizierung für alle Benutzer des Backends
 („Office“) auf Basis zeitbasierter Einmalpasswörter (TOTP,
 [RFC 6238](https://www.rfc-editor.org/rfc/rfc6238)). Jede gängige
@@ -27,65 +32,7 @@ MFA betrifft nur die interaktive Anmeldung am Backend. Sie ändert nichts an
     selbst. Die MFA-Richtlinie gilt deshalb für *jeden* Benutzer, der sich am
     Office anmelden kann, unabhängig von `is_staff`.
 
-## Für Backend-Benutzer
-
-### MFA einrichten
-
-1. Öffne das Benutzermenü (dein Benutzername oben rechts) und wähle
-   *Mehr-Faktor-Authentifizierung* (auch über die gleichnamige Schaltfläche
-   auf deiner Profilseite erreichbar).
-2. Klicke auf *MFA einrichten*.
-3. Scanne den QR-Code mit deiner Authenticator-App. Wenn du ihn nicht scannen
-   kannst, gib den Schlüssel unter dem QR-Code manuell ein (Typ:
-   zeitbasiert / TOTP, 6 Stellen, 30 Sekunden, SHA-1).
-4. Gib den sechsstelligen Code aus deiner App ein und klicke auf *Prüfen und
-   aktivieren*. MFA ist erst aktiv, wenn ein Code erfolgreich geprüft wurde;
-   das bloße Öffnen der Einrichtungsseite ändert nichts.
-5. byro zeigt nun **zehn Wiederherstellungscodes**. Bewahre sie sicher auf
-   (zum Beispiel in einem Passwortmanager). Sie werden nur einmal angezeigt.
-
-Ab jetzt fragt jede Anmeldung nach dem Passwort einen Code aus deiner
-Authenticator-App ab. Für ein Konto mit aktivierter MFA lässt sich dieser
-Schritt nicht überspringen.
-
-### Anmelden
-
-Gib wie bisher Benutzername und Passwort ein. Auf der nächsten Seite gibst du
-den aktuellen sechsstelligen Code aus deiner Authenticator-App ein. Codes sind
-nur kurz gültig, und jeder Code kann nur einmal verwendet werden.
-
-### Einen Wiederherstellungscode verwenden
-
-Hast du keinen Zugriff auf deine Authenticator-App, klicke auf der Code-Seite
-auf *Wiederherstellungscode verwenden* und gib einen deiner Codes ein
-(`XXXX-XXXX-XXXX`, Bindestriche und Groß-/Kleinschreibung spielen keine Rolle).
-Jeder Wiederherstellungscode funktioniert genau einmal. Nach der Anmeldung
-sagt dir byro, wie viele Codes übrig sind; erzeuge neue, wenn es knapp wird.
-
-### Neue Wiederherstellungscodes erzeugen
-
-*Benutzermenü → Mehr-Faktor-Authentifizierung → Neue Wiederherstellungscodes
-erzeugen*. Du musst mit einem aktuellen Code aus deiner Authenticator-App
-bestätigen. Alle bisherigen Wiederherstellungscodes werden sofort ungültig.
-
-### MFA deaktivieren
-
-*Benutzermenü → Mehr-Faktor-Authentifizierung → MFA deaktivieren*, bestätigt
-mit einem aktuellen Authenticator-Code. Das entfernt den Authenticator und alle
-Wiederherstellungscodes; danach schützt nur noch das Passwort das Konto.
-
-Ist MFA für alle Administratoren vorgeschrieben, steht diese Option nicht zur
-Verfügung.
-
-### Authenticator verloren und keine Wiederherstellungscodes mehr
-
-Bitte einen Administrator mit Shell-Zugang zum byro-Server, deine MFA mit dem
-unten beschriebenen Management Command zurückzusetzen. Über die Weboberfläche
-lässt sich die MFA eines anderen Benutzers nicht zurücksetzen.
-
-## Für Administratoren
-
-### MFA für alle Administratoren vorschreiben
+## MFA für alle Administratoren vorschreiben
 
 Unter *Einstellungen → Allgemein* findest du die Karte
 *Mehr-Faktor-Authentifizierung* mit der Option **MFA für alle Administratoren
@@ -107,7 +54,7 @@ vorschreiben** (standardmäßig aus). Das Aktivieren hat folgende Auswirkungen:
 
 Das Ändern der Option wird im Audit-Log festgehalten.
 
-### Anzeige in Authenticator-Apps
+## Anzeige in Authenticator-Apps
 
 Einträge aus byros QR-Code zeigen immer **BYRO** als Dienstnamen. Die zweite
 Zeile, der Kontoname, ist in derselben Einstellungskarte konfigurierbar
@@ -122,7 +69,7 @@ Doppelpunkte sind nicht erlaubt: Das von Authenticator-Apps verwendete
 Die Einstellung wirkt nur auf neu eingerichtete Authenticator; bestehende
 Einträge in den Apps behalten den Namen, den sie beim Anlegen hatten.
 
-### MFA-Status eines Benutzers prüfen
+## MFA-Status eines Benutzers prüfen
 
 Die Benutzerliste markiert Benutzer mit MFA mit einem Schild-Symbol. Auf dem
 Server gibt
@@ -144,7 +91,7 @@ MFA required by policy: no
 
 Geheimnisse und Wiederherstellungscodes werden nie angezeigt.
 
-### MFA eines Benutzers zurücksetzen (Notfallwiederherstellung)
+## MFA eines Benutzers zurücksetzen (Notfallwiederherstellung)
 
 Hat ein Benutzer seinen Authenticator verloren und keine
 Wiederherstellungscodes mehr (oder ist aus einem anderen Grund ausgesperrt),
@@ -177,7 +124,7 @@ Sitzungen können nur mit dem standardmäßigen datenbankbasierten
 Sitzungsspeicher (`SESSION_ENGINE` endet auf `.db`) automatisch beendet werden;
 der Befehl sagt dir, wenn das nicht der Fall ist.
 
-### Sicherheitshinweise
+## Sicherheitshinweise
 
 - **TOTP-Geheimnisse werden verschlüsselt gespeichert.** Der
   Verschlüsselungsschlüssel wird aus Djangos `SECRET_KEY` abgeleitet (siehe
@@ -206,7 +153,7 @@ der Befehl sagt dir, wenn das nicht der Fall ist.
 - **Systemzeit:** TOTP hängt von einer korrekten Uhr auf dem Server (und dem
   Telefon des Benutzers) ab. Betreibe einen NTP-Client auf dem Server.
 
-### Hinweise für Plugin-Entwickler
+## Hinweise für Plugin-Entwickler
 
 Jede URL, die eine Anmeldung verlangt, ist automatisch von der MFA-Durchsetzung
 erfasst, Plugin-Views eingeschlossen. URLs, die ein Plugin über das Signal

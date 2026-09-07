@@ -2,7 +2,10 @@
 
 Diese Seite beschreibt die anwendungsinternen Einstellungen unter
 „Einstellungen“ im Office. Benutzerkonten und Login stehen auf einer eigenen
-Seite: [Benutzer und Login](users-and-login.md).
+Seite: [Benutzer und Login](users-and-login.md). Dein persönlicher API-Token
+und deine eigene MFA-Einrichtung sind kein Teil von „Einstellungen“, sondern
+über dein Benutzermenü erreichbar – siehe
+[Mein Konto](../usage/account.md) im Benutzerhandbuch.
 
 ## Ersteinrichtung
 
@@ -71,14 +74,6 @@ Angabe. Für jedes Feld lässt sich einstellen:
 
 Ohne gespeicherte Konfiguration zeigt byro eine sinnvolle Vorbelegung
 (Mitgliedsnummer, Name, Adresse, E-Mail, Beitragsbeginn, -intervall, -betrag).
-
-## API-Token
-
-Jedes Konto hat unter „Einstellungen → API-Token“ einen eigenen Token für die
-REST-API (siehe [Entwicklung & API](../development/index.md)); „Erneuern“
-löscht den alten und erzeugt einen neuen. Der Token gilt nur, wenn das Konto
-`is_staff` ist (siehe [Benutzer und Login](users-and-login.md#benutzerkonten-verwalten));
-ohne `is_staff` lässt sich der Token zwar anzeigen, die API lehnt ihn aber ab.
 
 ## Über byro
 

@@ -1,36 +1,27 @@
-# Administration
+# Konfiguration
 
-Dieser Bereich behandelt die Verwaltung einer laufenden byro-Installation: die
-Funktionen, die Administratoren in byro selbst einrichten, und die
-Wartungsaufgaben rundherum.
+Dieser Bereich behandelt, was du *innerhalb* einer laufenden byro-Installation
+einrichtest, über das Office – unabhängig davon, wie und wo byro betrieben
+wird.
 
 - [Benutzer und Login](users-and-login.md): Konten anlegen und bearbeiten,
   Passwort- und OIDC/SSO-Login, was `is_staff`/`is_superuser` wirklich
   bedeuten.
-- [Mehr-Faktor-Authentifizierung (MFA)](mfa.md): TOTP für Backend-Nutzer, die
-  Richtlinie für Administratoren, Wiederherstellung und die Management
-  Commands.
+- [Mehr-Faktor-Authentifizierung (MFA)](mfa.md): Richtlinie für alle Konten
+  vorschreiben, Status prüfen, Wiederherstellung und die Management Commands
+  (die persönliche Einrichtung steht im
+  [Benutzerhandbuch](../usage/mfa.md)).
 - [PGP-Mailverschlüsselung](pgp.md): ausgehende Mails signieren und Mails an
   Mitglieder mit OpenPGP verschlüsseln.
 - [Einstellungen](settings.md): Vereinskonfiguration, Registrierungsformular,
-  API-Token, Über byro und das Audit-Log.
-- [Plugins](plugins.md): wie Plugins in einer byroctl-, Docker-Compose- oder
-  Bare-Metal-Installation installiert und gepflegt werden (die Verwaltung
-  selbst läuft über die Deployment-Ebene, nicht über eine eigene Seite im
-  Office).
-- [Update](updating.md): was für ein byro-Update installationswegübergreifend
-  gilt, und die Grenzen von Downgrades.
-- [Backup und Restore](backup-restore.md): was gesichert werden muss,
-  Wiederherstellung und Umzug auf einen neuen Host.
-- [Management-Befehle](management-commands.md): Referenz der
-  Kommandozeilenbefehle für Einrichtung, Wartung und Kontoverwaltung.
-- [Monitoring, Logging und Fehlersuche](troubleshooting.md): Health-Checks,
-  Log-Speicherorte, Ressourcen/Skalierung und häufige Probleme.
-- [Sicherheits-Baseline](security-baseline.md): TLS, Geheimnisse,
-  Container-Rechte und Konto-Wiederherstellung im Überblick.
+  Über byro und das Audit-Log.
+- [Konfigurationsreferenz](../configuration/index.md): alle Optionen aus
+  `byro.cfg`/den `BYRO_*`-Umgebungsvariablen.
 
-Die genauen Update- und Backup-Befehle je Installationsweg stehen weiterhin
-auf den Installationsseiten
-([byroctl](../installation/byroctl.md#updates),
-[Docker Compose](../installation/docker-compose.md#updates),
-[Bare Metal](../installation/bare-metal.md#nachste-schritte-updates)).
+Dein eigenes Profil, deine persönliche MFA-Einrichtung und dein API-Token
+sind über dein Benutzermenü erreichbar, nicht über diese Seite – siehe
+[Mein Konto](../usage/account.md) im Benutzerhandbuch. Serverbetrieb, Update,
+Backup und Restore, Monitoring und die Sicherheits-Baseline gehören zum
+technischen Selbst-Hosting und stehen unter [Administration](operations.md);
+welche Plugins es gibt und wie sie installiert werden, steht unter
+[Plugins & Integrationen](plugins.md).

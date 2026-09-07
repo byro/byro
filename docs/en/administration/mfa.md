@@ -1,5 +1,10 @@
 # Multi-factor authentication (MFA)
 
+This page covers MFA **policy and administration** for administrators and
+server access. How an individual account sets up MFA, signs in with it, or
+uses recovery codes is in the user guide:
+[Multi-factor authentication](../usage/mfa.md).
+
 byro supports multi-factor authentication for all users of the backend
 ("office") based on time-based one-time passwords (TOTP,
 [RFC 6238](https://www.rfc-editor.org/rfc/rfc6238)). Any common authenticator
@@ -26,63 +31,7 @@ MFA only concerns the interactive backend login. It does not change
     therefore applies to *every* user who can log in to the office,
     regardless of `is_staff`.
 
-## For backend users
-
-### Setting up MFA
-
-1. Open the user menu (your username in the top right corner) and choose
-   *Multi-factor authentication* (also reachable from the *Multi-factor
-   authentication* button on your own profile page).
-2. Click *Set up MFA*.
-3. Scan the QR code with your authenticator app. If you cannot scan it, enter
-   the key shown below the QR code manually (type: time-based / TOTP, 6
-   digits, 30 seconds, SHA-1).
-4. Enter the six-digit code your app shows and click *Verify and enable*. MFA
-   is only activated once a code has been verified successfully – simply
-   opening the setup page does not change anything.
-5. byro now shows **ten recovery codes**. Store them in a safe place (for
-   example a password manager). They are shown only once.
-
-From now on, every login asks for a code from your authenticator app after the
-password. There is no way to skip this step for an account with MFA enabled.
-
-### Signing in
-
-Enter username and password as before. On the next page, enter the current
-six-digit code from your authenticator app. Codes are valid for a short time
-only and every code can be used only once.
-
-### Using a recovery code
-
-If you do not have access to your authenticator app, click *Use a recovery
-code* on the code page and enter one of your recovery codes
-(`XXXX-XXXX-XXXX`, dashes and case do not matter). Every recovery code works
-exactly once. After signing in, byro tells you how many codes are left;
-generate new codes if you are running low.
-
-### Generating new recovery codes
-
-*User menu → Multi-factor authentication → Generate new recovery codes*. You
-have to confirm with a current code from your authenticator app. All previous
-recovery codes stop working immediately.
-
-### Disabling MFA
-
-*User menu → Multi-factor authentication → Disable MFA*, confirmed with a
-current authenticator code. This removes the authenticator and all recovery
-codes; afterwards the account is protected by the password only.
-
-If MFA is required for all administrators, this option is not available.
-
-### Lost authenticator and no recovery codes left
-
-Ask an administrator with shell access to the byro server to reset your MFA
-with the management command described below. It is not possible to reset
-another user's MFA from the web interface.
-
-## For administrators
-
-### Requiring MFA for all administrators
+## Requiring MFA for all administrators
 
 Under *Settings → General* you find the card *Multi-factor authentication*
 with the option **Require MFA for all administrators** (off by default).
@@ -103,7 +52,7 @@ Enabling it has the following effects:
 
 Changing the option is recorded in the audit log.
 
-### Display in authenticator apps
+## Display in authenticator apps
 
 Entries created from byro's QR code always show **BYRO** as the service name.
 The second line, the account name, is configurable in the same settings card
@@ -119,7 +68,7 @@ separates the service name from the account with a colon.
 The setting only affects newly set up authenticators; existing entries in the
 users' apps keep the name they had when they were created.
 
-### Checking a user's MFA status
+## Checking a user's MFA status
 
 The user list marks users with MFA with a shield icon. On the server:
 
@@ -140,7 +89,7 @@ MFA required by policy: no
 
 Secrets and recovery codes are never displayed.
 
-### Resetting the MFA of a user (break-glass recovery)
+## Resetting the MFA of a user (break-glass recovery)
 
 If a user lost their authenticator and has no recovery codes left (or is
 locked out for any other reason), reset their MFA on the server:
@@ -169,7 +118,7 @@ Sessions can only be terminated automatically with the default
 database-backed session storage (`SESSION_ENGINE` ending in `.db`); the
 command tells you if that is not the case.
 
-### Security notes
+## Security notes
 
 - **TOTP secrets are stored encrypted.** The encryption key is derived from
   Django's `SECRET_KEY` (see [Configuration](../configuration/index.md)). Keep
@@ -195,7 +144,7 @@ command tells you if that is not the case.
 - **System time:** TOTP depends on a correct clock on the server (and on the
   user's phone). Run an NTP client on the server.
 
-### Notes for plugin developers
+## Notes for plugin developers
 
 Every URL that requires a login is automatically covered by the MFA
 enforcement, plugin views included. URLs that a plugin marks as public via the
