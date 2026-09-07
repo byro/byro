@@ -2,9 +2,10 @@
 
 Diese Seite bündelt die betrieblichen Sicherheitsentscheidungen, die für
 jede byro-Installation gelten, unabhängig vom Installationsweg. Anmeldung
-(OIDC, Passwort-Login), Benutzerrollen und das Audit-Log sind separat unter
-[Administration](index.md) beschrieben, sobald diese Seiten entstanden sind;
-[Mehr-Faktor-Authentifizierung](mfa.md) ist bereits dokumentiert.
+(OIDC, Passwort-Login) und Benutzerrollen stehen unter
+[Benutzer und Login](users-and-login.md), das Audit-Log unter
+[Einstellungen](settings.md#audit-log),
+[Mehr-Faktor-Authentifizierung](mfa.md) auf ihrer eigenen Seite.
 
 ## TLS und Reverse Proxy
 
@@ -63,12 +64,25 @@ ausgesperrtes Administratorkonto führt über die Kommandozeile
 Zugriff auf die Server-Kommandozeile hat, kann also jedes Konto
 übernehmen – schütze den Server-Zugang entsprechend.
 
+## Web-Sicherheitsheader
+
+byro setzt einige Header fest, ohne Konfigurationsoption:
+`X-Frame-Options: DENY` (kein Einbetten in fremde `<iframe>`s),
+`X-Content-Type-Options: nosniff` sowie einen eigenen Cookie-Namen für
+Session (`byro_session`) und CSRF (`byro_csrftoken`).
+`CSRF_TRUSTED_ORIGINS` wird automatisch aus `[site] url` abgeleitet, du musst
+es nicht selbst pflegen. Es gibt **keine HSTS-Einstellung im Code** – dafür
+ist dein Reverse Proxy zuständig (das Caddy-Add-on setzt es nicht automatisch;
+ergänze es in einem eigenen Caddyfile-Snippet oder deiner Proxy-Konfiguration,
+falls gewünscht).
+
 ## Was hier absichtlich fehlt
 
-OpenID-Connect-Login, Benutzerrollen/`is_staff`, das Audit-Log und die
-REST-API-Authentifizierung sind sicherheitsrelevant, aber Sache der
-Administration *in* byro, nicht des Selbst-Hostings; sie werden in der
-[Administration](index.md) beschrieben, sobald diese Seiten entstanden sind.
-Bis dahin gilt: Die API-Dokumentation (`/api/v1/docs/`) und das API-Schema
-(`/api/v1/schema/`) sind ohne Login erreichbar, die API selbst verlangt einen
-Token und setzt `is_staff` voraus.
+OpenID-Connect-Login, Benutzerrollen/`is_staff` und das Audit-Log sind
+sicherheitsrelevant, aber Sache der Administration *in* byro, nicht des
+Selbst-Hostings; sie stehen unter
+[Benutzer und Login](users-and-login.md) und
+[Einstellungen](settings.md#audit-log). Kurz zur Einordnung: Die
+API-Dokumentation (`/api/v1/docs/`) und das API-Schema (`/api/v1/schema/`)
+sind ohne Login erreichbar, die API selbst verlangt einen Token und setzt
+`is_staff` voraus (siehe [Entwicklung & API](../development/index.md)).

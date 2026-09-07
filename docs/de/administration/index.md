@@ -4,13 +4,20 @@ Dieser Bereich behandelt die Verwaltung einer laufenden byro-Installation: die
 Funktionen, die Administratoren in byro selbst einrichten, und die
 Wartungsaufgaben rundherum.
 
+- [Benutzer und Login](users-and-login.md): Konten anlegen und bearbeiten,
+  Passwort- und OIDC/SSO-Login, was `is_staff`/`is_superuser` wirklich
+  bedeuten.
 - [Mehr-Faktor-Authentifizierung (MFA)](mfa.md): TOTP für Backend-Nutzer, die
   Richtlinie für Administratoren, Wiederherstellung und die Management
   Commands.
 - [PGP-Mailverschlüsselung](pgp.md): ausgehende Mails signieren und Mails an
   Mitglieder mit OpenPGP verschlüsseln.
+- [Einstellungen](settings.md): Vereinskonfiguration, Registrierungsformular,
+  API-Token, Über byro und das Audit-Log.
 - [Plugins](plugins.md): wie Plugins in einer byroctl-, Docker-Compose- oder
-  Bare-Metal-Installation installiert und gepflegt werden.
+  Bare-Metal-Installation installiert und gepflegt werden (die Verwaltung
+  selbst läuft über die Deployment-Ebene, nicht über eine eigene Seite im
+  Office).
 - [Update](updating.md): was für ein byro-Update installationswegübergreifend
   gilt, und die Grenzen von Downgrades.
 - [Backup und Restore](backup-restore.md): was gesichert werden muss,

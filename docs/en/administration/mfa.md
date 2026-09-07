@@ -19,11 +19,12 @@ MFA only concerns the interactive backend login. It does not change
   an MFA page.
 
 !!! note
-    byro grants access to the complete backend to every active user account,
-    there are no separate roles or a "staff" flag for the office. The MFA
-    policy therefore applies to *every* user who can log in.
-
-<!-- migration note (AP01 GAPS A11): the staff flag exists and gates the REST API; clarified in AP08. -->
+    byro grants access to the complete backend to every active user account;
+    there are no tiered roles for the office (see
+    [Users and login](users-and-login.md)). The `is_staff` field exists, but
+    only gates REST API access, not the office itself. The MFA policy
+    therefore applies to *every* user who can log in to the office,
+    regardless of `is_staff`.
 
 ## For backend users
 

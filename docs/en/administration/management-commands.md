@@ -44,9 +44,14 @@ The examples below show the byroctl form; substitute as needed.
 
 ## Auditing and export
 
-* `export_logchain` - exports the hash-chained audit log (`-a` to include all
-  entries, `-x` to exclude certain models); relevant for associations with
-  audit obligations.
+* `export_logchain` - exports the full hash chain as JSON (every entry with
+  its hash and authenticated metadata); relevant for associations with audit
+  obligations. All entries always appear; `-a`/`--data-include-actions` and
+  `-A`/`--data-exclude-actions` (each a regex on `action_type`, `-a` defaults
+  to matching everything) only control whether an entry's `data` field is
+  included in the export, without changing the chain itself - useful for
+  keeping sensitive payloads out of a shared export. See
+  [Audit log](settings.md#audit-log) for the background.
 
 ## Reference
 

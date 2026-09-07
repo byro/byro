@@ -21,10 +21,11 @@ MFA betrifft nur die interaktive Anmeldung am Backend. Sie ändert nichts an
 
 !!! note
     byro gewährt jedem aktiven Benutzerkonto Zugriff auf das gesamte Backend;
-    es gibt keine getrennten Rollen oder ein „Staff“-Flag für das Office. Die
-    MFA-Richtlinie gilt deshalb für *jeden* Benutzer, der sich anmelden kann.
-
-<!-- migration note (AP01 GAPS A11): das Staff-Flag existiert und steuert die REST-API; wird in AP08 präzisiert. -->
+    es gibt keine abgestuften Rollen für das Office (siehe
+    [Benutzer und Login](users-and-login.md)). Das Feld `is_staff` existiert,
+    steuert aber nur den Zugriff auf die REST-API, nicht auf das Office
+    selbst. Die MFA-Richtlinie gilt deshalb für *jeden* Benutzer, der sich am
+    Office anmelden kann, unabhängig von `is_staff`.
 
 ## Für Backend-Benutzer
 

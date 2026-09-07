@@ -31,7 +31,12 @@ this:
 --8<-- "src/byro.example.cfg"
 ```
 
-<!-- migration note (AP01 GAPS A3/A4): the [oidc] section and the https option are not documented yet; added in AP07/AP08. -->
+!!! note
+    This example file does not show every option in this reference (for
+    example `[oidc]` and `[site] https`/`trust_proxy`/`secret` are missing) -
+    it is a starting template, not a complete map of every possible key.
+    Every option, including the ones not preset here, can be set as
+    described below.
 
 ## The filesystem section
 
@@ -83,6 +88,16 @@ this:
 - **Environment variable:** `BYRO_SITE_URL`
 - **Default:** `http://localhost`
 
+### `https`
+
+- Decides whether byro marks its session cookie `Secure`
+  (`SESSION_COOKIE_SECURE`), sending it only over HTTPS connections. Set it to
+  `True` as soon as byro is only reachable over HTTPS - directly or through a
+  reverse proxy. Independent of `trust_proxy`: `https` only controls cookie
+  security, not whether byro trusts an `X-Forwarded-Proto` header.
+- **Environment variable:** `BYRO_HTTPS`
+- **Default:** follows whether `url` starts with `https://`.
+
 ### `trust_proxy`
 
 - Set this to `True` **only** if byro runs behind a reverse proxy (nginx,
@@ -101,6 +116,64 @@ this:
   signing. You do not need to set this variable – byro will generate a secret
   key and save it in a local file if you do not set it manually.
 - **Default:** None
+
+## The oidc section
+
+Optional single sign-on through OpenID Connect, in addition to the regular
+password login (never as a replacement - an account with no password and no
+matching OIDC claim could otherwise no longer sign in at all). If
+`issuer_url` is empty, the login page shows no SSO button and the related
+routes answer 404. For the flow, the group check and its security
+consequences, see [Users and login](../administration/users-and-login.md).
+
+### `issuer_url`
+
+- Base URL of the OIDC provider. byro loads its
+  `.well-known/openid-configuration` (discovery, cached for 4 hours) and
+  derives every other endpoint from it. Leave empty to disable OIDC login.
+- **Environment variable:** `BYRO_OIDC_ISSUER_URL`
+- **Default:** `''`
+
+### `client_id`
+
+- Client id byro is registered as with the OIDC provider.
+- **Environment variable:** `BYRO_OIDC_CLIENT_ID`
+- **Default:** `''`
+
+### `client_secret`
+
+- The matching client secret. Like any secret, never pass it on the command
+  line; `byroctl install`/`config set` read it from
+  `BYROCTL_OIDC_CLIENT_SECRET` (see
+  [byroctl](../installation/byroctl.md#environment-variables)).
+- **Environment variable:** `BYRO_OIDC_CLIENT_SECRET`
+- **Default:** `''`
+
+### `admin_group`
+
+- When set, the `groups` claim (a string or a list) in the ID token or
+  userinfo response must contain this value, or sign-in fails. **This only
+  controls who may sign in at all - not what the account can do inside the
+  Office afterwards** (see the security consequences under
+  [Users and login](../administration/users-and-login.md)).
+- **Environment variable:** `BYRO_OIDC_ADMIN_GROUP`
+- **Default:** `''` (no group check, every successful OIDC login is accepted)
+
+### `auto_create_account`
+
+- Automatically creates a new, passwordless byro account when the OIDC
+  username (see `username_field`) does not match an existing account yet. If
+  `False`, sign-in fails for unknown usernames even if `admin_group` is
+  satisfied.
+- **Environment variable:** `BYRO_OIDC_AUTO_CREATE_ACCOUNT`
+- **Default:** `False`
+
+### `username_field`
+
+- Name of the claim (in the ID token, or in the userinfo response if not
+  present there) used as the byro username. Must stay stable across logins.
+- **Environment variable:** `BYRO_OIDC_USERNAME_FIELD`
+- **Default:** `'preferred_username'`
 
 ## The database section
 

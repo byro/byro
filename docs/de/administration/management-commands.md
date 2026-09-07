@@ -43,9 +43,14 @@ Die folgenden Beispiele zeigen die byroctl-Form; ersetze sie nach Bedarf.
 
 ## Prüfung und Export
 
-* `export_logchain` – exportiert das hash-verkettete Audit-Log (Filter `-a`
-  für alle Einträge, `-x` zum Ausschließen bestimmter Modelle); relevant für
-  Vereine mit Prüfpflichten.
+* `export_logchain` – exportiert die vollständige Hash-Kette als JSON (jeder
+  Eintrag mit Hash und authentifizierten Metadaten); relevant für Vereine mit
+  Prüfpflichten. Alle Einträge erscheinen immer; `-a`/`--data-include-actions`
+  und `-A`/`--data-exclude-actions` (je ein Regex auf `action_type`, Standard
+  für `-a` ist „alles“) steuern nur, ob das Feld `data` je Eintrag mit
+  exportiert wird oder nicht – nützlich, um sensible Nutzdaten aus einem
+  weitergegebenen Export herauszuhalten, ohne die Kette selbst zu verändern.
+  Siehe [Audit-Log](settings.md#audit-log) für den Hintergrund.
 
 ## Referenz
 

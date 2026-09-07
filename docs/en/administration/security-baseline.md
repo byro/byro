@@ -2,9 +2,10 @@
 
 This page collects the operational security decisions that apply to every
 byro installation, regardless of the installation path. Sign-in (OIDC,
-password login), user roles and the audit log are described separately under
-[Administration](index.md) once those pages exist;
-[multi-factor authentication](mfa.md) is already documented.
+password login) and user roles are covered under
+[Users and login](users-and-login.md), the audit log under
+[Settings](settings.md#audit-log),
+[multi-factor authentication](mfa.md) on its own page.
 
 ## TLS and reverse proxy
 
@@ -59,11 +60,24 @@ administrator account goes through the command line
 to the server's command line can therefore take over any account - protect
 server access accordingly.
 
+## Web security headers
+
+byro sets a few headers unconditionally, with no configuration option:
+`X-Frame-Options: DENY` (no embedding in a foreign `<iframe>`),
+`X-Content-Type-Options: nosniff`, and its own cookie names for the session
+(`byro_session`) and CSRF (`byro_csrftoken`). `CSRF_TRUSTED_ORIGINS` is
+derived automatically from `[site] url`, you do not maintain it yourself.
+There is **no HSTS setting in the code** - that is your reverse proxy's job
+(the Caddy add-on does not set it automatically; add it yourself in a
+Caddyfile snippet or your proxy configuration if you want it).
+
 ## What is deliberately not here
 
-OpenID Connect login, user roles/`is_staff`, the audit log and REST API
-authentication are security relevant, but are the concern of administration
-*inside* byro, not of self-hosting; they are described in
-[Administration](index.md) once those pages exist. Until then: the API
-documentation (`/api/v1/docs/`) and the API schema (`/api/v1/schema/`) are
-reachable without login, the API itself requires a token and `is_staff`.
+OpenID Connect login, user roles/`is_staff` and the audit log are security
+relevant, but are the concern of administration *inside* byro, not of
+self-hosting; they are covered under
+[Users and login](users-and-login.md) and
+[Settings](settings.md#audit-log). For context: the API documentation
+(`/api/v1/docs/`) and the API schema (`/api/v1/schema/`) are reachable
+without login, the API itself requires a token and `is_staff` (see
+[Development & API](../development/index.md)).

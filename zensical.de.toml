@@ -27,8 +27,10 @@ nav = [
   ] },
   { "Administration" = [
     "administration/index.md",
+    { "Benutzer und Login" = "administration/users-and-login.md" },
     { "Mehr-Faktor-Authentifizierung" = "administration/mfa.md" },
     { "PGP-Mailverschlüsselung" = "administration/pgp.md" },
+    { "Einstellungen" = "administration/settings.md" },
     { "Plugins" = "administration/plugins.md" },
     { "Update" = "administration/updating.md" },
     { "Backup und Restore" = "administration/backup-restore.md" },

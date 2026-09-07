@@ -4,12 +4,17 @@ This section covers the administration of a running byro instance: the
 features that administrators configure inside byro and the maintenance tasks
 around it.
 
+- [Users and login](users-and-login.md): creating and editing accounts,
+  password and OIDC/SSO login, what `is_staff`/`is_superuser` actually mean.
 - [Multi-factor authentication (MFA)](mfa.md): TOTP for backend users, the
   policy for administrators, recovery and the management commands.
 - [PGP email encryption](pgp.md): signing outgoing mail and encrypting mail to
   members with OpenPGP.
+- [Settings](settings.md): association configuration, registration form, API
+  token, about byro and the audit log.
 - [Plugins](plugins.md): how plugins are installed and maintained in a byroctl,
-  Docker Compose or bare metal installation.
+  Docker Compose or bare metal installation (managing them itself happens at
+  the deployment layer, not through a page inside the Office).
 - [Updating](updating.md): what applies to a byro update across installation
   paths, and the limits of downgrades.
 - [Backup and restore](backup-restore.md): what needs to be backed up,
