@@ -46,6 +46,17 @@ def test_new_account_not_superuser_when_not_in_superuser_group(settings):
 
 
 @pytest.mark.django_db
+def test_auto_create_disabled_raises_for_unknown_user(settings):
+    settings.OIDC_ADMIN_GROUP = ""
+    settings.OIDC_SUPERUSER_GROUP = ""
+    settings.OIDC_AUTO_CREATE_ACCOUNT = False
+
+    with pytest.raises(OIDCError):
+        get_or_create_user({"preferred_username": "unknown"}, "at")
+    assert not get_user_model().objects.filter(username="unknown").exists()
+
+
+@pytest.mark.django_db
 def test_admin_group_required_to_create_or_log_in(settings):
     settings.OIDC_ADMIN_GROUP = "byro-admins"
     settings.OIDC_SUPERUSER_GROUP = ""
