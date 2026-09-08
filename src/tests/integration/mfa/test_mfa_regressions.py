@@ -185,6 +185,44 @@ def test_oidc_login_requires_challenge_for_mfa_user(
 
 
 @pytest.mark.django_db
+def test_oidc_mfa_exempt_skips_challenge(
+    client, mfa_user, totp_device, configuration, oidc, settings
+):
+    settings.OIDC_MFA_EXEMPT = True
+    response = oidc(client, next_url="/members/list")
+    assert response.status_code == 302
+    assert response.url == "/members/list"
+
+    # no redirect to the challenge, even though mfa_user has a device
+    assert client.get("/members/list").status_code == 200
+
+
+@pytest.mark.django_db
+def test_oidc_mfa_exempt_skips_policy_enrollment(
+    client, user, mfa_policy, oidc, settings
+):
+    settings.OIDC_MFA_EXEMPT = True
+    response = oidc(client)
+    assert response.status_code == 302
+    assert response.url == "/"
+
+    # policy would normally force enrollment (see test_oidc_login_cannot_bypass_policy)
+    assert client.get("/").status_code == 200
+
+
+@pytest.mark.django_db
+def test_oidc_mfa_exempt_does_not_apply_to_password_login(
+    client, mfa_user, totp_device, configuration, login_user, settings
+):
+    settings.OIDC_MFA_EXEMPT = True
+    login_user(client, mfa_user)
+
+    response = client.get("/")
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("mfa:challenge"))
+
+
+@pytest.mark.django_db
 def test_oidc_login_does_not_inherit_verification(
     client, mfa_user, totp_device, configuration, oidc, fresh_code, login_user
 ):

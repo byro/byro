@@ -58,6 +58,17 @@ def user(login_user):
 
 
 @pytest.fixture
+def superuser(login_user):
+    user = get_user_model().objects.create(
+        username="admin_user", is_staff=True, is_superuser=True
+    )
+    user.set_password("test_password")
+    user.save()
+    yield user
+    user.delete()
+
+
+@pytest.fixture
 def logged_in_client(login_user, client, user):
     login_user(client, user)
     return client

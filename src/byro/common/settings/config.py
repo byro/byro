@@ -58,9 +58,21 @@ CONFIG = {
         "client_id": {"default": "", "env": os.getenv("BYRO_OIDC_CLIENT_ID")},
         "client_secret": {"default": "", "env": os.getenv("BYRO_OIDC_CLIENT_SECRET")},
         "admin_group": {"default": "", "env": os.getenv("BYRO_OIDC_ADMIN_GROUP")},
+        "superuser_group": {
+            "default": "",
+            "env": os.getenv("BYRO_OIDC_SUPERUSER_GROUP"),
+        },
+        "sync_groups": {
+            "default": "false",
+            "env": os.getenv("BYRO_OIDC_SYNC_GROUPS"),
+        },
         "auto_create_account": {
             "default": "false",
             "env": os.getenv("BYRO_OIDC_AUTO_CREATE_ACCOUNT"),
+        },
+        "mfa_exempt": {
+            "default": "false",
+            "env": os.getenv("BYRO_OIDC_MFA_EXEMPT"),
         },
         "username_field": {
             "default": "preferred_username",

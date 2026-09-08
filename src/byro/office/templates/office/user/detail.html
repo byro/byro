@@ -45,7 +45,7 @@
             <form method="post" action="{% url 'office:settings.users.disable-password' pk=user.pk %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger"
-                        onclick="return confirm('{% trans "Disable password for this user? They will no longer be able to log in with a password."|escapejs %}')">
+                        onclick="return confirm('{% trans "Disable password for this user? They will no longer be able to log in with a password and their API token will be revoked."|escapejs %}')">
                     <span class="fa fa-lock"></span> {% trans "Disable password" %}
                 </button>
             </form>
@@ -55,5 +55,12 @@
                 {% trans "This user's password is disabled. Set a new password above to re-enable password login." %}
             </p>
         {% endif %}
+        <form method="post" action="{% url 'office:settings.users.regenerate-token' pk=user.pk %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger"
+                    onclick="return confirm('{% trans "Regenerate this user's API token? Any application using their current token will stop working."|escapejs %}')">
+                <span class="fa fa-refresh"></span> {% trans "Regenerate API token" %}
+            </button>
+        </form>
     {% endif %}
 {% endblock %}

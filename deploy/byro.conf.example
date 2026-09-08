@@ -92,7 +92,19 @@ BYRO_PGP_HOME=/var/byro/data/gnupg
 #BYRO_OIDC_CLIENT_ID=
 #BYRO_OIDC_CLIENT_SECRET=
 #BYRO_OIDC_ADMIN_GROUP=
+# Grant superuser rights to members of this group (leave unset to never grant
+# superuser via OIDC; existing local superuser status is then left alone).
+#BYRO_OIDC_SUPERUSER_GROUP=
 #BYRO_OIDC_AUTO_CREATE_ACCOUNT=false
+# Re-check group membership on every OIDC login and update is_staff/is_superuser
+# to match, instead of only when the account is first created. WARNING: if the
+# identity provider ever loses or misconfigures BYRO_OIDC_SUPERUSER_GROUP for
+# everyone, every account syncs down to non-superuser on its next login, and
+# nobody may be left who can grant superuser rights back through byro itself.
+#BYRO_OIDC_SYNC_GROUPS=false
+# Skip byro's own MFA challenge for OIDC sessions, if your identity provider
+# already enforces MFA. Password logins are unaffected.
+#BYRO_OIDC_MFA_EXEMPT=false
 #BYRO_OIDC_USERNAME_FIELD=preferred_username
 
 # ---------------------------------------------------------------------------

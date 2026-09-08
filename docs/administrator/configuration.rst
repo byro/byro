@@ -256,3 +256,109 @@ The locale section
 - The system's default time zone as a ``pytz`` name.
 - **Environment variable:** ``BYRO_TIME_ZONE``
 - **Default:** ``'UTC'``
+
+The OIDC section
+-----------------
+
+This section configures optional single sign-on login via OpenID Connect. Leave
+``issuer_url`` empty (the default) to disable it entirely; the password login form
+is unaffected either way. Only accounts with the ``is_staff`` flag can log in to
+the backend, via password or OIDC.
+
+``issuer_url``
+~~~~~~~~~~~~~~
+
+- The identity provider's issuer URL. byro discovers the rest of the OIDC
+  endpoints from ``<issuer_url>/.well-known/openid-configuration``.
+- **Environment variable:** ``BYRO_OIDC_ISSUER_URL``
+- **Default:** ``''`` – OIDC login is disabled.
+
+``client_id`` / ``client_secret``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- The OAuth2 client credentials registered with the identity provider for byro.
+- **Environment variables:** ``BYRO_OIDC_CLIENT_ID``, ``BYRO_OIDC_CLIENT_SECRET``
+- **Default:** ``''``
+
+``admin_group``
+~~~~~~~~~~~~~~~
+
+- Restricts OIDC login to members of this group, as reported by the identity
+  provider's ``groups`` claim (or the userinfo endpoint). Leave empty to allow
+  any authenticated OIDC user through.
+- A local account that does not exist yet is auto-created (if
+  ``auto_create_account`` is enabled) with ``is_staff`` set, since reaching this
+  point already proved office access is intended.
+- **Environment variable:** ``BYRO_OIDC_ADMIN_GROUP``
+- **Default:** ``''``
+
+``superuser_group``
+~~~~~~~~~~~~~~~~~~~
+
+- If set, members of this group are granted superuser rights: a newly
+  auto-created account is created as a superuser, and – only if
+  ``sync_groups`` is enabled – an existing account's superuser status is kept
+  in sync with current membership on every login.
+- Leave empty to never grant or change superuser status via OIDC; existing
+  accounts then keep whatever superuser status was set locally, and new
+  accounts are never created as superusers.
+- **Environment variable:** ``BYRO_OIDC_SUPERUSER_GROUP``
+- **Default:** ``''``
+
+``auto_create_account``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Set to true to automatically create a local account the first time someone
+  passes the ``admin_group`` check via OIDC. If false, only users who already
+  have a local account can log in via OIDC.
+- **Environment variable:** ``BYRO_OIDC_AUTO_CREATE_ACCOUNT``
+- **Default:** ``false``
+
+``sync_groups``
+~~~~~~~~~~~~~~~
+
+- Set to true to re-evaluate ``admin_group``/``superuser_group`` membership on
+  *every* OIDC login of an *existing* account, updating its ``is_staff`` and
+  ``is_superuser`` flags to match. With this off (the default), group
+  membership only matters when an account is first auto-created; an existing
+  account's local flags are never touched again by OIDC login afterwards.
+- **Environment variable:** ``BYRO_OIDC_SYNC_GROUPS``
+- **Default:** ``false``
+
+.. warning:: Enabling ``sync_groups`` together with ``superuser_group`` ties
+   byro's superuser status directly to the identity provider's group
+   membership. If that group is ever deleted, renamed, or misconfigured at
+   the identity provider so that nobody is a member any more, **every**
+   account loses superuser status the next time it logs in via OIDC – there
+   is no built-in protection against ending up with zero superusers this
+   way (unlike removing your own superuser status by hand in byro's user
+   management, which is blocked). The same applies to ``admin_group`` and
+   ``is_staff``: if it is ever emptied out at the identity provider, every
+   synced account can lose backend access entirely. Recovering from this
+   requires direct database access (or a Django management shell) to set
+   ``is_staff``/``is_superuser`` back on at least one account – there is no
+   recovery path through byro's own interface once nobody can log in. Test
+   group changes carefully, and keep at least one break-glass account (a
+   local superuser with a usable password, not managed via OIDC at all) for
+   this scenario.
+
+``mfa_exempt``
+~~~~~~~~~~~~~~
+
+- Set to true to skip byro's own MFA challenge (and any policy-driven MFA
+  enrollment, see :doc:`mfa`) for sessions established via OIDC login, on the
+  assumption that the identity provider already enforces its own MFA. Only
+  applies to the session that was actually authenticated via OIDC; logging in
+  with a password is always subject to byro's MFA policy, regardless of this
+  setting.
+- **Environment variable:** ``BYRO_OIDC_MFA_EXEMPT``
+- **Default:** ``false``
+
+``username_field``
+~~~~~~~~~~~~~~~~~~~
+
+- The OIDC claim used as the Django username. Existing accounts are matched
+  against this claim on every login, so changing it after accounts already
+  exist will make byro treat those logins as new users.
+- **Environment variable:** ``BYRO_OIDC_USERNAME_FIELD``
+- **Default:** ``'preferred_username'``

@@ -116,7 +116,7 @@ def test_mfa_reset_force_skips_prompt(mfa_user, monkeypatch):
 def test_mfa_reset_only_terminates_sessions_of_that_user(
     verified_client, mfa_user, configuration, login_user
 ):
-    other = get_user_model().objects.create(username="other_admin")
+    other = get_user_model().objects.create(username="other_admin", is_staff=True)
     other.set_password("test_password")
     other.save()
     other_client = Client()

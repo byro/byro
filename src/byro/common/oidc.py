@@ -146,7 +146,9 @@ def get_or_create_user(claims, access_token):
         )
 
     admin_group = settings.OIDC_ADMIN_GROUP
-    if admin_group:
+    superuser_group = settings.OIDC_SUPERUSER_GROUP
+    groups = []
+    if admin_group or superuser_group:
         groups = claims.get("groups")
         if groups is None:
             if userinfo is None:
@@ -154,22 +156,39 @@ def get_or_create_user(claims, access_token):
             groups = userinfo.get("groups", [])
         if isinstance(groups, str):
             groups = groups.split()
-        if admin_group not in groups:
+        if admin_group and admin_group not in groups:
             raise OIDCError(
                 f"User is not a member of the required group '{admin_group}'"
             )
 
     try:
-        return User.objects.get(username=username)
+        user = User.objects.get(username=username)
     except User.DoesNotExist:
-        pass
-
-    if not settings.OIDC_AUTO_CREATE_ACCOUNT:
-        raise OIDCError(
-            f"No local account for '{username}' and auto-creation is disabled"
+        if not settings.OIDC_AUTO_CREATE_ACCOUNT:
+            raise OIDCError(
+                f"No local account for '{username}' and auto-creation is disabled"
+            )
+        user = User.objects.create_user(
+            username=username,
+            is_staff=True,
+            is_superuser=bool(superuser_group and superuser_group in groups),
         )
+        user.set_unusable_password()
+        user.save()
+        return user
 
-    user = User.objects.create_user(username=username)
-    user.set_unusable_password()
-    user.save()
+    # Existing accounts keep whatever staff/superuser status they were given
+    # locally unless group syncing is explicitly enabled -- an admin revoking
+    # a group at the identity provider should not silently change local
+    # permissions by default.
+    if settings.OIDC_SYNC_GROUPS:
+        is_staff = (admin_group in groups) if admin_group else True
+        is_superuser = (
+            (superuser_group in groups) if superuser_group else user.is_superuser
+        )
+        if user.is_staff != is_staff or user.is_superuser != is_superuser:
+            user.is_staff = is_staff
+            user.is_superuser = is_superuser
+            user.save(update_fields=["is_staff", "is_superuser"])
+
     return user

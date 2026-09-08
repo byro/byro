@@ -238,9 +238,20 @@ OIDC_ISSUER_URL = config.get("oidc", "issuer_url", fallback="").strip()
 OIDC_CLIENT_ID = config.get("oidc", "client_id", fallback="").strip()
 OIDC_CLIENT_SECRET = config.get("oidc", "client_secret", fallback="").strip()
 OIDC_ADMIN_GROUP = config.get("oidc", "admin_group", fallback="").strip()
+OIDC_SUPERUSER_GROUP = config.get("oidc", "superuser_group", fallback="").strip()
+# Re-evaluate is_staff/is_superuser from the current OIDC groups on every login,
+# not just when an account is first auto-created. See the admin documentation
+# for the "everyone loses superuser at once" risk this carries if the identity
+# provider's group membership is ever misconfigured.
+OIDC_SYNC_GROUPS = config.getboolean("oidc", "sync_groups", fallback=False)
 OIDC_AUTO_CREATE_ACCOUNT = config.getboolean(
     "oidc", "auto_create_account", fallback=False
 )
+# Skip byro's own TOTP challenge for sessions established via OIDC login, on
+# the assumption that the identity provider already enforces its own MFA.
+# Does not affect password logins, which are always subject to byro's MFA
+# policy regardless of this setting.
+OIDC_MFA_EXEMPT = config.getboolean("oidc", "mfa_exempt", fallback=False)
 OIDC_USERNAME_FIELD = config.get(
     "oidc", "username_field", fallback="preferred_username"
 ).strip()
@@ -335,7 +346,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAdminUser",
+        "byro.api.permissions.IsStaffOrSuperuser",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 50,
