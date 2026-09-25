@@ -3,6 +3,7 @@ include byro.docker.cfg
 include Dockerfile
 include docker-compose.yml
 include README.docker.md
+include README-PyPI.rst
 include install_local_plugins.sh
 include local/.gitkeep
 recursive-include byro *.py
