@@ -2,9 +2,9 @@
 
 ![byro](img/logo/byro_128.png){ width="128" }
 
-byro is a membership administration tool. byro is best suited to small and
-medium sized clubs/NGOs/associations of all kinds, with a focus on the DACH
-region. byro is heavily plugin based to help fit it to different requirements
+byro is a simple membership administration tool for small and medium-sized
+clubs, NGOs and associations of all kinds, with a focus on the DACH region.
+byro is heavily plugin based to help fit it to different requirements
 in different situations and countries.
 
 byro is stable and in active use in several communities. It is currently under
@@ -36,7 +36,7 @@ accounts, login, MFA, settings) plus the `byro.cfg`/`BYRO_*` reference, and
 extended with.
 
 **You want to extend byro or contribute to it**: start at
-[Development & API](development/overview.md).
+[Contributing](development/overview.md) or [API & Plugins](administration/plugins.md).
 
 - [Installation](installation/overview.md): run byro on your own server with
   byroctl, Docker Compose or bare metal.
@@ -49,7 +49,9 @@ extended with.
   memberships and fees, finances, documents, communication.
 - [Plugins](administration/plugins.md): what byro can be
   extended with.
-- [Development & API](development/overview.md): develop byro or a plugin.
+- [Contributing](development/overview.md): improve byro, work on the
+  documentation and prepare releases.
+- [API](development/api.md): use byro's REST API.
 
 ## Features
 
@@ -66,8 +68,8 @@ are missing!
 - **Import and match payment data** to members: bank data comes in through a
   plugin (the core itself ships no importer); the official
   [`finance-import-bank-files`](administration/plugins.md) plugin supports
-  CAMT.053. Matching to members runs through custom methods contributed by
-  plugins.
+  CAMT.053 and MT940. Matching to members runs through custom methods
+  contributed by plugins.
 - **Send mails:** All mails can be reviewed before they are sent out. You can
   also edit the default mail templates and add new ones.
 - **See member balances**. You can also check every single transaction at any

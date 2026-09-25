@@ -7,9 +7,7 @@ comes with great responsibility:
 !!! warning
     Hosting byro means taking responsibility for your members' personal and
     financial data. Please make sure that your installation and servers are
-    secure and will be maintained in the future. If you don't feel comfortable
-    with this, consider contacting us for information, or choosing an offline
-    installation.
+    secure and will be maintained in the future.
 
 There are three ways to install byro:
 

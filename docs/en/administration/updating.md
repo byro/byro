@@ -19,7 +19,7 @@ respective installation page:
    hand) or bare metal installation has no such automatic copy; back up
    yourself before updating there.
 3. Update plugins following the same logic as byro itself and check their own
-   release notes (see [Plugins](plugins.md#what-a-byro-update-does-with-plugins)).
+   release notes (see [Plugin management](plugin-management.md#what-a-byro-update-does-with-plugins)).
 
 ## What happens during an update
 

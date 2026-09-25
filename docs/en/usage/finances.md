@@ -62,7 +62,8 @@ processes it immediately with the chosen import format.
 
 * If no import format is offered, no matching plugin is installed - byro
   itself ships no bank importer (see [Plugins](../administration/plugins.md)
-  for installation, for example of the official CAMT.053 plugin).
+  for installation, for example of the official plugin for CAMT.053 and MT940
+  files).
 * After processing, byro reports how many bookings were read, newly
   imported, and skipped as already known. Re-importing the same or
   overlapping files creates **no** duplicate bookings.

@@ -12,7 +12,7 @@ What you get:
 * optionally Caddy as a reverse proxy that obtains and renews TLS certificates,
 * one configuration file, `byro.conf`,
 * plugins from a catalog or as pip requirements, built into the image for you
-  ([Plugins](../administration/plugins.md)),
+  ([plugin management](../administration/plugin-management.md)),
 * `byroctl update` with a safeguard copy of the database before every update.
 
 Everything byroctl starts is plain Docker Compose. You can always look at the
@@ -69,7 +69,8 @@ The installer asks a few questions, each with a sensible default:
 * how to send mail: a mail server on the same machine, an external SMTP
   server, or later,
 * which plugins from the catalog to install (short names such as
-  `finance-import-bank-files`; none by default, see [Plugins](../administration/plugins.md)),
+  `finance-import-bank-files`; none by default, see
+  [plugin management](../administration/plugin-management.md)),
 * user name, e-mail address and password of the first administrator.
 
 Then it writes the configuration, downloads the images, builds the plugin image
@@ -177,7 +178,8 @@ $ byroctl version                installed release, image digest, running versio
 $ byroctl self-update            re-fetch byroctl for the installed release (repair)
 ```
 
-Plugins are described on their own page: [Plugins](../administration/plugins.md);
+Plugins have dedicated pages: [Plugins](../administration/plugins.md) and
+[plugin management](../administration/plugin-management.md);
 every management command is listed under
 [Management commands](../administration/management-commands.md).
 
@@ -218,7 +220,8 @@ and shows the link to the release notes. `update` then
 4. replaces the Compose files, pulls the new image and pins its digest,
 5. rebuilds the plugin image on top of the new release if you use plugins
    (with your pins unchanged; `--update-plugins` moves catalog plugins to
-   their current release in the same run, see [Plugins](../administration/plugins.md)),
+   their current release in the same run, see
+   [plugin management](../administration/plugin-management.md)),
 6. stops byro, applies the database migrations and starts the new release.
 
 If a release is flagged as breaking, byroctl asks you to read the release

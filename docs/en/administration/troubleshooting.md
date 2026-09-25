@@ -81,4 +81,4 @@ with `createsuperuser`. For an MFA-related lockout (lost device), see
   reverse proxy terminates TLS (see
   [Security baseline](security-baseline.md#tls-and-reverse-proxy)).
 * **A plugin build fails.** See
-  [Plugin troubleshooting](plugins.md#troubleshooting).
+  [Plugin troubleshooting](plugin-management.md#troubleshooting).

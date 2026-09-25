@@ -7,8 +7,7 @@ Verantwortung mit sich:
 !!! warning
     Wer byro hostet, übernimmt die Verantwortung für die persönlichen und
     finanziellen Daten der Mitglieder. Stelle sicher, dass Installation und
-    Server sicher sind und auch künftig gepflegt werden. Wenn du dich damit
-    nicht wohlfühlst, sprich uns an oder wähle eine Offline-Installation.
+    Server sicher sind und auch künftig gepflegt werden.
 
 Es gibt drei Wege, byro zu installieren:
 

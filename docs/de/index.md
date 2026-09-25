@@ -2,9 +2,9 @@
 
 ![byro](img/logo/byro_128.png){ width="128" }
 
-byro ist eine Mitgliederverwaltung. byro eignet sich am besten für kleine und
-mittelgroße Vereine, NGOs und Verbände aller Art, mit Schwerpunkt auf dem
-deutschsprachigen Raum. byro setzt stark auf Plugins, damit es sich an
+byro ist eine einfache Mitgliederverwaltung für kleine und mittelgroße Vereine,
+NGOs und Verbände aller Art, wobei der Schwerpunkt auf der DACH-Region liegt.
+byro setzt stark auf Plugins, damit es sich an
 unterschiedliche Anforderungen in verschiedenen Situationen und Ländern
 anpassen lässt.
 
@@ -38,7 +38,7 @@ beschreibt den laufenden Betrieb danach (Update, Backup, Monitoring),
 zeigt, womit sich byro erweitern lässt.
 
 **Du willst byro erweitern oder daran mitarbeiten**: Start ist
-[Entwicklung & API](development/overview.md).
+[Unterstützen](development/overview.md) oder [API & Plugins](administration/plugins.md).
 
 - [Installation](installation/overview.md): byro auf dem eigenen Server
   betreiben, mit byroctl, Docker Compose oder Bare Metal.
@@ -52,8 +52,9 @@ zeigt, womit sich byro erweitern lässt.
   Kommunikation.
 - [Plugins](administration/plugins.md): womit sich byro
   erweitern lässt.
-- [Entwicklung & API](development/overview.md): byro oder ein Plugin
-  weiterentwickeln.
+- [Unterstützen](development/overview.md): byro weiterentwickeln, an der
+  Dokumentation arbeiten und Releases vorbereiten.
+- [API](development/api.md): die REST-API von byro nutzen.
 
 ## Funktionen
 
@@ -69,7 +70,8 @@ die dir fehlen!
 - **Zahlungen importieren und zuordnen:** Bankdaten kommen über ein Plugin
   hinein (der Core selbst bringt keinen Importer mit); das offizielle Plugin
   [`finance-import-bank-files`](administration/plugins.md) unterstützt
-  CAMT.053. Die Zuordnung zu Mitgliedern läuft über eigene Verfahren, die
+  CAMT.053 und MT940. Die Zuordnung zu Mitgliedern läuft über eigene Verfahren,
+  die
   Plugins beisteuern.
 - **Mails versenden:** Alle Mails können vor dem Versand geprüft werden. Die
   Standardvorlagen lassen sich bearbeiten und erweitern.

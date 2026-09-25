@@ -80,4 +80,4 @@ self-hosting; they are covered under
 [Settings](settings.md#audit-log). For context: the API documentation
 (`/api/v1/docs/`) and the API schema (`/api/v1/schema/`) are reachable
 without login, the API itself requires a token and `is_staff` (see
-[Development & API](../development/overview.md)).
+[API](../development/api.md)).

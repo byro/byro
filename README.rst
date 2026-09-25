@@ -3,71 +3,79 @@
 
 .. image:: https://img.shields.io/github/v/release/byro/byro
    :target: https://github.com/byro/byro/releases/latest
-   :alt: GitHub release (with filter)
+   :alt: Latest GitHub release
 
 .. image:: https://img.shields.io/pypi/v/byro
    :target: https://pypi.org/project/byro/
-   :alt: PyPI - Version
+   :alt: PyPI version
+
+.. image:: https://img.shields.io/github/license/byro/byro
+   :target: https://github.com/byro/byro/blob/main/LICENSE
+   :alt: AGPL-3.0-only license
 
 .. image:: https://github.com/byro/byro/actions/workflows/ci-cd.yml/badge.svg?branch=main
    :target: https://github.com/byro/byro/actions/workflows/ci-cd.yml?query=branch%3Amain
-   :alt: CI/CD
+   :alt: CI/CD status
 
 .. image:: https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/byro/byro
    :alt: Code coverage
 
-.. image:: https://img.shields.io/codeclimate/maintainability/byro/byro.svg
-   :target: https://codeclimate.com/github/byro/byro
-   :alt: Code maintainability
-
 .. image:: https://readthedocs.org/projects/byro/badge/?version=latest
-   :target: http://byro.readthedocs.io/
-   :alt: Documentation
+   :target: https://byro.readthedocs.io/en/latest/
+   :alt: Documentation status
 
+byro_ is a simple, self-hosted membership administration tool for small and
+medium-sized clubs, NGOs and associations, with a focus on the DACH region. It
+is stable, in active use in several communities and actively developed.
 
+byro is plugin-based so that organizations can adapt it to their own processes
+and local requirements. It is not a complete bookkeeping, event or ticketing
+system, and it does not offer a hosted default instance.
 
-byro_ is a membership administration tool for small and medium sized
-clubs/NGOs/associations of all kinds, with a focus on the DACH region. While it
-is still a work in progress, it is already usable and in active use.
+Getting started
+---------------
+
+* **Run byro for an organization:** The `installation guide`_ covers byroctl
+  (recommended), Docker Compose and bare-metal installations.
+* **Use an existing installation:** The `user guide`_ covers members, fees,
+  finances, documents and communication.
+* **Extend or improve byro:** Start with the `API and plugin documentation`_ or
+  `contributing`_.
 
 .. image:: https://raw.githubusercontent.com/byro/byro/main/docs/en/img/screenshots/office_dashboard.png
-
-Development and Production Setup
---------------------------------
-
-Please refer to the `development`_ or the `production documentation`_. The
-recommended way to run byro is `byroctl`_, which installs and updates a
-Docker based deployment with one command; Docker Compose by hand and a plain
-installation from PyPI are documented as well.
+   :alt: byro Office dashboard
+   :width: 800px
 
 Features
 --------
 
-
-Planned features
-----------------
-
+* Manage members, memberships and recurring fees.
+* Record and match payments; the official bank-file importer supports CAMT.053
+  and MT940.
+* Create documents, review and send mail, and keep member balances transparent.
+* Let members manage selected data and interact through the member area.
+* Protect Office accounts with multi-factor authentication.
+* Adapt byro through plugins and use its REST API for integrations.
 
 Plugins
 -------
 
-byro provides a rich API for plugins. See our `developer documentation`_ if you want to write a
-plugin.
+Plugins are Python packages that extend byro with importers, member data,
+documents or whole features. Administrators can install the compatible official
+plugins listed in the `plugin catalog`_; see `plugin management`_ for their
+installation and maintenance. The `plugin development documentation`_ explains
+how to build one.
 
-Plugins that work with the current byro release are listed in the `plugin catalog`_ that ships
-with every release; administrators install them with ``byroctl plugin add <name>`` (see the
-`plugin documentation`_). To get a plugin listed, publish a GitHub release and open a pull request
-against the catalog.
+The GitHub `byro-plugin topic`_ is a place to discover community plugins, not
+an endorsement; byroctl never installs entries from it automatically.
 
-- `byro-finance-import-bank-files`_ imports file-based bank statements, currently CAMT.053.
-- `byro-mailman`_ (mailing list integration) and `byro-gemeinnuetzigkeit`_ (receipts for German
-  non-profits) exist, but are not yet compatible with byro 2026.x.
+Contributing
+------------
 
-Community plugins are encouraged to add the `byro-plugin` tag if they are on GitHub. You can see
-all byro plugins on GitHub `here`_; byroctl never installs anything from that list on its own.
-`byro-shackspace`_ is an example for how a group can extend or modify byro to fit their purpose,
-e.g. add custom mechanisms and save additional data.
+Contributions to byro, its documentation and its plugins are welcome. See the
+`contributor documentation`_ for the development setup and contribution
+workflow.
 
 License
 -------
@@ -81,16 +89,14 @@ licenses of bundled third-party components.
 
 .. |byro| image:: https://raw.githubusercontent.com/byro/byro/main/docs/en/img/logo/byro_128.png
    :alt: byro
-.. _developer documentation: http://byro.readthedocs.io/en/latest/
-.. _development: https://byro.readthedocs.io/en/latest/development/setup/
 .. _byro: https://byro.cloud
-.. _here: https://github.com/topics/byro-plugin
+.. _installation guide: https://byro.readthedocs.io/en/latest/installation/overview/
+.. _user guide: https://byro.readthedocs.io/en/latest/usage/overview/
+.. _API and plugin documentation: https://byro.readthedocs.io/en/latest/administration/plugins/
+.. _contributing: https://byro.readthedocs.io/en/latest/development/overview/
 .. _plugin catalog: https://github.com/byro/byro/blob/main/deploy/plugin-catalog.conf
-.. _plugin documentation: https://byro.readthedocs.io/en/latest/administration/plugins/
-.. _byro-finance-import-bank-files: https://github.com/byro/byro-finance-import-bank-files
-.. _byro-mailman: https://github.com/byro/byro-mailman
-.. _byro-gemeinnuetzigkeit: https://github.com/byro/byro-gemeinnuetzigkeit
-.. _byro-shackspace: https://github.com/byro/byro-shackspace
-.. _production documentation: https://byro.readthedocs.io/en/latest/installation/
-.. _byroctl: https://byro.readthedocs.io/en/latest/installation/byroctl/
+.. _plugin management: https://byro.readthedocs.io/en/latest/administration/plugin-management/
+.. _plugin development documentation: https://byro.readthedocs.io/en/latest/development/plugins/overview/
+.. _byro-plugin topic: https://github.com/topics/byro-plugin
+.. _contributor documentation: https://byro.readthedocs.io/en/latest/development/contributing/
 .. _LICENSE: https://github.com/byro/byro/blob/main/LICENSE

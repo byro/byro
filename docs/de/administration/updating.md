@@ -20,7 +20,7 @@ jeweiligen Installationsseite:
    oder Bare-Metal-Installation gibt es diese automatische Kopie nicht;
    sichere dort selbst, bevor du aktualisierst.
 3. Aktualisiere Plugins nach der gleichen Logik wie byro selbst und prüfe ihre
-   eigenen Release Notes (siehe [Plugins](plugins.md#was-ein-byro-update-mit-plugins-macht)).
+   eigenen Release Notes (siehe [Plugin-Verwaltung](plugin-management.md#was-ein-byro-update-mit-plugins-macht)).
 
 ## Was während eines Updates passiert
 

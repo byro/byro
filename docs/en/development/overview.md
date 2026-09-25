@@ -1,7 +1,7 @@
-# Development & API
+# Contributing
 
-This part of the byro documentation is for you if you want to improve byro or
-develop a plugin.
+This part of the byro documentation is for you if you want to improve byro,
+work on the documentation or contribute to a release.
 
 If you want to improve byro itself, please head to our
 [contributor documentation](contributing.md).
@@ -11,12 +11,9 @@ with the [development setup](setup.md). It contains the contributing
 guidelines, an explanation on how to build a pull request, which style
 guidelines to follow, and an internal API documentation.
 
-The [signal list](signals.md) documents the hooks byro offers, and the
-[REST API](api.md) describes the programmatic interface for members and
-memberships. Plugin development guides are under
-[Plugins](../administration/plugins.md), in
-[Plugin development](plugins/overview.md): they show how to develop a byro
-plugin with some hopefully easy-to-follow example plugins.
+The [REST API](api.md) has its own section. Plugin development guides
+and the [signal list](signals.md) are under [Plugins](../administration/plugins.md),
+in [Plugin development](plugins/overview.md).
 
 If you maintain byro and prepare a release, [Releasing byro](releasing.md)
 describes the release pipeline, the `stable` pointer for byroctl and the

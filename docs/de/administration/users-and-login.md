@@ -73,7 +73,7 @@ legst neue an und bearbeitest bestehende. Jedes Konto hat:
 
 - **Benutzername**, **Name**, **E-Mail-Adresse**,
 - **`is_staff`**: Voraussetzung für Zugriff auf die REST-API (siehe
-  [Entwicklung & API](../development/overview.md)). Hat **keine** weitere
+  [API](../development/api.md)). Hat **keine** weitere
   Wirkung auf das Office selbst.
 - **`is_superuser`**: byro wertet dieses Feld **an keiner Stelle** selbst aus
   (kein Django-Admin-Interface eingebunden). Es erscheint im Audit-Log, hat

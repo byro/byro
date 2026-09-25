@@ -85,4 +85,4 @@ Selbst-Hostings; sie stehen unter
 [Einstellungen](settings.md#audit-log). Kurz zur Einordnung: Die
 API-Dokumentation (`/api/v1/docs/`) und das API-Schema (`/api/v1/schema/`)
 sind ohne Login erreichbar, die API selbst verlangt einen Token und setzt
-`is_staff` voraus (siehe [Entwicklung & API](../development/overview.md)).
+`is_staff` voraus (siehe [API](../development/api.md)).

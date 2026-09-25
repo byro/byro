@@ -13,7 +13,7 @@ Was du bekommst:
 * optional Caddy als Reverse Proxy, der TLS-Zertifikate beschafft und erneuert,
 * eine Konfigurationsdatei, `byro.conf`,
 * Plugins aus einem Katalog oder als pip-Requirements, für dich ins Image
-  gebaut ([Plugins](../administration/plugins.md)),
+  gebaut ([Plugin-Verwaltung](../administration/plugin-management.md)),
 * `byroctl update` mit einer Sicherheitskopie der Datenbank vor jedem Update.
 
 Alles, was byroctl startet, ist gewöhnliches Docker Compose. Du kannst dir die
@@ -75,7 +75,7 @@ Der Installer stellt ein paar Fragen, jede mit einem sinnvollen Standard:
   externer SMTP-Server oder später,
 * welche Plugins aus dem Katalog installiert werden (Kurznamen wie
   `finance-import-bank-files`; standardmäßig keine, siehe
-  [Plugins](../administration/plugins.md)),
+  [Plugin-Verwaltung](../administration/plugin-management.md)),
 * Benutzername, E-Mail-Adresse und Passwort des ersten Administrators.
 
 Danach schreibt er die Konfiguration, lädt die Images, baut bei Bedarf das
@@ -185,7 +185,8 @@ $ byroctl version                installiertes Release, Image-Digest, laufende V
 $ byroctl self-update            byroctl für das installierte Release neu laden (Reparatur)
 ```
 
-Plugins haben eine eigene Seite: [Plugins](../administration/plugins.md);
+Plugins haben eigene Seiten: [Plugins](../administration/plugins.md) und
+[Plugin-Verwaltung](../administration/plugin-management.md);
 alle Management-Befehle stehen unter
 [Management-Befehle](../administration/management-commands.md).
 
@@ -229,7 +230,8 @@ und zeigt den Link zu den Release Notes. `update` macht dann Folgendes:
 4. ersetzt die Compose-Dateien, lädt das neue Image und pinnt dessen Digest,
 5. baut das Plugin-Image auf dem neuen Release neu, falls du Plugins verwendest
    (mit unveränderten Pins; `--update-plugins` hebt Katalog-Plugins im selben
-   Lauf auf ihr aktuelles Release, siehe [Plugins](../administration/plugins.md)),
+   Lauf auf ihr aktuelles Release, siehe
+   [Plugin-Verwaltung](../administration/plugin-management.md)),
 6. stoppt byro, führt die Datenbankmigrationen aus und startet das neue
    Release.
 

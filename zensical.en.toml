@@ -48,45 +48,50 @@ nav = [
     ] },
   ] },
   { "User guide" = [
-    { "Overview" = "usage/overview.md" },
-    { "Member management" = [
-      { "Overview" = "usage/member-management.md" },
-      { "Members" = "usage/members.md" },
-      { "Memberships and fees" = "usage/memberships-and-fees.md" },
-    ] },
-    { "Finance" = [
-      { "Overview" = "usage/finances.md" },
-      { "Documents" = "usage/documents.md" },
-      { "Communication" = "usage/mails.md" },
-    ] },
-    { "Member area" = [
-      { "Member page" = "usage/member-page.md" },
-    ] },
-    { "My account" = [
-      { "Overview" = "usage/account.md" },
-      { "Multi-factor authentication" = "usage/mfa.md" },
-    ] },
-  ] },
-  { "Plugins" = [
-    { "Plugins" = [
-      { "Overview" = "administration/plugins.md" },
-    ] },
-    { "Plugin development" = [
-      { "Overview" = "development/plugins/overview.md" },
-      { "Creating a plugin" = "development/plugins/creating-a-plugin.md" },
-      { "Custom member data" = "development/plugins/member-data.md" },
-      { "Bank transaction importers" = "development/plugins/bank-transaction-importers.md" },
+    { "User guide" = [
+      { "Overview" = "usage/overview.md" },
+      { "Member management" = [
+        { "Overview" = "usage/member-management.md" },
+        { "Members" = "usage/members.md" },
+        { "Memberships and fees" = "usage/memberships-and-fees.md" },
+      ] },
+      { "Finance" = [
+        { "Overview" = "usage/finances.md" },
+        { "Documents" = "usage/documents.md" },
+        { "Communication" = "usage/mails.md" },
+      ] },
+      { "Member area" = [
+        { "Member page" = "usage/member-page.md" },
+      ] },
+      { "My account" = [
+        { "Overview" = "usage/account.md" },
+        { "Multi-factor authentication" = "usage/mfa.md" },
+      ] },
     ] },
   ] },
-  { "Development & API" = [
-    { "Development & API" = [
+  { "API & Plugins" = [
+    { "API & Plugins" = [
+      { "Plugins" = [
+        { "Overview" = "administration/plugins.md" },
+        { "Plugin management" = "administration/plugin-management.md" },
+      ] },
+      { "Plugin development" = [
+        { "Overview" = "development/plugins/overview.md" },
+        { "Creating a plugin" = "development/plugins/creating-a-plugin.md" },
+        { "Custom member data" = "development/plugins/member-data.md" },
+        { "Bank transaction importers" = "development/plugins/bank-transaction-importers.md" },
+        { "Signal list" = "development/signals.md" },
+      ] },
+      { "REST API" = "development/api.md" },
+    ] },
+  ] },
+  { "Contributing" = [
+    { "Contributing" = [
       { "Overview" = "development/overview.md" },
       { "Development setup" = "development/setup.md" },
       { "Contributing" = "development/contributing.md" },
       { "Working on the documentation" = "development/documentation.md" },
       { "Releasing byro" = "development/releasing.md" },
-      { "Signal list" = "development/signals.md" },
-      { "REST API" = "development/api.md" },
     ] },
   ] },
 ]
@@ -97,6 +102,7 @@ invalid_link_anchors = true
 
 [project.theme]
 language = "en"
+custom_dir = "docs/overrides/en"
 logo = "img/logo/byro_128.png"
 favicon = "img/logo/byro_32.png"
 features = [

@@ -79,9 +79,9 @@ management commands, monitoring/troubleshooting, security baseline);
 *Configuration* (what you set up *inside* byro through the Office — users/login,
 MFA, PGP, settings — plus the `byro.cfg`/`BYRO_*` configuration reference);
 *User guide* (day-to-day work in a running byro, split into *Member
-management*, *Finance*, *Member area* and *My account*); *Plugins* (which
-plugins exist, and how to build one); and *Development & API* (developing
-byro itself). Pick the page for the role doing the task, not the page that
+management*, *Finance*, *Member area* and *My account*); *API & Plugins*
+(which plugins exist, how to build them, and how to use the REST API); and
+*Contributing* (developing byro itself). Pick the page for the role doing the task, not the page that
 already exists and is closest. Describe one topic in one place; link to it
 from other pages instead of repeating it (an install method's own update
 procedure is not a repeat, since the steps differ per method — a concept like
@@ -90,14 +90,13 @@ procedure is not a repeat, since the steps differ per method — a concept like
 Every tab's own tree renders in the sidebar as a nested group
 (`navigation.sections`) named after the tab itself, so even a single-topic
 tab like *Installation* or *Administration* gets a bold sidebar heading
-instead of a bare page list. Every such heading is a plain, non-clickable
-bold label, and every group's first entry is an explicit `{"Overview" =
-path}` link to that group's landing page (for example *Plugin
-development* → *Overview*, or *User guide* → *Finance* → *Overview*) —
-never a bare, unlabelled page path. Only *Member management* has no
-existing landing page of its own, so it got a new short one
-(`usage/member-management.md`); *Member area* has a single labelled child
-page and needs no separate overview.
+instead of a bare page list. These are native, collapsible navigation groups.
+Every group's first entry is an explicit `{"Overview" = path}` link to that group's landing page (for
+example *Plugin development* → *Overview*, or *User guide* → *Finance* →
+*Overview*) — never a bare, unlabelled page path. Only *Member management*
+has no existing landing page of its own, so it got a new short one
+(`usage/member-management.md`); *Member area* has a single labelled child page
+and needs no separate overview.
 
 Installation, Administration and Configuration look similar (all three are
 "for administrators"), but split on three different axes: Installation is
@@ -109,9 +108,10 @@ is about what happens *inside* byro through the Office UI (or the `byro.cfg`
 file/`BYRO_*` variables that back it), regardless of how or where byro is
 hosted. A page that would answer the same way no matter who's hosting the
 instance belongs in Configuration, not Installation or Administration. Plugins
-and Development & API split similarly: Plugins is about using and choosing
-plugins, and about building one yourself; Development & API is about working
-on byro's own core (setup, contributing, releasing, signals, the REST API).
+and the other developer-facing sections split similarly: API & Plugins is about
+using the REST API and choosing or building plugins; Contributing is about
+working on byro's own core, the
+documentation and releases.
 
 **Diátaxis, applied quietly.** Within a page, keep tutorial ("do this to
 learn"), how-to ("do this to get a result"), reference ("look this up
@@ -279,30 +279,21 @@ it are secured; otherwise rewrite the passage from the code and known facts.
   `operations.md`) live under the *Administration* tab; `overview.md`,
   `users-and-login.md`, `mfa.md`, `pgp.md`, `settings.md` (plus
   `configuration/reference.md`, physically outside `administration/`) live
-  under *Configuration*; `plugins.md` lives under *Plugins* together with
+  under *Configuration*; `plugins.md` lives under *API & Plugins* together with
   `development/plugins/overview.md` and its subpages, even though those are
   physically under `development/`, not `administration/`. Only rename a
   directory or file when the page's own topic changes, not to make it match
   its current tab.
-- Every top-level tab wraps its own page tree in one nested `nav` group named
-  after the tab (for example `{ "Plugins" = [ { "Plugins" = [...] }, {
-  "Plugin-Entwicklung" = [...] } ] }`), so the sidebar always shows a bold
-  section heading, even for a tab with only one topic. Every group's own
-  section heading stays a plain, non-clickable bold label, and its first
-  child is always an explicit `{"Überblick" = path}`/`{"Overview" = path}`
-  entry linking to that group's landing page. Getting this right takes two
-  things, not one: the entry must be *labelled* (never a bare, unlabelled
-  page path), **and** the landing page's file must *not* be literally named
-  `index.md`/`README.md` anywhere in that section's subtree. `navigation.indexes`
-  (the mkdocs-material feature that turns a section heading into a link)
-  triggers on the second condition alone, regardless of nav labels or
-  `#`-heading text — it scans the whole section for a page file named
-  `index.md`/`README.md` and links the heading to whichever one it finds
-  first, which is precisely why `docs/de/configuration/reference.md` (the
-  `byro.cfg`/`BYRO_*` reference nested inside the *Konfiguration* tab) had to
-  be renamed away from `index.md` too, even though it already had an
-  explicit `Konfigurationsreferenz` label. Landing pages in this project are
-  therefore deliberately never named `index.md`/`README.md` (`overview.md`,
-  `operations.md`, `plugins.md`, `finances.md`, `account.md`, `reference.md`,
-  …), so no section heading is ever clickable by accident of a filename (see
-  the AP11b migration report, Nachtrag 4, for the full investigation).
+- Every top-level tab wraps its page tree in one nested `nav` group named
+  after the tab. This gives the sidebar a native, non-clickable heading and
+  keeps its child groups collapsible. Add a nested group only for a real shared
+  topic, for example *Plugins* → *Overview* and *Plugin management*. Single
+  pages without such a topic stay direct entries, such as *REST API* or
+  *Member page*.
+- The first child of a grouped topic is an explicit
+  `{"Überblick" = path}`/`{"Overview" = path}` landing-page entry. Its file
+  must not literally be named `index.md` or `README.md`: with
+  `navigation.indexes`, either name would make the group heading link to that
+  page. Landing pages therefore use names such as `overview.md`,
+  `operations.md`, `plugins.md`, `finances.md`, `account.md` and
+  `reference.md`.

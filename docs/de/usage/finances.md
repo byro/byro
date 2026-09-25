@@ -65,7 +65,7 @@ MiB) und verarbeitet sie sofort mit dem gewählten Importformat.
 * Steht kein Importformat zur Auswahl, ist kein passendes Plugin installiert
   – byro selbst bringt keinen Bankimporter mit (siehe
   [Plugins](../administration/plugins.md) für die Installation, zum Beispiel
-  des offiziellen Plugins für CAMT.053-Dateien).
+  des offiziellen Plugins für CAMT.053- und MT940-Dateien).
 * Nach der Verarbeitung meldet byro, wie viele Buchungen gelesen, neu
   importiert und als bereits bekannt übersprungen wurden. Ein wiederholter
   Import derselben oder überlappender Dateien erzeugt **keine** doppelten

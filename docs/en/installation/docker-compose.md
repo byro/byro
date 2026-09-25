@@ -41,7 +41,7 @@ Caddy as a reverse proxy with automatic HTTPS is the second add-on:
 ```
 
 The third add-on switches the byro services to an image built locally with
-plugins (see [Plugins](../administration/plugins.md)):
+plugins (see [plugin management](../administration/plugin-management.md)):
 
 ```yaml
 --8<-- "deploy/compose/plugins.yml"

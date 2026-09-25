@@ -87,4 +87,4 @@ verloren) siehe
   obwohl ein Reverse Proxy TLS terminiert (siehe
   [Sicherheits-Baseline](security-baseline.md#tls-und-reverse-proxy)).
 * **Plugin-Build schlägt fehl.** Siehe die
-  [Fehlersuche bei Plugins](plugins.md#fehlersuche).
+  [Fehlersuche bei Plugins](plugin-management.md#fehlersuche).

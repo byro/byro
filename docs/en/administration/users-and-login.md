@@ -68,7 +68,7 @@ new ones and edit existing ones. Each account has:
 
 - **Username**, **name**, **e-mail address**,
 - **`is_staff`**: a prerequisite for REST API access (see
-  [Development & API](../development/overview.md)). Has **no** other effect on
+  [API](../development/api.md)). Has **no** other effect on
   the Office itself.
 - **`is_superuser`**: byro **never** evaluates this field itself (no Django
   admin site is wired in). It appears in the audit log but has no practical
