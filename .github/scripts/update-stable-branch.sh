@@ -12,7 +12,7 @@
 # allows an older release; a re-created tag with changed content refreshes the
 # branch. Every change is a new commit on top of the branch history, built with
 # git plumbing (no checkout, no index) and pushed as a fast-forward. Process and
-# rationale: docs/developer/releasing.rst.
+# rationale: docs/en/development/releasing.md.
 #
 # Options:
 #   --force             allow pointing stable at an older release
@@ -110,7 +110,7 @@ Documentation: https://byro.readthedocs.io/en/latest/administrator/installation-
 
 Do not edit this branch or push to it by hand. The pointer moves automatically
 after every release; to move it deliberately, run the "Stable pointer" workflow
-(see docs/developer/releasing.rst in the main branch).
+(see docs/en/development/releasing.md in the main branch).
 EOF
 }
 

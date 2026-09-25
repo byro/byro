@@ -1,0 +1,176 @@
+# Zensical configuration for the en documentation tree (docs/en/).
+# Build:  zensical build -f zensical.en.toml --strict
+# Serve:  zensical serve -f zensical.en.toml
+# Both language trees use identical relative paths; only titles and navigation labels differ.
+
+[project]
+site_name = "byro documentation"
+site_url = "https://byro.readthedocs.io/en/latest/"
+site_description = "byro – membership administration for small and medium sized associations"
+copyright = '&copy; the byro contributors · This documentation is licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>'
+repo_url = "https://github.com/byro/byro"
+repo_name = "byro/byro"
+edit_uri = "edit/main/docs/en/"
+docs_dir = "docs/en"
+site_dir = "docs/_build/zensical/en"
+use_directory_urls = true
+strict = true
+
+nav = [
+  { "Getting started" = "index.md" },
+  { "Installation" = [
+    { "Installation" = [
+      { "Overview" = "installation/overview.md" },
+      { "With byroctl (recommended)" = "installation/byroctl.md" },
+      { "With Docker Compose" = "installation/docker-compose.md" },
+      { "Bare metal" = "installation/bare-metal.md" },
+      { "Legacy: production/ (deprecated)" = "installation/legacy-production.md" },
+    ] },
+  ] },
+  { "Administration" = [
+    { "Administration" = [
+      { "Overview" = "administration/operations.md" },
+      { "Updating" = "administration/updating.md" },
+      { "Backup and restore" = "administration/backup-restore.md" },
+      { "Management commands" = "administration/management-commands.md" },
+      { "Monitoring, logging and troubleshooting" = "administration/troubleshooting.md" },
+      { "Security baseline" = "administration/security-baseline.md" },
+    ] },
+  ] },
+  { "Configuration" = [
+    { "Configuration" = [
+      { "Overview" = "administration/overview.md" },
+      { "Users and login" = "administration/users-and-login.md" },
+      { "Multi-factor authentication" = "administration/mfa.md" },
+      { "PGP email encryption" = "administration/pgp.md" },
+      { "Settings" = "administration/settings.md" },
+      { "Configuration reference" = "configuration/reference.md" },
+    ] },
+  ] },
+  { "User guide" = [
+    { "User guide" = [
+      { "Overview" = "usage/overview.md" },
+      { "Member management" = [
+        { "Overview" = "usage/member-management.md" },
+        { "Members" = "usage/members.md" },
+        { "Memberships and fees" = "usage/memberships-and-fees.md" },
+      ] },
+      { "Finance" = [
+        { "Overview" = "usage/finances.md" },
+        { "Documents" = "usage/documents.md" },
+        { "Communication" = "usage/mails.md" },
+      ] },
+      { "Member area" = [
+        { "Member page" = "usage/member-page.md" },
+      ] },
+      { "My account" = [
+        { "Overview" = "usage/account.md" },
+        { "Multi-factor authentication" = "usage/mfa.md" },
+      ] },
+    ] },
+  ] },
+  { "API & Plugins" = [
+    { "API & Plugins" = [
+      { "Plugins" = [
+        { "Overview" = "administration/plugins.md" },
+        { "Plugin management" = "administration/plugin-management.md" },
+      ] },
+      { "Plugin development" = [
+        { "Overview" = "development/plugins/overview.md" },
+        { "Creating a plugin" = "development/plugins/creating-a-plugin.md" },
+        { "Custom member data" = "development/plugins/member-data.md" },
+        { "Bank transaction importers" = "development/plugins/bank-transaction-importers.md" },
+        { "Signal list" = "development/signals.md" },
+      ] },
+      { "REST API" = "development/api.md" },
+    ] },
+  ] },
+  { "Contributing" = [
+    { "Contributing" = [
+      { "Overview" = "development/overview.md" },
+      { "Development setup" = "development/setup.md" },
+      { "Contributing" = "development/contributing.md" },
+      { "Working on the documentation" = "development/documentation.md" },
+      { "Releasing byro" = "development/releasing.md" },
+    ] },
+  ] },
+]
+
+[project.validation]
+invalid_links = true
+invalid_link_anchors = true
+
+[project.theme]
+language = "en"
+custom_dir = "docs/overrides/en"
+logo = "img/logo/byro_128.png"
+favicon = "img/logo/byro_32.png"
+features = [
+  "content.action.edit",
+  "content.action.view",
+  "content.code.annotate",
+  "content.code.copy",
+  "content.footnote.tooltips",
+  "content.tabs.link",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.instant",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+  "toc.follow",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+[project.plugins.mkdocstrings]
+handlers.python.paths = ["src"]
+handlers.python.options.docstring_style = "sphinx"
+handlers.python.options.show_source = false
+handlers.python.options.show_root_heading = true
+handlers.python.options.show_root_full_path = true
+handlers.python.options.heading_level = 3
+handlers.python.options.members_order = "source"
+handlers.python.options.separate_signature = true
+handlers.python.options.show_signature_annotations = true
+handlers.python.options.docstring_section_style = "table"
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+tables = {}
+toc.permalink = true
+pymdownx.details = {}
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.line_spans = "__span"
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.keys = {}
+pymdownx.snippets.base_path = ["."]
+pymdownx.snippets.check_paths = true
+pymdownx.superfences = {}
+pymdownx.tabbed.alternate_style = true
+pymdownx.tabbed.combine_header_slug = true
+pymdownx.tasklist.custom_checkbox = true
