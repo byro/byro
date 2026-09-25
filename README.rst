@@ -9,7 +9,7 @@
    :target: https://pypi.org/project/byro/
    :alt: PyPI version
 
-.. image:: https://img.shields.io/github/license/byro/byro
+.. image:: https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg
    :target: https://github.com/byro/byro/blob/main/LICENSE
    :alt: AGPL-3.0-only license
 
@@ -20,7 +20,6 @@
 .. image:: https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/byro/byro
    :alt: Code coverage
-
 .. image:: https://readthedocs.org/projects/byro/badge/?version=latest
    :target: https://byro.readthedocs.io/en/latest/
    :alt: Documentation status
