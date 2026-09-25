@@ -33,4 +33,4 @@ pyyaml-env-tag==1.1
 six==1.17.0
 tomli==2.4.1
 watchdog==6.0.0
-zensical==0.0.59
+zensical==0.0.64
