@@ -1,28 +1,11 @@
-|byro|
-======
+|release-badge| |pypi-badge| |ci-badge| |coverage-badge| |docs-badge| |license-badge|
 
-.. image:: https://img.shields.io/github/v/release/byro/byro
-   :target: https://github.com/byro/byro/releases/latest
-   :alt: Latest GitHub release
+.. image:: https://raw.githubusercontent.com/byro/byro/main/docs/en/img/logo/byro_128.png
+   :alt: byro
+   :align: center
 
-.. image:: https://img.shields.io/pypi/v/byro
-   :target: https://pypi.org/project/byro/
-   :alt: PyPI version
-
-.. image:: https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg
-   :target: https://github.com/byro/byro/blob/main/LICENSE
-   :alt: AGPL-3.0-only license
-
-.. image:: https://github.com/byro/byro/actions/workflows/ci-cd.yml/badge.svg?branch=main
-   :target: https://github.com/byro/byro/actions/workflows/ci-cd.yml?query=branch%3Amain
-   :alt: CI/CD status
-
-.. image:: https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/byro/byro
-   :alt: Code coverage
-.. image:: https://readthedocs.org/projects/byro/badge/?version=latest
-   :target: https://byro.readthedocs.io/en/latest/
-   :alt: Documentation status
+byro
+====
 
 byro_ is a simple, self-hosted membership administration tool for small and
 medium-sized clubs, NGOs and associations, with a focus on the DACH region. It
@@ -86,8 +69,24 @@ Commons Attribution-ShareAlike 4.0 International License (``CC-BY-SA-4.0``).
 See the `LICENSE`_ file for details, including the licensing history and the
 licenses of bundled third-party components.
 
-.. |byro| image:: https://raw.githubusercontent.com/byro/byro/main/docs/en/img/logo/byro_128.png
-   :alt: byro
+.. |release-badge| image:: https://img.shields.io/github/v/release/byro/byro
+   :target: https://github.com/byro/byro/releases/latest
+   :alt: Latest GitHub release
+.. |pypi-badge| image:: https://img.shields.io/pypi/v/byro
+   :target: https://pypi.org/project/byro/
+   :alt: PyPI version
+.. |ci-badge| image:: https://img.shields.io/github/actions/workflow/status/byro/byro/ci-cd.yml?branch=main&label=CI%2FCD
+   :target: https://github.com/byro/byro/actions/workflows/ci-cd.yml?query=branch%3Amain
+   :alt: CI/CD status
+.. |coverage-badge| image:: https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/byro/byro
+   :alt: Code coverage
+.. |docs-badge| image:: https://img.shields.io/readthedocs/byro?label=docs
+   :target: https://byro.readthedocs.io/en/latest/
+   :alt: Documentation status
+.. |license-badge| image:: https://img.shields.io/badge/license-AGPL--3.0--only-lightgrey.svg
+   :target: https://github.com/byro/byro/blob/main/LICENSE
+   :alt: AGPL-3.0-only license
 .. _byro: https://byro.cloud
 .. _installation guide: https://byro.readthedocs.io/en/latest/installation/overview/
 .. _user guide: https://byro.readthedocs.io/en/latest/usage/overview/
