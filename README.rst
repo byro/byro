@@ -15,8 +15,9 @@
      <img src="https://raw.githubusercontent.com/byro/byro/main/docs/en/img/logo/byro_128.png" alt="byro" width="128">
    </p>
 
-byro
-====
+.. raw:: html
+
+   <h1 align="center">byro</h1>
 
 byro_ is a simple, self-hosted membership administration tool for small and
 medium-sized clubs, NGOs and associations, with a focus on the DACH region. It
