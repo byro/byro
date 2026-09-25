@@ -3,7 +3,7 @@ name: Release flags
 # Lints deploy/release.env and reminds maintainers to reset a release flag after
 # the release that needed it was published. Runs on every push to main and every
 # pull request without a path filter: a forgotten reset has to show up even when
-# nothing below deploy/ changes. See docs/developer/releasing.rst.
+# nothing below deploy/ changes. See docs/en/development/releasing.md.
 
 on:
   push:

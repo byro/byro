@@ -10,7 +10,7 @@
 # values run to the end of the line, no quotes, no inline comments, no tabs, no
 # trailing whitespace. Anything the lint accepts must be what byroctl reads;
 # deploy/tests/plugin_catalog.bats checks that contract. Process:
-# docs/developer/releasing.rst, section "Plugin catalog".
+# docs/en/development/releasing.md, section "Plugin catalog".
 
 FILE="deploy/plugin-catalog.conf"
 KEYS="name description package source repo"

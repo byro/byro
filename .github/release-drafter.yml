@@ -6,7 +6,7 @@ header: |
   <!-- Kurze Beschreibung des Releases: Was ist das Highlight? Breaking Changes? -->
   <!-- Vor dem Veröffentlichen: deploy/release.env prüfen (Flags für dieses Release gesetzt, SHA256SUMS
        regeneriert, in den Notes erklärt?), Hinweise für Administratoren ergänzen. Danach gesetzte Flags
-       per PR auf 0 zurücksetzen. Ablauf und Checkliste: docs/developer/releasing.rst -->
+       per PR auf 0 zurücksetzen. Ablauf und Checkliste: docs/en/development/releasing.md -->
 
 categories:
   - title: '🚨 Breaking Changes'
