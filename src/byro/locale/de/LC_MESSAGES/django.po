@@ -3081,20 +3081,27 @@ msgstr "Wiederherstellungscode"
 msgid "Please enter a valid recovery code."
 msgstr "Bitte gib einen gültigen Wiederherstellungscode ein."
 
-#: byro/mfa/models.py:30
-msgid "Require MFA for all administrators"
-msgstr "MFA für alle Administratoren erzwingen"
+#: byro/mfa/models.py:80
+msgid "Required for all administrators"
+msgstr "Für alle Administratoren erforderlich"
 
-#: byro/mfa/models.py:32
+#: byro/mfa/models.py:82
+msgid "Required for all administrators except OIDC logins"
+msgstr "Für alle Administratoren erforderlich, außer bei OIDC-Anmeldungen"
+
+#: byro/mfa/models.py:89 byro/mfa/templates/mfa/settings_form.html:6
+msgid "MFA policy"
+msgstr "MFA-Richtlinie"
+
+#: byro/mfa/models.py:91
 msgid ""
-"When enabled, all users with access to the byro backend have to set up "
-"multi-factor authentication with an authenticator app (TOTP). Users without "
-"MFA are asked to set it up at their next login."
+"Choose whether MFA is optional, required for every backend login, or "
+"required except for sessions authenticated through OIDC. An authenticator "
+"that a user set up themselves is always required."
 msgstr ""
-"Wenn aktiviert, müssen alle Benutzer mit Zugriff auf das byro-Backend eine "
-"Multi-Faktor-Authentifizierung mit einer Authenticator-App (TOTP) "
-"einrichten. Benutzer ohne MFA werden bei ihrer nächsten Anmeldung zur "
-"Einrichtung aufgefordert."
+"Wähle, ob MFA optional ist, für jede Backend-Anmeldung erforderlich ist oder "
+"außer für per OIDC authentifizierte Sitzungen erforderlich ist. Ein selbst "
+"eingerichteter Authenticator ist immer erforderlich."
 
 #: byro/mfa/models.py:38 byro/mfa/signals.py:17
 #: byro/mfa/templates/mfa/challenge.html:5
@@ -3407,10 +3414,6 @@ msgstr ""
 "Die Multi-Faktor-Authentifizierung ist aktiviert. Falls dieser Benutzer den "
 "Zugriff auf Authenticator-App und Wiederherstellungscodes verloren hat, kann "
 "ein Administrator sie auf dem Server zurücksetzen:"
-
-#: byro/mfa/templates/mfa/settings_form.html:6
-msgid "Mandatory MFA"
-msgstr "MFA-Pflicht"
 
 #: byro/mfa/models.py:82
 msgid "Account name in authenticator apps"

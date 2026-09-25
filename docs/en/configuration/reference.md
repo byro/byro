@@ -125,6 +125,9 @@ matching OIDC claim could otherwise no longer sign in at all). If
 `issuer_url` is empty, the login page shows no SSO button and the related
 routes answer 404. For the flow, the group check and its security
 consequences, see [Users and login](../administration/users-and-login.md).
+The MFA policy itself is configured in *Settings → General*. Its OIDC-exception
+variant trusts the identity provider to enforce MFA for OIDC sessions; see
+[Multi-factor authentication](../administration/mfa.md) before selecting it.
 
 ### `issuer_url`
 

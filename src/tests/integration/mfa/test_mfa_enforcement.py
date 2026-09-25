@@ -28,7 +28,7 @@ SETTINGS_POST_DATA = {
 
 @pytest.mark.django_db
 def test_policy_is_disabled_by_default(configuration):
-    assert MFAConfiguration.get_solo().require_mfa is False
+    assert MFAConfiguration.get_solo().policy == MFAConfiguration.Policy.OPTIONAL
     assert not services.policy_requires_mfa()
 
 
@@ -37,10 +37,10 @@ def test_policy_can_be_changed_on_settings_page(logged_in_client, configuration)
     response = logged_in_client.get(reverse("office:settings.base"))
     assert response.status_code == 200
     content = response.content.decode()
-    assert "Require MFA for all administrators" in content
-    assert 'name="MFAConfiguration-require_mfa"' in content
+    assert "MFA policy" in content
+    assert 'name="MFAConfiguration-policy"' in content
     # heading in the label column next to the checkbox
-    assert "Mandatory MFA" in content
+    assert "Required for all administrators except OIDC logins" in content
     assert 'name="MFAConfiguration-issuer"' not in content
     assert 'name="MFAConfiguration-account_label"' in content
     assert 'value="{association} - {username}"' in content
@@ -50,17 +50,17 @@ def test_policy_can_be_changed_on_settings_page(logged_in_client, configuration)
         "Configuration-name": configuration.name,
         "Configuration-mail_from": configuration.mail_from,
         "Configuration-backoffice_mail": configuration.backoffice_mail,
-        "MFAConfiguration-require_mfa": "on",
+        "MFAConfiguration-policy": MFAConfiguration.Policy.REQUIRED,
         "MFAConfiguration-account_label": "{username} ({email})",
     }
     response = logged_in_client.post(reverse("office:settings.base"), data)
     assert response.status_code == 302
     config = MFAConfiguration.get_solo()
-    assert config.require_mfa is True
+    assert config.policy == MFAConfiguration.Policy.REQUIRED
     assert config.account_label == "{username} ({email})"
     entry = LogEntry.objects.filter(action_type="byro.settings.changed").latest("pk")
     assert entry.content_object == config
-    assert entry.data["changes"]["require_mfa"] == ["False", "True"]
+    assert entry.data["changes"]["policy"] == ["optional", "required"]
     assert entry.data["changes"]["account_label"] == [
         "{association} - {username}",
         "{username} ({email})",
@@ -162,7 +162,7 @@ def test_policy_applies_to_existing_sessions(client, user, configuration, login_
     assert client.get(reverse("office:dashboard")).status_code == 200
 
     config = MFAConfiguration.get_solo()
-    config.require_mfa = True
+    config.policy = MFAConfiguration.Policy.REQUIRED
     config.save()
 
     response = client.get(reverse("office:dashboard"))
@@ -207,7 +207,7 @@ def test_policy_applies_to_every_backend_user(client, mfa_policy, login_user):
 def test_reset_does_not_bypass_policy(client, mfa_user, mfa_policy, login_user):
     call_command("mfa_reset", mfa_user.username, "--force")
 
-    assert MFAConfiguration.get_solo().require_mfa is True
+    assert MFAConfiguration.get_solo().policy == MFAConfiguration.Policy.REQUIRED
     login_user(client, mfa_user)
     response = client.get(reverse("office:dashboard"))
     assert response.status_code == 302
@@ -229,7 +229,7 @@ def test_policy_with_incomplete_initial_settings_does_not_loop(
 ):
     # Fresh installation: general settings incomplete, policy on, no device.
     config = MFAConfiguration.get_solo()
-    config.require_mfa = True
+    config.policy = MFAConfiguration.Policy.REQUIRED
     config.save()
     login_user(client, user)
 

@@ -10,7 +10,7 @@ here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
 try:
-    with open(path.join(here, "../README.rst"), encoding="utf-8") as f:
+    with open(path.join(here, "README-PyPI.rst"), encoding="utf-8") as f:
         long_description = f.read()
 except:  # noqa
     long_description = ""
@@ -46,6 +46,7 @@ setup(
     python_requires=">=3.12",
     description="Membership and fees management for associations, clubs and groups",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
     url="https://byro.cloud",
     author="Tobias Kunze",
     author_email="r@rixx.de",

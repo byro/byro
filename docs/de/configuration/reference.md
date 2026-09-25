@@ -124,6 +124,9 @@ passenden OIDC-Claim kann sich sonst nicht mehr anmelden). Ist `issuer_url`
 leer, zeigt die Login-Seite keinen SSO-Button, und die dazugehörigen
 Routen antworten mit 404. Details zum Ablauf, zur Gruppenprüfung und zu den
 Sicherheitsfolgen: [Benutzer und Login](../administration/users-and-login.md).
+Die MFA-Richtlinie selbst wird unter *Einstellungen → Allgemein* gesetzt. Ihre
+OIDC-Ausnahme vertraut darauf, dass der Identity Provider MFA für OIDC-Sitzungen
+durchsetzt; lies vor der Auswahl [Mehr-Faktor-Authentifizierung](../administration/mfa.md).
 
 ### `issuer_url`
 

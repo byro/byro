@@ -17,7 +17,7 @@ def fast_password_hashers(settings):
 @pytest.fixture
 def mfa_policy(configuration):
     config = MFAConfiguration.get_solo()
-    config.require_mfa = True
+    config.policy = MFAConfiguration.Policy.REQUIRED
     config.save()
     return config
 

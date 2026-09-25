@@ -109,7 +109,7 @@ def test_mfa_reset_force_skips_prompt(mfa_user, monkeypatch):
     output = run("mfa_reset", mfa_user.username, "--force")
     assert "removed" in output
     assert not services.user_has_mfa(mfa_user)
-    assert MFAConfiguration.get_solo().require_mfa is False
+    assert MFAConfiguration.get_solo().policy == MFAConfiguration.Policy.OPTIONAL
 
 
 @pytest.mark.django_db
@@ -133,4 +133,4 @@ def test_mfa_reset_only_terminates_sessions_of_that_user(
 def test_mfa_reset_mentions_policy(mfa_user, mfa_policy):
     output = run("mfa_reset", mfa_user.username, "--force")
     assert "required by policy" in output
-    assert MFAConfiguration.get_solo().require_mfa is True
+    assert MFAConfiguration.get_solo().policy == MFAConfiguration.Policy.REQUIRED

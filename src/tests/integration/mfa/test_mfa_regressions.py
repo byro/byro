@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 
 from byro.common import views as common_views
 from byro.common.models import LogEntry
+from byro.mfa.models import MFAConfiguration
 
 # -- member pages -----------------------------------------------------------
 
@@ -164,9 +165,48 @@ def test_oidc_login_cannot_bypass_policy(client, user, mfa_policy, oidc):
 
 
 @pytest.mark.django_db
+def test_oidc_login_bypasses_only_the_oidc_exception_policy(
+    client, user, configuration, oidc
+):
+    config = MFAConfiguration.get_solo()
+    config.policy = MFAConfiguration.Policy.REQUIRED_EXCEPT_OIDC
+    config.save()
+
+    response = oidc(client)
+    assert response.status_code == 302
+    assert response.url == "/"
+    assert client.get("/").status_code == 200
+
+
+@pytest.mark.django_db
+def test_password_login_after_oidc_is_subject_to_policy(
+    client, user, configuration, oidc
+):
+    config = MFAConfiguration.get_solo()
+    config.policy = MFAConfiguration.Policy.REQUIRED_EXCEPT_OIDC
+    config.save()
+
+    oidc(client)
+    assert client.get("/").status_code == 200
+
+    response = client.post(
+        reverse("common:login"),
+        {"username": user.username, "password": "test_password"},
+    )
+    assert response.status_code == 302
+    response = client.get("/")
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("mfa:setup"))
+
+
+@pytest.mark.django_db
 def test_oidc_login_requires_challenge_for_mfa_user(
     client, mfa_user, totp_device, configuration, oidc, fresh_code
 ):
+    config = MFAConfiguration.get_solo()
+    config.policy = MFAConfiguration.Policy.REQUIRED_EXCEPT_OIDC
+    config.save()
+
     response = oidc(client, next_url="/members/list")
     assert response.status_code == 302
     assert response.url == "/members/list"

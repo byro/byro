@@ -75,13 +75,22 @@ class MFAConfiguration(ByroConfiguration):
 
     LOG_TARGET_BASE = "byro.mfa.settings"
 
-    require_mfa = models.BooleanField(
-        default=False,
-        verbose_name=_("Require MFA for all administrators"),
+    class Policy(models.TextChoices):
+        OPTIONAL = "optional", _("Optional")
+        REQUIRED = "required", _("Required for all administrators")
+        REQUIRED_EXCEPT_OIDC = "required_except_oidc", _(
+            "Required for all administrators except OIDC logins"
+        )
+
+    policy = models.CharField(
+        max_length=32,
+        choices=Policy.choices,
+        default=Policy.OPTIONAL,
+        verbose_name=_("MFA policy"),
         help_text=_(
-            "When enabled, all users with access to the byro backend have to set up "
-            "multi-factor authentication with an authenticator app (TOTP). Users "
-            "without MFA are asked to set it up at their next login."
+            "Choose whether MFA is optional, required for every backend login, or "
+            "required except for sessions authenticated through OIDC. An authenticator "
+            "that a user set up themselves is always required."
         ),
     )
     account_label = models.CharField(

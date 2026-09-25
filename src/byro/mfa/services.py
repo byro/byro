@@ -29,6 +29,7 @@ LOG_DISABLED = "byro.mfa.disabled"
 LOG_RESET = "byro.mfa.reset"
 LOG_RECOVERY_CODES_REGENERATED = "byro.mfa.recovery_codes.regenerated"
 LOG_RECOVERY_CODE_USED = "byro.mfa.recovery_code.used"
+OIDC_LOGIN_SESSION_KEY = "oidc_login"
 
 #: Unconfirmed devices older than this are replaced when the setup page is
 #: opened again, and removed by the periodic task.
@@ -67,8 +68,17 @@ def user_has_mfa(user):
     return TOTPDevice.objects.filter(user=user, confirmed=True).exists()
 
 
-def policy_requires_mfa():
-    return MFAConfiguration.get_solo().require_mfa
+def policy_requires_mfa(oidc_login=False):
+    """Whether the global policy requires MFA for this login session.
+
+    The OIDC exception intentionally covers only the global requirement. A
+    confirmed device is handled separately in :func:`mfa_required_for` so a
+    user who opted into MFA is never exempted.
+    """
+    policy = MFAConfiguration.get_solo().policy
+    return policy == MFAConfiguration.Policy.REQUIRED or (
+        policy == MFAConfiguration.Policy.REQUIRED_EXCEPT_OIDC and not oidc_login
+    )
 
 
 def is_backend_user(user):
@@ -78,12 +88,12 @@ def is_backend_user(user):
     return bool(getattr(user, "is_authenticated", False) and user.is_active)
 
 
-def mfa_required_for(user):
+def mfa_required_for(user, oidc_login=False):
     """MFA is required if the user enabled it themselves, or if the global
     policy requires it for all backend users."""
     if not is_backend_user(user):
         return False
-    return user_has_mfa(user) or policy_requires_mfa()
+    return user_has_mfa(user) or policy_requires_mfa(oidc_login=oidc_login)
 
 
 def is_verified(request):
@@ -95,7 +105,13 @@ def is_verified(request):
 
 def needs_verification(request):
     user = request.user
-    return user.is_authenticated and mfa_required_for(user) and not is_verified(request)
+    return (
+        user.is_authenticated
+        and mfa_required_for(
+            user, oidc_login=request.session.get(OIDC_LOGIN_SESSION_KEY, False)
+        )
+        and not is_verified(request)
+    )
 
 
 def get_verification_url(request, next_url=None):
