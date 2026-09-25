@@ -107,7 +107,7 @@ account, only server access helps, see
 
 Whether multi-factor authentication is optional or required for every
 account is a global setting, not per account: see
-[Requiring MFA for all administrators](mfa.md#requiring-mfa-for-all-administrators).
+[Choosing an MFA policy](mfa.md#choosing-an-mfa-policy).
 
 ## Sign-in behavior
 

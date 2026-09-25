@@ -23,6 +23,7 @@ from byro.common.oidc import (
     is_oidc_configured,
     validate_id_token,
 )
+from byro.mfa.services import OIDC_LOGIN_SESSION_KEY
 
 
 @method_decorator(never_cache, name="dispatch")
@@ -73,6 +74,9 @@ class LoginView(TemplateView):
             return redirect("common:login")
 
         login(request, user)
+        # A password login must never retain the provenance of an earlier OIDC
+        # login in the same browser session.
+        request.session[OIDC_LOGIN_SESSION_KEY] = False
         LogEntry.objects.create(
             content_object=user, user=user, action_type="byro.common.login.success"
         )
@@ -164,6 +168,9 @@ class OIDCCallbackView(View):
 
             user.backend = "django.contrib.auth.backends.ModelBackend"
             login(request, user)
+            # This marker is server-side session state, set only after the
+            # complete OIDC callback has validated the token.
+            request.session[OIDC_LOGIN_SESSION_KEY] = True
             LogEntry.objects.create(
                 content_object=user,
                 user=user,

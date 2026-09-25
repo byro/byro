@@ -12,8 +12,9 @@ app works, for example Aegis, Google Authenticator, Microsoft Authenticator,
 1Password or Bitwarden.
 
 MFA is **optional by default**: every backend user can enable it for their own
-account. Administrators can additionally **require MFA for all
-administrators**, i.e. for every user who can log in to the backend.
+account. Administrators can additionally require MFA for every user who can
+log in to the backend, with a separate option to trust MFA enforced by the
+OIDC identity provider.
 
 MFA only concerns the interactive backend login. It does not change
 
@@ -31,11 +32,19 @@ MFA only concerns the interactive backend login. It does not change
     therefore applies to *every* user who can log in to the office,
     regardless of `is_staff`.
 
-## Requiring MFA for all administrators
+## Choosing an MFA policy
 
 Under *Settings → General* you find the card *Multi-factor authentication*
-with the option **Require MFA for all administrators** (off by default).
-Enabling it has the following effects:
+with these policies:
+
+- **Optional** (the default): users can choose to set up MFA themselves.
+- **Required for all administrators**: every backend login must complete
+  byro's TOTP setup and challenge.
+- **Required for all administrators except OIDC logins**: password logins
+  follow the same requirement, while a session authenticated through OIDC is
+  not sent to byro's MFA setup when the user has no personal authenticator.
+
+The required policies have the following effects:
 
 - Users who already use MFA are not affected; they can no longer disable it,
   though.
@@ -44,13 +53,15 @@ Enabling it has the following effects:
   backend (only the setup itself and logout).
 - Sessions that were already logged in without MFA are treated the same way:
   the next request is redirected to the setup.
-- The setting applies to logins via single sign-on (OIDC) as well. byro does
-  not evaluate MFA information from the identity provider; OIDC users have to
-  complete the byro TOTP step, too.
+- The first required policy applies to OIDC logins as well. The OIDC-exception
+  policy deliberately trusts the identity provider to enforce MFA; byro does
+  not evaluate its `acr` or `amr` claims.
+- **A personal byro authenticator is never exempt.** A user who set up a TOTP
+  device must complete its challenge after both password and OIDC logins.
 - Enabling the option does not require that everybody has set up MFA already.
   Nobody is locked out – but every user has to enroll at their next login.
 
-Changing the option is recorded in the audit log.
+Changing the policy is recorded in the audit log.
 
 ## Display in authenticator apps
 
@@ -109,7 +120,7 @@ For scripted recovery, `--force` skips the confirmation prompt.
 
 !!! warning
     A reset is a recovery mechanism, not a way around the policy. **If MFA is
-    required for all administrators, the reset only allows the user to enroll
+    required for the user's login method, the reset only allows the user to enroll
     again**: after the next password login they are sent to the MFA setup and
     have to configure a new authenticator before they can use the backend. The
     global policy is not changed by the command.

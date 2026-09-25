@@ -49,7 +49,9 @@ class ChallengeView(SafeNextMixin, FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if services.get_confirmed_device(request.user) is None:
-            if services.policy_requires_mfa():
+            if services.policy_requires_mfa(
+                oidc_login=request.session.get(services.OIDC_LOGIN_SESSION_KEY, False)
+            ):
                 return redirect(
                     reverse("mfa:setup")
                     + "?"

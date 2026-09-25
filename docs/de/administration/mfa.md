@@ -12,9 +12,9 @@ Authenticator-App funktioniert, zum Beispiel Aegis, Google Authenticator,
 Microsoft Authenticator, 1Password oder Bitwarden.
 
 MFA ist **standardmäßig optional**: Jeder Backend-Benutzer kann sie für sein
-eigenes Konto aktivieren. Administratoren können zusätzlich **MFA für alle
-Administratoren vorschreiben**, also für jeden Benutzer, der sich am Backend
-anmelden kann.
+eigenes Konto aktivieren. Administratoren können sie zusätzlich für jeden
+Benutzer vorschreiben, der sich am Backend anmelden kann, und dabei optional
+der MFA-Durchsetzung des OIDC-Identity-Providers vertrauen.
 
 MFA betrifft nur die interaktive Anmeldung am Backend. Sie ändert nichts an
 
@@ -32,11 +32,20 @@ MFA betrifft nur die interaktive Anmeldung am Backend. Sie ändert nichts an
     selbst. Die MFA-Richtlinie gilt deshalb für *jeden* Benutzer, der sich am
     Office anmelden kann, unabhängig von `is_staff`.
 
-## MFA für alle Administratoren vorschreiben
+## MFA-Richtlinie wählen
 
 Unter *Einstellungen → Allgemein* findest du die Karte
-*Mehr-Faktor-Authentifizierung* mit der Option **MFA für alle Administratoren
-vorschreiben** (standardmäßig aus). Das Aktivieren hat folgende Auswirkungen:
+*Mehr-Faktor-Authentifizierung* mit diesen Richtlinien:
+
+- **Optional** (Standard): Benutzer können MFA selbst einrichten.
+- **Für alle Administratoren erforderlich**: Jede Backend-Anmeldung muss die
+  byro-TOTP-Einrichtung und -Prüfung durchlaufen.
+- **Für alle Administratoren erforderlich, außer bei OIDC-Anmeldungen**:
+  Passwort-Anmeldungen folgen derselben Pflicht; eine per OIDC authentifizierte
+  Sitzung ohne persönlichen Authenticator wird nicht zur byro-MFA-Einrichtung
+  geschickt.
+
+Die erforderlichen Richtlinien haben folgende Auswirkungen:
 
 - Benutzer, die MFA bereits verwenden, sind nicht betroffen; sie können sie
   aber nicht mehr deaktivieren.
@@ -45,14 +54,17 @@ vorschreiben** (standardmäßig aus). Das Aktivieren hat folgende Auswirkungen:
   keine andere Seite des Backends nutzen (nur die Einrichtung und Abmelden).
 - Bereits ohne MFA angemeldete Sitzungen werden gleich behandelt: Die nächste
   Anfrage wird zur Einrichtung umgeleitet.
-- Die Einstellung gilt auch für Anmeldungen per Single Sign-on (OIDC). byro
-  wertet keine MFA-Informationen des Identity Providers aus; OIDC-Benutzer
-  müssen den byro-TOTP-Schritt ebenfalls durchlaufen.
+- Die erste erforderliche Richtlinie gilt auch für OIDC-Anmeldungen. Die
+  OIDC-Ausnahme vertraut bewusst darauf, dass der Identity Provider MFA
+  durchsetzt; byro wertet dessen `acr`- oder `amr`-Claims nicht aus.
+- **Ein persönlicher byro-Authenticator ist nie ausgenommen.** Ein Benutzer,
+  der ein TOTP-Gerät eingerichtet hat, muss dessen Prüfung nach Passwort- und
+  OIDC-Anmeldungen durchlaufen.
 - Das Aktivieren setzt nicht voraus, dass alle MFA bereits eingerichtet haben.
   Niemand wird ausgesperrt, aber jeder Benutzer muss sich bei der nächsten
   Anmeldung einrichten.
 
-Das Ändern der Option wird im Audit-Log festgehalten.
+Das Ändern der Richtlinie wird im Audit-Log festgehalten.
 
 ## Anzeige in Authenticator-Apps
 
@@ -114,7 +126,7 @@ Bestätigungsabfrage.
 
 !!! warning
     Ein Reset ist ein Wiederherstellungsmechanismus, kein Weg um die
-    Richtlinie herum. **Ist MFA für alle Administratoren vorgeschrieben,
+    Richtlinie herum. **Ist MFA für die Anmeldeart des Benutzers vorgeschrieben,
     erlaubt der Reset dem Benutzer nur, sich neu einzurichten**: Nach der
     nächsten Passwortanmeldung wird er zur MFA-Einrichtung geschickt und muss
     einen neuen Authenticator einrichten, bevor er das Backend nutzen kann.

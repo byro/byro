@@ -115,7 +115,7 @@ kann, hilft nur der Server-Zugang, siehe
 
 Ob Mehr-Faktor-Authentifizierung optional oder für alle Konten vorgeschrieben
 ist, wird global eingestellt, nicht je Konto: siehe
-[MFA für alle Administratoren vorschreiben](mfa.md#mfa-fur-alle-administratoren-vorschreiben).
+[MFA-Richtlinie wählen](mfa.md#mfa-richtlinie-wahlen).
 
 ## Anmeldeverhalten
 
