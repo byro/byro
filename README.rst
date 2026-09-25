@@ -1,4 +1,13 @@
-|release-badge| |pypi-badge| |ci-badge| |coverage-badge| |docs-badge| |license-badge|
+.. raw:: html
+
+   <p align="center">
+     <a href="https://github.com/byro/byro/releases/latest"><img src="https://img.shields.io/github/v/release/byro/byro" alt="Latest GitHub release"></a>
+     <a href="https://pypi.org/project/byro/"><img src="https://img.shields.io/pypi/v/byro" alt="PyPI version"></a>
+     <a href="https://github.com/byro/byro/actions/workflows/ci-cd.yml?query=branch%3Amain"><img src="https://img.shields.io/github/actions/workflow/status/byro/byro/ci-cd.yml?branch=main&amp;label=CI%2FCD" alt="CI/CD status"></a>
+     <a href="https://codecov.io/gh/byro/byro"><img src="https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg" alt="Code coverage"></a>
+     <a href="https://byro.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/byro?label=docs" alt="Documentation status"></a>
+     <a href="https://github.com/byro/byro/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--only-lightgrey.svg" alt="AGPL-3.0-only license"></a>
+   </p>
 
 .. raw:: html
 
@@ -71,24 +80,6 @@ Commons Attribution-ShareAlike 4.0 International License (``CC-BY-SA-4.0``).
 See the `LICENSE`_ file for details, including the licensing history and the
 licenses of bundled third-party components.
 
-.. |release-badge| image:: https://img.shields.io/github/v/release/byro/byro
-   :target: https://github.com/byro/byro/releases/latest
-   :alt: Latest GitHub release
-.. |pypi-badge| image:: https://img.shields.io/pypi/v/byro
-   :target: https://pypi.org/project/byro/
-   :alt: PyPI version
-.. |ci-badge| image:: https://img.shields.io/github/actions/workflow/status/byro/byro/ci-cd.yml?branch=main&label=CI%2FCD
-   :target: https://github.com/byro/byro/actions/workflows/ci-cd.yml?query=branch%3Amain
-   :alt: CI/CD status
-.. |coverage-badge| image:: https://codecov.io/gh/byro/byro/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/byro/byro
-   :alt: Code coverage
-.. |docs-badge| image:: https://img.shields.io/readthedocs/byro?label=docs
-   :target: https://byro.readthedocs.io/en/latest/
-   :alt: Documentation status
-.. |license-badge| image:: https://img.shields.io/badge/license-AGPL--3.0--only-lightgrey.svg
-   :target: https://github.com/byro/byro/blob/main/LICENSE
-   :alt: AGPL-3.0-only license
 .. _byro: https://byro.cloud
 .. _installation guide: https://byro.readthedocs.io/en/latest/installation/overview/
 .. _user guide: https://byro.readthedocs.io/en/latest/usage/overview/
