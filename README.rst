@@ -1,8 +1,10 @@
 |release-badge| |pypi-badge| |ci-badge| |coverage-badge| |docs-badge| |license-badge|
 
-.. image:: https://raw.githubusercontent.com/byro/byro/main/docs/en/img/logo/byro_128.png
-   :alt: byro
-   :align: center
+.. raw:: html
+
+   <p align="center">
+     <img src="https://raw.githubusercontent.com/byro/byro/main/docs/en/img/logo/byro_128.png" alt="byro" width="128">
+   </p>
 
 byro
 ====
