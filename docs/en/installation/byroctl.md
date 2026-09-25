@@ -34,32 +34,37 @@ files in the installation directory and use `docker compose` directly.
 * An SMTP server to send mail. It can be configured later.
 * Roughly 2 GB of free disk space for the images, plus room for your data.
 
-The installer does not need root. If it should install into the default
-directory `/opt/byro`, create that directory once and hand it to your user:
+The installer does not need root. byro lives in one directory that you own;
+the installer proposes the directory you run it from. A system-wide location
+such as `/opt/byro` works too - create it once and hand it to your user:
 
 ```console
 $ sudo mkdir -p /opt/byro && sudo chown "$(id -u):$(id -g)" /opt/byro
 ```
 
-Alternatively choose a directory you own with `--root ~/byro`.
-
 ## Installation
 
-Run the bootstrap script. It downloads `byroctl` for the current stable
-release, verifies it and starts the installation:
+Create the directory byro should live in, change into it and run the bootstrap
+script. It downloads `byroctl` for the current stable release, verifies it and
+starts the installation:
 
 ```console
+$ mkdir ~/byro && cd ~/byro
 $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)"
 ```
 
-Add `-- --root /path` to install somewhere else, `-- --dry-run` to see what
-the script would do without changing anything, `-- --version vYYYY.M.P` to
-install a specific release instead of the current stable one, or
+Add `-- --root /path` to name the directory up front (a relative path is taken
+from the current directory), `-- --dry-run` to see what the script would do
+without changing anything, `-- --version vYYYY.M.P` to install a specific
+release instead of the current stable one, or
 `-- --no-symlink` if `byroctl` should not be linked into `/usr/local/bin` or
 `~/.local/bin`.
 
 The installer asks a few questions, each with a sensible default:
 
+* the installation directory, proposing the current one (skipped with
+  `--root`); a directory that already holds files but no byro installation has
+  to be confirmed,
 * the public URL of your byro, for example `https://byro.example.org`,
 * whether byro should obtain TLS certificates itself (Caddy, ports 80 and 443
   must be free), whether you run your own reverse proxy, or whether byro is
@@ -82,12 +87,13 @@ know.
 
 Every answer can be given up front with `--set KEY=VALUE`, passwords only
 through environment variables so that they never appear in a process list or
-shell history:
+shell history. Without a terminal nobody can confirm the installation
+directory, so `--non-interactive` requires `--root`:
 
 ```console
 $ export BYROCTL_ADMIN_PASSWORD='…'
 $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)" -- \
-    --non-interactive \
+    --non-interactive --root /opt/byro \
     --set BYRO_SITE_URL=https://byro.example.org \
     --set BYROCTL_PROXY=caddy \
     --set BYRO_LANGUAGE_CODE=de --set BYRO_TIME_ZONE=Europe/Berlin \
@@ -113,7 +119,7 @@ It continues where it stopped and does not ask the general questions again.
 
 ## The installation directory
 
-By default everything lives in `/opt/byro`:
+Everything lives in the directory you chose, here `/opt/byro`:
 
 ```text
 /opt/byro/

@@ -38,33 +38,38 @@ direkt verwenden.
 * Ein SMTP-Server zum Mailversand. Er kann später konfiguriert werden.
 * Etwa 2 GB freier Plattenplatz für die Images, plus Platz für deine Daten.
 
-Der Installer braucht kein Root. Soll er in das Standardverzeichnis
-`/opt/byro` installieren, lege das Verzeichnis einmal an und übergib es
-deinem Benutzer:
+Der Installer braucht kein Root. byro liegt in einem Verzeichnis, das dir
+gehört; der Installer schlägt das Verzeichnis vor, aus dem du ihn startest. Ein
+systemweites Verzeichnis wie `/opt/byro` funktioniert ebenfalls - lege es
+einmal an und übergib es deinem Benutzer:
 
 ```console
 $ sudo mkdir -p /opt/byro && sudo chown "$(id -u):$(id -g)" /opt/byro
 ```
 
-Alternativ wähle mit `--root ~/byro` ein Verzeichnis, das dir gehört.
-
 ## Installation
 
-Führe das Bootstrap-Skript aus. Es lädt `byroctl` für das aktuelle stabile
-Release, prüft es und startet die Installation:
+Lege das Verzeichnis an, in dem byro liegen soll, wechsle hinein und führe das
+Bootstrap-Skript aus. Es lädt `byroctl` für das aktuelle stabile Release,
+prüft es und startet die Installation:
 
 ```console
+$ mkdir ~/byro && cd ~/byro
 $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)"
 ```
 
-Hänge `-- --root /pfad` an, um woanders zu installieren, `-- --dry-run`, um zu
-sehen, was das Skript tun würde, ohne etwas zu ändern, `-- --version vYYYY.M.P`,
-um statt des aktuellen stabilen Release eine bestimmte Version zu installieren,
+Hänge `-- --root /pfad` an, um das Verzeichnis vorab festzulegen (ein relativer
+Pfad gilt ausgehend vom aktuellen Verzeichnis), `-- --dry-run`, um zu sehen,
+was das Skript tun würde, ohne etwas zu ändern, `-- --version vYYYY.M.P`, um
+statt des aktuellen stabilen Release eine bestimmte Version zu installieren,
 oder `-- --no-symlink`, wenn `byroctl` nicht nach `/usr/local/bin` oder
 `~/.local/bin` verlinkt werden soll.
 
 Der Installer stellt ein paar Fragen, jede mit einem sinnvollen Standard:
 
+* das Installationsverzeichnis; vorgeschlagen wird das aktuelle Verzeichnis
+  (entfällt mit `--root`); ein Verzeichnis, das schon Dateien, aber keine
+  byro-Installation enthält, muss bestätigt werden,
 * die öffentliche URL deines byro, zum Beispiel `https://byro.example.org`,
 * ob byro selbst TLS-Zertifikate beschaffen soll (Caddy, Ports 80 und 443
   müssen frei sein), ob du einen eigenen Reverse Proxy betreibst oder ob byro
@@ -86,12 +91,13 @@ startet byro. Am Ende gibt er die URL und die Pfade aus, die du kennen musst.
 
 Jede Antwort lässt sich mit `--set KEY=VALUE` vorab geben, Passwörter nur über
 Umgebungsvariablen, damit sie nie in einer Prozessliste oder Shell-Historie
-auftauchen:
+auftauchen. Ohne Terminal kann niemand das Installationsverzeichnis
+bestätigen, daher braucht `--non-interactive` `--root`:
 
 ```console
 $ export BYROCTL_ADMIN_PASSWORD='…'
 $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)" -- \
-    --non-interactive \
+    --non-interactive --root /opt/byro \
     --set BYRO_SITE_URL=https://byro.example.org \
     --set BYROCTL_PROXY=caddy \
     --set BYRO_LANGUAGE_CODE=de --set BYRO_TIME_ZONE=Europe/Berlin \
@@ -118,7 +124,7 @@ und stellt die allgemeinen Fragen nicht noch einmal.
 
 ## Das Installationsverzeichnis
 
-Standardmäßig liegt alles in `/opt/byro`:
+Alles liegt im gewählten Verzeichnis, hier `/opt/byro`:
 
 ```text
 /opt/byro/
