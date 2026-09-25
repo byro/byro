@@ -494,6 +494,29 @@ script_dir() {
     cd -P "$(dirname "$src")" && pwd
 }
 
+# absolute_dir PATH: PATH as an absolute path. An existing directory is resolved
+# physically (symlinks followed), a missing one is anchored at the current
+# directory. Kept in sync with the copy in install.sh.
+absolute_dir() {
+    local p="${1%/}"
+    [[ -n "$p" ]] || p="/"
+    [[ "$p" == /* ]] || p="$PWD/${p#./}"
+    if [[ -d "$p" ]]; then
+        (cd -P -- "$p" && pwd)
+    else
+        printf '%s' "$p"
+    fi
+}
+
+# set_root DIR: BYRO_ROOT and the paths derived from it. Always absolute: the
+# commands change into BYRO_ROOT and keep addressing files as $BYRO_ROOT/...,
+# which a relative --root would otherwise point one level too deep.
+set_root() {
+    BYRO_ROOT="$(absolute_dir "$1")"
+    CONF_FILE="$BYRO_ROOT/byro.conf"
+    PLUGINS_FILE="$BYRO_ROOT/plugins/plugins.txt"
+}
+
 # --- install ------------------------------------------------------------------------------
 
 valid_proxy_mode() { [[ "$1" =~ ^(caddy|own|none)$ ]]; }
@@ -782,6 +805,7 @@ cmd_install() {
     done
 
     ensure_root_dir
+    set_root "$BYRO_ROOT"   # now that it exists: the physical path
     cd "$BYRO_ROOT"
     acquire_lock
     preflight_install
@@ -2352,7 +2376,8 @@ Commands:
 
 Global options:
   --root DIR   installation directory (default: directory of this script,
-               or BYRO_ROOT from the environment)
+               or BYRO_ROOT from the environment); a relative DIR is taken
+               from the current directory
 USAGE
 }
 
@@ -2391,9 +2416,7 @@ main() {
     if [[ -z "$root" ]]; then
         root="$(script_dir)"
     fi
-    BYRO_ROOT="${root%/}"
-    CONF_FILE="$BYRO_ROOT/byro.conf"
-    PLUGINS_FILE="$BYRO_ROOT/plugins/plugins.txt"
+    set_root "$root"
     case "$cmd" in
         install) cmd_install "$@" ;;
         config)  cmd_config "$@" ;;

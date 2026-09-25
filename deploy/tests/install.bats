@@ -314,3 +314,19 @@ bank_files_release() {
     grep -q "manage migrate" "$SHIM_LOG"
     [ "$(grep -c 'byro-x==1.0' "$BYRO_ROOT/plugins/plugins.txt")" -eq 1 ]
 }
+
+@test "a relative --root is taken from the current directory, not nested into itself" {
+    cd "$BYRO_ROOT"
+    run byroctl --root ./byro install --non-interactive --version v2026.3.0 \
+        --admin-user admin --admin-email admin@example.org \
+        --set BYRO_SITE_URL=https://byro.example.org --set BYROCTL_PROXY=none --set BYRO_DEPLOY_PORT=18999
+    [ "$status" -eq 0 ]
+    [ -f "$BYRO_ROOT/byro/byro.conf" ]
+    [ -f "$BYRO_ROOT/byro/docker-compose.yml" ]
+    [ "$(readlink "$BYRO_ROOT/byro/.env")" = "byro.conf" ]
+    [ ! -e "$BYRO_ROOT/byro/byro" ]
+    [[ "$output" == *"is installed and running"* ]]
+    run byroctl --root byro version
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"root:           $(cd -P "$BYRO_ROOT/byro" && pwd)"* ]]
+}
