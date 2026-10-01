@@ -10,11 +10,12 @@ accounts (see
 
 *User menu → My profile* opens the edit form for your own account
 (username, name, e-mail address). Every account with access to the Office can
-use it. You cannot change your own permissions here: the fields for staff and
-superuser status are only shown to superusers, and even a superuser cannot
-remove their own superuser status. The same restriction applies as in user
-management: **every save requires a new password**, even if you only want to
-change your name or e-mail address. Details and background:
+use it. The fields for staff and superuser status are only shown to
+superusers, so a staff account cannot change its own permissions here. A
+superuser can change their own staff status, but not remove their own
+superuser status. The same restriction applies as in user management:
+**every save requires a new password**, even if you only want to change your
+name or e-mail address. Details and background:
 [Managing user accounts](../administration/users-and-login.md#managing-user-accounts).
 
 ## Multi-factor authentication

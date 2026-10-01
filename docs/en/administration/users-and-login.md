@@ -34,7 +34,9 @@ and `is_superuser`:
 These rules are enforced on the server, not only by hiding menu entries. A
 staff account that opens a superuser-only page directly gets an error page
 (HTTP 403). An account that loses both flags while it is signed in is signed
-out with its next request.
+out with its next request to a protected page. Pages that need no login
+(the login page, member pages, `/log/info`) do not end the session; an API
+token of the account stops working immediately.
 
 !!! warning
     The model is deliberately small. There are **no finer-grained roles**: no
@@ -84,7 +86,9 @@ depend on OIDC, for example the account created during installation with
 are not set, byro redirects every signed-in account (except during the MFA
 flow) to the initial setup. Only a superuser can complete it; a staff
 account, for example one just created through OIDC, sees an error page
-telling it that a superuser has to finish the setup first.
+telling it that a superuser has to finish the setup first. Logging out and
+signing in with another account (password or OIDC) stays possible while the
+setup is incomplete.
 
 ## Password login
 
@@ -153,10 +157,10 @@ two permission fields. Each account has:
   superuser-only functions (see [Permission model](#permission-model)). Not
   preselected.
 
-**No self-demotion:** in your own profile the superuser field is locked. You
-cannot remove your own superuser status; another superuser has to do that.
-You can switch off your own `is_staff`, which changes nothing as long as you
-are a superuser.
+**No self-demotion:** in your own profile only the superuser field is locked.
+You cannot remove your own superuser status; another superuser has to do
+that. Your own `is_staff` stays editable: you can switch it on or off
+yourself, which changes nothing as long as you are a superuser.
 
 **Password when editing:** the edit form requires a new password on **every**
 save - even if you only change the name or `is_staff`. There is no way to

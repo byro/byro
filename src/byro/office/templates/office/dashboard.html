@@ -44,15 +44,24 @@
             </span>
         </a>
         {% for warning in pgp_warnings %}
-            <a
-                class="dashboard-block block-{{ warning.level }}"
-                href="{{ warning.url }}"
-            >
-                <h1>{{ warning.title }}</h1>
-                <span class="dashboard-description">
-                    {{ warning.lines|join:"<br>" }}
-                </span>
-            </a>
+            {% if warning.url %}
+                <a
+                    class="dashboard-block block-{{ warning.level }}"
+                    href="{{ warning.url }}"
+                >
+                    <h1>{{ warning.title }}</h1>
+                    <span class="dashboard-description">
+                        {{ warning.lines|join:"<br>" }}
+                    </span>
+                </a>
+            {% else %}
+                <div class="dashboard-block block-{{ warning.level }}">
+                    <h1>{{ warning.title }}</h1>
+                    <span class="dashboard-description">
+                        {{ warning.lines|join:"<br>" }}
+                    </span>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}

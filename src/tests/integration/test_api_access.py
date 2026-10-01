@@ -78,3 +78,34 @@ def test_api_ignores_browser_session_of_a_superuser(
 def test_api_schema_and_docs_stay_public():
     assert APIClient().get(reverse("api:schema")).status_code == 200
     assert APIClient().get(reverse("api:swagger-ui")).status_code == 200
+
+
+@pytest.mark.parametrize("is_superuser", (False, True))
+@pytest.mark.django_db
+def test_api_token_stops_working_when_backend_access_is_removed(
+    create_user, member, is_superuser
+):
+    user = create_user("api_user", is_staff=True, is_superuser=is_superuser)
+    client = api_client_for(user)
+    url = reverse("api:members-list")
+    assert client.get(url).status_code == 200
+
+    user.is_staff = False
+    user.is_superuser = False
+    user.save()
+
+    # the very same token that worked a moment ago
+    assert client.get(url).status_code == 403
+    response = client.patch(
+        reverse("api:members-detail", kwargs={"pk": member.pk}),
+        {"name": "Changed Name"},
+        format="json",
+    )
+    assert response.status_code == 403
+    member.refresh_from_db()
+    assert member.name != "Changed Name"
+
+    # granting access again revives the token, it was never deleted
+    user.is_staff = True
+    user.save()
+    assert client.get(url).status_code == 200

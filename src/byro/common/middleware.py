@@ -17,6 +17,17 @@ class SettingsMiddleware:
         "settings.plugins",
         "healthz",
     )
+    #: Logging out and switching the account must always be possible. An
+    #: account that cannot complete the initial setup itself (no superuser)
+    #: would otherwise be stuck on a page it is not allowed to use.
+    AUTHENTICATION_VIEWS = frozenset(
+        {
+            "common:login",
+            "common:logout",
+            "common:oidc-login",
+            "common:oidc-callback",
+        }
+    )
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -27,6 +38,7 @@ class SettingsMiddleware:
         if (
             not request.user.is_anonymous
             and url.url_name not in self.ALLOWED_URLS
+            and url.view_name not in self.AUTHENTICATION_VIEWS
             and url.namespace != "mfa"
         ):
             config = Configuration.get_solo()

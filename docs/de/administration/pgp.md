@@ -170,4 +170,7 @@ können.
 Das Office-Dashboard zeigt PGP-Warnungen für eine unvollständige
 Signaturkonfiguration, aktive Mitgliedsschlüssel, die ungültig, widerrufen
 oder abgelaufen sind, bald ablaufende Schlüssel sowie Fehler beim Import oder
-Auffrischen von Keyservern.
+Auffrischen von Keyservern. Diese Warnungen sieht jedes Konto. Die Warnung zur
+unvollständigen Signaturkonfiguration verlinkt nur für Superuser auf die
+allgemeinen Einstellungen; Staff-Konten sehen stattdessen den Hinweis, einen
+Superuser zu bitten, weil sie die Einstellungen nicht öffnen können.

@@ -38,7 +38,10 @@ Arten von Konten:
 Diese Regeln setzt der Server durch, nicht nur das Ausblenden von
 Menüeinträgen. Ein Staff-Konto, das eine Superuser-Seite direkt aufruft,
 erhält eine Fehlerseite (HTTP 403). Ein Konto, das beide Flags verliert,
-während es angemeldet ist, wird mit dem nächsten Aufruf abgemeldet.
+während es angemeldet ist, wird mit dem nächsten Aufruf einer geschützten
+Seite abgemeldet. Seiten, die keinen Login verlangen (Login-Seite,
+Mitgliederseiten, `/log/info`), beenden die Sitzung nicht; ein API-Token des
+Kontos funktioniert sofort nicht mehr.
 
 !!! warning
     Das Modell ist bewusst klein. Es gibt **keine feineren Rollen**: keinen
@@ -90,7 +93,9 @@ angelegte Konto. Ist kein Superuser mehr vorhanden, siehe
 angemeldete Konto (außer während des MFA-Ablaufs) auf die Ersteinrichtung um.
 Abschließen kann sie nur ein Superuser; ein Staff-Konto, zum Beispiel ein
 frisch per OIDC angelegtes, sieht eine Fehlerseite mit dem Hinweis, dass
-zuerst ein Superuser die Einrichtung abschließen muss.
+zuerst ein Superuser die Einrichtung abschließen muss. Abmelden und die
+Anmeldung mit einem anderen Konto (Passwort oder OIDC) bleiben möglich,
+solange die Einrichtung unvollständig ist.
 
 ## Passwort-Login
 
@@ -162,10 +167,10 @@ enthält die beiden Berechtigungsfelder nicht. Jedes Konto hat:
   Funktionen, die nur Superusern offenstehen (siehe
   [Berechtigungsmodell](#berechtigungsmodell)). Nicht vorausgewählt.
 
-**Keine Selbst-Herabstufung:** Im eigenen Profil ist das Superuser-Feld
+**Keine Selbst-Herabstufung:** Im eigenen Profil ist nur das Superuser-Feld
 gesperrt. Du kannst dir den Superuser-Status nicht selbst entziehen; das muss
-ein anderer Superuser tun. Dein eigenes `is_staff` kannst du abschalten, was
-nichts ändert, solange du Superuser bist.
+ein anderer Superuser tun. Dein eigenes `is_staff` bleibt änderbar: Du kannst
+es selbst ein- oder abschalten, was nichts ändert, solange du Superuser bist.
 
 **Passwort beim Bearbeiten:** Das Bearbeitungsformular verlangt bei **jedem**
 Speichern ein neues Passwort für das Konto – auch wenn du nur den Namen oder

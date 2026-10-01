@@ -906,6 +906,10 @@ msgid "Signing is enabled, but no signing key is configured."
 msgstr ""
 "Signaturen sind aktiviert, aber es ist kein Signaturschlüssel konfiguriert."
 
+#: byro/mails/pgp.py
+msgid "Please ask a superuser to configure it in the settings."
+msgstr "Bitte einen Administrator, ihn in den Einstellungen zu hinterlegen."
+
 #: byro/mails/pgp.py:217
 msgid "PGP key problems"
 msgstr "PGP-Schlüsselprobleme"

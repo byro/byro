@@ -1049,6 +1049,14 @@ def test_dashboard_warns_about_missing_signing_key():
     warnings = get_dashboard_warnings()
 
     assert any(warning["level"] == "danger" for warning in warnings)
+    (warning,) = warnings
+    assert warning["url"] == reverse("office:settings.base")
+
+    # for accounts that may not open the settings: same warning, no link
+    (warning,) = get_dashboard_warnings(link_to_settings=False)
+    assert warning["level"] == "danger"
+    assert "url" not in warning
+    assert len(warning["lines"]) == 2
 
 
 @pytest.mark.django_db
