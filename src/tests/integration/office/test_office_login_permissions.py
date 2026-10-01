@@ -4,9 +4,11 @@ and ``is_superuser``."""
 import pytest
 from django.contrib.auth import SESSION_KEY, get_user_model
 from django.shortcuts import reverse
+from django.test import Client
 
 from byro.common import views as common_views
 from byro.common.models import LogEntry
+from byro.mfa.services import OIDC_LOGIN_SESSION_KEY
 
 NO_ACCESS = "byro.common.login.no_access"
 NO_ACCESS_MESSAGE = "This account does not have access to the backend."
@@ -248,39 +250,6 @@ def test_login_page_is_usable_while_logged_in_on_incomplete_installation(
 # -- OIDC through the real callback path -------------------------------------
 
 
-@pytest.fixture
-def oidc_provider(settings, monkeypatch):
-    """Only the communication with the identity provider is replaced; the
-    callback view and ``get_or_create_user`` run unchanged."""
-    settings.OIDC_ISSUER_URL = "https://idp.example.org"
-    settings.OIDC_CLIENT_ID = "byro"
-    settings.OIDC_USERNAME_FIELD = "preferred_username"
-    settings.OIDC_ADMIN_GROUP = ""
-    settings.OIDC_AUTO_CREATE_ACCOUNT = True
-    monkeypatch.setattr(
-        common_views,
-        "build_auth_url",
-        lambda redirect_uri, state, nonce: "https://idp.example.org/auth",
-    )
-    monkeypatch.setattr(
-        common_views,
-        "exchange_code",
-        lambda code, redirect_uri: {"id_token": "id", "access_token": "at"},
-    )
-
-    def callback(client, claims):
-        monkeypatch.setattr(
-            common_views, "validate_id_token", lambda id_token, nonce: claims
-        )
-        session = client.session
-        session["oidc_state"] = "state123"
-        session["oidc_nonce"] = "nonce123"
-        session.save()
-        return client.get(reverse("common:oidc-callback") + "?state=state123&code=abc")
-
-    return callback
-
-
 @pytest.mark.django_db
 def test_oidc_callback_provisions_account_with_regular_access(
     client, configuration, oidc_provider
@@ -309,10 +278,10 @@ def test_oidc_callback_provisions_account_with_regular_access(
 
 
 @pytest.mark.django_db
-def test_oidc_callback_checks_admin_group_before_provisioning(
+def test_oidc_callback_checks_staff_group_before_provisioning(
     client, configuration, oidc_provider, settings
 ):
-    settings.OIDC_ADMIN_GROUP = "byro-admins"
+    settings.OIDC_STAFF_GROUP = "byro-admins"
     User = get_user_model()
 
     response = oidc_provider(
@@ -384,3 +353,243 @@ def test_oidc_routes_work_while_logged_in_on_incomplete_installation(
     assert response.url == "/"
     assert client.session[SESSION_KEY] == str(superuser.pk)
     assert client.get(reverse("office:settings.initial")).status_code == 200
+
+
+# -- OIDC group mapping and synchronization ----------------------------------
+
+STAFF_GROUP = "byro-staff"
+SUPERUSER_GROUP = "byro-superusers"
+SYNCED = "byro.common.user.oidc_permissions_synced"
+
+
+@pytest.fixture
+def group_sync(settings, oidc_provider):
+    settings.OIDC_STAFF_GROUP = STAFF_GROUP
+    settings.OIDC_SUPERUSER_GROUP = SUPERUSER_GROUP
+    settings.OIDC_SYNC_GROUPS = True
+    return oidc_provider
+
+
+def flags_of(account):
+    account.refresh_from_db()
+    return account.is_staff, account.is_superuser
+
+
+@pytest.mark.django_db
+def test_sync_revokes_last_role_before_rejecting_the_login(
+    client, create_user, configuration, group_sync
+):
+    account = create_user("known", is_staff=True, is_superuser=True)
+
+    response = group_sync(client, {"preferred_username": "known", "groups": []})
+
+    # not: rejected at the gate with the local permissions left in place
+    assert flags_of(account) == (False, False)
+    assert response.status_code == 302
+    assert response.url == reverse("common:login")
+    assert SESSION_KEY not in client.session
+    entry = LogEntry.objects.get(action_type=SYNCED)
+    assert entry.content_object == account
+    assert entry.data["changes"] == {
+        "is_staff": [True, False],
+        "is_superuser": [True, False],
+    }
+    # and the password login is closed as well now
+    response = client.post(
+        reverse("common:login"), {"username": "known", "password": "test_password"}
+    )
+    assert response.url == reverse("common:login")
+    assert SESSION_KEY not in client.session
+    assert LogEntry.objects.filter(action_type=NO_ACCESS, user=account).exists()
+
+
+@pytest.mark.django_db
+def test_sync_ends_other_sessions_of_an_account_that_lost_its_roles(
+    client, create_user, configuration, login_user, group_sync
+):
+    account = create_user("known", is_staff=True)
+    other_browser = Client()
+    login_user(other_browser, account)
+    assert other_browser.get(reverse("office:dashboard")).status_code == 200
+
+    group_sync(client, {"preferred_username": "known", "groups": []})
+
+    response = other_browser.get(reverse("office:dashboard"))
+    assert response.status_code == 302
+    assert response.url == reverse("common:login")
+    assert SESSION_KEY not in other_browser.session
+
+
+@pytest.mark.django_db
+def test_member_of_superuser_group_only_logs_in_without_staff(
+    client, create_user, configuration, group_sync
+):
+    account = create_user("known", is_staff=True)
+
+    response = group_sync(
+        client, {"preferred_username": "known", "groups": [SUPERUSER_GROUP]}
+    )
+
+    assert flags_of(account) == (False, True)
+    assert response.url == "/"
+    assert client.session[SESSION_KEY] == str(account.pk)
+    assert client.get(reverse("office:settings.users.list")).status_code == 200
+
+
+@pytest.mark.django_db
+def test_sync_grants_roles_and_logs_in(client, create_user, configuration, group_sync):
+    account = create_user("known")
+
+    response = group_sync(
+        client, {"preferred_username": "known", "groups": [STAFF_GROUP]}
+    )
+
+    assert flags_of(account) == (True, False)
+    assert response.url == "/"
+    assert client.get(reverse("office:dashboard")).status_code == 200
+    assert client.get(reverse("office:settings.base")).status_code == 403
+    assert LogEntry.objects.filter(action_type=SYNCED).count() == 1
+
+    # a second login with the same groups changes and logs nothing
+    group_sync(client, {"preferred_username": "known", "groups": [STAFF_GROUP]})
+    assert LogEntry.objects.filter(action_type=SYNCED).count() == 1
+
+
+@pytest.mark.django_db
+def test_provisioning_follows_the_groups(client, configuration, group_sync):
+    response = group_sync(
+        client, {"preferred_username": "boss", "groups": [SUPERUSER_GROUP]}
+    )
+
+    account = get_user_model().objects.get(username="boss")
+    assert flags_of(account) == (False, True)
+    assert response.url == "/"
+    assert client.session[SESSION_KEY] == str(account.pk)
+    assert not LogEntry.objects.filter(action_type=SYNCED).exists()
+
+
+@pytest.mark.django_db
+def test_without_sync_group_membership_grants_nothing_to_existing_accounts(
+    client, create_user, configuration, group_sync, settings
+):
+    settings.OIDC_SYNC_GROUPS = False
+    account = create_user("known")
+
+    response = group_sync(
+        client,
+        {"preferred_username": "known", "groups": [STAFF_GROUP, SUPERUSER_GROUP]},
+    )
+
+    assert flags_of(account) == (False, False)
+    assert response.url == reverse("common:login")
+    assert SESSION_KEY not in client.session
+    assert LogEntry.objects.filter(action_type=NO_ACCESS, user=account).exists()
+
+
+@pytest.mark.django_db
+def test_without_sync_the_gate_keeps_local_roles(
+    client, create_user, configuration, group_sync, settings
+):
+    settings.OIDC_SYNC_GROUPS = False
+    account = create_user("known", is_staff=True, is_superuser=True)
+
+    response = group_sync(client, {"preferred_username": "known", "groups": []})
+
+    assert response.url == reverse("common:login")
+    assert SESSION_KEY not in client.session
+    assert flags_of(account) == (True, True)
+    assert not LogEntry.objects.filter(action_type=SYNCED).exists()
+
+
+@pytest.mark.django_db
+def test_inactive_account_is_rejected_and_not_synchronized(
+    client, create_user, configuration, group_sync
+):
+    account = create_user("known", is_staff=True, is_active=False)
+
+    response = group_sync(
+        client, {"preferred_username": "known", "groups": [SUPERUSER_GROUP]}
+    )
+
+    assert response.url == reverse("common:login")
+    assert SESSION_KEY not in client.session
+    assert flags_of(account) == (True, False)
+    assert not LogEntry.objects.filter(action_type=SYNCED).exists()
+
+
+@pytest.mark.django_db
+def test_synchronized_login_is_still_marked_as_oidc_session(
+    client, create_user, configuration, group_sync
+):
+    create_user("known")
+
+    group_sync(client, {"preferred_username": "known", "groups": [STAFF_GROUP]})
+
+    assert client.session[OIDC_LOGIN_SESSION_KEY] is True
+
+
+# -- ambiguous configuration: OIDC is switched off, passwords keep working ---
+
+
+@pytest.fixture
+def conflicting_groups(settings, oidc_provider):
+    """admin_group and staff_group set to different values."""
+    settings.OIDC_ADMIN_GROUP = "byro-admins"
+    settings.OIDC_STAFF_GROUP = ""
+    settings.OIDC_GROUP_CONFLICT = True
+    return oidc_provider
+
+
+CONFIGURATION_ERROR = "SSO login is disabled because of a configuration error."
+
+
+@pytest.mark.django_db
+def test_conflicting_groups_disable_oidc_login(
+    client, create_user, configuration, conflicting_groups, monkeypatch
+):
+    def no_provider_contact(*args, **kwargs):
+        raise AssertionError("the provider must not be contacted")
+
+    monkeypatch.setattr(common_views, "build_auth_url", no_provider_contact)
+    monkeypatch.setattr(common_views, "exchange_code", no_provider_contact)
+    account = create_user("known", is_staff=True, is_superuser=True)
+
+    # no SSO button
+    content = client.get(reverse("common:login")).content.decode()
+    assert reverse("common:oidc-login") not in content
+
+    response = client.get(reverse("common:oidc-login"), follow=True)
+    assert response.resolver_match.url_name == "login"
+    content = response.content.decode()
+    assert CONFIGURATION_ERROR in content
+    # nothing about the configured groups is shown to visitors
+    assert "byro-admins" not in content
+
+    response = conflicting_groups(
+        client, {"preferred_username": "known", "groups": ["byro-admins"]}
+    )
+    assert response.status_code == 302
+    assert response.url == reverse("common:login")
+    assert SESSION_KEY not in client.session
+    assert flags_of(account) == (True, True)
+    assert not get_user_model().objects.exclude(pk=account.pk).exists()
+
+
+@pytest.mark.django_db
+def test_password_login_works_despite_conflicting_groups(
+    client, superuser, configuration, conflicting_groups
+):
+    response = client.post(
+        reverse("common:login"),
+        {"username": superuser.username, "password": "test_password"},
+    )
+
+    assert response.url == "/"
+    assert client.session[SESSION_KEY] == str(superuser.pk)
+    assert client.get(reverse("office:settings.base")).status_code == 200
+
+
+@pytest.mark.django_db
+def test_sso_button_is_shown_for_an_unambiguous_configuration(client, oidc_provider):
+    content = client.get(reverse("common:login")).content.decode()
+    assert reverse("common:oidc-login") in content

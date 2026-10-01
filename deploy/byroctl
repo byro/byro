@@ -148,6 +148,17 @@ conf_get() {
     conf_decode "$value"
 }
 
+# conf_get_trimmed KEY [FILE]: the value without leading and trailing
+# whitespace, empty if the key is unset. This is how byro itself reads group
+# names and similar plain values, so comparisons here match what byro does.
+conf_get_trimmed() {
+    local value
+    value="$(conf_get "$1" "${2:-$CONF_FILE}" 2>/dev/null)" || value=""
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+    printf '%s' "$value"
+}
+
 # conf_has KEY [FILE]: true if the key has a non-empty value.
 conf_has() {
     local value
@@ -961,7 +972,7 @@ conf_lint_value() {
 # config_check: validates byro.conf and the compose configuration. Prints every
 # problem, returns 1 if any error was found.
 config_check() {
-    local errors=0 warnings=0 line key raw mode f value repo digest version
+    local errors=0 warnings=0 line key raw mode f value repo digest version admin_group staff_group
     err()  { printf 'byroctl: config check: ERROR: %s\n' "$*" >&2; errors=$((errors + 1)); }
     note() { printf 'byroctl: config check: warning: %s\n' "$*" >&2; warnings=$((warnings + 1)); }
 
@@ -1003,6 +1014,20 @@ config_check() {
     fi
     if conf_has BYRO_DEBUG; then
         note "BYRO_DEBUG is set - never run a production instance in debug mode"
+    fi
+    # BYRO_OIDC_ADMIN_GROUP is the deprecated name of BYRO_OIDC_STAFF_GROUP. If
+    # both name different groups, byro cannot tell which one is meant and
+    # switches the OIDC login off, so such a configuration is not applied.
+    # Compared the way byro does: surrounding whitespace does not count, and
+    # a value of nothing but whitespace is not set.
+    admin_group="$(conf_get_trimmed BYRO_OIDC_ADMIN_GROUP)"
+    staff_group="$(conf_get_trimmed BYRO_OIDC_STAFF_GROUP)"
+    if [[ -n "$admin_group" ]]; then
+        if [[ -n "$staff_group" && "$staff_group" != "$admin_group" ]]; then
+            err "BYRO_OIDC_ADMIN_GROUP and BYRO_OIDC_STAFF_GROUP are set to different values; byro would disable the OIDC login. BYRO_OIDC_ADMIN_GROUP is the deprecated name of BYRO_OIDC_STAFF_GROUP: keep only BYRO_OIDC_STAFF_GROUP"
+        else
+            note "BYRO_OIDC_ADMIN_GROUP is deprecated - rename it to BYRO_OIDC_STAFF_GROUP (same behaviour)"
+        fi
     fi
     digest="$(conf_get BYRO_DEPLOY_IMAGE_DIGEST 2>/dev/null || true)"
     if [[ -n "$digest" ]]; then

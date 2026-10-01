@@ -46,6 +46,21 @@ def log_initial(*, debug, config_files, db_name, LOG_DIR, plugins):
     end_box(size)
 
 
+def resolve_oidc_staff_group(staff_group, admin_group):
+    """Resolve the OIDC group that maps to ``is_staff``.
+
+    ``admin_group`` is the deprecated name of ``staff_group``. Returns the
+    effective group and whether the configuration is ambiguous: both options
+    set to different values. There is deliberately no precedence in that
+    case, the caller has to refuse OIDC logins until it is fixed.
+    """
+    staff_group = (staff_group or "").strip()
+    admin_group = (admin_group or "").strip()
+    if staff_group and admin_group and staff_group != admin_group:
+        return "", True
+    return staff_group or admin_group, False
+
+
 def reduce_dict(data):
     return {
         section_name: {

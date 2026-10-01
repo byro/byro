@@ -89,3 +89,29 @@ def test_rejected_login_is_rendered_readably(user):
     with translation.override("de"):
         rendered = format_log_entry(entry)
     assert "Anmeldung abgelehnt: Konto hat keinen Backend-Zugriff" in rendered
+
+
+@pytest.mark.django_db
+def test_oidc_permission_sync_is_rendered_readably(user):
+    entry = LogEntry.objects.create(
+        content_object=user,
+        action_type="byro.common.user.oidc_permissions_synced",
+        data={
+            "source": "internal: oidc_group_sync",
+            "changes": {"is_staff": [True, False], "is_superuser": [False, True]},
+        },
+    )
+
+    with translation.override("en"):
+        rendered = format_log_entry(entry)
+        source = format_log_source(entry)
+    assert "Permissions changed by OIDC group synchronization" in rendered
+    assert user.username in rendered
+    assert "is_staff" in rendered and "is_superuser" in rendered
+    assert "byro.common.user.oidc_permissions_synced" not in rendered
+    # shown as an automatic process, not as an action of the user
+    assert source == '<span class="fa fa-gears"></span> oidc_group_sync'
+
+    with translation.override("de"):
+        rendered = format_log_entry(entry)
+    assert "Rechte durch OIDC-Gruppensynchronisation geändert" in rendered

@@ -90,6 +90,92 @@ setup() {
     [[ "$output" == *"BYRO_DEBUG is set"* ]]
 }
 
+@test "config check accepts the deprecated OIDC admin group with a warning" {
+    conf_set BYRO_OIDC_ADMIN_GROUP byro-admins
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"BYRO_OIDC_ADMIN_GROUP is deprecated"* ]]
+    [[ "$output" == *"config check: OK"* ]]
+    # the same group under both names is not a conflict
+    conf_set BYRO_OIDC_STAFF_GROUP byro-admins
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"BYRO_OIDC_ADMIN_GROUP is deprecated"* ]]
+}
+
+@test "config check rejects different OIDC admin and staff groups" {
+    conf_set BYRO_OIDC_ADMIN_GROUP byro-admins
+    conf_set BYRO_OIDC_STAFF_GROUP byro-staff
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"ERROR: BYRO_OIDC_ADMIN_GROUP and BYRO_OIDC_STAFF_GROUP are set to different values"* ]]
+    # and config set refuses to apply it
+    conf_set BYRO_OIDC_STAFF_GROUP ""
+    : >"$SHIM_LOG"
+    run byroctl --root "$BYRO_ROOT" config set BYRO_OIDC_STAFF_GROUP byro-staff --apply
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"not applying a configuration with errors"* ]]
+    refute grep -q "compose up" "$SHIM_LOG"
+}
+
+@test "config check compares the OIDC groups without surrounding whitespace" {
+    # byro strips the values, so these two name the same group
+    conf_set BYRO_OIDC_ADMIN_GROUP " admins "
+    conf_set BYRO_OIDC_STAFF_GROUP admins
+    [ "$(conf_get BYRO_OIDC_ADMIN_GROUP)" = " admins " ]
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"different values"* ]]
+    [[ "$output" == *"BYRO_OIDC_ADMIN_GROUP is deprecated"* ]]
+    conf_set BYRO_OIDC_ADMIN_GROUP admins
+    conf_set BYRO_OIDC_STAFF_GROUP "	admins  "
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"different values"* ]]
+    # still a conflict if the names really differ
+    conf_set BYRO_OIDC_ADMIN_GROUP " admins "
+    conf_set BYRO_OIDC_STAFF_GROUP " other "
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"set to different values"* ]]
+}
+
+@test "config check treats a whitespace-only OIDC group as not set" {
+    # nothing but whitespace under the old name: neither deprecated nor a conflict
+    conf_set BYRO_OIDC_ADMIN_GROUP "   "
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"OIDC"* ]]
+    conf_set BYRO_OIDC_STAFF_GROUP byro-staff
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"OIDC"* ]]
+    # and the other way round: the old name alone stays a plain deprecation
+    conf_set BYRO_OIDC_ADMIN_GROUP admins
+    conf_set BYRO_OIDC_STAFF_GROUP "   "
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"different values"* ]]
+    [[ "$output" == *"BYRO_OIDC_ADMIN_GROUP is deprecated"* ]]
+}
+
+@test "conf_get_trimmed strips surrounding whitespace only" {
+    conf_set A "  two words  "
+    conf_set B "   "
+    [ "$(conf_get_trimmed A)" = "two words" ]
+    [ "$(conf_get_trimmed B)" = "" ]
+    [ "$(conf_get_trimmed NOT_THERE)" = "" ]
+}
+
+@test "config check says nothing about the current OIDC group options" {
+    conf_set BYRO_OIDC_STAFF_GROUP byro-staff
+    conf_set BYRO_OIDC_SUPERUSER_GROUP byro-superusers
+    conf_set BYRO_OIDC_SYNC_GROUPS true
+    run byroctl --root "$BYRO_ROOT" config check
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"OIDC"* ]]
+}
+
 @test "config check warns when the pinned digest cannot be confirmed" {
     export SHIM_TAGS="ghcr.io/byro/byro:v2026.3.0"
     run byroctl --root "$BYRO_ROOT" config check

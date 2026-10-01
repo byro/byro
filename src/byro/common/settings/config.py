@@ -57,6 +57,16 @@ CONFIG = {
         "issuer_url": {"default": "", "env": os.getenv("BYRO_OIDC_ISSUER_URL")},
         "client_id": {"default": "", "env": os.getenv("BYRO_OIDC_CLIENT_ID")},
         "client_secret": {"default": "", "env": os.getenv("BYRO_OIDC_CLIENT_SECRET")},
+        "staff_group": {"default": "", "env": os.getenv("BYRO_OIDC_STAFF_GROUP")},
+        "superuser_group": {
+            "default": "",
+            "env": os.getenv("BYRO_OIDC_SUPERUSER_GROUP"),
+        },
+        "sync_groups": {
+            "default": "false",
+            "env": os.getenv("BYRO_OIDC_SYNC_GROUPS"),
+        },
+        # Deprecated alias of staff_group, see resolve_oidc_staff_group().
         "admin_group": {"default": "", "env": os.getenv("BYRO_OIDC_ADMIN_GROUP")},
         "auto_create_account": {
             "default": "false",

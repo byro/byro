@@ -6,6 +6,9 @@ from django.db.models.signals import post_save
 class CommonConfig(AppConfig):
     name = "byro.common"
 
+    def ready(self):
+        from . import checks  # noqa
+
 
 def user_save_receiver(sender, instance, created, **kwargs):
     if created:

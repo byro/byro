@@ -12,7 +12,7 @@ except ImportError:  # pragma: no cover - fallback for very old Pythons
 
 from byro.common.settings.config import build_config
 from byro.common.settings.secret import get_or_create_secret
-from byro.common.settings.utils import log_initial
+from byro.common.settings.utils import log_initial, resolve_oidc_staff_group
 
 config, config_files = build_config()
 CONFIG = config
@@ -237,7 +237,14 @@ FORMS_URLFIELD_ASSUME_HTTPS = True
 OIDC_ISSUER_URL = config.get("oidc", "issuer_url", fallback="").strip()
 OIDC_CLIENT_ID = config.get("oidc", "client_id", fallback="").strip()
 OIDC_CLIENT_SECRET = config.get("oidc", "client_secret", fallback="").strip()
+# admin_group is the deprecated name of staff_group. OIDC_ADMIN_GROUP only keeps
+# the raw value for the system checks, everything else uses OIDC_STAFF_GROUP.
 OIDC_ADMIN_GROUP = config.get("oidc", "admin_group", fallback="").strip()
+OIDC_STAFF_GROUP, OIDC_GROUP_CONFLICT = resolve_oidc_staff_group(
+    config.get("oidc", "staff_group", fallback=""), OIDC_ADMIN_GROUP
+)
+OIDC_SUPERUSER_GROUP = config.get("oidc", "superuser_group", fallback="").strip()
+OIDC_SYNC_GROUPS = config.getboolean("oidc", "sync_groups", fallback=False)
 OIDC_AUTO_CREATE_ACCOUNT = config.getboolean(
     "oidc", "auto_create_account", fallback=False
 )
