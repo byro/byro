@@ -290,7 +290,11 @@ clients could forge the header.
 
 ## Troubleshooting
 
-* `byroctl config check` validates `byro.conf` and the Compose files.
+* `byroctl config check` validates `byro.conf` and the Compose files. It
+  also refuses a configuration in which `BYRO_OIDC_ADMIN_GROUP` and
+  `BYRO_OIDC_STAFF_GROUP` name different groups, and reminds you that
+  `BYRO_OIDC_ADMIN_GROUP` is deprecated (see
+  [Configuration](../configuration/reference.md#admin_group)).
 * `byroctl logs web` shows what the web service is doing; `byroctl logs db`
   the database.
 * `docker compose ps` in the installation directory shows the containers and

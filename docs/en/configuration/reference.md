@@ -123,8 +123,9 @@ Optional single sign-on through OpenID Connect, in addition to the regular
 password login (never as a replacement - an account with no password and no
 matching OIDC claim could otherwise no longer sign in at all). If
 `issuer_url` is empty, the login page shows no SSO button and the related
-routes answer 404. For the flow, the group check and its security
-consequences, see [Users and login](../administration/users-and-login.md).
+routes answer 404. For the flow, the group mapping and its security
+consequences, see
+[OIDC/SSO login](../administration/users-and-login.md#oidcsso-login).
 The MFA policy itself is configured in *Settings → General*. Its OIDC-exception
 variant trusts the identity provider to enforce MFA for OIDC sessions; see
 [Multi-factor authentication](../administration/mfa.md) before selecting it.
@@ -152,28 +153,64 @@ variant trusts the identity provider to enforce MFA for OIDC sessions; see
 - **Environment variable:** `BYRO_OIDC_CLIENT_SECRET`
 - **Default:** `''`
 
-### `admin_group`
+### `staff_group`
 
-- When set, the `groups` claim (a string or a list) in the ID token or
-  userinfo response must contain this value, or sign-in fails. **This only
-  controls who may sign in through OIDC at all - not what the account can do
-  inside the Office afterwards.** Despite its name, the option makes nobody a
-  superuser; permissions come from the flags of the local account (see
-  [Permission model](../administration/users-and-login.md#permission-model)).
-- **Environment variable:** `BYRO_OIDC_ADMIN_GROUP`
-- **Default:** `''` (no group check, every successful OIDC login is accepted)
+- Group of the identity provider that maps to `is_staff` (regular access to
+  the Office and the API). The groups are read from the `groups` claim (a
+  string or a list) of the ID token, or from the userinfo response if the
+  token has no such claim.
+- When set, it also limits the OIDC login: the user has to be a member of
+  this group or of `superuser_group`, or sign-in fails.
+- **Environment variable:** `BYRO_OIDC_STAFF_GROUP`
+- **Default:** `''` (no group check, every successful OIDC login is accepted;
+  new accounts become staff)
+
+### `superuser_group`
+
+- Group of the identity provider that maps to `is_superuser` (settings, user
+  management, log). Membership never sets `is_staff` by itself; that flag is
+  decided separately. With `staff_group` configured it follows that group,
+  so a member of this group alone is a superuser without `is_staff` and can
+  still sign in. Without `staff_group`, a new account becomes staff by
+  default and an existing account keeps its `is_staff`.
+- **Environment variable:** `BYRO_OIDC_SUPERUSER_GROUP`
+- **Default:** `''` (OIDC never grants or removes superuser status)
 
 ### `auto_create_account`
 
 - Automatically creates a new, passwordless byro account when the OIDC
   username (see `username_field`) does not match an existing account yet. The
-  account is created once with `is_staff=True` and `is_superuser=False`:
-  regular access to the Office and the API, no administrative access. Later
-  logins never change these flags, there is no synchronization from OIDC
-  groups. If `False`, sign-in fails for unknown usernames even if
-  `admin_group` is satisfied.
+  account gets its permissions once from `staff_group` and
+  `superuser_group`. Without `staff_group` it becomes staff, without
+  `superuser_group` it is never a superuser. If `False`, sign-in fails for
+  unknown usernames even if the group check is satisfied.
 - **Environment variable:** `BYRO_OIDC_AUTO_CREATE_ACCOUNT`
 - **Default:** `False`
+
+### `sync_groups`
+
+- If `False`, the groups only set the permissions of a newly created
+  account; an OIDC login never changes an existing account.
+- If `True`, every OIDC login sets `is_staff` and `is_superuser` of the
+  account to its current membership in `staff_group` and `superuser_group`,
+  **including removing them**. A flag whose group is not configured is not
+  touched. Read
+  [Synchronizing permissions](../administration/users-and-login.md#synchronizing-permissions-on-every-login)
+  first and keep a local superuser with a password.
+- **Environment variable:** `BYRO_OIDC_SYNC_GROUPS`
+- **Default:** `False`
+
+### `admin_group`
+
+- **Deprecated**, the old name of `staff_group`. It is still read and behaves
+  like `staff_group`; an existing configuration that only sets `admin_group`
+  keeps working. Rename it to `staff_group`.
+- Do not set both options to different values: byro then disables the OIDC
+  login until the configuration is fixed (password sign-in keeps working),
+  and `byroctl config check` reports an error. See
+  [The deprecated admin_group](../administration/users-and-login.md#the-deprecated-admin_group).
+- **Environment variable:** `BYRO_OIDC_ADMIN_GROUP`
+- **Default:** `''`
 
 ### `username_field`
 

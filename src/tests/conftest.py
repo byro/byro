@@ -15,6 +15,8 @@ from byro.bookkeeping.models import (
     Transaction,
 )
 from byro.bookkeeping.special_accounts import SpecialAccounts
+from byro.common import oidc
+from byro.common import views as common_views
 from byro.common.models.configuration import Configuration
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
@@ -88,6 +90,51 @@ def logged_in_client(login_user, client, user):
 def superuser_client(login_user, client, superuser):
     login_user(client, superuser)
     return client
+
+
+@pytest.fixture
+def oidc_provider(settings, monkeypatch):
+    """An OIDC login through the real callback view. Only the communication
+    with the identity provider is replaced; the callback, account lookup,
+    provisioning and group synchronization run unchanged.
+
+    Returns a callable ``(client, claims)`` that performs the callback with
+    the given ID token claims."""
+    settings.OIDC_ISSUER_URL = "https://idp.example.org"
+    settings.OIDC_CLIENT_ID = "byro"
+    settings.OIDC_USERNAME_FIELD = "preferred_username"
+    settings.OIDC_STAFF_GROUP = ""
+    settings.OIDC_SUPERUSER_GROUP = ""
+    settings.OIDC_SYNC_GROUPS = False
+    settings.OIDC_GROUP_CONFLICT = False
+    settings.OIDC_AUTO_CREATE_ACCOUNT = True
+    monkeypatch.setattr(
+        common_views,
+        "build_auth_url",
+        lambda redirect_uri, state, nonce: "https://idp.example.org/auth",
+    )
+    monkeypatch.setattr(
+        common_views,
+        "exchange_code",
+        lambda code, redirect_uri: {"id_token": "id", "access_token": "at"},
+    )
+
+    def no_userinfo(access_token):
+        raise AssertionError("unexpected userinfo request")
+
+    monkeypatch.setattr(oidc, "get_userinfo", no_userinfo)
+
+    def callback(client, claims):
+        monkeypatch.setattr(
+            common_views, "validate_id_token", lambda id_token, nonce: claims
+        )
+        session = client.session
+        session["oidc_state"] = "state123"
+        session["oidc_nonce"] = "nonce123"
+        session.save()
+        return client.get(reverse("common:oidc-callback") + "?state=state123&code=abc")
+
+    return callback
 
 
 @pytest.fixture

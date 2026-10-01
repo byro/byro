@@ -3,6 +3,8 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+from byro.common.models import LogEntry
+
 # (is_staff, is_superuser, may use the API)
 FLAG_COMBINATIONS = (
     pytest.param(False, False, False, id="no-flags"),
@@ -109,3 +111,38 @@ def test_api_token_stops_working_when_backend_access_is_removed(
     user.is_staff = True
     user.save()
     assert client.get(url).status_code == 200
+
+
+@pytest.mark.django_db
+def test_api_token_stops_working_after_oidc_group_sync(
+    client, create_user, configuration, member, oidc_provider, settings
+):
+    """The permissions are taken away by the real OIDC callback and group
+    synchronization, not by the test."""
+    settings.OIDC_STAFF_GROUP = "byro-staff"
+    settings.OIDC_SUPERUSER_GROUP = "byro-superusers"
+    settings.OIDC_SYNC_GROUPS = True
+    user = create_user("api_user", is_staff=True, is_superuser=True)
+    api = api_client_for(user)
+    list_url = reverse("api:members-list")
+    detail_url = reverse("api:members-detail", kwargs={"pk": member.pk})
+    assert api.get(list_url).status_code == 200
+    old_name = member.name
+
+    # removed from both groups at the provider, then an OIDC login
+    response = oidc_provider(client, {"preferred_username": "api_user", "groups": []})
+
+    assert response.url == reverse("common:login")
+    user.refresh_from_db()
+    assert (user.is_staff, user.is_superuser) == (False, False)
+    assert LogEntry.objects.filter(
+        action_type="byro.common.user.oidc_permissions_synced"
+    ).exists()
+    # the token still exists, it just no longer grants anything
+    assert Token.objects.filter(user=user).count() == 1
+    assert api.get(list_url).status_code == 403
+    assert api.get(detail_url).status_code == 403
+    response = api.patch(detail_url, {"name": "Changed Name"}, format="json")
+    assert response.status_code == 403
+    member.refresh_from_db()
+    assert member.name == old_name

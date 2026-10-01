@@ -83,5 +83,17 @@ lockout (lost device), see
   fail.** `[site] trust_proxy` (`BYRO_TRUST_PROXY`) is not set even though a
   reverse proxy terminates TLS (see
   [Security baseline](security-baseline.md#tls-and-reverse-proxy)).
+* **The SSO button is gone and OIDC logins are refused with "SSO login is
+  disabled because of a configuration error".** `admin_group` and
+  `staff_group` are both set, but to different values. Keep only
+  `staff_group` (see
+  [The deprecated admin_group](users-and-login.md#the-deprecated-admin_group)).
+  Password sign-in keeps working in the meantime.
+* **A user lost their permissions after an OIDC login.** With `sync_groups`
+  enabled, byro takes the permissions from the groups of the identity
+  provider on every OIDC login (see
+  [Synchronizing permissions](users-and-login.md#synchronizing-permissions-on-every-login)).
+  Check the group membership and whether the provider still sends the
+  `groups` claim; the audit log shows the change.
 * **A plugin build fails.** See
   [Plugin troubleshooting](plugin-management.md#troubleshooting).

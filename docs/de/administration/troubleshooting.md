@@ -88,5 +88,17 @@ einen MFA-bedingten Aussperr-Fall (Gerät verloren) siehe
   schlagen fehl.** `[site] trust_proxy` (`BYRO_TRUST_PROXY`) ist nicht gesetzt,
   obwohl ein Reverse Proxy TLS terminiert (siehe
   [Sicherheits-Baseline](security-baseline.md#tls-und-reverse-proxy)).
+* **Der SSO-Button fehlt, und OIDC-Logins werden mit „Die SSO-Anmeldung ist
+  wegen eines Konfigurationsfehlers deaktiviert“ abgewiesen.** `admin_group`
+  und `staff_group` sind beide gesetzt, aber mit unterschiedlichen Werten.
+  Behalte nur `staff_group` (siehe
+  [Die veraltete Option admin_group](users-and-login.md#die-veraltete-option-admin_group)).
+  Die Passwort-Anmeldung funktioniert in der Zwischenzeit weiter.
+* **Ein Benutzer hat nach einem OIDC-Login seine Rechte verloren.** Mit
+  aktiviertem `sync_groups` übernimmt byro die Rechte bei jedem OIDC-Login
+  aus den Gruppen des Identity-Providers (siehe
+  [Rechte bei jedem Login synchronisieren](users-and-login.md#rechte-bei-jedem-login-synchronisieren)).
+  Prüfe die Gruppenmitgliedschaft und ob der Anbieter den Claim `groups`
+  noch sendet; das Audit-Log zeigt die Änderung.
 * **Plugin-Build schlägt fehl.** Siehe die
   [Fehlersuche bei Plugins](plugin-management.md#fehlersuche).

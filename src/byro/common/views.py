@@ -1,3 +1,4 @@
+import logging
 import secrets
 import urllib
 
@@ -19,12 +20,15 @@ from byro.common.oidc import (
     OIDCError,
     build_auth_url,
     exchange_code,
+    get_configuration_error,
     get_or_create_user,
     is_oidc_configured,
     validate_id_token,
 )
 from byro.common.permissions import has_backend_access, log_out
 from byro.mfa.services import OIDC_LOGIN_SESSION_KEY
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(never_cache, name="dispatch")
@@ -51,7 +55,7 @@ class LoginView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["oidc_enabled"] = is_oidc_configured()
+        ctx["oidc_enabled"] = is_oidc_configured() and not get_configuration_error()
         return ctx
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponseRedirect:
@@ -118,10 +122,31 @@ class LogInfoView(TemplateView):
         return context
 
 
+def refuse_misconfigured_oidc(request):
+    """OIDC logins are refused as long as the configuration is ambiguous.
+    Returns the response to send, or None if OIDC may be used. The visitor
+    only learns that SSO is unavailable; details go to the server log."""
+    error = get_configuration_error()
+    if not error:
+        return None
+    logger.error("OIDC login refused, the configuration is ambiguous: %s", error)
+    messages.error(
+        request,
+        _(
+            "SSO login is disabled because of a configuration error. "
+            "Please contact your administrator."
+        ),
+    )
+    return redirect("common:login")
+
+
 class OIDCLoginView(View):
     def get(self, request):
         if not is_oidc_configured():
             raise Http404
+        refusal = refuse_misconfigured_oidc(request)
+        if refusal:
+            return refusal
         state = secrets.token_urlsafe(32)
         nonce = secrets.token_urlsafe(32)
         request.session["oidc_state"] = state
@@ -139,6 +164,9 @@ class OIDCCallbackView(View):
     def get(self, request):
         if not is_oidc_configured():
             raise Http404
+        refusal = refuse_misconfigured_oidc(request)
+        if refusal:
+            return refusal
 
         error = request.GET.get("error")
         if error:

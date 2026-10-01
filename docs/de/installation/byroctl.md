@@ -304,7 +304,11 @@ wenn byro direkt erreichbar ist, weil Clients den Header fälschen könnten.
 
 ## Fehlersuche
 
-* `byroctl config check` prüft `byro.conf` und die Compose-Dateien.
+* `byroctl config check` prüft `byro.conf` und die Compose-Dateien. Es
+  verweigert außerdem eine Konfiguration, in der `BYRO_OIDC_ADMIN_GROUP` und
+  `BYRO_OIDC_STAFF_GROUP` unterschiedliche Gruppen nennen, und weist darauf
+  hin, dass `BYRO_OIDC_ADMIN_GROUP` veraltet ist (siehe
+  [Konfiguration](../configuration/reference.md#admin_group)).
 * `byroctl logs web` zeigt, was der Web-Dienst tut; `byroctl logs db` die
   Datenbank.
 * `docker compose ps` im Installationsverzeichnis zeigt die Container und ihren

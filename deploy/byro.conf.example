@@ -91,8 +91,17 @@ BYRO_PGP_HOME=/var/byro/data/gnupg
 #BYRO_OIDC_ISSUER_URL=
 #BYRO_OIDC_CLIENT_ID=
 #BYRO_OIDC_CLIENT_SECRET=
-#BYRO_OIDC_ADMIN_GROUP=
+# Members of this group may sign in and get regular access (staff). Empty:
+# every user of the identity provider may sign in.
+#BYRO_OIDC_STAFF_GROUP=
+# Members of this group are superusers. Empty: OIDC never grants superuser
+# rights.
+#BYRO_OIDC_SUPERUSER_GROUP=
 #BYRO_OIDC_AUTO_CREATE_ACCOUNT=false
+# false: the groups only set the permissions of a newly created account.
+# true: every OIDC login updates the permissions from the groups above and
+# also removes them. Keep a local superuser with a password in that case.
+#BYRO_OIDC_SYNC_GROUPS=false
 #BYRO_OIDC_USERNAME_FIELD=preferred_username
 
 # ---------------------------------------------------------------------------

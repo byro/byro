@@ -378,6 +378,18 @@ msgstr "Über SSO (OIDC) angemeldet"
 msgid "User logged in"
 msgstr "Benutzer angemeldet"
 
+#: byro/common/templates/log_entry/byro.common.user.oidc_permissions_synced.html:5
+msgid "Permissions changed by OIDC group synchronization"
+msgstr "Rechte durch OIDC-Gruppensynchronisation geändert"
+
+#: byro/common/views.py
+msgid ""
+"SSO login is disabled because of a configuration error. Please contact your "
+"administrator."
+msgstr ""
+"Die SSO-Anmeldung ist wegen eines Konfigurationsfehlers deaktiviert. Bitte "
+"wende dich an deine Administration."
+
 #: byro/common/templates/log_entry/byro.common.login.no_access.html:5
 msgid "Login rejected: account has no backend access"
 msgstr "Anmeldung abgelehnt: Konto hat keinen Backend-Zugriff"

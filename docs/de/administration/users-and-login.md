@@ -76,9 +76,10 @@ früheren Flag-Werte nicht wieder her.
 Im Office kann ein Superuser sich den Superuser-Status nicht selbst entziehen,
 und nur Superuser verwalten Konten; mindestens ein Superuser bleibt also
 immer bestehen. Diese Garantie endet am Office: Ein Konto lässt sich weiterhin
-auf dem Server ändern (Shell, Datenbank), und was bei einem externen
-Identity-Provider passiert, sieht byro nicht. Per OIDC angelegte Konten sind
-von sich aus nie Superuser.
+auf dem Server ändern (Shell, Datenbank), und mit der
+OIDC-Gruppensynchronisation kann der Identity-Provider jedem Konto, das sich
+per OIDC anmeldet, den Superuser-Status entziehen (siehe
+[Rechte bei jedem Login synchronisieren](#rechte-bei-jedem-login-synchronisieren)).
 
 Behalte mindestens ein lokales Superuser-Konto mit Passwort, das nicht von
 OIDC abhängt, zum Beispiel das bei der Installation mit `createsuperuser`
@@ -115,27 +116,147 @@ Login-Seite zusätzlich einen SSO-Button. Der Ablauf:
 2. Nach erfolgreicher Anmeldung beim Anbieter validiert byro den ID-Token
    (Signatur über die JWKS des Anbieters, Aussteller, Zielgruppe, Ablauf,
    `nonce`).
-3. Ist `admin_group` gesetzt, muss der Claim `groups` diesen Wert enthalten,
-   sonst schlägt der Login fehl – **das ist die einzige Zugriffsprüfung, die
-   OIDC bietet.** Sie entscheidet nur, wer sich per OIDC anmelden darf, nicht,
-   was das Konto danach im Office darf; das bestimmen die Flags des lokalen
-   Kontos (siehe [Berechtigungsmodell](#berechtigungsmodell)).
+3. Ist `staff_group` oder `superuser_group` gesetzt, liest byro die Gruppen
+   des Benutzers: aus dem Claim `groups` des ID-Tokens, wenn das Token einen
+   hat, sonst vom Userinfo-Endpunkt. Ein vorhandener, aber leerer Claim ist
+   eine gültige Antwort (Mitglied keiner Gruppe), Userinfo wird dann nicht
+   gefragt. Nur wenn der Claim an beiden Stellen fehlt, gilt der Benutzer als
+   Mitglied keiner Gruppe.
 4. byro sucht ein bestehendes Konto mit dem Benutzernamen aus `username_field`
-   (Standard `preferred_username`). Findet es keins und ist
-   `auto_create_account` aktiviert, legt es ein neues, **passwortloses** Konto
-   mit `is_staff=True` und `is_superuser=False` an; die Person kann also
-   sofort im Office arbeiten, hat aber keinen administrativen Zugriff. Ist
-   `auto_create_account` deaktiviert, schlägt der Login für unbekannte
+   (Standard `preferred_username`). Findet es keins, besteht der Benutzer die
+   Gruppenprüfung aus Schritt 6 und ist `auto_create_account` aktiviert, legt
+   es ein neues, **passwortloses** Konto mit den unter
+   [OIDC-Gruppen und Rechte](#oidc-gruppen-und-rechte) beschriebenen Rechten
+   an. Ist `auto_create_account` deaktiviert, schlägt der Login für unbekannte
    Benutzernamen fehl.
-5. Ist das gefundene oder angelegte Konto `is_active=False`, wird die
-   Anmeldung mit einer Fehlermeldung abgelehnt.
-6. Ist das Konto weder Staff noch Superuser, wird die Anmeldung mit einer
+5. Ist `sync_groups` aktiviert, werden die Rechte eines bestehenden, aktiven
+   Kontos anhand der Gruppen aktualisiert und gespeichert.
+6. Gruppenprüfung: Ist `staff_group` gesetzt, muss der Benutzer Mitglied von
+   `staff_group` oder der konfigurierten `superuser_group` sein, sonst
+   schlägt der Login fehl. Das passiert nach Schritt 5; gerade entzogene
+   Rechte bleiben also entzogen, obwohl der Login abgewiesen wird.
+7. Ist das Konto `is_active=False`, wird die Anmeldung mit einer Fehlermeldung
+   abgelehnt. Ein deaktiviertes Konto wird von Schritt 5 nie verändert.
+8. Ist das Konto weder Staff noch Superuser, wird die Anmeldung mit einer
    Fehlermeldung abgelehnt und im Audit-Log festgehalten.
 
-Die Flags werden **einmalig beim Anlegen des Kontos** gesetzt. byro
-synchronisiert `is_staff` und `is_superuser` nicht anhand von OIDC-Gruppen:
-Ein OIDC-Login ändert die Flags eines bestehenden Kontos nie, vergeben und
-entzogen werden sie von einem Superuser unter „Einstellungen → Benutzer“.
+### OIDC-Gruppen und Rechte
+
+Zwei Optionen bilden Gruppen des Identity-Providers auf die beiden Flags des
+[Berechtigungsmodells](#berechtigungsmodell) ab:
+
+- `staff_group`: Mitglieder erhalten `is_staff`. Die Gruppe begrenzt außerdem,
+  wer sich überhaupt per OIDC anmelden darf (Schritt 6). Ist sie leer, darf
+  sich jeder Benutzer des Identity-Providers anmelden.
+- `superuser_group`: Mitglieder erhalten `is_superuser`. Ist sie leer, vergibt
+  und entzieht OIDC den Superuser-Status nie.
+
+Die beiden Flags bleiben unabhängig: Die Mitgliedschaft in `superuser_group`
+setzt `is_staff` nie von sich aus. Ob ein Mitglied von `superuser_group`
+auch Staff ist, entscheidet allein die Staff-Seite:
+
+- Ist `staff_group` konfiguriert, folgt `is_staff` dieser Gruppe. Ein
+  Benutzer, der nur in `superuser_group` ist, erhält dann `is_superuser`
+  ohne `is_staff`, als neues Konto oder über `sync_groups`, und kann sich
+  trotzdem anmelden, weil ein Superuser immer Zugriff hat.
+- Ist keine `staff_group` konfiguriert, wird ein neues Konto standardmäßig
+  Staff (siehe Tabelle unten), auch wenn es in `superuser_group` ist. Bei
+  einem bestehenden Konto bleibt `is_staff`, wie es ist.
+
+Ein Konto mit `is_superuser`, aber ohne `is_staff`, entsteht also nur, wenn
+die Staff-Seite das so vorgibt: über eine konfigurierte `staff_group` oder
+weil das Flag lokal bereits so gesetzt ist.
+
+Ein **neues Konto** (`auto_create_account`) erhält seine Rechte einmalig:
+
+| `staff_group` gesetzt | `superuser_group` gesetzt | `is_staff` | `is_superuser` |
+|---|---|---|---|
+| nein | nein | ja | nein |
+| ja | nein | ja (die Mitgliedschaft ist Voraussetzung für den Login) | nein |
+| nein | ja | ja | wenn Mitglied von `superuser_group` |
+| ja | ja | wenn Mitglied von `staff_group` | wenn Mitglied von `superuser_group` |
+
+Die einfachste Einrichtung, `auto_create_account` ohne jede Gruppe, macht
+also weiterhin jeden neuen OIDC-Benutzer zu einem normalen Staff-Konto und
+nie zu einem Superuser.
+
+Bei einem **bestehenden Konto** kommt es auf `sync_groups` an:
+
+- `sync_groups = false` (Standard): Ein OIDC-Login ändert die Flags nie. Die
+  Gruppenprüfung entscheidet, ob sich der Benutzer per OIDC anmelden darf,
+  die lokalen Flags entscheiden, was das Konto darf. Eine spätere Aufnahme in
+  eine Gruppe vergibt nichts: Ein Superuser setzt die Flags unter
+  „Einstellungen → Benutzer“.
+- `sync_groups = true`: siehe nächster Abschnitt.
+
+Gruppennamen mit Leerzeichen funktionieren nur, wenn der Anbieter den Claim
+`groups` als Liste sendet; ein als einzelne Zeichenkette gesendeter Claim
+wird an Leerzeichen getrennt. Ein Claim in jeder anderen Form, zum Beispiel
+eine Liste, die etwas anderes als Gruppennamen enthält, lässt die Anmeldung
+scheitern. byro legt dann kein Konto an und ändert keine Rechte.
+
+### Rechte bei jedem Login synchronisieren
+
+Mit `sync_groups = true` ist der Identity-Provider für die konfigurierten
+Gruppen die **maßgebliche Quelle**. Bei jedem erfolgreichen OIDC-Login eines
+bestehenden Kontos gilt:
+
+- Ist `staff_group` gesetzt, wird `is_staff` auf „Mitglied von `staff_group`“
+  gesetzt.
+- Ist `superuser_group` gesetzt, wird `is_superuser` auf „Mitglied von
+  `superuser_group`“ gesetzt.
+- Ein Flag, dessen Gruppe nicht konfiguriert ist, bleibt genau so, wie es ist.
+
+byro liest das Konto unmittelbar vor dem Vergleich und dem Schreiben unter
+einer Sperre neu und schreibt nur ein Flag, das zugeordnet ist und sich
+tatsächlich unterscheidet. Ein Flag, dessen Gruppe nicht konfiguriert ist,
+wird also nie geschrieben, auch wenn es im selben Moment jemand im Office
+ändert.
+
+Eine Änderung wird gespeichert, bevor Gruppenprüfung und Berechtigungsmodell
+ausgewertet werden, und mit den alten und neuen Flags im Audit-Log
+festgehalten. Ein Benutzer, der aus `staff_group` entfernt wurde, verliert
+`is_staff` mit dem nächsten OIDC-Login; ist das Konto danach weder Staff noch
+Superuser, wird dieser Login abgewiesen.
+
+!!! warning
+    - Wer Benutzer beim Identity-Provider aus einer synchronisierten Gruppe
+      entfernt, entzieht ihnen das Recht in byro, ohne jede Absicherung. Das
+      kann **jeden** Superuser entfernen, der sich per OIDC anmeldet. Behalte
+      einen
+      [lokalen Notfall-Superuser](#lokalen-notfall-superuser-behalten) mit
+      Passwort.
+    - Synchronisiert wird nur **während eines OIDC-Logins des jeweiligen
+      Kontos**. Bis dahin ändert sich nichts: Sitzungen, Passwort-Anmeldung
+      und API-Token des Kontos funktionieren weiter. Konten, die sich nicht
+      per OIDC anmelden, verändert byro nie.
+    - `staff_group` allein verwaltet keine Superuser. Nach dem Update auf
+      das Berechtigungsmodell ist jedes vorhandene Konto Superuser (siehe
+      [Bestehende Installationen](#bestehende-installationen)). Ein solches
+      Konto verliert `is_staff` und seine OIDC-Anmeldung, wenn es
+      `staff_group` verlässt, behält aber `is_superuser` und damit
+      Passwort-Anmeldung und API-Token, bis du zusätzlich `superuser_group`
+      setzt oder das Flag von Hand entziehst.
+    - Sendet der Anbieter den Claim `groups` nicht mehr, zum Beispiel nach
+      einer Änderung an Scope oder Mapper, gilt jeder Benutzer als Mitglied
+      keiner Gruppe und verliert mit dem nächsten Login die synchronisierten
+      Rechte.
+
+### Die veraltete Option `admin_group`
+
+`admin_group` ist der alte Name von `staff_group` und wird weiterhin gelesen.
+Für sich allein verhält sich die Option wie bisher: Nur Mitglieder dürfen
+sich per OIDC anmelden, und neue Konten werden Staff. Zwei Dinge sind neu:
+Zusammen mit `superuser_group` genügt die Mitgliedschaft in **einer** der
+beiden Gruppen für die Anmeldung, und mit `sync_groups` steuert sie wie
+`staff_group` auch `is_staff`.
+
+Benenne sie bei Gelegenheit in `staff_group` um. Sind beide Optionen mit
+unterschiedlichen Werten gesetzt, rät byro nicht, welche gemeint ist: Der
+SSO-Button verschwindet und OIDC-Logins werden abgewiesen, bis die
+Konfiguration korrigiert ist. Die Passwort-Anmeldung funktioniert weiter.
+`manage.py check` meldet das Problem, und `byroctl config check` verweigert
+das Anwenden einer solchen Konfiguration.
 
 **Fehlerfälle** (abgelaufener Code, ungültiger `state`, Ablehnung durch den
 Anbieter, Netzwerkfehler beim Anbieter) landen alle als Fehlermeldung auf der
@@ -147,8 +268,8 @@ Passwort-Login im selben Versuch.
     Passwort-Anmeldung dieses Kontos. Ist OIDC konfiguriert und der
     Benutzername identisch, kann sich das Konto weiterhin per OIDC anmelden.
     Um ein Konto vollständig zu sperren, muss es beim OIDC-Anbieter selbst
-    entfernt oder deaktiviert werden (`admin_group` verlassen lassen genügt,
-    falls konfiguriert), oder `is_active` muss falsch sein.
+    entfernt oder deaktiviert werden (für die OIDC-Anmeldung genügt es, die
+    konfigurierten Gruppen zu verlassen), oder `is_active` muss falsch sein.
 
 ## Benutzerkonten verwalten
 
@@ -218,4 +339,7 @@ ist, wird global eingestellt, nicht je Konto: siehe
   erfolgreiche Logins, Logins auf deaktivierte Konten, wegen fehlendem
   Backend-Zugriff abgelehnte Logins und Logouts werden protokolliert (siehe
   [Audit-Log](settings.md#audit-log)). Wird die Sitzung eines Kontos beendet,
-  das seinen Backend-Zugriff verloren hat, erscheint das als Logout.
+  das seinen Backend-Zugriff verloren hat, erscheint das als Logout. Durch
+  die OIDC-Gruppensynchronisation geänderte Rechte werden mit den alten und
+  neuen Flags protokolliert; der Eintrag enthält keine Claims und keine
+  Gruppennamen.
