@@ -5,8 +5,8 @@ einrichtest, über das Office – unabhängig davon, wie und wo byro betrieben
 wird.
 
 - [Benutzer und Login](users-and-login.md): Konten anlegen und bearbeiten,
-  Passwort- und OIDC/SSO-Login, was `is_staff`/`is_superuser` wirklich
-  bedeuten.
+  Passwort- und OIDC/SSO-Login, das Berechtigungsmodell hinter `is_staff`
+  und `is_superuser`.
 - [Mehr-Faktor-Authentifizierung (MFA)](mfa.md): Richtlinie für alle Konten
   vorschreiben, Status prüfen, Wiederherstellung und die Management Commands
   (die persönliche Einrichtung steht im

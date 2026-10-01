@@ -2,7 +2,7 @@ import secrets
 import urllib
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 from django.db import connection
 from django.http import Http404, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
@@ -23,6 +23,7 @@ from byro.common.oidc import (
     is_oidc_configured,
     validate_id_token,
 )
+from byro.common.permissions import has_backend_access, log_out
 from byro.mfa.services import OIDC_LOGIN_SESSION_KEY
 
 
@@ -73,6 +74,9 @@ class LoginView(TemplateView):
             )
             return redirect("common:login")
 
+        if not has_backend_access(user):
+            return reject_login_without_backend_access(request, user)
+
         login(request, user)
         # A password login must never retain the provenance of an earlier OIDC
         # login in the same browser session.
@@ -87,14 +91,20 @@ class LoginView(TemplateView):
         return redirect("/")
 
 
+def reject_login_without_backend_access(request, user):
+    """The credentials were valid, but the account is neither staff nor
+    superuser and therefore must not get a backend session."""
+    messages.error(request, _("This account does not have access to the backend."))
+    LogEntry.objects.create(
+        content_object=user,
+        user=user,
+        action_type="byro.common.login.no_access",
+    )
+    return redirect("common:login")
+
+
 def logout_view(request: HttpRequest) -> HttpResponseRedirect:
-    if request.user:
-        LogEntry.objects.create(
-            content_object=request.user,
-            user=request.user,
-            action_type="byro.common.logout",
-        )
-    logout(request)
+    log_out(request)
     return redirect("/")
 
 
@@ -165,6 +175,9 @@ class OIDCCallbackView(View):
             if not user.is_active:
                 messages.error(request, _("User account is deactivated."))
                 return redirect("common:login")
+
+            if not has_backend_access(user):
+                return reject_login_without_backend_access(request, user)
 
             user.backend = "django.contrib.auth.backends.ModelBackend"
             login(request, user)

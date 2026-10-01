@@ -47,8 +47,8 @@ def test_outbox_send_continues_after_a_pgp_failure(
 
 
 @pytest.mark.django_db
-def test_settings_show_private_signing_key_upload(logged_in_client, configuration):
-    response = logged_in_client.get(reverse("office:settings.base"))
+def test_settings_show_private_signing_key_upload(superuser_client, configuration):
+    response = superuser_client.get(reverse("office:settings.base"))
     content = response.content.decode()
 
     assert response.status_code == 200, content

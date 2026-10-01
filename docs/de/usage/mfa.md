@@ -61,7 +61,7 @@ bestätigen. Alle bisherigen Wiederherstellungscodes werden sofort ungültig.
 mit einem aktuellen Authenticator-Code. Das entfernt den Authenticator und alle
 Wiederherstellungscodes; danach schützt nur noch das Passwort das Konto.
 
-Ist MFA für alle Administratoren vorgeschrieben, steht diese Option nicht zur
+Ist MFA für alle Backend-Benutzer vorgeschrieben, steht diese Option nicht zur
 Verfügung.
 
 ## Authenticator verloren und keine Wiederherstellungscodes mehr

@@ -1,5 +1,6 @@
 import pytest
 from django.http.request import QueryDict
+from django.utils import translation
 
 from byro.common.models.log import LogEntry
 from byro.common.templatetags.log_entry import format_log_entry, format_log_source
@@ -70,3 +71,21 @@ def test_log_entry_source_formatting(mail_template, user):
         )
         == 'value (via <span class="fa fa-user"></span> regular_user)'
     )
+
+
+@pytest.mark.django_db
+def test_rejected_login_is_rendered_readably(user):
+    entry = LogEntry.objects.create(
+        content_object=user, user=user, action_type="byro.common.login.no_access"
+    )
+
+    with translation.override("en"):
+        rendered = format_log_entry(entry)
+    assert "Login rejected: account has no backend access" in rendered
+    assert user.username in rendered
+    # not just the technical action type of the default formatter
+    assert "byro.common.login.no_access" not in rendered
+
+    with translation.override("de"):
+        rendered = format_log_entry(entry)
+    assert "Anmeldung abgelehnt: Konto hat keinen Backend-Zugriff" in rendered

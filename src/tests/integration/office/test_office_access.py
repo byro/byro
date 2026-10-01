@@ -8,8 +8,6 @@ from byro.common.models import LogEntry
 @pytest.mark.parametrize(
     "url",
     (
-        "settings.base",
-        "settings.registration",
         "dashboard",
         "members.typeahead",
         "members.list",
@@ -27,7 +25,7 @@ from byro.common.models import LogEntry
 )
 @pytest.mark.parametrize("logged_in", (True, False))
 @pytest.mark.django_db
-def test_office_access_urls(client, user, login_user, url, logged_in):
+def test_office_access_urls(client, user, configuration, login_user, url, logged_in):
     if logged_in:
         login_user(client, user)
 
@@ -37,7 +35,7 @@ def test_office_access_urls(client, user, login_user, url, logged_in):
 
 
 @pytest.mark.django_db
-def test_office_login_client(client, user):
+def test_office_login_client(client, user, configuration):
     log_count = LogEntry.objects.count()
     user.set_password("thepassword")
     user.save()

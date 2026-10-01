@@ -78,11 +78,11 @@ falls gewünscht).
 
 ## Was hier absichtlich fehlt
 
-OpenID-Connect-Login, Benutzerrollen/`is_staff` und das Audit-Log sind
-sicherheitsrelevant, aber Sache der Administration *in* byro, nicht des
+OpenID-Connect-Login, das Berechtigungsmodell (`is_staff`/`is_superuser`) und
+das Audit-Log sind sicherheitsrelevant, aber Sache der Administration *in* byro, nicht des
 Selbst-Hostings; sie stehen unter
 [Benutzer und Login](users-and-login.md) und
 [Einstellungen](settings.md#audit-log). Kurz zur Einordnung: Die
 API-Dokumentation (`/api/v1/docs/`) und das API-Schema (`/api/v1/schema/`)
-sind ohne Login erreichbar, die API selbst verlangt einen Token und setzt
-`is_staff` voraus (siehe [API](../development/api.md)).
+sind ohne Login erreichbar, die API selbst verlangt den Token eines Kontos,
+das Staff oder Superuser ist (siehe [API](../development/api.md)).

@@ -213,7 +213,7 @@ class DisableView(FormView):
             messages.error(
                 request,
                 _(
-                    "Multi-factor authentication is required for all administrators "
+                    "Multi-factor authentication is required for all backend users "
                     "and cannot be disabled."
                 ),
             )

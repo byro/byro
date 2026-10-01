@@ -154,9 +154,11 @@ durchsetzt; lies vor der Auswahl [Mehr-Faktor-Authentifizierung](../administrati
 
 - Ist diese Option gesetzt, muss der ID-Token- oder Userinfo-Claim `groups`
   (String oder Liste) diesen Wert enthalten, sonst schlägt die Anmeldung fehl.
-  **Steuert nur, wer sich überhaupt anmelden darf – nicht, welche Rechte das
-  Konto danach im Office hat** (siehe die Sicherheitsfolgen unter
-  [Benutzer und Login](../administration/users-and-login.md)).
+  **Steuert nur, wer sich überhaupt per OIDC anmelden darf – nicht, welche
+  Rechte das Konto danach im Office hat.** Anders als der Name vermuten lässt,
+  macht die Option niemanden zum Superuser; die Rechte ergeben sich aus den
+  Flags des lokalen Kontos (siehe
+  [Berechtigungsmodell](../administration/users-and-login.md#berechtigungsmodell)).
 - **Umgebungsvariable:** `BYRO_OIDC_ADMIN_GROUP`
 - **Standard:** `''` (keine Gruppenprüfung, jeder erfolgreiche OIDC-Login wird
   akzeptiert)
@@ -165,8 +167,12 @@ durchsetzt; lies vor der Auswahl [Mehr-Faktor-Authentifizierung](../administrati
 
 - Legt automatisch ein neues, passwortloses byro-Konto an, wenn der
   OIDC-Benutzername (siehe `username_field`) noch keinem bestehenden Konto
-  entspricht. Ist die Option `False`, schlägt die Anmeldung für unbekannte
-  Benutzernamen fehl, auch wenn `admin_group` erfüllt ist.
+  entspricht. Das Konto wird einmalig mit `is_staff=True` und
+  `is_superuser=False` angelegt: normaler Zugriff auf Office und API, kein
+  administrativer Zugriff. Spätere Anmeldungen ändern diese Flags nie, eine
+  Synchronisation anhand von OIDC-Gruppen gibt es nicht. Ist die Option
+  `False`, schlägt die Anmeldung für unbekannte Benutzernamen fehl, auch wenn
+  `admin_group` erfüllt ist.
 - **Umgebungsvariable:** `BYRO_OIDC_AUTO_CREATE_ACCOUNT`
 - **Standard:** `False`
 

@@ -24,11 +24,12 @@ The API uses token authentication: every Office account has its own token in
 the user menu under *API token* (see
 [My account](../usage/account.md#api-token)), sent as the header
 `Authorization: Token <your-token>`. The token only works while the account
-is `is_staff` (see
-[Users and login](../administration/users-and-login.md#managing-user-accounts));
-there are **no fine-grained API permissions** - a valid token from an
-`is_staff` account has full access to every API endpoint, exactly as that
-account has full access to the entire Office.
+is active and staff or superuser, the same rule that decides who may sign in
+to the Office (see
+[Permission model](../administration/users-and-login.md#permission-model)).
+There are **no fine-grained API permissions**: a valid token from such an
+account has full access to every API endpoint. The API currently offers no
+endpoints for the superuser-only functions (settings, user management, log).
 
 ## Endpoints
 

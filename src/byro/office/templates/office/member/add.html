@@ -20,7 +20,9 @@
             {% blocktrans trimmed %}
                 Please configure the fields you want to display in your member registration form.
             {% endblocktrans %}
-            <a href="{% url "office:settings.registration" %}">{% trans "here!" %}</a>
+            {% if request.user.is_superuser %}
+                <a href="{% url "office:settings.registration" %}">{% trans "here!" %}</a>
+            {% endif %}
         </div>
     {% endif %}
     <script type="text/javascript" src="{% static "office/registration.js" %}"></script>

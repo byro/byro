@@ -12,7 +12,7 @@ app works, for example Aegis, Google Authenticator, Microsoft Authenticator,
 1Password or Bitwarden.
 
 MFA is **optional by default**: every backend user can enable it for their own
-account. Administrators can additionally require MFA for every user who can
+account. Superusers can additionally require MFA for every user who can
 log in to the backend, with a separate option to trust MFA enforced by the
 OIDC identity provider.
 
@@ -25,12 +25,11 @@ MFA only concerns the interactive backend login. It does not change
   an MFA page.
 
 !!! note
-    byro grants access to the complete backend to every active user account;
-    there are no tiered roles for the office (see
-    [Users and login](users-and-login.md)). The `is_staff` field exists, but
-    only gates REST API access, not the office itself. The MFA policy
-    therefore applies to *every* user who can log in to the office,
-    regardless of `is_staff`.
+    The MFA policy applies to *every* account that can log in to the
+    office: staff accounts as well as superusers (see
+    [Permission model](users-and-login.md#permission-model)). It is not
+    limited to superusers. Changing the policy is part of the general
+    settings and therefore reserved for superusers.
 
 ## Choosing an MFA policy
 
@@ -38,9 +37,9 @@ Under *Settings → General* you find the card *Multi-factor authentication*
 with these policies:
 
 - **Optional** (the default): users can choose to set up MFA themselves.
-- **Required for all administrators**: every backend login must complete
+- **Required for all backend users**: every backend login must complete
   byro's TOTP setup and challenge.
-- **Required for all administrators except OIDC logins**: password logins
+- **Required for all backend users except OIDC logins**: password logins
   follow the same requirement, while a session authenticated through OIDC is
   not sent to byro's MFA setup when the user has no personal authenticator.
 

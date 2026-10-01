@@ -33,7 +33,8 @@ The examples below show the byroctl form; substitute as needed.
 
 ## Account management
 
-* `createsuperuser` - creates a new administrator account (Django built-in).
+* `createsuperuser` - creates a new superuser account with `is_staff` and
+  `is_superuser` set (Django built-in).
 * `changepassword <username>` - resets the password of an existing account
   (Django built-in). byro has no self-service password reset; this is the
   way to recover a locked-out administrator account (see

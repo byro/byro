@@ -24,11 +24,13 @@ Die API verwendet Token-Authentifizierung: Jedes Office-Konto hat einen
 eigenen Token im Benutzermenü unter *API-Token* (siehe
 [Mein Konto](../usage/account.md#api-token)), gesendet als
 Header `Authorization: Token <dein-token>`. Der Token funktioniert nur,
-solange das zugehörige Konto `is_staff` ist (siehe
-[Benutzer und Login](../administration/users-and-login.md#benutzerkonten-verwalten));
-es gibt **keine feingranularen API-Berechtigungen** – ein gültiger Token
-eines `is_staff`-Kontos hat vollen Zugriff auf alle API-Endpunkte, genau wie
-das zugehörige Konto vollen Zugriff auf das gesamte Office hat.
+solange das zugehörige Konto aktiv und Staff oder Superuser ist; dieselbe
+Regel entscheidet, wer sich am Office anmelden darf (siehe
+[Berechtigungsmodell](../administration/users-and-login.md#berechtigungsmodell)).
+Es gibt **keine feingranularen API-Berechtigungen**: Ein gültiger Token eines
+solchen Kontos hat vollen Zugriff auf alle API-Endpunkte. Für die Funktionen,
+die nur Superusern offenstehen (Einstellungen, Benutzerverwaltung, Log),
+bietet die API derzeit keine Endpunkte.
 
 ## Endpunkte
 

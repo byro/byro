@@ -378,6 +378,14 @@ msgstr "Über SSO (OIDC) angemeldet"
 msgid "User logged in"
 msgstr "Benutzer angemeldet"
 
+#: byro/common/templates/log_entry/byro.common.login.no_access.html:5
+msgid "Login rejected: account has no backend access"
+msgstr "Anmeldung abgelehnt: Konto hat keinen Backend-Zugriff"
+
+#: byro/common/middleware.py byro/common/views.py
+msgid "This account does not have access to the backend."
+msgstr "Dieses Konto hat keinen Zugriff auf das Backend."
+
 #: byro/common/views.py:40
 msgid "No user account matches the entered credentials."
 msgstr "Zu den Eingaben wurde kein Nutzer gefunden."
@@ -2182,8 +2190,8 @@ msgid "Backend user"
 msgstr "Backend-Benutzer"
 
 #: byro/office/templates/office/user/list.html:38
-msgid "Frontend user"
-msgstr "Frontend-Benutzer"
+msgid "No backend access"
+msgstr "Kein Backend-Zugriff"
 
 #: byro/office/templatetags/office_tags.py:9
 msgid "Unknown document type"
@@ -2534,6 +2542,54 @@ msgstr "Passwort"
 #: byro/office/views/users.py:89
 msgid "You cannot disable your own password."
 msgstr "Du kannst dein eigenes Passwort nicht deaktivieren."
+
+#: byro/office/views/users.py
+msgid "Backend access (staff)"
+msgstr "Backend-Zugriff (Staff)"
+
+#: byro/office/views/users.py
+msgid "Allows this account to log in to the backend and to use the API."
+msgstr "Erlaubt diesem Konto die Anmeldung im Backend und die Nutzung der API."
+
+#: byro/office/views/users.py
+msgid ""
+"Additionally grants access to the settings, the user management and the log. "
+"Superusers can always log in, even without backend access."
+msgstr ""
+"Gewährt zusätzlich Zugriff auf die Einstellungen, die Benutzerverwaltung und "
+"das Logbuch. Administratoren können sich immer anmelden, auch ohne "
+"Backend-Zugriff."
+
+#: byro/office/views/users.py
+msgid "You cannot change your own superuser status."
+msgstr "Du kannst deinen eigenen Administrator-Status nicht ändern."
+
+#: byro/office/views/users.py
+msgid "Only superusers may manage other user accounts."
+msgstr "Nur Administratoren dürfen andere Benutzerkonten verwalten."
+
+#: byro/office/views/settings.py
+msgid ""
+"The initial setup of this installation has to be completed by a superuser."
+msgstr ""
+"Die Ersteinrichtung dieser Installation muss von einem Administrator "
+"abgeschlossen werden."
+
+#: byro/office/templates/403.html:4
+msgid "Permission denied"
+msgstr "Zugriff verweigert"
+
+#: byro/office/templates/403.html:11
+msgid ""
+"You do not have permission to access this page. It is restricted to "
+"superusers."
+msgstr ""
+"Du hast keine Berechtigung für diese Seite. Sie ist Administratoren "
+"vorbehalten."
+
+#: byro/office/templates/403.html:16
+msgid "Back to the dashboard"
+msgstr "Zurück zum Überblick"
 
 #: byro/office/views/users.py:99
 msgid "The user's password has been disabled."
@@ -3082,12 +3138,12 @@ msgid "Please enter a valid recovery code."
 msgstr "Bitte gib einen gültigen Wiederherstellungscode ein."
 
 #: byro/mfa/models.py:80
-msgid "Required for all administrators"
-msgstr "Für alle Administratoren erforderlich"
+msgid "Required for all backend users"
+msgstr "Für alle Backend-Benutzer erforderlich"
 
 #: byro/mfa/models.py:82
-msgid "Required for all administrators except OIDC logins"
-msgstr "Für alle Administratoren erforderlich, außer bei OIDC-Anmeldungen"
+msgid "Required for all backend users except OIDC logins"
+msgstr "Für alle Backend-Benutzer erforderlich, außer bei OIDC-Anmeldungen"
 
 #: byro/mfa/models.py:89 byro/mfa/templates/mfa/settings_form.html:6
 msgid "MFA policy"
@@ -3234,10 +3290,10 @@ msgstr "MFA deaktivieren"
 
 #: byro/mfa/templates/mfa/settings.html:51
 msgid ""
-"Multi-factor authentication is required for all administrators of this byro "
+"Multi-factor authentication is required for all backend users of this byro "
 "installation and cannot be disabled."
 msgstr ""
-"Die Multi-Faktor-Authentifizierung ist für alle Administratoren dieser "
+"Die Multi-Faktor-Authentifizierung ist für alle Backend-Benutzer dieser "
 "byro-Installation verpflichtend und kann nicht deaktiviert werden."
 
 #: byro/mfa/templates/mfa/settings.html:57
@@ -3246,10 +3302,10 @@ msgstr "Nicht eingerichtet"
 
 #: byro/mfa/templates/mfa/settings.html:61
 msgid ""
-"Multi-factor authentication is required for all administrators of this byro "
+"Multi-factor authentication is required for all backend users of this byro "
 "installation. Please set it up now."
 msgstr ""
-"Die Multi-Faktor-Authentifizierung ist für alle Administratoren dieser "
+"Die Multi-Faktor-Authentifizierung ist für alle Backend-Benutzer dieser "
 "byro-Installation verpflichtend. Bitte richte sie jetzt ein."
 
 #: byro/mfa/templates/mfa/settings.html:65
@@ -3270,10 +3326,10 @@ msgstr "Multi-Faktor-Authentifizierung einrichten"
 
 #: byro/mfa/templates/mfa/setup.html:11
 msgid ""
-"Multi-factor authentication is required for all administrators of this byro "
+"Multi-factor authentication is required for all backend users of this byro "
 "installation. Please set it up to continue."
 msgstr ""
-"Die Multi-Faktor-Authentifizierung ist für alle Administratoren dieser "
+"Die Multi-Faktor-Authentifizierung ist für alle Backend-Benutzer dieser "
 "byro-Installation verpflichtend. Bitte richte sie ein, um fortzufahren."
 
 #: byro/mfa/templates/mfa/setup.html:17
@@ -3370,10 +3426,10 @@ msgstr "Neue Wiederherstellungscodes"
 
 #: byro/mfa/views.py:216
 msgid ""
-"Multi-factor authentication is required for all administrators and cannot be "
+"Multi-factor authentication is required for all backend users and cannot be "
 "disabled."
 msgstr ""
-"Die Multi-Faktor-Authentifizierung ist für alle Administratoren "
+"Die Multi-Faktor-Authentifizierung ist für alle Backend-Benutzer "
 "verpflichtend und kann nicht deaktiviert werden."
 
 #: byro/mfa/views.py:225

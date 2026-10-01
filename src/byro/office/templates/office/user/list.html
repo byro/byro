@@ -39,7 +39,7 @@
                             {% if user.is_staff %}
                                 <span class="fa fa-user" title="{% trans "Backend user" %}"></span><span class="sr-only">{% trans "Backend user" %}</span>
                             {% else %}
-                                <span class="sr-only">{% trans "Frontend user" %}</span>
+                                <span class="fa fa-ban" title="{% trans "No backend access" %}"></span><span class="sr-only">{% trans "No backend access" %}</span>
                             {% endif %}
                         {% endif %}
                     </td>

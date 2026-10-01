@@ -10,13 +10,17 @@ from byro.bookkeeping.models import Account
 from byro.common.forms import ConfigurationForm, InitialForm, RegistrationConfigForm
 from byro.common.models import LogEntry
 from byro.common.models.configuration import ByroConfiguration, Configuration
+from byro.common.permissions import SuperuserRequiredMixin
 from byro.mails.forms import PGPConfigurationForm
 from byro.mails.models import PGPConfiguration
 
 
-class InitialSettings(FormView):
+class InitialSettings(SuperuserRequiredMixin, FormView):
     form_class = InitialForm
     template_name = "office/settings/initial.html"
+    permission_denied_message = _(
+        "The initial setup of this installation has to be completed by a superuser."
+    )
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
@@ -47,7 +51,7 @@ class InitialSettings(FormView):
         return reverse("office:settings.registration")
 
 
-class ConfigurationView(FormView):
+class ConfigurationView(SuperuserRequiredMixin, FormView):
     form_class = ConfigurationForm
     template_name = "office/settings/form.html"
 
@@ -148,7 +152,7 @@ class ConfigurationView(FormView):
         return reverse("office:settings.base")
 
 
-class RegistrationConfigView(FormView):
+class RegistrationConfigView(SuperuserRequiredMixin, FormView):
     form_class = RegistrationConfigForm
     template_name = "office/settings/registration_form.html"
 
@@ -178,7 +182,7 @@ class AboutByroView(TemplateView):
         return context
 
 
-class LogView(ListView):
+class LogView(SuperuserRequiredMixin, ListView):
     template_name = "office/settings/log.html"
     context_object_name = "log_entries"
     model = LogEntry

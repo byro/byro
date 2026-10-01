@@ -90,6 +90,11 @@ def newsletter_sidebar(sender, **kwargs):
     }
 ```
 
+If you set `'section': 'settings'` to put the entry into the "Settings"
+submenu, it is only shown to superusers, and your plugin has to restrict the
+view to superusers itself: see
+[Settings entries are superuser only](../signals.md#settings-entries-are-superuser-only).
+
 ## Configuring your plugin
 
 If you'd like to provide custom configuration options (for example, the name

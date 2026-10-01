@@ -73,11 +73,11 @@ Caddyfile snippet or your proxy configuration if you want it).
 
 ## What is deliberately not here
 
-OpenID Connect login, user roles/`is_staff` and the audit log are security
-relevant, but are the concern of administration *inside* byro, not of
+OpenID Connect login, the permission model (`is_staff`/`is_superuser`) and
+the audit log are security relevant, but are the concern of administration *inside* byro, not of
 self-hosting; they are covered under
 [Users and login](users-and-login.md) and
 [Settings](settings.md#audit-log). For context: the API documentation
 (`/api/v1/docs/`) and the API schema (`/api/v1/schema/`) are reachable
-without login, the API itself requires a token and `is_staff` (see
-[API](../development/api.md)).
+without login, the API itself requires a token of an account that is staff or
+superuser (see [API](../development/api.md)).

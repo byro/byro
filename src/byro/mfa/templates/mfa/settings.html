@@ -48,7 +48,7 @@
                 {% else %}
                     <p class="text-muted mt-3">
                         <span class="fa fa-lock"></span>
-                        {% trans "Multi-factor authentication is required for all administrators of this byro installation and cannot be disabled." %}
+                        {% trans "Multi-factor authentication is required for all backend users of this byro installation and cannot be disabled." %}
                     </p>
                 {% endif %}
             {% else %}
@@ -58,7 +58,7 @@
                 </p>
                 {% if status.required_by_policy %}
                     <div class="alert alert-warning">
-                        {% trans "Multi-factor authentication is required for all administrators of this byro installation. Please set it up now." %}
+                        {% trans "Multi-factor authentication is required for all backend users of this byro installation. Please set it up now." %}
                     </div>
                 {% endif %}
                 <p>

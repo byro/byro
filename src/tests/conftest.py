@@ -58,8 +58,35 @@ def user(login_user):
 
 
 @pytest.fixture
+def create_user():
+    """Create accounts with any combination of ``is_staff``/``is_superuser``
+    and the password ``login_user`` expects."""
+
+    def create(username, is_staff=False, is_superuser=False, **kwargs):
+        user = get_user_model().objects.create(
+            username=username, is_staff=is_staff, is_superuser=is_superuser, **kwargs
+        )
+        user.set_password("test_password")
+        user.save()
+        return user
+
+    return create
+
+
+@pytest.fixture
+def superuser(create_user):
+    return create_user("super_user", is_staff=True, is_superuser=True)
+
+
+@pytest.fixture
 def logged_in_client(login_user, client, user):
     login_user(client, user)
+    return client
+
+
+@pytest.fixture
+def superuser_client(login_user, client, superuser):
+    login_user(client, superuser)
     return client
 
 

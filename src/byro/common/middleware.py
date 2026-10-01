@@ -1,9 +1,12 @@
 from django.conf import settings
+from django.contrib import messages
 from django.shortcuts import redirect, reverse
 from django.urls import resolve
 from django.utils import translation
+from django.utils.translation import gettext as _
 
 from byro.common.models.configuration import Configuration
+from byro.common.permissions import has_backend_access, log_out
 from byro.common.signals import unauthenticated_urls
 
 
@@ -72,14 +75,17 @@ class PermissionMiddleware:
     def __call__(self, request):
         url = resolve(request.path_info)
 
-        allow = True
-
-        if request.user.is_anonymous and not url_allows_unauthenticated(
+        if has_backend_access(request.user) or url_allows_unauthenticated(
             request, url, sender=self
         ):
-            allow = False
-
-        if not allow:
-            return redirect(reverse("common:login") + f"?next={request.path}")
-        else:
             return self.get_response(request)
+
+        if request.user.is_authenticated:
+            # The account lost its backend access (neither staff nor
+            # superuser any more) while it was logged in.
+            log_out(request)
+            messages.error(
+                request, _("This account does not have access to the backend.")
+            )
+            return redirect("common:login")
+        return redirect(reverse("common:login") + f"?next={request.path}")

@@ -59,8 +59,11 @@ $ docker compose run --rm manage changepassword <username>
 $ python -m byro changepassword <username>
 ```
 
-If no administrator account is left at all, create a new one the same way
-with `createsuperuser`. For an MFA-related lockout (lost device), see
+If no superuser account is left at all, create a new one the same way with
+`createsuperuser`; the new account is staff and superuser and can restore
+the permissions of the other accounts under "Settings → Users" (see
+[Permission model](users-and-login.md#permission-model)). For an MFA-related
+lockout (lost device), see
 `mfa_reset` in
 [Resetting the MFA of a user](mfa.md#resetting-the-mfa-of-a-user-break-glass-recovery).
 

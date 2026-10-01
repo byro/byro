@@ -27,6 +27,14 @@ If you want your Plugin to appear in the "Finance" or "Settings" submenu in the
 side bar, please set ``section`` in your return dict to either ``finance`` or
 ``settings``, and don't set an ``icon``.
 
+The "Settings" submenu is only shown to superusers. An entry with ``section``
+set to ``settings`` therefore marks an administrative function, and the views
+behind it must enforce that themselves with
+``byro.common.permissions.SuperuserRequiredMixin`` (or the
+``superuser_required`` decorator). Hiding the navigation entry is not an access
+control: byro does not know which views belong to your entry and cannot
+protect them for you.
+
 May return an iterable of multiple dictionaries as described above.
 """
 
