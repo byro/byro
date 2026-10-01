@@ -1,5 +1,4 @@
 import pytest
-from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.urls import reverse
 
@@ -33,14 +32,14 @@ def test_policy_is_disabled_by_default(configuration):
 
 
 @pytest.mark.django_db
-def test_policy_can_be_changed_on_settings_page(logged_in_client, configuration):
-    response = logged_in_client.get(reverse("office:settings.base"))
+def test_policy_can_be_changed_on_settings_page(superuser_client, configuration):
+    response = superuser_client.get(reverse("office:settings.base"))
     assert response.status_code == 200
     content = response.content.decode()
     assert "MFA policy" in content
     assert 'name="MFAConfiguration-policy"' in content
     # heading in the label column next to the checkbox
-    assert "Required for all administrators except OIDC logins" in content
+    assert "Required for all backend users except OIDC logins" in content
     assert 'name="MFAConfiguration-issuer"' not in content
     assert 'name="MFAConfiguration-account_label"' in content
     assert 'value="{association} - {username}"' in content
@@ -53,7 +52,7 @@ def test_policy_can_be_changed_on_settings_page(logged_in_client, configuration)
         "MFAConfiguration-policy": MFAConfiguration.Policy.REQUIRED,
         "MFAConfiguration-account_label": "{username} ({email})",
     }
-    response = logged_in_client.post(reverse("office:settings.base"), data)
+    response = superuser_client.post(reverse("office:settings.base"), data)
     assert response.status_code == 302
     config = MFAConfiguration.get_solo()
     assert config.policy == MFAConfiguration.Policy.REQUIRED
@@ -68,7 +67,7 @@ def test_policy_can_be_changed_on_settings_page(logged_in_client, configuration)
 
 
 @pytest.mark.django_db
-def test_settings_page_rejects_unknown_placeholder(logged_in_client, configuration):
+def test_settings_page_rejects_unknown_placeholder(superuser_client, configuration):
     data = {
         **SETTINGS_POST_DATA,
         "Configuration-name": configuration.name,
@@ -76,14 +75,14 @@ def test_settings_page_rejects_unknown_placeholder(logged_in_client, configurati
         "Configuration-backoffice_mail": configuration.backoffice_mail,
         "MFAConfiguration-account_label": "{username} {typo}",
     }
-    response = logged_in_client.post(reverse("office:settings.base"), data)
+    response = superuser_client.post(reverse("office:settings.base"), data)
     assert response.status_code == 200
     assert "Unknown placeholder" in response.content.decode()
     assert MFAConfiguration.get_solo().account_label == "{association} - {username}"
 
 
 @pytest.mark.django_db
-def test_settings_page_rejects_colons(logged_in_client, configuration):
+def test_settings_page_rejects_colons(superuser_client, configuration):
     data = {
         **SETTINGS_POST_DATA,
         "Configuration-name": configuration.name,
@@ -91,7 +90,7 @@ def test_settings_page_rejects_colons(logged_in_client, configuration):
         "Configuration-backoffice_mail": configuration.backoffice_mail,
         "MFAConfiguration-account_label": "BYRO: {username}",
     }
-    response = logged_in_client.post(reverse("office:settings.base"), data)
+    response = superuser_client.post(reverse("office:settings.base"), data)
     assert response.status_code == 200
     assert "Colons are not allowed" in response.content.decode()
     assert MFAConfiguration.get_solo().account_label == "{association} - {username}"
@@ -138,7 +137,7 @@ def test_policy_enrollment_grants_access(
     response = client.get(reverse("mfa:setup") + "?next=/members/list")
     assert response.status_code == 200
     content = response.content.decode()
-    assert "required for all administrators" in content
+    assert "required for all backend users" in content
     # reduced navigation while locked
     assert reverse("office:members.list") not in content.replace(
         'value="/members/list"', ""
@@ -189,18 +188,32 @@ def test_policy_user_with_mfa_gets_challenge(
 
 
 @pytest.mark.django_db
-def test_policy_applies_to_every_backend_user(client, mfa_policy, login_user):
-    # byro's office does not use the staff flag; every user who can log in
-    # has full access, so every user is covered by the policy.
-    plain = get_user_model().objects.create(
-        username="plain_user", is_staff=False, is_superuser=False
+@pytest.mark.parametrize(
+    "is_staff,is_superuser", ((True, False), (False, True), (True, True))
+)
+def test_policy_applies_to_every_backend_user(
+    client, mfa_policy, login_user, create_user, is_staff, is_superuser
+):
+    # The policy covers everybody with backend access, staff as well as
+    # superusers, not only the administrators among them.
+    backend_user = create_user(
+        "backend_user", is_staff=is_staff, is_superuser=is_superuser
     )
-    plain.set_password("test_password")
-    plain.save()
-    login_user(client, plain)
+    login_user(client, backend_user)
     response = client.get(reverse("office:dashboard"))
     assert response.status_code == 302
     assert response.url.startswith(reverse("mfa:setup"))
+
+
+@pytest.mark.django_db
+def test_account_without_backend_access_never_reaches_the_policy(
+    client, mfa_policy, login_user, create_user
+):
+    plain = create_user("plain_user")
+    login_user(client, plain)
+    response = client.get(reverse("office:dashboard"))
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("common:login"))
 
 
 @pytest.mark.django_db

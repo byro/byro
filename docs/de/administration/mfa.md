@@ -12,7 +12,7 @@ Authenticator-App funktioniert, zum Beispiel Aegis, Google Authenticator,
 Microsoft Authenticator, 1Password oder Bitwarden.
 
 MFA ist **standardmäßig optional**: Jeder Backend-Benutzer kann sie für sein
-eigenes Konto aktivieren. Administratoren können sie zusätzlich für jeden
+eigenes Konto aktivieren. Superuser können sie zusätzlich für jeden
 Benutzer vorschreiben, der sich am Backend anmelden kann, und dabei optional
 der MFA-Durchsetzung des OIDC-Identity-Providers vertrauen.
 
@@ -25,12 +25,11 @@ MFA betrifft nur die interaktive Anmeldung am Backend. Sie ändert nichts an
   eine MFA-Seite umgeleitet.
 
 !!! note
-    byro gewährt jedem aktiven Benutzerkonto Zugriff auf das gesamte Backend;
-    es gibt keine abgestuften Rollen für das Office (siehe
-    [Benutzer und Login](users-and-login.md)). Das Feld `is_staff` existiert,
-    steuert aber nur den Zugriff auf die REST-API, nicht auf das Office
-    selbst. Die MFA-Richtlinie gilt deshalb für *jeden* Benutzer, der sich am
-    Office anmelden kann, unabhängig von `is_staff`.
+    Die MFA-Richtlinie gilt für *jedes* Konto, das sich am Office anmelden
+    kann: für Staff-Konten ebenso wie für Superuser (siehe
+    [Berechtigungsmodell](users-and-login.md#berechtigungsmodell)). Sie ist
+    nicht auf Superuser beschränkt. Die Richtlinie zu ändern gehört zu den
+    allgemeinen Einstellungen und ist damit Superusern vorbehalten.
 
 ## MFA-Richtlinie wählen
 
@@ -38,9 +37,9 @@ Unter *Einstellungen → Allgemein* findest du die Karte
 *Mehr-Faktor-Authentifizierung* mit diesen Richtlinien:
 
 - **Optional** (Standard): Benutzer können MFA selbst einrichten.
-- **Für alle Administratoren erforderlich**: Jede Backend-Anmeldung muss die
+- **Für alle Backend-Benutzer erforderlich**: Jede Backend-Anmeldung muss die
   byro-TOTP-Einrichtung und -Prüfung durchlaufen.
-- **Für alle Administratoren erforderlich, außer bei OIDC-Anmeldungen**:
+- **Für alle Backend-Benutzer erforderlich, außer bei OIDC-Anmeldungen**:
   Passwort-Anmeldungen folgen derselben Pflicht; eine per OIDC authentifizierte
   Sitzung ohne persönlichen Authenticator wird nicht zur byro-MFA-Einrichtung
   geschickt.

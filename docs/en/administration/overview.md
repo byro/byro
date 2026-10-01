@@ -4,7 +4,8 @@ This section covers what you set up *inside* a running byro installation,
 through the Office - regardless of how or where byro is hosted.
 
 - [Users and login](users-and-login.md): creating and editing accounts,
-  password and OIDC/SSO login, what `is_staff`/`is_superuser` actually mean.
+  password and OIDC/SSO login, the permission model behind `is_staff` and
+  `is_superuser`.
 - [Multi-factor authentication (MFA)](mfa.md): requiring the policy for all
   accounts, checking status, recovery and the management commands (personal
   setup is in the [user guide](../usage/mfa.md)).

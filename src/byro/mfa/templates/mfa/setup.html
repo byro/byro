@@ -8,7 +8,7 @@
 {% block content %}
     {% if request.mfa_locked %}
         <div class="alert alert-info">
-            {% trans "Multi-factor authentication is required for all administrators of this byro installation. Please set it up to continue." %}
+            {% trans "Multi-factor authentication is required for all backend users of this byro installation. Please set it up to continue." %}
         </div>
     {% endif %}
     <div class="row">

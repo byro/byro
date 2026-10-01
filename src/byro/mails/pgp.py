@@ -214,21 +214,31 @@ def import_member_key(member, fingerprint, source):
     return key
 
 
-def get_dashboard_warnings():
+def get_dashboard_warnings(link_to_settings=True):
+    """Collect PGP related warnings for the dashboard.
+
+    The signing key is configured in the general settings, which only
+    superusers may open. Pass ``link_to_settings=False`` for everybody else:
+    they still see the warning, but with a hint instead of a link.
+    """
     from byro.mails.models import MemberPGPKey, PGPConfiguration, PGPKeyStatus
 
     config = PGPConfiguration.get_solo()
     warnings = []
 
     if config.signing_enabled and not config.signing_key_fingerprint:
-        warnings.append(
-            {
-                "level": "danger",
-                "title": _("PGP signing incomplete"),
-                "lines": [_("Signing is enabled, but no signing key is configured.")],
-                "url": reverse("office:settings.base"),
-            }
-        )
+        warning = {
+            "level": "danger",
+            "title": _("PGP signing incomplete"),
+            "lines": [_("Signing is enabled, but no signing key is configured.")],
+        }
+        if link_to_settings:
+            warning["url"] = reverse("office:settings.base")
+        else:
+            warning["lines"].append(
+                _("Please ask a superuser to configure it in the settings.")
+            )
+        warnings.append(warning)
 
     problematic_keys = MemberPGPKey.objects.filter(
         is_active=True,

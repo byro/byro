@@ -61,7 +61,7 @@ recovery codes stop working immediately.
 current authenticator code. This removes the authenticator and all recovery
 codes; afterwards the account is protected by the password only.
 
-If MFA is required for all administrators, this option is not available.
+If MFA is required for all backend users, this option is not available.
 
 ## Lost authenticator and no recovery codes left
 

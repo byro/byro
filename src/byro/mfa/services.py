@@ -19,6 +19,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp import login as otp_login
 
 from byro.common.models import LogEntry
+from byro.common.permissions import has_backend_access
 from byro.mfa.encryption import SecretDecryptionError
 from byro.mfa.models import MFAConfiguration, RecoveryCode, TOTPDevice
 
@@ -82,10 +83,10 @@ def policy_requires_mfa(oidc_login=False):
 
 
 def is_backend_user(user):
-    """byro grants office access to every authenticated, active Django user
-    (see ``PermissionMiddleware``); there is no separate staff flag for the
-    backend. The MFA policy therefore applies to exactly these users."""
-    return bool(getattr(user, "is_authenticated", False) and user.is_active)
+    """The MFA policy applies to exactly the accounts that may use the
+    backend: active staff users and superusers. The single definition of
+    that lives in :func:`byro.common.permissions.has_backend_access`."""
+    return has_backend_access(user)
 
 
 def mfa_required_for(user, oidc_login=False):

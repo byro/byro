@@ -6,11 +6,18 @@ the Office. User accounts and login have their own page:
 MFA setup are not part of "Settings" - they are reachable from your user
 menu instead, see [My account](../usage/account.md) in the user guide.
 
+The "Settings" menu sits below "Mails" in the sidebar and is **only shown to
+superusers**. Staff accounts neither see it nor can they open its pages
+directly (see [Permission model](users-and-login.md#permission-model)).
+Sections that are restricted this way are marked **superuser only** below.
+"About" is a separate sidebar entry right below it and available to every
+account.
+
 ## Initial setup
 
-Right after installation (and for every account, as long as the required
-fields are missing, see [First login](users-and-login.md#first-login)), byro
-asks for three things:
+**Superuser only.** Right after installation, as long as the required fields
+are missing (see [First login](users-and-login.md#first-login)), byro asks a
+superuser for three things:
 
 - **Association name**,
 - **sender address** for mail byro sends on the association's behalf,
@@ -21,9 +28,9 @@ the rest of the Office becomes usable.
 
 ## General
 
-The general settings (`settings/`) combine several forms on one page: the
-association configuration itself plus, where installed, PGP (see
-[PGP email encryption](pgp.md)) and configuration models plugins contribute
+**Superuser only.** The general settings (`settings/`) combine several forms
+on one page: the association configuration itself plus, where installed, PGP
+(see [PGP email encryption](pgp.md)) and configuration models plugins contribute
 through `ByroConfiguration` (see
 [Custom member data](../development/plugins/member-data.md)) - each plugin
 can add its own section to this page this way.
@@ -55,8 +62,8 @@ secrets) from this logging.
 
 ## Registration form
 
-Under "Settings → Registration form" you decide which fields are asked for
-when a new member is created: member and membership fields, every field
+**Superuser only.** Under "Settings → Registration form" you decide which
+fields are asked for when a new member is created: member and membership fields, every field
 installed profile plugins contribute (for example `byro.plugins.profile`),
 plus the PGP fingerprint entry. For each field you can set:
 
@@ -74,16 +81,19 @@ name, address, e-mail, fee start, interval, amount).
 
 ## About byro
 
-Shows the installed byro version and the loaded plugins with their metadata
-(name, version, description).
+The sidebar entry "About", directly below "Settings", shows the installed
+byro version and the loaded plugins with their metadata (name, version,
+description). It is available to every account with access to the Office,
+not only to superusers.
 
 ## Audit log
 
-"Settings → Log" shows the most recent audit log entries: who changed what,
-when (member changes, settings, logins, plugin events, …). Every entry is
+**Superuser only.** "Settings → Log" shows the most recent audit log entries:
+who changed what, when (member changes, settings, logins, plugin events, …). Every entry is
 part of a **cryptographically chained hash chain** (each entry references
 the previous one through a hash); entries can neither be deleted nor
-modified afterwards through the application. `/log/info` shows the current
+modified afterwards through the application. The "Log" tab of a single
+member stays available to staff. `/log/info` shows the current
 chain head without requiring a login - an external party can use it to check
 whether a copy of the chain they hold still matches the current state,
 without signing in.

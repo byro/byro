@@ -2,17 +2,20 @@
 
 Your user menu (your username in the top right of the Office) bundles three
 actions for your **own** account - unlike "Settings → Users" in
-[Configuration](../administration/overview.md), where accounts are managed
-(including other people's, as long as you are signed in, see the security
-notes there).
+[Configuration](../administration/overview.md), where superusers manage all
+accounts (see
+[Permission model](../administration/users-and-login.md#permission-model)).
 
 ## Editing your own profile
 
-*User menu → My profile* opens the same edit form used to manage other
-accounts (username, name, e-mail address, `is_staff`/`is_superuser`). The
-same restriction applies as there: **every save requires a new password**,
-even if you only want to change your name or e-mail address. Details and
-background:
+*User menu → My profile* opens the edit form for your own account
+(username, name, e-mail address). Every account with access to the Office can
+use it. The fields for staff and superuser status are only shown to
+superusers, so a staff account cannot change its own permissions here. A
+superuser can change their own staff status, but not remove their own
+superuser status. The same restriction applies as in user management:
+**every save requires a new password**, even if you only want to change your
+name or e-mail address. Details and background:
 [Managing user accounts](../administration/users-and-login.md#managing-user-accounts).
 
 ## Multi-factor authentication
@@ -24,7 +27,7 @@ account. Its own page: [MFA](mfa.md).
 
 *User menu → API token* shows your personal token for the
 [REST API](../development/api.md); *Regenerate* deletes the old one and
-creates a new one. The token only works while your account is `is_staff`
-(see
-[Managing user accounts](../administration/users-and-login.md#managing-user-accounts));
-without `is_staff` it can still be displayed, but the API rejects it.
+creates a new one. The token only works while your account is staff or
+superuser (see
+[Permission model](../administration/users-and-login.md#permission-model));
+without either flag the API rejects it.

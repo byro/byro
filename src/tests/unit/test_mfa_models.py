@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django_otp.oath import TOTP
 
+from byro.common.permissions import has_backend_access
 from byro.mfa import services
 from byro.mfa.encryption import SecretDecryptionError, decrypt_secret, encrypt_secret
 from byro.mfa.models import (
@@ -288,6 +289,37 @@ def test_backend_user_and_policy(user, configuration):
 
     user.is_active = False
     assert not services.is_backend_user(user)
+
+
+@pytest.mark.parametrize(
+    "is_staff,is_superuser,backend",
+    (
+        (False, False, False),
+        (True, False, True),
+        (False, True, True),
+        (True, True, True),
+    ),
+)
+@pytest.mark.django_db
+def test_mfa_uses_the_central_backend_access_definition(
+    create_user, configuration, is_staff, is_superuser, backend
+):
+    account = create_user("someone", is_staff=is_staff, is_superuser=is_superuser)
+    assert services.is_backend_user(account) is backend
+    assert services.is_backend_user(account) is has_backend_access(account)
+
+    # an authenticator the account set up itself
+    device = TOTPDevice.create_pending(account)
+    device.confirmed = True
+    device.save()
+    assert services.mfa_required_for(account) is backend
+
+    # the global policy
+    device.delete()
+    config = MFAConfiguration.get_solo()
+    config.policy = MFAConfiguration.Policy.REQUIRED
+    config.save()
+    assert services.mfa_required_for(account) is backend
 
 
 @pytest.mark.django_db

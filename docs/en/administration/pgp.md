@@ -160,4 +160,7 @@ users can review and send them through the normal mail workflow.
 
 The office dashboard shows PGP warnings for incomplete signing configuration,
 active member keys that are invalid, revoked, or expired, soon-expiring keys,
-and keyserver import or refresh errors.
+and keyserver import or refresh errors. Every account sees these warnings.
+The warning about incomplete signing configuration links to the general
+settings for superusers only; staff accounts see a hint to ask a superuser
+instead, because they cannot open the settings.

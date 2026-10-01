@@ -7,11 +7,19 @@ und deine eigene MFA-Einrichtung sind kein Teil von „Einstellungen“, sondern
 über dein Benutzermenü erreichbar – siehe
 [Mein Konto](../usage/account.md) im Benutzerhandbuch.
 
+Das Menü „Einstellungen“ steht in der Seitenleiste unter „Mails“ und wird
+**nur Superusern angezeigt**. Staff-Konten sehen es nicht und können seine
+Seiten auch nicht direkt aufrufen (siehe
+[Berechtigungsmodell](users-and-login.md#berechtigungsmodell)). Abschnitte,
+für die das gilt, sind unten mit **nur Superuser** gekennzeichnet. „Über“ ist
+ein eigener Eintrag der Seitenleiste direkt darunter und steht jedem Konto
+offen.
+
 ## Ersteinrichtung
 
-Direkt nach der Installation (und für jedes Konto, solange die Pflichtfelder
-fehlen, siehe [Erstlogin](users-and-login.md#erstlogin)) fragt byro drei
-Angaben ab:
+**Nur Superuser.** Direkt nach der Installation, solange die Pflichtfelder
+fehlen (siehe [Erstlogin](users-and-login.md#erstlogin)), fragt byro einen
+Superuser nach drei Angaben:
 
 - **Vereinsname**,
 - **Absenderadresse** für Mails, die byro im Namen des Vereins verschickt,
@@ -22,8 +30,8 @@ unten) und der Rest des Office wird nutzbar.
 
 ## Allgemein
 
-Die allgemeinen Einstellungen (`settings/`) fassen mehrere Formulare auf einer
-Seite zusammen: die eigentliche Vereinskonfiguration sowie, sofern
+**Nur Superuser.** Die allgemeinen Einstellungen (`settings/`) fassen mehrere
+Formulare auf einer Seite zusammen: die eigentliche Vereinskonfiguration sowie, sofern
 installiert, PGP (siehe [PGP-Mailverschlüsselung](pgp.md)) und
 Konfigurationsmodelle, die Plugins über `ByroConfiguration` beisteuern (siehe
 [Eigene Mitgliedsdaten](../development/plugins/member-data.md)) – jedes Plugin
@@ -58,8 +66,8 @@ im Audit-Log festgehalten (siehe unten); Formulare können einzelne Felder
 
 ## Registrierungsformular
 
-Unter „Einstellungen → Registrierungsformular“ legst du fest, welche Felder
-beim Anlegen eines neuen Mitglieds abgefragt werden: Mitglieds- und
+**Nur Superuser.** Unter „Einstellungen → Registrierungsformular“ legst du
+fest, welche Felder beim Anlegen eines neuen Mitglieds abgefragt werden: Mitglieds- und
 Mitgliedschaftsfelder sowie alle Felder, die installierte Profil-Plugins
 beisteuern (zum Beispiel `byro.plugins.profile`), dazu die PGP-Fingerabdruck-
 Angabe. Für jedes Feld lässt sich einstellen:
@@ -77,17 +85,20 @@ Ohne gespeicherte Konfiguration zeigt byro eine sinnvolle Vorbelegung
 
 ## Über byro
 
-Zeigt die installierte byro-Version und die geladenen Plugins mit ihren
-Metadaten (Name, Version, Beschreibung).
+Der Eintrag „Über“ in der Seitenleiste, direkt unter „Einstellungen“, zeigt
+die installierte byro-Version und die geladenen Plugins mit ihren Metadaten
+(Name, Version, Beschreibung). Er steht jedem Konto mit Zugriff auf das Office
+offen, nicht nur Superusern.
 
 ## Audit-Log
 
-„Einstellungen → Log“ zeigt die letzten Einträge des Audit-Logs: wer was
-wann geändert hat (Mitgliederänderungen, Einstellungen, Logins, Plugin-
+**Nur Superuser.** „Einstellungen → Log“ zeigt die letzten Einträge des
+Audit-Logs: wer was wann geändert hat (Mitgliederänderungen, Einstellungen, Logins, Plugin-
 Ereignisse, …). Jeder Eintrag ist Teil einer **kryptografisch verketteten
 Hash-Kette** (jeder Eintrag verweist über einen Hash auf den vorherigen);
 Einträge lassen sich über die Anwendung weder löschen noch nachträglich
-ändern. `/log/info` zeigt unauthentifiziert den aktuellen Kettenkopf – eine
+ändern. Der Reiter „Log“ am einzelnen Mitglied bleibt für Staff erreichbar.
+`/log/info` zeigt unauthentifiziert den aktuellen Kettenkopf – eine
 externe Partei kann so ohne Login prüfen, ob eine ihr vorliegende Kopie der
 Kette noch mit dem aktuellen Stand übereinstimmt.
 

@@ -77,9 +77,9 @@ class MFAConfiguration(ByroConfiguration):
 
     class Policy(models.TextChoices):
         OPTIONAL = "optional", _("Optional")
-        REQUIRED = "required", _("Required for all administrators")
+        REQUIRED = "required", _("Required for all backend users")
         REQUIRED_EXCEPT_OIDC = "required_except_oidc", _(
-            "Required for all administrators except OIDC logins"
+            "Required for all backend users except OIDC logins"
         )
 
     policy = models.CharField(

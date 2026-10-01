@@ -169,7 +169,11 @@ def get_or_create_user(claims, access_token):
             f"No local account for '{username}' and auto-creation is disabled"
         )
 
-    user = User.objects.create_user(username=username)
+    # A provisioned account gets regular backend access once, when it is
+    # created. Existing accounts are never changed by an OIDC login.
+    user = User.objects.create_user(
+        username=username, is_staff=True, is_superuser=False
+    )
     user.set_unusable_password()
     user.save()
     return user

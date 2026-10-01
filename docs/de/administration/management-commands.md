@@ -32,7 +32,8 @@ Die folgenden Beispiele zeigen die byroctl-Form; ersetze sie nach Bedarf.
 
 ## Kontoverwaltung
 
-* `createsuperuser` – legt ein neues Administratorkonto an (Django-Standard).
+* `createsuperuser` – legt ein neues Superuser-Konto an, bei dem `is_staff`
+  und `is_superuser` gesetzt sind (Django-Standard).
 * `changepassword <benutzername>` – setzt das Passwort eines bestehenden
   Kontos zurück (Django-Standard). byro hat keinen Self-Service-Passwort-Reset;
   das ist der Weg, ein ausgesperrtes Administratorkonto wiederherzustellen

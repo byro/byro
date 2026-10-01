@@ -90,6 +90,11 @@ def newsletter_sidebar(sender, **kwargs):
     }
 ```
 
+Setzt du `'section': 'settings'`, um den Eintrag in das Untermenü
+„Einstellungen“ zu hängen, wird er nur Superusern angezeigt, und dein Plugin
+muss die View selbst auf Superuser beschränken: siehe
+[Einträge unter Einstellungen sind nur für Superuser](../signals.md#eintrage-unter-einstellungen-sind-nur-fur-superuser).
+
 ## Dein Plugin konfigurieren
 
 Willst du eigene Konfigurationsoptionen anbieten (zum Beispiel Name oder

@@ -156,18 +156,22 @@ variant trusts the identity provider to enforce MFA for OIDC sessions; see
 
 - When set, the `groups` claim (a string or a list) in the ID token or
   userinfo response must contain this value, or sign-in fails. **This only
-  controls who may sign in at all - not what the account can do inside the
-  Office afterwards** (see the security consequences under
-  [Users and login](../administration/users-and-login.md)).
+  controls who may sign in through OIDC at all - not what the account can do
+  inside the Office afterwards.** Despite its name, the option makes nobody a
+  superuser; permissions come from the flags of the local account (see
+  [Permission model](../administration/users-and-login.md#permission-model)).
 - **Environment variable:** `BYRO_OIDC_ADMIN_GROUP`
 - **Default:** `''` (no group check, every successful OIDC login is accepted)
 
 ### `auto_create_account`
 
 - Automatically creates a new, passwordless byro account when the OIDC
-  username (see `username_field`) does not match an existing account yet. If
-  `False`, sign-in fails for unknown usernames even if `admin_group` is
-  satisfied.
+  username (see `username_field`) does not match an existing account yet. The
+  account is created once with `is_staff=True` and `is_superuser=False`:
+  regular access to the Office and the API, no administrative access. Later
+  logins never change these flags, there is no synchronization from OIDC
+  groups. If `False`, sign-in fails for unknown usernames even if
+  `admin_group` is satisfied.
 - **Environment variable:** `BYRO_OIDC_AUTO_CREATE_ACCOUNT`
 - **Default:** `False`
 

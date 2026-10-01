@@ -65,9 +65,11 @@ $ docker compose run --rm manage changepassword <benutzername>
 $ python -m byro changepassword <benutzername>
 ```
 
-Existiert noch kein Administratorkonto mehr, lege mit `createsuperuser` (auf
-demselben Weg) ein neues an. Für einen MFA-bedingten Aussperr-Fall (Gerät
-verloren) siehe
+Existiert kein Superuser-Konto mehr, lege mit `createsuperuser` (auf
+demselben Weg) ein neues an; das neue Konto ist Staff und Superuser und kann
+die Rechte der übrigen Konten unter „Einstellungen → Benutzer“ wiederherstellen
+(siehe [Berechtigungsmodell](users-and-login.md#berechtigungsmodell)). Für
+einen MFA-bedingten Aussperr-Fall (Gerät verloren) siehe
 [MFA eines Benutzers zurücksetzen](mfa.md#mfa-eines-benutzers-zurucksetzen-notfallwiederherstellung).
 
 ## Häufige Probleme

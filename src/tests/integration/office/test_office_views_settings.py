@@ -13,9 +13,9 @@ def positions(*keys):
 
 @pytest.mark.django_db
 def test_registration_settings_preselect_default_fields(
-    configuration, logged_in_client
+    configuration, superuser_client
 ):
-    response = logged_in_client.get(reverse("office:settings.registration"))
+    response = superuser_client.get(reverse("office:settings.registration"))
     content = response.content.decode()
 
     assert response.status_code == 200
@@ -27,9 +27,9 @@ def test_registration_settings_preselect_default_fields(
 
 @pytest.mark.django_db
 def test_registration_settings_reject_missing_mandatory_fields(
-    configuration, logged_in_client
+    configuration, superuser_client
 ):
-    response = logged_in_client.post(
+    response = superuser_client.post(
         reverse("office:settings.registration"), positions("member__name")
     )
 
@@ -40,8 +40,8 @@ def test_registration_settings_reject_missing_mandatory_fields(
 
 
 @pytest.mark.django_db
-def test_registration_settings_save_mandatory_fields(configuration, logged_in_client):
-    response = logged_in_client.post(
+def test_registration_settings_save_mandatory_fields(configuration, superuser_client):
+    response = superuser_client.post(
         reverse("office:settings.registration"), positions(*DEFAULT_FIELDS)
     )
 
