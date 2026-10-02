@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 from byro.common import views as common_views
 from byro.common.models import LogEntry
-from byro.mfa.models import MFAConfiguration
+from byro.mfa.models import MFAConfiguration, RecoveryCode, TOTPDevice
 
 # -- member pages -----------------------------------------------------------
 
@@ -110,6 +110,66 @@ def test_api_ignores_unverified_browser_session(
 def test_api_schema_and_docs_stay_public(mfa_policy):
     assert APIClient().get(reverse("api:schema")).status_code == 200
     assert APIClient().get(reverse("api:swagger-ui")).status_code == 200
+
+
+def revoke_api_token_url(user):
+    return reverse("office:settings.users.revoke-api-token", kwargs={"pk": user.pk})
+
+
+@pytest.mark.django_db
+def test_superuser_cannot_revoke_api_tokens_before_the_mfa_step(
+    client, user, create_user, configuration, login_user
+):
+    superuser = create_user("root", is_staff=True, is_superuser=True)
+    device = TOTPDevice.create_pending(superuser)
+    device.confirmed = True
+    device.save()
+    key = Token.objects.create(user=user).key
+    # password accepted, second factor still missing
+    login_user(client, superuser)
+
+    response = client.post(revoke_api_token_url(user))
+
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("mfa:challenge"))
+    assert Token.objects.get(user=user).key == key
+    assert not LogEntry.objects.filter(
+        action_type="byro.common.user.api_token_revoked"
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_revoking_an_api_token_leaves_mfa_alone(
+    client,
+    mfa_user,
+    totp_device,
+    recovery_codes,
+    create_user,
+    configuration,
+    login_user,
+):
+    superuser = create_user("root", is_staff=True, is_superuser=True)
+    Token.objects.create(user=mfa_user)
+    login_user(client, superuser)
+
+    def mfa_state():
+        return (
+            list(TOTPDevice.objects.filter(user=mfa_user).values()),
+            list(RecoveryCode.objects.filter(user=mfa_user).order_by("pk").values()),
+        )
+
+    before = mfa_state()
+
+    response = client.post(revoke_api_token_url(mfa_user))
+
+    assert response.status_code == 302
+    assert response.url == reverse(
+        "office:settings.users.detail", kwargs={"pk": mfa_user.pk}
+    )
+    assert not Token.objects.filter(user=mfa_user).exists()
+    assert mfa_state() == before
+    assert len(before[0]) == 1 and before[0][0]["confirmed"]
+    assert RecoveryCode.objects.remaining_for(mfa_user) == 10
 
 
 # -- OIDC -------------------------------------------------------------------

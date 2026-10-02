@@ -2185,6 +2185,72 @@ msgstr ""
 "Das Passwort dieses Benutzers ist deaktiviert. Oben ein neues Passwort "
 "setzen, um die Passwortanmeldung wieder zu aktivieren."
 
+#: byro/office/templates/office/user/detail.html
+msgid "This user has an API token. The token itself is not shown here."
+msgstr ""
+"Dieser Benutzer hat einen API-Token. Der Token selbst wird hier nicht "
+"angezeigt."
+
+#: byro/office/templates/office/user/detail.html
+msgid ""
+"Revoke this user's API token? The current API token will stop working "
+"immediately. The user can obtain a new token from their API token page."
+msgstr ""
+"API-Token dieses Benutzers widerrufen? Der aktuelle API-Token funktioniert "
+"sofort nicht mehr. Der Benutzer kann sich auf seiner API-Token-Seite einen "
+"neuen Token holen."
+
+#: byro/office/templates/office/user/detail.html
+msgid "Revoke API token"
+msgstr "API-Token widerrufen"
+
+#: byro/office/templates/office/user/detail.html
+msgid ""
+"This user has no API token. A new one is created when the user opens their "
+"API token page."
+msgstr ""
+"Dieser Benutzer hat keinen API-Token. Ein neuer wird erzeugt, sobald der "
+"Benutzer seine API-Token-Seite öffnet."
+
+#: byro/office/views/users.py
+msgid "Use your own API token page to manage your token."
+msgstr "Verwalte deinen eigenen Token über deine API-Token-Seite."
+
+#: byro/office/views/users.py
+msgid "This user has no API token."
+msgstr "Dieser Benutzer hat keinen API-Token."
+
+#: byro/office/views/users.py
+msgid ""
+"The API token has been revoked and no longer works. The user can obtain a "
+"new token from their API token page."
+msgstr ""
+"Der API-Token wurde widerrufen und funktioniert nicht mehr. Der Benutzer "
+"kann sich auf seiner API-Token-Seite einen neuen Token holen."
+
+#: byro/office/views/users.py
+msgid ""
+"The API token has been revoked and no longer works, but the audit log entry "
+"could not be written. Please inform whoever operates this installation. The "
+"user can obtain a new token from their API token page."
+msgstr ""
+"Der API-Token wurde widerrufen und funktioniert nicht mehr, der Eintrag im "
+"Logbuch konnte aber nicht geschrieben werden. Bitte informiere die Person, "
+"die diese Installation betreibt. Der Benutzer kann sich auf seiner "
+"API-Token-Seite einen neuen Token holen."
+
+#: byro/common/templates/log_entry/byro.common.user.api_token_created.html:5
+msgid "API token created"
+msgstr "API-Token erzeugt"
+
+#: byro/common/templates/log_entry/byro.common.user.api_token_regenerated.html:5
+msgid "API token regenerated"
+msgstr "API-Token neu generiert"
+
+#: byro/common/templates/log_entry/byro.common.user.api_token_revoked.html:5
+msgid "API token revoked"
+msgstr "API-Token widerrufen"
+
 #: byro/office/templates/office/user/list.html:10
 msgid "Add new user"
 msgstr "Neuen Benutzer hinzufügen"

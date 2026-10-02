@@ -55,5 +55,24 @@
                 {% trans "This user's password is disabled. Set a new password above to re-enable password login." %}
             </p>
         {% endif %}
+        <hr>
+        {% if has_api_token %}
+            <p class="text-muted">
+                <span class="fa fa-key"></span>
+                {% trans "This user has an API token. The token itself is not shown here." %}
+            </p>
+            <form method="post" action="{% url 'office:settings.users.revoke-api-token' pk=user.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('{% trans "Revoke this user's API token? The current API token will stop working immediately. The user can obtain a new token from their API token page."|escapejs %}')">
+                    <span class="fa fa-key"></span> {% trans "Revoke API token" %}
+                </button>
+            </form>
+        {% else %}
+            <p class="text-muted">
+                <span class="fa fa-key"></span>
+                {% trans "This user has no API token. A new one is created when the user opens their API token page." %}
+            </p>
+        {% endif %}
     {% endif %}
 {% endblock %}

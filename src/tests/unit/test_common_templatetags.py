@@ -115,3 +115,35 @@ def test_oidc_permission_sync_is_rendered_readably(user):
     with translation.override("de"):
         rendered = format_log_entry(entry)
     assert "Rechte durch OIDC-Gruppensynchronisation geändert" in rendered
+
+
+@pytest.mark.parametrize(
+    "action,english,german",
+    (
+        ("api_token_created", "API token created", "API-Token erzeugt"),
+        ("api_token_regenerated", "API token regenerated", "API-Token neu generiert"),
+        ("api_token_revoked", "API token revoked", "API-Token widerrufen"),
+    ),
+)
+@pytest.mark.django_db
+def test_api_token_changes_are_rendered_readably(
+    user, create_user, action, english, german
+):
+    actor = create_user("root", is_superuser=True)
+    entry = LogEntry.objects.create(
+        content_object=user, user=actor, action_type=f"byro.common.user.{action}"
+    )
+
+    with translation.override("en"):
+        rendered = format_log_entry(entry)
+        source = format_log_source(entry)
+    assert english in rendered
+    # the affected account in the entry, the acting account as its source
+    assert user.username in rendered
+    assert source == '<span class="fa fa-user"></span> root'
+    # not just the technical action type of the default formatter
+    assert f"byro.common.user.{action}" not in rendered
+
+    with translation.override("de"):
+        rendered = format_log_entry(entry)
+    assert german in rendered

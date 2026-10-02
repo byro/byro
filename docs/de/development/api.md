@@ -27,6 +27,10 @@ Header `Authorization: Token <dein-token>`. Der Token funktioniert nur,
 solange das zugehörige Konto aktiv und Staff oder Superuser ist; dieselbe
 Regel entscheidet, wer sich am Office anmelden darf (siehe
 [Berechtigungsmodell](../administration/users-and-login.md#berechtigungsmodell)).
+Ein Token, den sein Konto erneuert oder den ein Superuser widerrufen hat
+(siehe
+[Benutzerkonten verwalten](../administration/users-and-login.md#benutzerkonten-verwalten)),
+wird von diesem Moment an mit `401` abgelehnt.
 Es gibt **keine feingranularen API-Berechtigungen**: Ein gültiger Token eines
 solchen Kontos hat vollen Zugriff auf alle API-Endpunkte. Für die Funktionen,
 die nur Superusern offenstehen (Einstellungen, Benutzerverwaltung, Log),

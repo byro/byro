@@ -2,11 +2,13 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, UpdateView, View
 
+from byro.common import api_tokens
 from byro.common.models import LogEntry
 from byro.common.permissions import (
     SuperuserRequiredMixin,
@@ -123,6 +125,13 @@ class UserDetailView(UpdateView):
         kwargs["request_user"] = self.request.user
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Only whether a token exists: the token itself is never part of the
+        # user management.
+        context["has_api_token"] = api_tokens.has_token(self.object)
+        return context
+
     def form_valid(self, form):
         LogEntry.objects.create(
             content_object=form.instance,
@@ -152,6 +161,46 @@ class UserPasswordDisableView(SuperuserRequiredMixin, View):
             action_type="byro.common.user.password_disabled",
         )
         messages.success(request, _("The user's password has been disabled."))
+        return redirect(reverse("office:settings.users.detail", kwargs={"pk": pk}))
+
+
+class UserApiTokenRevokeView(SuperuserRequiredMixin, View):
+    """Invalidate the API token of another account. The token itself is never
+    shown or replaced here: the account owner gets a new one on their own API
+    token page."""
+
+    def post(self, request, pk, *args, **kwargs):
+        if request.user.pk == pk:
+            messages.error(
+                request, _("Use your own API token page to manage your token.")
+            )
+            return redirect("office:settings.api-token")
+        user = get_object_or_404(User, pk=pk)
+        try:
+            result = api_tokens.revoke_token(user, actor=request.user)
+        except User.DoesNotExist as exc:
+            # removed between the lookup and the row lock
+            raise Http404 from exc
+        if not result.revoked:
+            messages.info(request, _("This user has no API token."))
+        elif result.audited:
+            messages.success(
+                request,
+                _(
+                    "The API token has been revoked and no longer works. The "
+                    "user can obtain a new token from their API token page."
+                ),
+            )
+        else:
+            messages.warning(
+                request,
+                _(
+                    "The API token has been revoked and no longer works, but the "
+                    "audit log entry could not be written. Please inform whoever "
+                    "operates this installation. The user can obtain a new token "
+                    "from their API token page."
+                ),
+            )
         return redirect(reverse("office:settings.users.detail", kwargs={"pk": pk}))
 
 

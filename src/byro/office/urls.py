@@ -53,6 +53,11 @@ urlpatterns = [
         users.UserPasswordDisableView.as_view(),
         name="settings.users.disable-password",
     ),
+    path(
+        "settings/users/<int:pk>/revoke-api-token",
+        users.UserApiTokenRevokeView.as_view(),
+        name="settings.users.revoke-api-token",
+    ),
     path("settings", settings.ConfigurationView.as_view(), name="settings.base"),
     path("", dashboard.DashboardView.as_view(), name="dashboard"),
     path(

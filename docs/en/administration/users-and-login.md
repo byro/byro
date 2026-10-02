@@ -289,10 +289,31 @@ afterwards (see the OIDC warning above about the interaction). It cannot be
 applied to your own account. To re-enable password sign-in, save the edit
 form with a new password.
 
+**Revoking an API token** (`settings/users/<pk>/revoke-api-token`): the page
+of another account shows whether that account has an
+[API token](../usage/account.md#api-token), never the token itself. "Revoke
+API token" deletes it. The token stops working immediately (the API answers
+with `401`) and no replacement is issued. Nothing else about the account
+changes: password, OIDC sign-in, MFA, sessions and permissions stay as they
+are. It cannot be applied to your own account; use your own API token page
+for that.
+
+Revoking is **not an API lock**. It invalidates the token issued so far, for
+example because it may have leaked. The owner of the account gets a new
+token the next time they open their API token page. To keep an account away
+from the API, remove `is_staff` and `is_superuser` (see
+[Permission model](#permission-model)).
+
+Every revocation is recorded in the audit log, without the token. If that
+entry cannot be written, the token stays revoked nevertheless: you see a
+warning instead of the confirmation, and the error is written to the
+application log.
+
 **There is no way to delete or deactivate an account** (set
-`is_active=False`) through the Office UI. "Disable password" is the only
-built-in way to restrict an account, and as described above only blocks
-password sign-in.
+`is_active=False`) through the Office UI. "Disable password" only blocks
+password sign-in, and "Revoke API token" only invalidates the token issued
+so far. To take away the access of an account, remove both `is_staff` and
+`is_superuser`.
 
 There is **no self-service password reset** and no invitation workflow for
 new accounts; a superuser creates every account themselves with an
@@ -322,3 +343,6 @@ account is a global setting, not per account: see
   lost its backend access is logged as a logout. Permissions changed by the
   OIDC group synchronization are logged with the old and new flags; the
   entry contains no claims or group names.
+- **API tokens:** creating, regenerating and revoking an API token is
+  logged with the affected account and the account that did it. The entries
+  never contain a token.
