@@ -304,10 +304,17 @@ token the next time they open their API token page. To keep an account away
 from the API, remove `is_staff` and `is_superuser` (see
 [Permission model](#permission-model)).
 
-Every revocation is recorded in the audit log, without the token. If that
-entry cannot be written, the token stays revoked nevertheless: you see a
-warning instead of the confirmation, and the error is written to the
-application log.
+Every revocation is recorded in the audit log, without the token. If only
+that entry cannot be written, the token stays revoked nevertheless: you see
+a warning instead of the confirmation, and the application log gets a line
+with the ids of the two accounts, never the token or an error message.
+
+If the revocation itself fails, for example because the database cannot
+store it, you get an error page. The outcome is then not confirmed: usually
+nothing was changed, but if the database was cut off while it stored the
+change, the token may be gone nevertheless. Open the page of the account
+again to see whether it still has a token, and revoke again if it does. The
+log of such an error contains no token either.
 
 **There is no way to delete or deactivate an account** (set
 `is_active=False`) through the Office UI. "Disable password" only blocks

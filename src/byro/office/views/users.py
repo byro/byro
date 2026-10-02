@@ -2,9 +2,11 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, UpdateView, View
 
@@ -164,10 +166,14 @@ class UserPasswordDisableView(SuperuserRequiredMixin, View):
         return redirect(reverse("office:settings.users.detail", kwargs={"pk": pk}))
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class UserApiTokenRevokeView(SuperuserRequiredMixin, View):
     """Invalidate the API token of another account. The token itself is never
     shown or replaced here: the account owner gets a new one on their own API
-    token page."""
+    token page.
+
+    The revocation commits on its own and refuses to run inside another
+    transaction, so this view stays outside of ``ATOMIC_REQUESTS``."""
 
     def post(self, request, pk, *args, **kwargs):
         if request.user.pk == pk:
@@ -178,9 +184,11 @@ class UserApiTokenRevokeView(SuperuserRequiredMixin, View):
         user = get_object_or_404(User, pk=pk)
         try:
             result = api_tokens.revoke_token(user, actor=request.user)
-        except User.DoesNotExist as exc:
+        except api_tokens.ApiTokenAccountMissing as exc:
             # removed between the lookup and the row lock
             raise Http404 from exc
+        # Any other failure is an error page: the revocation has no confirmed
+        # result, and the page of the account shows the state of its token.
         if not result.revoked:
             messages.info(request, _("This user has no API token."))
         elif result.audited:

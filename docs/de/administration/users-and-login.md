@@ -325,9 +325,18 @@ fernzuhalten, entferne `is_staff` und `is_superuser` (siehe
 [Berechtigungsmodell](#berechtigungsmodell)).
 
 Jeder Widerruf wird im Audit-Log festgehalten, ohne den Token. Lässt sich
-dieser Eintrag nicht schreiben, bleibt der Token trotzdem widerrufen: Du
-siehst statt der Bestätigung eine Warnung, und der Fehler landet im
-Anwendungslog.
+nur dieser Eintrag nicht schreiben, bleibt der Token trotzdem widerrufen: Du
+siehst statt der Bestätigung eine Warnung, und das Anwendungslog bekommt
+eine Zeile mit den IDs der beiden Konten, nie mit dem Token oder einer
+Fehlermeldung.
+
+Schlägt der Widerruf selbst fehl, zum Beispiel weil die Datenbank ihn nicht
+speichern kann, bekommst du eine Fehlerseite. Das Ergebnis ist dann nicht
+bestätigt: Meist wurde nichts geändert, aber wenn die Verbindung zur
+Datenbank beim Speichern abgebrochen ist, kann der Token trotzdem entfernt
+sein. Öffne die Seite des Kontos erneut, um zu sehen, ob es noch einen Token
+hat, und widerrufe ihn dann noch einmal. Auch das Log eines solchen Fehlers
+enthält keinen Token.
 
 **Es gibt keine Möglichkeit, ein Konto zu löschen oder zu deaktivieren**
 (`is_active=False` zu setzen) über die Office-Oberfläche. „Passwort

@@ -3,16 +3,22 @@ revoke the token of another account, and every change is recorded in the
 audit log without the token."""
 
 import json
+import logging
+import traceback
 
 import pytest
 from django.contrib.auth import get_user_model
 from django.contrib.messages import constants as message_levels
 from django.core.management import call_command
+from django.db import IntegrityError, OperationalError, connection, transaction
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.shortcuts import reverse
 from django.test import Client
+from django.urls import resolve
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+from byro.common import api_tokens
 from byro.common.models import LogEntry
 from byro.common.templatetags.log_entry import format_log_entry, format_log_source
 
@@ -58,6 +64,46 @@ def keys_of(user):
 
 def messages_of(response):
     return [(m.level, str(m)) for m in response.context["messages"]]
+
+
+@pytest.fixture
+def production_errors(settings, caplog):
+    """Uncaught exceptions are handled the way a deployment does it: Django
+    answers with an error page and logs the exception with its traceback to
+    ``django.request``. Returns a callable that checks what was logged."""
+    settings.DEBUG = False
+    settings.DEBUG_PROPAGATE_EXCEPTIONS = False
+    caplog.set_level(logging.DEBUG)
+
+    def assert_only_controlled_error_logged(response, error, *secrets):
+        assert response.status_code == 500
+        (record,) = [
+            r for r in caplog.records if r.name == "django.request" and r.exc_info
+        ]
+        exc = record.exc_info[1]
+        # what reached Django is the fixed error of the token service ...
+        assert type(exc) is error
+        assert exc.args == (error.message,)
+        # ... and nothing leads back to the exception that caused it
+        assert exc.__cause__ is None
+        assert exc.__context__ is None
+        rendered = "".join(traceback.format_exception(exc))
+        assert error.message in rendered
+        formatter = logging.Formatter("%(name)s %(message)s")
+        assert secrets
+        for secret in secrets:
+            assert secret not in response.content.decode()
+            assert secret not in rendered
+            assert secret not in caplog.text
+            for logged in caplog.records:
+                assert secret not in formatter.format(logged)
+                assert secret not in str(vars(logged))
+            # nor do the frames of the traceback hold it in a local variable
+            for frame, _ in traceback.walk_tb(exc.__traceback__):
+                if "/byro/" in frame.f_code.co_filename:
+                    assert secret not in repr(frame.f_locals)
+
+    return assert_only_controlled_error_logged
 
 
 @pytest.fixture
@@ -246,6 +292,124 @@ def test_token_stays_revoked_if_the_audit_entry_fails(
     assert not token_entries().exists()
 
 
+@pytest.mark.django_db(transaction=True)
+def test_failed_revocation_is_not_reported_as_done(
+    superuser_client, target, monkeypatch
+):
+    """The transaction cannot be committed: there is no confirmed result, so
+    the superuser gets an error instead of a success or warning message. The
+    page of the account shows what the state of the token is; here the
+    database refused the commit, so it is still there."""
+
+    real_commit = BaseDatabaseWrapper.commit
+    write_entry = api_tokens._write_revocation_entry
+    revoking = []
+
+    def write_entry_before_failing_commit(*args, **kwargs):
+        revoking.append(True)
+        return write_entry(*args, **kwargs)
+
+    def failing_commit(self):
+        # only the transaction of the revocation, not those of the middlewares
+        if revoking:
+            revoking.clear()
+            raise OperationalError("could not commit")
+        return real_commit(self)
+
+    monkeypatch.setattr(
+        api_tokens, "_write_revocation_entry", write_entry_before_failing_commit
+    )
+    monkeypatch.setattr(BaseDatabaseWrapper, "commit", failing_commit)
+
+    with pytest.raises(api_tokens.ApiTokenRevocationError):
+        superuser_client.post(revoke_url(target))
+
+    assert keys_of(target) == [target.key]
+    assert api_status(target.key) == 200
+    assert not token_entries().exists()
+    # the test client keeps the exception of the failed request
+    superuser_client.exc_info = None
+    response = superuser_client.get(detail_url(target))
+    assert messages_of(response) == []
+    assert response.context["has_api_token"] is True
+
+
+@pytest.mark.django_db
+def test_superuser_is_warned_if_the_audit_entry_is_rolled_back_silently(
+    superuser_client, target, monkeypatch
+):
+    """The entry is inserted, then its savepoint is marked for rollback
+    without an error. That must not count as a written audit entry."""
+    create_entry = LogEntry.objects.create
+    inserted = []
+
+    def create_and_mark_for_rollback(*args, **kwargs):
+        entry = create_entry(*args, **kwargs)
+        if kwargs["action_type"] == REVOKED:
+            inserted.append(LogEntry.objects.filter(pk=entry.pk).exists())
+            transaction.set_rollback(True)
+        return entry
+
+    monkeypatch.setattr(LogEntry.objects, "create", create_and_mark_for_rollback)
+
+    response = superuser_client.post(revoke_url(target), follow=True)
+
+    assert inserted == [True]
+    assert response.redirect_chain == [(detail_url(target), 302)]
+    assert [level for level, _ in messages_of(response)] == [message_levels.WARNING]
+    message = messages_of(response)[0][1]
+    assert "The API token has been revoked and no longer works" in message
+    assert "the audit log entry could not be written" in message
+    assert keys_of(target) == []
+    assert api_status(target.key) == 401
+    assert not token_entries().exists()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_request_log_of_a_failed_revocation_never_contains_the_token(
+    superuser_client, target, monkeypatch, production_errors
+):
+    """Every exception on the way quotes the token. Django logs what reaches
+    it with message and traceback, so only the fixed error of the token
+    service may reach it."""
+    key = target.key
+    create_entry = LogEntry.objects.create
+
+    def failing_create(*args, **kwargs):
+        if kwargs["action_type"] == REVOKED:
+            raise RuntimeError(f"cannot write the audit entry for {key}")
+        return create_entry(*args, **kwargs)
+
+    def broken_rollback(self, sid):
+        raise OperationalError(f"SAVEPOINT does not exist ({key})")
+
+    superuser_client.raise_request_exception = False
+    with monkeypatch.context() as patch:
+        patch.setattr(LogEntry.objects, "create", failing_create)
+        patch.setattr(BaseDatabaseWrapper, "savepoint_rollback", broken_rollback)
+        response = superuser_client.post(revoke_url(target))
+
+    production_errors(response, api_tokens.ApiTokenRevocationError, key)
+    assert not token_entries().exists()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_revocation_works_with_atomic_requests(superuser_client, target, monkeypatch):
+    """The revocation commits on its own and refuses to run in a transaction
+    of the caller, so the view must not be wrapped in one."""
+    monkeypatch.setitem(connection.settings_dict, "ATOMIC_REQUESTS", True)
+    view = resolve(revoke_url(target)).func
+    assert view._non_atomic_requests == {"default"}
+
+    response = superuser_client.post(revoke_url(target))
+
+    assert response.status_code == 302
+    assert response.url == detail_url(target)
+    assert keys_of(target) == []
+    assert api_status(target.key) == 401
+    assert actions() == [REVOKED]
+
+
 # -- nobody else can -----------------------------------------------------------
 
 
@@ -332,6 +496,25 @@ def test_user_detail_shows_token_state_without_the_token(superuser_client, targe
 
 
 @pytest.mark.django_db
+def test_user_detail_context_only_holds_the_token_state(superuser_client, target):
+    response = superuser_client.get(detail_url(target))
+
+    assert response.context["has_api_token"] is True
+    values = {}
+    for layer in response.context:
+        values.update(layer.flatten())
+    assert {"has_api_token", "user", "object", "form", "view"} <= set(values)
+    for name, value in values.items():
+        assert not isinstance(value, Token), name
+        assert target.key not in repr(value), name
+        assert target.key not in str(value), name
+    # the account object did not load its token either
+    for name in ("user", "object"):
+        assert values[name] == target
+        assert "auth_token" not in values[name]._state.fields_cache
+
+
+@pytest.mark.django_db
 def test_user_detail_without_token_offers_no_revocation(superuser_client, create_user):
     other = create_user("other", is_staff=True)
 
@@ -412,11 +595,63 @@ def test_own_token_survives_a_failed_regeneration(logged_in_client, user, monkey
 
     monkeypatch.setattr(Token.objects, "create", failing_create)
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(api_tokens.ApiTokenIssueError):
         logged_in_client.post(reverse(TOKEN_REGENERATE))
 
     assert keys_of(user) == [old]
     assert api_status(old) == 200
+    assert not token_entries().exists()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_request_log_of_a_failed_regeneration_never_contains_a_token(
+    logged_in_client, user, monkeypatch, production_errors
+):
+    """The replacement already exists in the transaction when the audit entry
+    fails, with an error that quotes the old and the new token."""
+    old = Token.objects.create(user=user).key
+    create_entry = LogEntry.objects.create
+    issued = []
+
+    def failing_create(*args, **kwargs):
+        if kwargs["action_type"] == REGENERATED:
+            issued.append(Token.objects.get(user=user).key)
+            raise IntegrityError(f"Key (key)=({issued[-1]}) replaces {old}")
+        return create_entry(*args, **kwargs)
+
+    monkeypatch.setattr(LogEntry.objects, "create", failing_create)
+    logged_in_client.raise_request_exception = False
+
+    response = logged_in_client.post(reverse(TOKEN_REGENERATE))
+
+    assert len(issued) == 1 and issued[0] != old
+    production_errors(response, api_tokens.ApiTokenIssueError, old, *issued)
+    assert keys_of(user) == [old]
+    assert api_status(old) == 200
+    assert not token_entries().exists()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_request_log_of_a_failed_first_visit_never_contains_the_token(
+    logged_in_client, user, monkeypatch, production_errors
+):
+    create_entry = LogEntry.objects.create
+    issued = []
+
+    def failing_create(*args, **kwargs):
+        if kwargs["action_type"] == CREATED:
+            issued.append(Token.objects.get(user=user).key)
+            raise RuntimeError(f"cannot write the audit entry for {issued[-1]}")
+        return create_entry(*args, **kwargs)
+
+    monkeypatch.setattr(LogEntry.objects, "create", failing_create)
+    logged_in_client.raise_request_exception = False
+
+    response = logged_in_client.get(reverse(TOKEN_PAGE))
+
+    assert len(issued) == 1
+    production_errors(response, api_tokens.ApiTokenIssueError, *issued)
+    assert keys_of(user) == []
     assert not token_entries().exists()
 
 
