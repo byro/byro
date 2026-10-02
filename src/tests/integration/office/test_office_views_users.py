@@ -78,6 +78,112 @@ def test_superuser_creates_users_with_any_flags(
     ).exists()
 
 
+@pytest.mark.parametrize("posted", ({}, {"password": ""}))
+@pytest.mark.django_db
+def test_creating_users_requires_a_password(superuser_client, superuser, posted):
+    response = superuser_client.post(
+        reverse("office:settings.users.add"),
+        {"username": "newbie", "is_staff": "on", **posted},
+    )
+
+    assert response.status_code == 200
+    assert "password" in response.context["form"].errors
+    assert not User.objects.filter(username="newbie").exists()
+    assert not LogEntry.objects.filter(
+        action_type="byro.common.user.created", user=superuser
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_password_is_only_required_for_new_users(superuser_client, user):
+    response = superuser_client.get(reverse("office:settings.users.add"))
+    assert response.context["form"].fields["password"].required
+    content = response.content.decode()
+    # keeps password managers from filling in the credentials of the editor
+    assert 'autocomplete="new-password"' in content
+    assert "Leave empty to leave the password unchanged." not in content
+
+    response = superuser_client.get(detail_url(user))
+    assert not response.context["form"].fields["password"].required
+    content = response.content.decode()
+    assert 'autocomplete="new-password"' in content
+    assert "Leave empty to leave the password unchanged." in content
+
+
+@pytest.mark.parametrize("posted", ({}, {"password": ""}))
+@pytest.mark.django_db
+def test_superuser_edits_user_without_changing_the_password(
+    superuser_client, superuser, user, posted
+):
+    password_hash = user.password
+
+    response = superuser_client.post(
+        detail_url(user),
+        {
+            "username": user.username,
+            "last_name": "New Name",
+            "email": "new@example.com",
+            "is_superuser": "on",
+            **posted,
+        },
+    )
+
+    assert response.status_code == 302
+    assert flags(user) == (False, True)
+    assert user.last_name == "New Name"
+    assert user.email == "new@example.com"
+    assert user.password == password_hash
+    assert user.check_password("test_password")
+    assert LogEntry.objects.filter(
+        action_type="byro.common.user.updated", user=superuser
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_superuser_sets_new_password_of_other_users(superuser_client, user):
+    password_hash = user.password
+
+    response = superuser_client.post(
+        detail_url(user),
+        {"username": user.username, "is_staff": "on", "password": "a-new-password"},
+    )
+
+    assert response.status_code == 302
+    user.refresh_from_db()
+    assert user.password != password_hash
+    assert user.check_password("a-new-password")
+    assert not user.check_password("test_password")
+
+
+@pytest.mark.django_db
+def test_disabled_password_stays_disabled_without_new_password(superuser_client, user):
+    user.set_unusable_password()
+    user.save()
+    password_hash = user.password
+
+    response = superuser_client.post(
+        detail_url(user),
+        {"username": user.username, "last_name": "New Name", "is_staff": "on"},
+    )
+
+    assert response.status_code == 302
+    user.refresh_from_db()
+    assert user.last_name == "New Name"
+    assert user.password == password_hash
+    assert not user.has_usable_password()
+
+    # entering a password is the documented way to re-enable password login
+    response = superuser_client.post(
+        detail_url(user),
+        {"username": user.username, "is_staff": "on", "password": "a-new-password"},
+    )
+
+    assert response.status_code == 302
+    user.refresh_from_db()
+    assert user.has_usable_password()
+    assert user.check_password("a-new-password")
+
+
 @pytest.mark.django_db
 def test_superuser_changes_flags_of_other_users(superuser_client, superuser, user):
     response = superuser_client.post(
@@ -200,6 +306,29 @@ def test_staff_edits_own_profile(logged_in_client, user):
     assert user.email == "new@example.com"
     assert user.check_password("another-password")
     assert flags(user) == (True, False)
+
+
+@pytest.mark.django_db
+def test_staff_edits_own_profile_without_changing_the_password(logged_in_client, user):
+    password_hash = user.password
+
+    response = logged_in_client.post(
+        detail_url(user),
+        {
+            "username": user.username,
+            "last_name": "New Name",
+            "email": "new@example.com",
+        },
+    )
+
+    assert response.status_code == 302
+    assert flags(user) == (True, False)
+    assert user.last_name == "New Name"
+    assert user.email == "new@example.com"
+    assert user.password == password_hash
+    assert user.check_password("test_password")
+    # the unchanged password keeps the own session alive
+    assert logged_in_client.get(detail_url(user)).status_code == 200
 
 
 @pytest.mark.django_db

@@ -13,10 +13,11 @@ Konto (Benutzername, Name, E-Mail-Adresse). Jedes Konto mit Zugriff auf das
 Office kann es nutzen. Die Felder für Staff- und Superuser-Status sehen nur
 Superuser; ein Staff-Konto kann seine eigenen Rechte hier also nicht ändern.
 Ein Superuser kann seinen eigenen Staff-Status ändern, sich den
-Superuser-Status aber nicht selbst entziehen. Es gilt dieselbe Einschränkung
-wie in der Benutzerverwaltung: **jedes Speichern verlangt ein neues
-Passwort**, auch wenn du nur deinen Namen oder deine E-Mail-Adresse ändern
-willst. Details und Hintergrund:
+Superuser-Status aber nicht selbst entziehen. Das Passwortfeld ist optional:
+**Lass es leer, um dein bisheriges Passwort zu behalten**, zum Beispiel wenn
+du nur deinen Namen oder deine E-Mail-Adresse ändern willst. Gibst du ein
+neues Passwort ein, ersetzt es das bisherige und du musst dich neu anmelden.
+Details und Hintergrund:
 [Benutzerkonten verwalten](../administration/users-and-login.md#benutzerkonten-verwalten).
 
 ## Mehr-Faktor-Authentifizierung

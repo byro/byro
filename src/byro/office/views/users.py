@@ -20,11 +20,21 @@ from byro.common.permissions import (
 
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+    password = forms.CharField(
+        label=_("Password"),
+        # Keeps browsers from filling in the saved password of the editor.
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )
 
     def __init__(self, *args, request_user, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["last_name"].label = _("Name")
+        if self.instance.pk:
+            # Existing accounts keep their password unless a new one is entered.
+            self.fields["password"].required = False
+            self.fields["password"].help_text = _(
+                "Leave empty to leave the password unchanged."
+            )
         if not is_superuser(request_user):
             # Only superusers manage permissions. Removing the fields also
             # drops any submitted value, so nobody can promote themselves.

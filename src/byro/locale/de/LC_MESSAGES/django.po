@@ -2621,6 +2621,10 @@ msgstr "Der Import konnte nicht verarbeitet werden: "
 msgid "Password"
 msgstr "Passwort"
 
+#: byro/office/views/users.py
+msgid "Leave empty to leave the password unchanged."
+msgstr "Leer lassen, um das Passwort nicht zu ändern."
+
 #: byro/office/views/users.py:89
 msgid "You cannot disable your own password."
 msgstr "Du kannst dein eigenes Passwort nicht deaktivieren."

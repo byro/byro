@@ -276,12 +276,14 @@ You cannot remove your own superuser status; another superuser has to do
 that. Your own `is_staff` stays editable: you can switch it on or off
 yourself, which changes nothing as long as you are a superuser.
 
-**Password when editing:** the edit form requires a new password on **every**
-save - even if you only change the name or `is_staff`. There is no way to
-change other fields without also setting a new password at the same time.
-Tell the affected person the new password afterwards, or use `changepassword`
-instead (see [Management commands](management-commands.md#account-management))
-if you only want to set a known password without opening the edit form.
+**Password when editing:** the password field of the edit form is optional.
+Leave it empty to keep the account's password exactly as it is - this also
+applies to a disabled password, which stays disabled. If you enter a
+password, it replaces the current one when you save; tell the affected person
+the new password afterwards. A password is still required when you create an
+account. To set a password without opening the edit form, use
+`changepassword` (see
+[Management commands](management-commands.md#account-management)).
 
 **Disabling a password** (`settings/users/<pk>/disable-password`) sets an
 unusable password; the account can no longer sign in with a password
