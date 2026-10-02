@@ -27,6 +27,9 @@ the user menu under *API token* (see
 is active and staff or superuser, the same rule that decides who may sign in
 to the Office (see
 [Permission model](../administration/users-and-login.md#permission-model)).
+A token that its owner regenerated or that a superuser revoked (see
+[Managing user accounts](../administration/users-and-login.md#managing-user-accounts))
+is rejected with `401` from that moment on.
 There are **no fine-grained API permissions**: a valid token from such an
 account has full access to every API endpoint. The API currently offers no
 endpoints for the superuser-only functions (settings, user management, log).

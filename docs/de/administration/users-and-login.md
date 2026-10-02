@@ -308,11 +308,41 @@ anmelden (siehe die OIDC-Warnung oben zur Wechselwirkung). Es lässt sich nicht
 selbst auf das eigene Konto anwenden. Um das Passwort wieder zu aktivieren,
 speichere das Bearbeitungsformular mit einem neuen Passwort.
 
+**API-Token widerrufen** (`settings/users/<pk>/revoke-api-token`): Die Seite
+eines anderen Kontos zeigt, ob dieses Konto einen
+[API-Token](../usage/account.md#api-token) hat, nie den Token selbst.
+„API-Token widerrufen“ löscht ihn. Der Token funktioniert sofort nicht mehr
+(die API antwortet mit `401`), und es wird kein Ersatz ausgestellt. Sonst
+ändert sich am Konto nichts: Passwort, OIDC-Anmeldung, MFA, Sitzungen und
+Rechte bleiben, wie sie sind. Es lässt sich nicht auf das eigene Konto
+anwenden; nutze dafür deine eigene API-Token-Seite.
+
+Widerrufen ist **keine API-Sperre**. Es macht den bisher ausgegebenen Token
+ungültig, zum Beispiel weil er in falsche Hände geraten sein könnte. Die
+Person, der das Konto gehört, bekommt einen neuen Token, sobald sie ihre
+API-Token-Seite das nächste Mal öffnet. Um ein Konto von der API
+fernzuhalten, entferne `is_staff` und `is_superuser` (siehe
+[Berechtigungsmodell](#berechtigungsmodell)).
+
+Jeder Widerruf wird im Audit-Log festgehalten, ohne den Token. Lässt sich
+nur dieser Eintrag nicht schreiben, bleibt der Token trotzdem widerrufen: Du
+siehst statt der Bestätigung eine Warnung, und das Anwendungslog bekommt
+eine Zeile mit den IDs der beiden Konten, nie mit dem Token oder einer
+Fehlermeldung.
+
+Schlägt der Widerruf selbst fehl, zum Beispiel weil die Datenbank ihn nicht
+speichern kann, bekommst du eine Fehlerseite. Das Ergebnis ist dann nicht
+bestätigt: Meist wurde nichts geändert, aber wenn die Verbindung zur
+Datenbank beim Speichern abgebrochen ist, kann der Token trotzdem entfernt
+sein. Öffne die Seite des Kontos erneut, um zu sehen, ob es noch einen Token
+hat, und widerrufe ihn dann noch einmal. Auch das Log eines solchen Fehlers
+enthält keinen Token.
+
 **Es gibt keine Möglichkeit, ein Konto zu löschen oder zu deaktivieren**
 (`is_active=False` zu setzen) über die Office-Oberfläche. „Passwort
-deaktivieren“ ist die einzige eingebaute Möglichkeit, ein Konto
-einzuschränken, und blockiert wie oben beschrieben nur die
-Passwort-Anmeldung.
+deaktivieren“ blockiert nur die Passwort-Anmeldung, und „API-Token
+widerrufen“ macht nur den bisher ausgegebenen Token ungültig. Um einem Konto
+den Zugriff zu nehmen, entferne `is_staff` und `is_superuser`.
 
 Es gibt **keinen Self-Service-Passwort-Reset** und keinen Einladungs-Workflow
 für neue Konten; ein Superuser legt jedes Konto selbst mit einem
@@ -343,3 +373,6 @@ ist, wird global eingestellt, nicht je Konto: siehe
   die OIDC-Gruppensynchronisation geänderte Rechte werden mit den alten und
   neuen Flags protokolliert; der Eintrag enthält keine Claims und keine
   Gruppennamen.
+- **API-Tokens:** Das Erzeugen, Erneuern und Widerrufen eines API-Tokens wird
+  mit dem betroffenen Konto und dem Konto protokolliert, das es ausgelöst
+  hat. Die Einträge enthalten nie einen Token.

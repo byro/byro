@@ -26,8 +26,19 @@ account. Its own page: [MFA](mfa.md).
 ## API token
 
 *User menu → API token* shows your personal token for the
-[REST API](../development/api.md); *Regenerate* deletes the old one and
-creates a new one. The token only works while your account is staff or
-superuser (see
+[REST API](../development/api.md). If your account has no token yet, opening
+the page creates one. *Regenerate* deletes the old one and creates a new
+one; the old token stops working immediately. The token only works while
+your account is staff or superuser (see
 [Permission model](../administration/users-and-login.md#permission-model));
 without either flag the API rejects it.
+
+Only you see and manage your token. A superuser can revoke it in the user
+management, for example because it may have leaked (see
+[Managing user accounts](../administration/users-and-login.md#managing-user-accounts)),
+but can neither read it nor create one for you. A revoked token stops
+working immediately. Your account, your password and your sign-in are not
+affected, and you get a new token by opening this page again.
+
+Creating, regenerating and revoking a token is recorded in the audit log,
+never with the token itself.
