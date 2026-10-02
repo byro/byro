@@ -13,9 +13,10 @@ accounts (see
 use it. The fields for staff and superuser status are only shown to
 superusers, so a staff account cannot change its own permissions here. A
 superuser can change their own staff status, but not remove their own
-superuser status. The same restriction applies as in user management:
-**every save requires a new password**, even if you only want to change your
-name or e-mail address. Details and background:
+superuser status. The password field is optional: **leave it empty to keep
+your current password**, for example if you only want to change your name or
+e-mail address. If you enter a new password, it replaces the current one and
+you have to sign in again. Details and background:
 [Managing user accounts](../administration/users-and-login.md#managing-user-accounts).
 
 ## Multi-factor authentication

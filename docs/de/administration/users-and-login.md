@@ -293,14 +293,14 @@ gesperrt. Du kannst dir den Superuser-Status nicht selbst entziehen; das muss
 ein anderer Superuser tun. Dein eigenes `is_staff` bleibt änderbar: Du kannst
 es selbst ein- oder abschalten, was nichts ändert, solange du Superuser bist.
 
-**Passwort beim Bearbeiten:** Das Bearbeitungsformular verlangt bei **jedem**
-Speichern ein neues Passwort für das Konto – auch wenn du nur den Namen oder
-`is_staff` änderst. Es gibt keine Möglichkeit, andere Felder zu ändern, ohne
-gleichzeitig ein neues Passwort zu vergeben. Informiere die betroffene Person
-danach über das neue Passwort, oder nutze stattdessen
-`changepassword` (siehe [Management-Befehle](management-commands.md#kontoverwaltung)),
-wenn du nur ein bekanntes Passwort setzen willst, ohne das Bearbeitungsformular
-zu öffnen.
+**Passwort beim Bearbeiten:** Das Passwortfeld des Bearbeitungsformulars ist
+optional. Lass es leer, damit das Passwort des Kontos genau so bleibt, wie es
+ist – das gilt auch für ein deaktiviertes Passwort, das deaktiviert bleibt.
+Gibst du ein Passwort ein, ersetzt es beim Speichern das bisherige; informiere
+die betroffene Person danach über das neue Passwort. Beim Anlegen eines Kontos
+ist ein Passwort weiterhin erforderlich. Um ein Passwort zu setzen, ohne das
+Bearbeitungsformular zu öffnen, nutze `changepassword` (siehe
+[Management-Befehle](management-commands.md#kontoverwaltung)).
 
 **Passwort deaktivieren** (`settings/users/<pk>/disable-password`) setzt ein
 unbrauchbares Passwort; das Konto kann sich danach nicht mehr per Passwort
