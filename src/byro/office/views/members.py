@@ -164,7 +164,7 @@ class MemberListView(MemberListMixin, ListView):
                 request,
                 _("Balance refresh has been started in the background."),
             )
-        return redirect(request.path)
+        return redirect("office:members.list")
 
 
 class MemberDisclosureView(MemberListMixin, TemplateView):
@@ -385,12 +385,9 @@ class MemberListExportView(
             },
         )
 
-        if form.cleaned_data["export_format"].startswith("csv"):
-            return self.export_csv(
-                header, data, csv_format=form.cleaned_data["export_format"]
-            )
-
-        return redirect(self.request.get_full_path())
+        return self.export_csv(
+            header, data, csv_format=form.cleaned_data["export_format"]
+        )
 
     def export_csv(self, header, data, csv_format="default"):
         class EchoBOM:
@@ -529,7 +526,7 @@ def default_csv_form_valid(view, form, dialect="excel"):
                                 k.strip()
                             ),
                         )
-                        return redirect(view.request.get_full_path())
+                        return redirect("office:members.list.import")
 
             do_update = False
             have_changes = False
@@ -596,7 +593,7 @@ def default_csv_form_valid(view, form, dialect="excel"):
                             fields["_internal_last_transaction"].name,
                         ),
                     )
-                    return redirect(view.request.get_full_path())
+                    return redirect("office:members.list.import")
 
                 member.log(view, ".created")
                 member.save()
@@ -1123,6 +1120,11 @@ class MultipleFormsMixin:
     def get_operations(self):
         raise NotImplementedError
 
+    def get_redirect_url(self):
+        """Return the URL to redirect to after a POST, unless a callback
+        returned a response of its own."""
+        raise NotImplementedError
+
     def mangle_button(self, name, prefix):
         return f"submit_{prefix}_{name}"
 
@@ -1170,7 +1172,7 @@ class MultipleFormsMixin:
         if retval:
             return retval
 
-        return redirect(self.request.get_full_path())
+        return redirect(self.get_redirect_url())
 
 
 class MemberOperationsView(MultipleFormsMixin, MemberView):
@@ -1228,6 +1230,9 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
         )
 
         return retval
+
+    def get_redirect_url(self):
+        return reverse("office:members.operations", kwargs={"pk": self.get_object().pk})
 
     @transaction.atomic
     def adjust_balance(self, form, active_buttons):

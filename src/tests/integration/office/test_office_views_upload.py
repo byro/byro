@@ -4,7 +4,7 @@ from decimal import Decimal
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import include, path, reverse
 
 from byro.bookkeeping.bank_import import (
     BankTransactionImporter,
@@ -14,9 +14,16 @@ from byro.bookkeeping.bank_import import (
 from byro.bookkeeping.models import Booking, RealTransactionSource
 from byro.bookkeeping.models.real_transaction import SourceState
 from byro.bookkeeping.signals import bank_transaction_importers, process_csv_upload
-from byro.office.views.upload import LEGACY_IMPORTER_CHOICE
+from byro.office.views.upload import LEGACY_IMPORTER_CHOICE, BankTransactionImportView
 
 pytestmark = pytest.mark.usefixtures("configuration")
+
+# URLconf for tests marked with ``pytest.mark.urls(__name__)``: the regular
+# byro URLs plus a second, unnamed path to the bank transaction import.
+urlpatterns = [
+    path("alias/bank-import", BankTransactionImportView.as_view()),
+    path("", include("byro.urls")),
+]
 
 
 class LineImporter(BankTransactionImporter):
@@ -129,6 +136,24 @@ def test_upload_with_importer_imports_and_reports_counts(
     assert "1 newly imported" in content
     assert "1 already known" in content
     assert Booking.objects.filter(source__isnull=False).count() == 3
+
+
+@pytest.mark.django_db
+@pytest.mark.urls(__name__)
+def test_upload_redirects_to_named_route_from_other_path(
+    logged_in_client, line_importer
+):
+    response = logged_in_client.post(
+        "/alias/bank-import",
+        {
+            "importer": "test.lines",
+            "source_file": SimpleUploadedFile("statement.csv", b"25.00;Fee;REF-1\n"),
+        },
+    )
+    assert response.status_code == 302
+    assert response["Location"] == reverse("office:finance.uploads.add")
+    assert response["Location"] == "/upload/add"
+    assert RealTransactionSource.objects.get().state == SourceState.PROCESSED
 
 
 @pytest.mark.django_db
