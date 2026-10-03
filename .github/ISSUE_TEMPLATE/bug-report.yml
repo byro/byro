@@ -1,0 +1,93 @@
+name: Bug report
+description: Report something in byro that is not working as expected.
+labels:
+  - bug
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug!
+
+        Please use [Discussions](https://github.com/byro/byro/discussions/categories/q-a) for general questions, and report security vulnerabilities privately as described in our [security policy](https://github.com/byro/byro/security/policy).
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of the problem you observed.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What do we need to do to see the problem ourselves?
+      placeholder: |
+        1. Go to …
+        2. Click on …
+        3. See the error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead? Include error messages if there are any.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: byro version
+      description: You can find the version in the footer of byro, with `byroctl version`, in your image tag or with `pip show byro`. For a development checkout, the commit hash is fine.
+      placeholder: vYYYY.M.P
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Installation / deployment method
+      options:
+        - byroctl
+        - Docker Compose (by hand)
+        - Bare metal
+        - Legacy production/ setup
+        - Development setup
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system / environment
+      description: The operating system of the server and anything else that may be relevant, such as the database, the Python version or the browser.
+      placeholder: Debian 13, PostgreSQL 17, Firefox
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Log output or tracebacks related to the problem. Please remove secrets and personal data first. No need for backticks, this is formatted as code automatically.
+      render: shell
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that helps us understand the problem, such as screenshots, installed plugins or other things you noticed.
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have searched the existing issues and did not find this problem.
+          required: true
+        - label: This report contains no secrets, passwords, API tokens, personal data or other sensitive information.
+          required: true

@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest a new feature or an improvement for byro.
+labels:
+  - enhancement
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping to improve byro!
+
+        You do not need to know how a feature could be implemented. Describing the problem you would like to see solved is the most helpful part.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem would this feature solve? What are you trying to do, and what is getting in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like byro to do?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other solutions or workarounds you have thought about or tried.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that helps us understand the request, such as screenshots or examples.
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have searched the existing issues and did not find the same or a similar request.
+          required: true
