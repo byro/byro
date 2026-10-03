@@ -9,12 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, UpdateView, View
 from i18nfield.forms import I18nModelForm
 
-from byro.mails.models import (
-    EMail,
-    MailTemplate,
-    RecipientsLockedError,
-    RecipientType,
-)
+from byro.mails.models import EMail, MailTemplate, RecipientsLockedError, RecipientType
 from byro.mails.send import SendMailException
 from byro.members.models import Member
 

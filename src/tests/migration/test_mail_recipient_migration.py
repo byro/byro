@@ -1,9 +1,8 @@
 import importlib
+from unittest.mock import patch
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from unittest.mock import patch
-
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import MigrationLoader
