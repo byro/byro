@@ -286,3 +286,37 @@ def test_member_download_and_edit(member, membership, logged_in_client):
     new_member = Member.objects.filter(pk=member.pk).first()
     assert new_member.name == "Fnord!"
     assert new_member.profile_sepa.iban == "DE11520513735120710131"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "name,search",
+    (
+        ("Jona Than", "Jona"),
+        ('<span id="byro-xss-test">XSS test</span>', "byro-xss-test"),
+        (
+            "<img src=x onerror=\"document.documentElement.dataset.byroXss='executed'\">",
+            "onerror",
+        ),
+    ),
+)
+def test_members_typeahead_returns_name_unchanged_as_json(
+    member, logged_in_client, name, search
+):
+    # Markup is valid member data: the endpoint returns it unchanged as JSON and
+    # leaves the output encoding to the consumer. This covers the data contract
+    # only, not the rendering in office/members.js, which needs a browser.
+    member.name = name
+    member.full_clean()
+    member.save()
+
+    response = logged_in_client.get(
+        reverse("office:members.typeahead"), {"search": search}
+    )
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == "application/json"
+    assert response.json() == {
+        "count": 1,
+        "results": [{"id": member.pk, "nick": None, "name": name}],
+    }

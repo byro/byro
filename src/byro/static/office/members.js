@@ -22,7 +22,8 @@ $('.member-typeahead').typeahead(null, {
   source: members,
   templates: {
     suggestion: function(data) {
-      return '<div class="tt-suggestion tt-selectable">' + data.value + ' (' + data.name + ')' + '</div>'
+      // Member data is untrusted: build the element and set it as text, never as HTML.
+      return $('<div>').text(data.value + ' (' + data.name + ')')
     }
   }
 });
