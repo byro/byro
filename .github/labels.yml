@@ -8,6 +8,10 @@
   color: 'd876e3'
   description: Needs maintainer triage
 
+- name: needs-design
+  color: 'c5def5'
+  description: The problem is understood, but implementation requires product or technical design decisions first.
+
 - name: good first issue
   color: '7057ff'
   description: Good for newcomers
