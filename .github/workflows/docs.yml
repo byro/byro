@@ -16,6 +16,9 @@ on:
       - '.readthedocs.yml'
       - '.github/workflows/docs.yml'
 
+permissions:
+  contents: read
+
 jobs:
   parity:
     name: "[Docs] German/English page parity"
