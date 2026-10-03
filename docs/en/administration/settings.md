@@ -38,7 +38,7 @@ can add its own section to this page this way.
 The association configuration itself covers:
 
 - **Association name, address, URL**,
-- **Statute of limitations** (`liability_interval`, in months): up to what
+- **Statute of limitations in months** (`liability_interval`): up to what
   age a member's outstanding fees can still be claimed,
 - **Accounting start** (`accounting_start`): an optional date fees are
   billed from retroactively - useful when an organization was migrated to

@@ -40,7 +40,7 @@ kann so einen eigenen Abschnitt auf dieser Seite ergänzen.
 Die Vereinskonfiguration selbst umfasst:
 
 - **Vereinsname, -adresse, -URL**,
-- **Verjährungsfrist** (`liability_interval`, in Monaten): bis zu welchem
+- **Verjährungsfrist in Monaten** (`liability_interval`): bis zu welchem
   Alter offene Beitragsforderungen eines Mitglieds noch eingefordert werden
   können,
 - **Buchhaltung ab** (`accounting_start`): optionales Datum, ab dem

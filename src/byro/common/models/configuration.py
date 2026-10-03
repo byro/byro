@@ -42,7 +42,7 @@ class Configuration(ByroConfiguration):
     )
     liability_interval = models.IntegerField(
         default=36,
-        verbose_name=_("Statute of limitations"),
+        verbose_name=_("Statute of limitations in months"),
         help_text=_(
             "For which interval can you make members pay their outstanding fees?"
         ),

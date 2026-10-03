@@ -172,8 +172,8 @@ msgid "Association URL"
 msgstr "URL da Associação"
 
 #: byro/common/models/configuration.py:39
-msgid "Statute of limitations"
-msgstr "Prazo de prescrição"
+msgid "Statute of limitations in months"
+msgstr "Prazo de prescrição em meses"
 
 #: byro/common/models/configuration.py:41
 msgid "For which interval can you make members pay their outstanding fees?"

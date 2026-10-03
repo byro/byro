@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.shortcuts import reverse
 
@@ -50,3 +52,22 @@ def test_registration_settings_save_mandatory_fields(configuration, superuser_cl
     saved = {entry["name"] for entry in Configuration.get_solo().registration_form}
     assert {"membership__start", "membership__interval", "membership__amount"} <= saved
     assert LogEntry.objects.filter(action_type=REGISTRATION_CHANGED).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("language,unit", (("en", "months"), ("de", "Monaten")))
+def test_general_settings_label_liability_interval_with_unit(
+    configuration, superuser_client, settings, language, unit
+):
+    settings.DEFAULT_LANGUAGE = language
+
+    response = superuser_client.get(reverse("office:settings.base"))
+    label = re.search(
+        r'<label[^>]*for="id_Configuration-liability_interval"[^>]*>(.*?)</label>',
+        response.content.decode(),
+        re.DOTALL,
+    )
+
+    assert response.status_code == 200
+    assert label, "no label rendered for the statute of limitations"
+    assert unit in label.group(1)
