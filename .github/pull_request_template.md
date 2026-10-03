@@ -1,17 +1,21 @@
+<!-- The pull request title must follow Conventional Commits (the "PR title" check validates it):
+
+  type(optional scope): summary
+
+  feat(members): add configurable member numbers
+  fix(finance): handle empty CAMT statements
+  docs(install): document reverse proxy setup
+
+  Types: feat, fix, docs, perf, refactor, test, build, ci, chore, revert
+  Breaking change: add "!" before the colon, e.g. feat(api)!: change authentication response format
+  Security fix: fix(security): ...
+
+  The title decides where the change appears in the release notes; no labels are needed.
+-->
+
 ## Description
 
 <!-- What does this PR do? Why? -->
-
-## Type of change
-
-<!-- Please add the matching label to this PR:
-  - breaking-change  → introduces breaking changes
-  - enhancement      → new feature or improvement
-  - bug / fix        → bug fix
-  - maintenance      → refactoring, CI, tooling
-  - documentation    → docs only
-  - skip-changelog   → no entry in release notes needed
--->
 
 ## Notes for reviewers
 

@@ -7,17 +7,47 @@ Deployment-Tooling einhergehen: den `stable`-Zeiger und die Release-Flags in
 
 ## Wie ein Release entsteht
 
+Automatik und Maintainer teilen sich die Arbeit:
+
+* **Automatisch:** der Release-Entwurf mit dem kategorisierten Changelog und
+  der vorgeschlagenen Version; nach dem Veröffentlichen die Release-Pipeline
+  mit Tests und Build, dem Upload zu PyPI, dem Container-Image und dem
+  `stable`-Zeiger.
+* **Von Hand:** die Zusammenfassung des Releases oben in den Release Notes,
+  die Hinweise für Administratoren, die Release-Flags in `deploy/release.env`,
+  die abschließende Prüfung der Version samt Jahr, das Veröffentlichen des
+  Releases und das Zurücksetzen der Flags danach.
+
 1. [Release Drafter](https://github.com/release-drafter/release-drafter) hält
    auf GitHub einen Release-Entwurf aktuell. Jeder gemergte Pull Request fügt
-   eine Zeile unter der Kategorie seines Labels hinzu (`breaking-change`,
-   `enhancement`, `bug`/`fix`, `maintenance`, `dependencies`,
-   `documentation`). Der Drafter schlägt auch den nächsten Tag vor, aber nach
-   Semantic-Versioning-Regeln: `breaking-change` erhöht das erste Feld,
-   `enhancement` das zweite, alles andere das dritte. byros Schema ist
-   `vYYYY.MINOR.PATCH`, prüfe den vorgeschlagenen Tag also und passe ihn bei
-   Bedarf von Hand an: Das erste Feld ist immer das aktuelle Jahr, das erste
-   Release eines Jahres ist `vYYYY.1.0`, und ein `breaking-change`-Label darf
-   das Jahr nicht erhöhen.
+   eine Zeile unter dem Abschnitt hinzu, den sein Titel bestimmt (siehe
+   [Titel von Pull Requests](contributing.md#titel-von-pull-requests)). Der
+   erste Treffer in dieser Reihenfolge gewinnt:
+
+    * *Breaking Changes*: jeder Typ mit `!`,
+    * *Security*: `fix(security)`,
+    * *Deployment & Operations*: `feat` oder `fix` mit dem Scope `byroctl`,
+      `deploy`, `docker`, `install` oder `update`,
+    * *Features*: `feat`,
+    * *Bug Fixes*: `fix`,
+    * *Documentation*: `docs`,
+    * *Dependencies*: das Label `dependencies`, das Dependabot setzt, oder
+      der Scope `deps`.
+
+    Pull Requests der übrigen Typen (`ci`, `test`, `refactor`, `build`,
+    `chore`, `perf`, `revert`) erscheinen nicht in den Release Notes, ebenso
+    wenig ein Pull Request mit dem Label `skip-changelog`. Stellt sich ein
+    Titel als falsch heraus, korrigiere ihn, auch nach dem Merge: Der Entwurf
+    zieht nach.
+
+    Der Drafter schlägt auch den nächsten Tag in byros Schema
+    `vYYYY.MINOR.PATCH` vor: Ein Breaking Change und ein `feat` erhöhen
+    `MINOR`, alles andere erhöht `PATCH`. Nach `v2026.4.0` führt ein Pull
+    Request mit dem Titel `fix(mails)!: …` also zu `v2026.5.0`. Das erste Feld
+    ist das Kalenderjahr, keine Major-Version, und der Drafter ändert es nie.
+    Das Jahr bleibt eine manuelle Entscheidung: Prüfe den vorgeschlagenen Tag
+    beim ersten Release eines Jahres und setze ihn von Hand auf `vYYYY.1.0`.
+
 2. Vor dem Veröffentlichen bearbeite den Entwurf: Schreibe die Einleitung (der
    Platzhalter oben) und geh die Checkliste am Ende dieser Seite durch.
 3. Veröffentliche das Release. GitHub erzeugt den Tag, und der Tag startet die
@@ -109,9 +139,9 @@ direkten Push.
     bestätigen (`byroctl update` fragt, `--yes` bestätigt). Verwende es nur,
     wenn ein Administrator vor dem Update handeln oder entscheiden muss: eine
     Konfiguration, die sich ändern muss, ein Dienst, der wegfällt, ein
-    manueller Schritt. Es ist kein Synonym für das Label `breaking-change`,
-    das auch Code- und Plugin-API-Änderungen abdeckt, die von Administratoren
-    nichts verlangen.
+    manueller Schritt. Es ist kein Synonym für einen Breaking Change, der im
+    Titel eines Pull Requests mit `!` markiert ist: Der deckt auch Code- und
+    Plugin-API-Änderungen ab, die von Administratoren nichts verlangen.
 
 `BYRO_RELEASE_DATA_MIGRATION=1`
 :   Das Release ändert Dateien außerhalb der Datenbank (Dokumente, Uploads,
@@ -215,8 +245,16 @@ Vor dem Veröffentlichen:
 
 * der Entwurf ist geprüft, die Einleitung geschrieben, die Kategorien sind
   vollständig,
+* die Release Notes enthalten keinen unaufgelösten Platzhalter: keine
+  wörtliche Variable wie `$RESOLVED_TAG`, und der Hinweis oben ist durch die
+  Einleitung ersetzt,
+* Tag und Titel nennen die beabsichtigte Version: `vYYYY.MINOR.PATCH` mit dem
+  aktuellen Jahr, und `vYYYY.1.0` für das erste Release eines Jahres,
 * `deploy/release.env` hat die Flags, die dieses Release braucht, und die
   Release Notes erklären sie,
+* `deploy/SHA256SUMS` ist aktuell, falls sich ein Release-Artefakt unter
+  `deploy/` geändert hat, zum Beispiel `release.env` oder der Plugin-Katalog
+  (`.github/scripts/deploy-checksums.sh --check`),
 * die Release Notes sagen Administratoren, was zu tun ist,
 * `deploy/plugin-catalog.conf` listet nur Plugins, die mit diesem Release
   funktionieren, und der Katalog-Lint ist grün,
@@ -226,5 +264,8 @@ Vor dem Veröffentlichen:
 Nach dem Veröffentlichen:
 
 * der Pipeline-Lauf ist grün, einschließlich *Point stable at the release*,
+* das Paket liegt auf PyPI und das Image `ghcr.io/byro/byro:vYYYY.M.P` in der
+  Registry,
 * `stable` nennt das neue Release (`stable.env` auf dem Branch),
-* ein gesetztes Flag ist in einem Folge-Pull-Request auf `0` zurückgesetzt.
+* ein gesetztes Flag ist in einem Folge-Pull-Request auf `0` zurückgesetzt,
+  zusammen mit einem regenerierten `deploy/SHA256SUMS`.

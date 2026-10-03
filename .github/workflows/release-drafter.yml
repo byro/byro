@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - main
+  # Refreshes the draft when the title or a label (skip-changelog, dependencies)
+  # of a pull request changes, e.g. when the title of a merged one is corrected.
   pull_request_target:
-    types: [opened, reopened, synchronize, labeled, unlabeled]
+    types: [edited, labeled, unlabeled]
 
 permissions:
   contents: read

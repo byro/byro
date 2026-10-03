@@ -1,48 +1,12 @@
-# Changelog-relevante Labels
-- name: breaking-change
-  color: 'b60205'
-  description: Introduces breaking changes
+# Quelle der Wahrheit für die Labels des Repositories: sync-labels.yml löscht
+# jedes Label, das hier nicht steht. Art (Bug, Feature, Task) steht im Issue
+# Type, die Art einer Änderung im Titel des Pull Requests, Bearbeitung in den
+# Assignees, Review- und Entwurfsstatus in GitHub selbst.
 
-- name: enhancement
-  color: '0075ca'
-  description: New feature or improvement
-
-- name: bug
-  color: 'd73a4a'
-  description: Something isn't working
-
-- name: fix
-  color: 'e4e669'
-  description: A fix for a bug or issue
-
-- name: maintenance
-  color: 'e4e669'
-  description: Refactoring, CI, tooling, chores
-
-- name: dependencies
-  color: '0366d6'
-  description: Dependency updates (Dependabot/Renovate)
-
-- name: documentation
-  color: '0075ca'
-  description: Documentation changes
-
-- name: skip-changelog
-  color: 'eeeeee'
-  description: Exclude this PR from release notes
-
-# Workflow-Labels
+# Issue-Workflow
 - name: needs-triage
   color: 'd876e3'
   description: Needs maintainer triage
-
-- name: needs-review
-  color: 'fbca04'
-  description: Waiting for review
-
-- name: work-in-progress
-  color: 'ededed'
-  description: Not ready to merge
 
 - name: good first issue
   color: '7057ff'
@@ -50,18 +14,13 @@
 
 - name: help wanted
   color: '008672'
-  description: Extra attention is needed
+  description: Maintainers are looking for contributors
 
-# Dependabot-Labels
-- name: github_actions
-  color: '000000'
-  description: Pull requests that update GitHub Actions code
+# Pull-Request-Automatisierung
+- name: dependencies
+  color: '0366d6'
+  description: Dependency updates (Dependabot)
 
-- name: python
-  color: '2b67c6'
-  description: Pull requests that update python code
-
-- name: docker
-  color: '21ceff'
-  description: Pull requests that update docker code
-
+- name: skip-changelog
+  color: 'eeeeee'
+  description: Exclude this PR from release notes

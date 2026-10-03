@@ -1,7 +1,7 @@
 name: Feature request
 description: Suggest a new feature or an improvement for byro.
+type: Feature
 labels:
-  - enhancement
   - needs-triage
 body:
   - type: markdown

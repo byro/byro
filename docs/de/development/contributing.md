@@ -45,6 +45,60 @@ und eröffne einen Pull Request. Unsere Continuous Integration prüft deine
 der Dokumentation, …). Gib uns bitte fünf bis sieben Tage für ein Review oder
 einen direkten Merge.
 
+## Issues
+
+Issues tragen einen der Issue Types von GitHub: *Bug*, *Feature* oder *Task*.
+Die Issue-Formulare setzen *Bug* und *Feature* für dich; *Task* ist für
+technische Arbeiten gedacht, die Maintainer selbst anlegen. Neue Issues
+erhalten außerdem das Label `needs-triage`, bis ein Maintainer sie gesichtet
+hat. Für Typ, Priorität oder Status eines Issues gibt es keine Labels.
+
+Wer einem Issue zugewiesen ist (Assignee), arbeitet aktiv daran. Möchtest du
+ein Issue übernehmen, schreib das in einen Kommentar, und ein Maintainer weist
+es dir zu. Zwei Labels helfen bei der Auswahl:
+
+- `good first issue` kennzeichnet Aufgaben, die sich für den Einstieg eignen,
+- `help wanted` kennzeichnet Issues, für die die Maintainer ausdrücklich
+  Mitwirkende suchen.
+
+## Titel von Pull Requests
+
+Der Titel eines Pull Requests folgt
+[Conventional Commits](https://www.conventionalcommits.org/): ein Typ, ein
+optionaler Scope in Klammern, ein Doppelpunkt und eine kurze Zusammenfassung.
+
+```text
+feat(members): add configurable member numbers
+fix(finance): handle empty CAMT statements
+docs(install): document reverse proxy setup
+chore(deps): update Django
+ci: update release workflow
+```
+
+| Typ        | Verwende ihn für                                |
+| ---------- | ----------------------------------------------- |
+| `feat`     | eine neue Funktion                              |
+| `fix`      | eine Fehlerbehebung                             |
+| `docs`     | reine Dokumentationsänderungen                  |
+| `perf`     | eine Performance-Verbesserung                   |
+| `refactor` | Umbauten ohne Verhaltensänderung                |
+| `test`     | reine Teständerungen                            |
+| `build`    | Paketierung und Build-System                    |
+| `ci`       | CI-Workflows und -Skripte                       |
+| `chore`    | sonstige Wartung, zum Beispiel `chore(deps)`    |
+| `revert`   | das Zurücknehmen einer früheren Änderung        |
+
+Der Scope ist optional und benennt den Teil von byro, den du geändert hast.
+Markiere einen Breaking Change mit `!` vor dem Doppelpunkt, zum Beispiel
+`feat(api)!: change authentication response format`, und verwende
+`fix(security)` für Sicherheitskorrekturen.
+
+Die CI-Prüfung *PR title* validiert den Titel. Geprüft wird nur der Titel,
+nicht deine einzelnen Commit-Nachrichten. Der Titel entscheidet außerdem, wo
+deine Änderung in den Release Notes erscheint, du musst also keine Labels
+setzen. Eröffne einen Draft Pull Request, solange deine Arbeit noch nicht
+bereit für ein Review ist.
+
 ## Dokumentation
 
 Ändert dein Pull Request sichtbares Verhalten (eine neue Einstellung, ein
