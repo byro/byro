@@ -78,12 +78,6 @@ def get_backend():
     return getattr(module, class_name)()
 
 
-def get_member_for_recipient(address):
-    from byro.members.models import Member
-
-    return Member.all_objects.filter(email__iexact=(address or "").strip()).first()
-
-
 def get_active_key(member):
     from byro.mails.models import PGPKeyStatus
 
@@ -145,7 +139,8 @@ def prepare_email_message(
     if not config.encryption_enabled:
         return email_message
 
-    member = member or get_member_for_recipient(recipient_address)
+    # Only recipients that were addressed as members are encrypted. An address
+    # is never used to find a member: several members may share one address.
     if not member:
         return email_message
 

@@ -3,30 +3,71 @@
 <div class="form-group row">
     <label class="col-md-3 col-form-label">To</label>
     <div class="col-md-9">
-        <div class="row">
-            <input type="radio" name="to_type" id="to_type__addr" value="addr"
-                   {% if form.to_type.initial == 'addr' %}checked{% endif %}
-                   {% if form.fields.to_type.disabled %}disabled{% endif %}
-            >
-            <label for="to_type__addr" class="col-md-8 col-form-label">
-                {% bootstrap_field form.to layout='horizontal' show_label=False %}
-            </label>
-        </div>
-        <div class="row">
-            <input type="radio" name="to_type" id="to_type__all" value="all"
-                   {% if form.to_type.initial == 'all' %}checked{% endif %}
-                   {% if form.fields.to_type.disabled %}disabled{% endif %}
-            >
-            <label for="to_type__all" class="col-md-8 col-form-label">{% trans "All members" %}</label>
-        </div>
-        <div class="row">
-            <input type="radio" name="to_type" id="to_type__member" value="member"
-                   {% if form.to_type.initial == 'member' %}checked{% endif %}
-                   {% if form.fields.to_type.disabled %}disabled{% endif %}
-            >
-            <label for="to_type__member" class="col-md-8 col-form-label">{% trans "Member" %}:
-                {% bootstrap_field form.to_member layout='horizontal' show_label=False %}
-            </label>
-        </div>
+        {% if form.recipients_locked %}
+            <div class="row">
+                <span class="col-md-8 col-form-label">{{ form.instance.recipient_display }}</span>
+            </div>
+            {% if not form.instance.sent and form.instance.has_deliveries %}
+                <div class="alert alert-info">
+                    {% if form.instance.has_unsupported_recipient %}
+                        {% blocktrans trimmed %}
+                            This mail was created by an older version and has been
+                            delivered partly. byro cannot tell which members have
+                            received it already, so it cannot be sent anymore. Copy
+                            it to a new mail or discard it.
+                        {% endblocktrans %}
+                    {% else %}
+                        {% blocktrans trimmed %}
+                            This mail has already been delivered to some of its
+                            recipients, so its recipients cannot be changed anymore.
+                            Sending it again only reaches the recipients that are
+                            still missing. To write to somebody else, copy it to a
+                            new mail.
+                        {% endblocktrans %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            {% if form.instance.has_unsupported_recipient %}
+                <div class="alert alert-warning">
+                    {% blocktrans trimmed %}
+                        This mail was created by an older version and its recipient
+                        could not be converted. Please select the recipient again.
+                    {% endblocktrans %}
+                </div>
+            {% elif form.member_missing %}
+                <div class="alert alert-warning">
+                    {% blocktrans trimmed %}
+                        No valid member is selected as the recipient of this mail.
+                        Please select a member.
+                    {% endblocktrans %}
+                </div>
+            {% endif %}
+            <div class="row">
+                <input type="radio" name="to_type" id="to_type__addr" value="addr"
+                       {% if form.to_type.value == 'addr' %}checked{% endif %}
+                       {% if form.fields.to_type.disabled %}disabled{% endif %}
+                >
+                <label for="to_type__addr" class="col-md-8 col-form-label">
+                    {% bootstrap_field form.to layout='horizontal' show_label=False %}
+                </label>
+            </div>
+            <div class="row">
+                <input type="radio" name="to_type" id="to_type__all" value="all"
+                       {% if form.to_type.value == 'all' %}checked{% endif %}
+                       {% if form.fields.to_type.disabled %}disabled{% endif %}
+                >
+                <label for="to_type__all" class="col-md-8 col-form-label">{% trans "All members" %}</label>
+            </div>
+            <div class="row">
+                <input type="radio" name="to_type" id="to_type__member" value="member"
+                       {% if form.to_type.value == 'member' %}checked{% endif %}
+                       {% if form.fields.to_type.disabled %}disabled{% endif %}
+                >
+                <label for="to_type__member" class="col-md-8 col-form-label">{% trans "Member" %}:
+                    {% bootstrap_field form.to_member layout='horizontal' show_label=False %}
+                </label>
+            </div>
+        {% endif %}
     </div>
 </div>

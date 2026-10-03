@@ -2,7 +2,7 @@ import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from byro.documents.models import Document
-from byro.mails.models import EMail
+from byro.mails.models import EMail, RecipientType
 
 
 @pytest.fixture
@@ -23,6 +23,8 @@ def test_document_send(document, member, immediately):
     document.send(immediately=immediately)
     assert EMail.objects.count() == count + 1
     mail = EMail.objects.last()
-    assert mail.to == document.member.email
+    assert mail.to_type == RecipientType.MEMBER
+    assert mail.to == ""
+    assert mail.get_member_recipients() == [member]
     assert mail.attachments.count() == 1
     assert (mail.sent is None) is not immediately
