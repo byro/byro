@@ -46,14 +46,14 @@ def send_pgp_expiry_reminders(sender, **kwargs):
     for key in keys:
         if not key.member.email:
             continue
-        EMail.objects.create(
-            to=key.member.email,
+        EMail.for_member(
+            key.member,
             subject=_("Your PGP key expires soon"),
             text=_(
                 "Hello {name},\n\n"
                 "the PGP key stored for your membership expires on {date}. "
                 "Please send us an updated public key before it expires.\n"
             ).format(name=key.member.name, date=key.expires_at.date()),
-        )
+        ).save()
         key.last_reminder_at = now
         key.save(update_fields=["last_reminder_at"])
