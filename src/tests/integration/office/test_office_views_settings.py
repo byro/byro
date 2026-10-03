@@ -71,3 +71,18 @@ def test_general_settings_label_liability_interval_with_unit(
     assert response.status_code == 200
     assert label, "no label rendered for the statute of limitations"
     assert unit in label.group(1)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("field,value", (("currency", "EUR"), ("currency_symbol", "€")))
+def test_general_settings_start_with_default_currency(
+    configuration, superuser_client, field, value
+):
+    response = superuser_client.get(reverse("office:settings.base"))
+    field_input = re.search(
+        rf'<input[^>]*name="Configuration-{field}"[^>]*>', response.content.decode()
+    )
+
+    assert response.status_code == 200
+    assert field_input, f"no input rendered for {field}"
+    assert f'value="{value}"' in field_input.group(0)

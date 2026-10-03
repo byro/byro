@@ -8,7 +8,9 @@ def init_templates(apps, schema_editor):
 
     MailTemplate = apps.get_model("mails", "MailTemplate")
     Configuration = apps.get_model("common", "Configuration")
-    config, _ = Configuration.objects.get_or_create()
+    # A configuration created here is the one of a new installation, the model
+    # default of the currency is only added by a later migration.
+    config, _ = Configuration.objects.get_or_create(defaults={"currency": "EUR"})
     if not config.welcome_member_template:
         welcome_member = MailTemplate.objects.create(
             subject=default.WELCOME_MEMBER_SUBJECT, text=default.WELCOME_MEMBER_TEXT

@@ -63,6 +63,7 @@ class Configuration(ByroConfiguration):
         verbose_name=_("Language"),
     )
     currency = models.CharField(
+        default="EUR",
         null=True,
         blank=True,
         max_length=3,

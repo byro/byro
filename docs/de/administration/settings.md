@@ -48,7 +48,7 @@ Die Vereinskonfiguration selbst umfasst:
   byro, wenn ältere, unbezahlte Beiträge nicht nachträglich fällig werden
   sollen,
 - **Sprache** und **Währung** (Code, Symbol, Symbol vor/nach dem Betrag,
-  Cent-Anzeige),
+  Cent-Anzeige); eine neue Installation beginnt mit `EUR` und `€`,
 - **Externe Basis-URL** (`public_base_url`): nur nötig, wenn öffentliche
   Mitgliederseiten unter einer anderen Basis-URL erreichbar sein sollen als
   der Rest von byro; sonst leer lassen.
