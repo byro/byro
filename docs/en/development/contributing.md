@@ -50,8 +50,10 @@ review or a direct merge.
 Issues carry one of GitHub's issue types: *Bug*, *Feature* or *Task*. The
 issue forms set *Bug* and *Feature* for you; *Task* is for technical work that
 maintainers create themselves. New issues also receive the label
-`needs-triage` until a maintainer has looked at them. There are no labels for
-the type, the priority or the status of an issue.
+`needs-triage` until a maintainer has looked at them. `needs-design` marks an
+issue whose problem is understood, but which needs a product or technical
+design decision before work on it can start. There are no labels for the type
+or the priority of an issue.
 
 The assignee shows who is actively working on an issue. If you would like to
 work on one, say so in a comment, and a maintainer assigns it to you. Two

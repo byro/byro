@@ -51,7 +51,10 @@ Issues tragen einen der Issue Types von GitHub: *Bug*, *Feature* oder *Task*.
 Die Issue-Formulare setzen *Bug* und *Feature* für dich; *Task* ist für
 technische Arbeiten gedacht, die Maintainer selbst anlegen. Neue Issues
 erhalten außerdem das Label `needs-triage`, bis ein Maintainer sie gesichtet
-hat. Für Typ, Priorität oder Status eines Issues gibt es keine Labels.
+hat. `needs-design` kennzeichnet ein Issue, dessen Problem verstanden ist, das
+aber vor Beginn der Umsetzung eine fachliche oder technische
+Entwurfsentscheidung braucht. Für Typ oder Priorität eines Issues gibt es
+keine Labels.
 
 Wer einem Issue zugewiesen ist (Assignee), arbeitet aktiv daran. Möchtest du
 ein Issue übernehmen, schreib das in einen Kommentar, und ein Maintainer weist
