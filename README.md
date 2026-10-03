@@ -8,7 +8,7 @@ It is not a source branch. It only carries
 * `stable.env`, one line `BYRO_RELEASE_VERSION=vYYYY.M.P`.
 
 Everything else (byroctl, the Compose files, the container image) comes from the
-immutable release tag. Install byro with
+immutable release tag. Install byro by running, in the directory it should live in,
 
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)"
 
@@ -16,4 +16,4 @@ Documentation: https://byro.readthedocs.io/en/latest/administrator/installation-
 
 Do not edit this branch or push to it by hand. The pointer moves automatically
 after every release; to move it deliberately, run the "Stable pointer" workflow
-(see docs/developer/releasing.rst in the main branch).
+(see docs/en/development/releasing.md in the main branch).

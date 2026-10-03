@@ -10,7 +10,10 @@
 # may use Docker; never calls sudo itself.
 #
 # Options
-#   --root DIR          installation directory (default /opt/byro)
+#   --root DIR          installation directory. Without it the installer asks,
+#                       proposing the current directory; --non-interactive
+#                       requires it. A relative DIR is taken from the current
+#                       directory.
 #   --version TAG       install this release tag instead of the current stable one
 #   --dry-run           show what would happen, change nothing
 #   --no-symlink        do not link byroctl into /usr/local/bin or ~/.local/bin
@@ -37,7 +40,7 @@ STABLE_URL="${BYROCTL_STABLE_URL:-$RAW_BASE/stable/stable.env}"
 STABLE_FILE="${BYROCTL_STABLE_FILE:-}"
 SOURCE_DIR="${BYROCTL_SOURCE_DIR:-}"
 
-ROOT=/opt/byro
+ROOT=""          # chosen in choose_root unless --root is given
 VERSION=""
 DRY_RUN=0
 SYMLINK=1
@@ -49,6 +52,20 @@ die() { printf 'install.sh: ERROR: %s\n' "$1" >&2; exit "${2:-1}"; }
 
 version_ge() { [[ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" == "$2" ]]; }
 require_https() { [[ "$1" == https://* ]] || die "$2 must use https:// (got: $1)"; }
+
+# absolute_dir PATH: PATH as an absolute path. An existing directory is resolved
+# physically (symlinks followed), a missing one is anchored at the current
+# directory. Kept in sync with the copy in byroctl.
+absolute_dir() {
+    local p="${1%/}"
+    [[ -n "$p" ]] || p="/"
+    [[ "$p" == /* ]] || p="$PWD/${p#./}"
+    if [[ -d "$p" ]]; then
+        (cd -P -- "$p" && pwd)
+    else
+        printf '%s' "$p"
+    fi
+}
 
 sha256_of() {
     if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | awk '{print $1}'
@@ -64,7 +81,8 @@ usage() {
     cat >&2 <<'USAGE'
 Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/byro/byro/stable/install.sh)" -- [options]
 
-  --root DIR          installation directory (default /opt/byro)
+  --root DIR          installation directory; without it the installer asks and
+                      proposes the current directory (required with --non-interactive)
   --version TAG       install this release tag instead of the current stable one
   --dry-run           show what would happen, change nothing
   --no-symlink        do not link byroctl into /usr/local/bin or ~/.local/bin
@@ -89,7 +107,7 @@ parse_args() {
             *) PASSTHRU+=("$1"); shift ;;
         esac
     done
-    ROOT="${ROOT%/}"
+    [[ -z "$ROOT" ]] || ROOT="$(absolute_dir "$ROOT")"
 }
 
 check_prerequisites() {
@@ -214,6 +232,37 @@ reattach_terminal() {
     die "no terminal available for the installation questions. Run with --non-interactive and --set KEY=VALUE, or use: bash -c \"\$(curl -fsSL $RAW_BASE/stable/install.sh)\""
 }
 
+# choose_root: the installation directory. --root settles it; otherwise the
+# installer asks and proposes the current directory. Without a terminal nobody
+# can confirm a directory, so --non-interactive requires --root.
+choose_root() {
+    local answer
+    [[ -z "$ROOT" ]] || return 0
+    if (( NONINTERACTIVE )); then
+        die "no installation directory given. --non-interactive needs --root DIR (the interactive installer asks for the directory and proposes the current one)" 64
+    fi
+    log "no --root given; choose the installation directory (--root DIR skips this question)"
+    while true; do
+        read -r -p "Installation directory [$PWD]: " answer
+        [[ -n "$answer" ]] || answer="$PWD"
+        if [[ "$answer" =~ ^~(/|$) ]]; then   # read does not expand a leading tilde
+            answer="$HOME${answer#\~}"
+        fi
+        ROOT="$(absolute_dir "$answer")"
+        if [[ -f "$ROOT/byro.conf" ]]; then
+            log "existing byro installation found in $ROOT; byroctl resumes it"
+        elif [[ -d "$ROOT" && -n "$(ls -A "$ROOT" 2>/dev/null)" ]]; then
+            read -r -p "$ROOT is not empty and holds no byro installation. Install byro here anyway? [y/N]: " answer
+            if [[ ! "$answer" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                ROOT=""
+                continue
+            fi
+        fi
+        break
+    done
+    log "installing into $ROOT"
+}
+
 main() {
     set -euo pipefail
     parse_args "$@"
@@ -221,7 +270,12 @@ main() {
     resolve_version
     check_image
     if (( DRY_RUN )); then
-        log "dry run - would install byro $VERSION into $ROOT"
+        local root_note=""
+        if [[ -z "$ROOT" ]]; then
+            ROOT="$(absolute_dir "$PWD")"
+            root_note=" (the current directory; the installer asks for the directory, --root DIR sets it)"
+        fi
+        log "dry run - would install byro $VERSION into $ROOT$root_note"
         log "  1. create $ROOT (or ask you to create it with sudo)"
         log "  2. download $RAW_BASE/$VERSION/deploy/byroctl and verify it against SHA256SUMS of $VERSION"
         (( SYMLINK )) && log "  3. link byroctl into /usr/local/bin or ~/.local/bin"
@@ -231,10 +285,11 @@ main() {
         fi
         return 0
     fi
+    reattach_terminal
+    choose_root
     prepare_root
     install_byroctl
     create_symlink
-    reattach_terminal
     exec "$ROOT/byroctl" --root "$ROOT" install --version "$VERSION" "${PASSTHRU[@]}"
 }
 
