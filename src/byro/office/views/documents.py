@@ -4,6 +4,7 @@ from django import forms
 from django.contrib import messages
 from django.db import transaction
 from django.http import FileResponse
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, FormView
 
@@ -58,7 +59,7 @@ class DocumentUploadView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return self.request.path
+        return reverse("office:documents.add")
 
 
 class DocumentDetailView(DetailView):

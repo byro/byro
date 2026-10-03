@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import messages
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -64,6 +65,19 @@ class TransactionDetailView(ListView):
     def get_object(self):
         return Transaction.objects.with_balances().get(pk=self.kwargs["pk"])
 
+    def get_in_account(self):
+        """Return the account the transaction was opened from, if any.
+
+        Redirects must be built from the returned account, never from
+        the raw query string value.
+        """
+        if "in_account" not in self.request.GET:
+            return None
+        try:
+            return Account.objects.get(pk=self.request.GET["in_account"])
+        except (Account.DoesNotExist, ValueError):
+            raise Http404("No such account.")
+
     def get_queryset(self):
         return self.get_object().bookings.all()
 
@@ -77,6 +91,7 @@ class TransactionDetailView(ListView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         t = self.get_object()
+        in_account = self.get_in_account()
         form = self.get_form(request.POST)
         upload_form = self.get_upload_form(request.POST, request.FILES)
 
@@ -88,24 +103,24 @@ class TransactionDetailView(ListView):
             t = self.get_object()
 
             if t.is_balanced:
-                if "in_account" in request.GET:
-                    account = Account.objects.get(pk=request.GET["in_account"])
-                    if account.unbalanced_transactions.count():
+                if in_account:
+                    if in_account.unbalanced_transactions.count():
                         return redirect(
                             "{}?filter=unbalanced".format(
                                 reverse(
                                     "office:finance.accounts.detail",
-                                    kwargs={"pk": account.pk},
+                                    kwargs={"pk": in_account.pk},
                                 )
                             )
                         )
                 return redirect("office:finance.accounts.list")
 
-        if "in_account" in request.GET:
+        if in_account:
             return redirect(
-                "{}?in_account={}".format(
-                    reverse("office:finance.transactions.detail", kwargs={"pk": t.pk}),
-                    request.GET["in_account"],
+                reverse(
+                    "office:finance.transactions.detail",
+                    kwargs={"pk": t.pk},
+                    query={"in_account": in_account.pk},
                 )
             )
         else:
