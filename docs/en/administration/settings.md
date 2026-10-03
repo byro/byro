@@ -44,7 +44,7 @@ The association configuration itself covers:
   billed from retroactively - useful when an organization was migrated to
   byro later and older, unpaid fees should not become due retroactively,
 - **Language** and **currency** (code, symbol, symbol before/after the
-  amount, cent display),
+  amount, cent display); a new installation starts with `EUR` and `€`,
 - **External base URL** (`public_base_url`): only needed if public member
   pages should be reachable under a different base URL than the rest of
   byro; otherwise leave it empty.
