@@ -3,59 +3,99 @@ tag-template: 'v$RESOLVED_VERSION'
 
 # Kurzer Intro-Text – vor dem Publishen manuell ergänzen
 header: |
-  <!-- Kurze Beschreibung des Releases: Was ist das Highlight? Breaking Changes? -->
-  <!-- Vor dem Veröffentlichen: deploy/release.env prüfen (Flags für dieses Release gesetzt, SHA256SUMS
-       regeneriert, in den Notes erklärt?), Hinweise für Administratoren ergänzen. Danach gesetzte Flags
-       per PR auf 0 zurücksetzen. Ablauf und Checkliste: docs/en/development/releasing.md -->
+  <!-- Kurze, von Hand geschriebene Zusammenfassung des Releases: Was ist das Highlight? Breaking Changes? -->
+  <!-- Vor dem Veröffentlichen:
+       * Hinweise für Administratoren ergänzen, wo nötig.
+       * deploy/release.env prüfen: Flags für dieses Release gesetzt und in den Notes erklärt?
+       * deploy/SHA256SUMS regeneriert, falls sich Release-Artefakte unter deploy/ geändert haben
+         (auch release.env und plugin-catalog.conf)?
+       * Plugin-Katalog (deploy/plugin-catalog.conf) prüfen, falls betroffen.
+       * Version prüfen: Tag und Titel im Schema vYYYY.MINOR.PATCH, das Jahr stimmt, das erste Release
+         eines Jahres ist vYYYY.1.0.
+       Danach: gesetzte Flags per PR auf 0 zurücksetzen, mit regeneriertem SHA256SUMS.
+       Ablauf und Checkliste: docs/en/development/releasing.md -->
 
+# Classification is based on the Conventional Commit style pull request title,
+# which the "PR title" check validates (.github/workflows/pr-title.yml). Labels
+# only matter for dependencies and skip-changelog.
+# Contributor guidance: docs/en/development/contributing.md
 categories:
-  - title: '🚨 Breaking Changes'
-    label: 'breaking-change'
-  - title: '🎉 New Features'
-    label: 'enhancement'
+  # Release-worthy changes. Everything else (ci, test, refactor, build, chore,
+  # perf, revert) stays out of the release notes and the version calculation.
+  - type: pre-include
+    when:
+      - conventional:
+          types: ['feat', 'fix', 'docs']
+      - conventional:
+          breaking: true
+      - label: 'dependencies'
+      - conventional:
+          scopes: ['deps', 'deps-dev']
+  - type: pre-exclude
+    when:
+      label: 'skip-changelog'
+
+  # Sections of the release notes in display order. The first match wins
+  # (exclusive), so a pull request is listed exactly once. Deployment &
+  # Operations has to precede Features & Enhancements and Bug Fixes to take
+  # scoped feat/fix changes away from them. Every section counts as a patch
+  # release unless a version-resolver rule below raises it.
+  - title: '💥 Breaking Changes'
+    exclusive: true
+    when:
+      conventional:
+        breaking: true
+  - title: '🔐 Security'
+    exclusive: true
+    when:
+      conventional:
+        type: 'fix'
+        scope: 'security'
+  - title: '🚀 Deployment & Operations'
+    exclusive: true
+    when:
+      conventional:
+        types: ['feat', 'fix']
+        scopes: ['byroctl', 'deploy', 'docker', 'install', 'update']
+  - title: '✨ Features & Enhancements'
+    exclusive: true
+    when:
+      conventional:
+        type: 'feat'
   - title: '🐛 Bug Fixes'
-    labels:
-      - 'bug'
-      - 'fix'
-  - title: '🔧 Maintenance'
-    label: 'maintenance'
-  - title: '📦 Updated Dependencies'
-    labels:
-      - 'dependencies'
-  - title: '📖 Documentation'
-    label: 'documentation'
+    exclusive: true
+    when:
+      conventional:
+        type: 'fix'
+  - title: '📚 Documentation'
+    exclusive: true
+    when:
+      conventional:
+        type: 'docs'
+  - title: '📦 Dependencies'
+    collapse-after: 3
+    when:
+      - label: 'dependencies'
+      - conventional:
+          scopes: ['deps', 'deps-dev']
 
-exclude-labels:
-  - 'skip-changelog'
-
-autolabeler:
-  - label: 'dependencies'
-    author:
-      - 'dependabot[bot]'
-      - 'renovate[bot]'
+  # Version calculation, independent of the section a change is listed in.
+  # byro's scheme is vYYYY.MINOR.PATCH: the first field is the calendar year,
+  # not a SemVer major version, so nothing here may be "major". A breaking
+  # change and a feat both advance MINOR, everything else PATCH; the highest
+  # increment wins. The year is set by hand for the first release of a year.
+  - type: version-resolver
+    semver-increment: minor
+    when:
+      - conventional:
+          breaking: true
+      - conventional:
+          type: 'feat'
 
 change-template: '- $TITLE by @$AUTHOR in #$NUMBER'
 change-title-escapes: '\<*_&'
 
-version-resolver:
-  major:
-    labels:
-      - 'breaking-change'
-  minor:
-    labels:
-      - 'enhancement'
-  patch:
-    labels:
-      - 'bug'
-      - 'fix'
-      - 'maintenance'
-      - 'dependencies'
-      - 'documentation'
-  default: patch
-
 template: |
-  $HEADER
-
   $CHANGES
 
-  **Full Changelog**: $PREVIOUS_TAG...$TAG
+  [Full Changelog](https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_TAG)

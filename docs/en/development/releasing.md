@@ -7,16 +7,45 @@ deployment tooling: the `stable` pointer and the release flags in
 
 ## How a release is made
 
+Automation and maintainers share the work:
+
+* **Automatic:** the draft release with the categorized changelog and the
+  proposed version; after publishing, the release pipeline with tests and
+  build, the upload to PyPI, the container image and the `stable` pointer.
+* **Manual:** the release summary at the top of the notes, the notes for
+  administrators, the release flags in `deploy/release.env`, the final check
+  of the version including the year, publishing the release, and resetting
+  the flags afterwards.
+
 1. [Release Drafter](https://github.com/release-drafter/release-drafter) keeps
    a draft release up to date on GitHub. Every merged pull request adds a line
-   under the category of its label (`breaking-change`, `enhancement`,
-   `bug`/`fix`, `maintenance`, `dependencies`, `documentation`). The drafter
-   also proposes the next tag, but with semantic-versioning rules:
-   `breaking-change` bumps the first field, `enhancement` the second,
-   everything else the third. byro's scheme is `vYYYY.MINOR.PATCH`, so check
-   the proposed tag and edit it by hand when needed: the first field is always
-   the current year, the first release of a year is `vYYYY.1.0`, and a
-   `breaking-change` label must not bump the year.
+   under the section that its title selects (see
+   [Pull request titles](contributing.md#pull-request-titles)). The first
+   match in this order wins:
+
+    * *Breaking Changes*: any type marked with `!`,
+    * *Security*: `fix(security)`,
+    * *Deployment & Operations*: `feat` or `fix` with the scope `byroctl`,
+      `deploy`, `docker`, `install` or `update`,
+    * *Features & Enhancements*: `feat`,
+    * *Bug Fixes*: `fix`,
+    * *Documentation*: `docs`,
+    * *Dependencies*: the label `dependencies`, which Dependabot sets, or the
+      scope `deps`.
+
+    Pull requests of the other types (`ci`, `test`, `refactor`, `build`,
+    `chore`, `perf`, `revert`) do not appear in the release notes, and neither
+    does one that carries the label `skip-changelog`. If a title turns out to
+    be wrong, edit it, even after the merge: the draft follows.
+
+    The drafter also proposes the next tag in byro's scheme
+    `vYYYY.MINOR.PATCH`: a breaking change and a `feat` advance `MINOR`,
+    everything else advances `PATCH`. After `v2026.4.0`, a pull request titled
+    `fix(mails)!: …` therefore leads to `v2026.5.0`. The first field is the
+    calendar year, not a major version, and the drafter never changes it. The
+    year stays a manual decision: check the proposed tag for the first release
+    of a year and set it by hand to `vYYYY.1.0`.
+
 2. Before publishing, edit the draft: write the introduction (the placeholder
    at the top) and go through the checklist at the end of this page.
 3. Publish the release. GitHub creates the tag, and the tag starts the release
@@ -105,8 +134,9 @@ pointer go through the workflow, never through a direct push.
     explicitly (`byroctl update` asks, `--yes` confirms). Use it only when an
     administrator has to act or decide before updating: a configuration that
     must change, a service that goes away, a manual step. It is not a synonym
-    for the `breaking-change` label, which also covers code and plugin API
-    changes that need no action from administrators.
+    for a breaking change marked with `!` in a pull request title, which also
+    covers code and plugin API changes that need no action from
+    administrators.
 
 `BYRO_RELEASE_DATA_MIGRATION=1`
 :   The release changes files outside the database (documents, uploads, GnuPG
@@ -206,8 +236,16 @@ Before publishing:
 
 * the draft is reviewed, the introduction is written, the categories are
   complete,
+* the notes contain no unresolved template placeholder: no literal variable
+  such as `$RESOLVED_TAG`, and the reminder at the top is replaced by the
+  introduction,
+* tag and title name the intended version: `vYYYY.MINOR.PATCH` with the
+  current year, and `vYYYY.1.0` for the first release of a year,
 * `deploy/release.env` has the flags this release needs, and the release notes
   explain them,
+* `deploy/SHA256SUMS` is up to date if a release artifact below `deploy/`
+  changed, for example `release.env` or the plugin catalog
+  (`.github/scripts/deploy-checksums.sh --check`),
 * the release notes tell administrators what to do,
 * `deploy/plugin-catalog.conf` lists only plugins that work with this release
   and the catalog lint is green,
@@ -217,5 +255,8 @@ Before publishing:
 After publishing:
 
 * the pipeline run is green, including *Point stable at the release*,
+* the package is on PyPI and the image `ghcr.io/byro/byro:vYYYY.M.P` is in
+  the registry,
 * `stable` names the new release (`stable.env` on the branch),
-* a flag that was set is reset to `0` in a follow-up pull request.
+* a flag that was set is reset to `0` in a follow-up pull request, together
+  with a regenerated `deploy/SHA256SUMS`.

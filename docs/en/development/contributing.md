@@ -45,6 +45,59 @@ your changes for any issues (breaking tests, code style issues, documentation
 style issues, …). Please give us five to seven days to get back to you with a
 review or a direct merge.
 
+## Issues
+
+Issues carry one of GitHub's issue types: *Bug*, *Feature* or *Task*. The
+issue forms set *Bug* and *Feature* for you; *Task* is for technical work that
+maintainers create themselves. New issues also receive the label
+`needs-triage` until a maintainer has looked at them. There are no labels for
+the type, the priority or the status of an issue.
+
+The assignee shows who is actively working on an issue. If you would like to
+work on one, say so in a comment, and a maintainer assigns it to you. Two
+labels help you choose:
+
+- `good first issue` marks tasks that are suitable for newcomers,
+- `help wanted` marks issues for which the maintainers are explicitly looking
+  for contributors.
+
+## Pull request titles
+
+The title of a pull request follows
+[Conventional Commits](https://www.conventionalcommits.org/): a type, an
+optional scope in parentheses, a colon and a short summary.
+
+```text
+feat(members): add configurable member numbers
+fix(finance): handle empty CAMT statements
+docs(install): document reverse proxy setup
+chore(deps): update Django
+ci: update release workflow
+```
+
+| Type       | Use it for                                    |
+| ---------- | --------------------------------------------- |
+| `feat`     | a new feature or enhancement                  |
+| `fix`      | a bug fix                                     |
+| `docs`     | documentation only                            |
+| `perf`     | a performance improvement                     |
+| `refactor` | restructuring without a change in behavior    |
+| `test`     | tests only                                    |
+| `build`    | packaging and the build system                |
+| `ci`       | CI workflows and scripts                      |
+| `chore`    | other maintenance, for example `chore(deps)`  |
+| `revert`   | reverting an earlier change                   |
+
+The scope is optional and names the part of byro you changed. Mark a breaking
+change with `!` before the colon, for example
+`feat(api)!: change authentication response format`, and use `fix(security)`
+for security fixes.
+
+The CI check *PR title* validates the title. Only the title is checked, not
+your individual commit messages. The title also decides where your change
+appears in the release notes, so you do not need to set any labels. Open a
+draft pull request while your work is not ready for review.
+
 ## Documentation
 
 If your pull request changes visible behavior (a new setting, a new workflow,

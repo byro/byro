@@ -1,9 +1,17 @@
 version: 2
+# Every update gets only the "dependencies" label (no ecosystem labels) and a
+# title of the form "chore(deps): bump ...", which the "PR title" check accepts
+# and Release Drafter lists under Dependencies.
 updates:
   - package-ecosystem: pip
     directory: "/src"
     schedule:
       interval: daily
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope
     open-pull-requests-limit: 10
     ignore:
     # Django is a range requirement (>=5.2,<5.3) without a lockfile, so
@@ -19,15 +27,35 @@ updates:
     directory: "/docs"
     schedule:
       interval: daily
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope
   - package-ecosystem: docker
     directory: "/src"
     schedule:
       interval: daily
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope
   - package-ecosystem: docker
     directory: "/deploy"
     schedule:
       interval: daily
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: daily
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope

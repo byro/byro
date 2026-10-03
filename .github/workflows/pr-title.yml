@@ -1,0 +1,45 @@
+name: PR title
+
+# Validates that the pull request title follows Conventional Commits. The title
+# decides the release-notes section and the version increment
+# (.github/release-drafter.yml), so it replaces the former changelog labels.
+# Contributor guidance: docs/en/development/contributing.md
+#
+# pull_request_target runs this workflow definition from main, also for pull
+# requests from forks, where a contributor cannot alter it. That is safe here
+# because the job never checks out or runs code from the pull request: it only
+# reads the title through the API with a read-only token.
+#
+# "synchronize" is required for a required status check: the check is attached
+# to the head commit, so every push needs a fresh result.
+
+on:
+  pull_request_target:
+    types: [ opened, reopened, edited, synchronize ]
+
+permissions: {}
+
+jobs:
+  pr-title:
+    # Stable name: configure "PR title" as the required status check for main.
+    name: PR title
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # A scope is optional and not restricted; "!" marks a breaking change.
+          types: |
+            feat
+            fix
+            docs
+            perf
+            refactor
+            test
+            build
+            ci
+            chore
+            revert
