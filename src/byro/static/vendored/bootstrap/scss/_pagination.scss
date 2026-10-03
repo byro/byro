@@ -11,12 +11,10 @@
   margin-left: -$pagination-border-width;
   line-height: $pagination-line-height;
   color: $pagination-color;
-  text-decoration: if($link-decoration == none, null, none);
   background-color: $pagination-bg;
   border: $pagination-border-width solid $pagination-border-color;
 
   &:hover {
-    z-index: 2;
     color: $pagination-hover-color;
     text-decoration: none;
     background-color: $pagination-hover-bg;
@@ -24,9 +22,14 @@
   }
 
   &:focus {
-    z-index: 3;
-    outline: $pagination-focus-outline;
+    z-index: 2;
+    outline: 0;
     box-shadow: $pagination-focus-box-shadow;
+  }
+
+  // Opinionated: add "hand" cursor to non-disabled .page-link elements
+  &:not(:disabled):not(.disabled) {
+    cursor: pointer;
   }
 }
 
@@ -44,7 +47,7 @@
   }
 
   &.active .page-link {
-    z-index: 3;
+    z-index: 1;
     color: $pagination-active-color;
     background-color: $pagination-active-bg;
     border-color: $pagination-active-border-color;
@@ -66,9 +69,9 @@
 //
 
 .pagination-lg {
-  @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $line-height-lg, $pagination-border-radius-lg);
+  @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $line-height-lg, $border-radius-lg);
 }
 
 .pagination-sm {
-  @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $line-height-sm, $pagination-border-radius-sm);
+  @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $line-height-sm, $border-radius-sm);
 }

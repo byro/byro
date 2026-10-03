@@ -1,7 +1,7 @@
 // Base class
 //
 // Kickstart any navigation component with a set of style resets. Works with
-// `<nav>`s, `<ul>`s or `<ol>`s.
+// `<nav>`s or `<ul>`s.
 
 .nav {
   display: flex;
@@ -14,17 +14,14 @@
 .nav-link {
   display: block;
   padding: $nav-link-padding-y $nav-link-padding-x;
-  text-decoration: if($link-decoration == none, null, none);
 
-  @include hover-focus() {
+  @include hover-focus {
     text-decoration: none;
   }
 
   // Disabled state lightens text
   &.disabled {
     color: $nav-link-disabled-color;
-    pointer-events: none;
-    cursor: default;
   }
 }
 
@@ -35,15 +32,15 @@
 .nav-tabs {
   border-bottom: $nav-tabs-border-width solid $nav-tabs-border-color;
 
-  .nav-link {
+  .nav-item {
     margin-bottom: -$nav-tabs-border-width;
-    background-color: transparent;
+  }
+
+  .nav-link {
     border: $nav-tabs-border-width solid transparent;
     @include border-top-radius($nav-tabs-border-radius);
 
-    @include hover-focus() {
-      // Prevents active .nav-link tab overlapping focus outline of previous/next .nav-link
-      isolation: isolate;
+    @include hover-focus {
       border-color: $nav-tabs-link-hover-border-color;
     }
 
@@ -76,8 +73,6 @@
 
 .nav-pills {
   .nav-link {
-    background: none;
-    border: 0;
     @include border-radius($nav-pills-border-radius);
   }
 
@@ -94,7 +89,6 @@
 //
 
 .nav-fill {
-  > .nav-link,
   .nav-item {
     flex: 1 1 auto;
     text-align: center;
@@ -102,7 +96,6 @@
 }
 
 .nav-justified {
-  > .nav-link,
   .nav-item {
     flex-basis: 0;
     flex-grow: 1;
