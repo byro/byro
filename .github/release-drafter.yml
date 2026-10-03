@@ -37,9 +37,9 @@ categories:
 
   # Sections of the release notes in display order. The first match wins
   # (exclusive), so a pull request is listed exactly once. Deployment &
-  # Operations has to precede Features and Bug Fixes to take scoped feat/fix
-  # changes away from them. Every section counts as a patch release unless a
-  # version-resolver rule below raises it.
+  # Operations has to precede Features & Enhancements and Bug Fixes to take
+  # scoped feat/fix changes away from them. Every section counts as a patch
+  # release unless a version-resolver rule below raises it.
   - title: '💥 Breaking Changes'
     exclusive: true
     when:
@@ -57,7 +57,7 @@ categories:
       conventional:
         types: ['feat', 'fix']
         scopes: ['byroctl', 'deploy', 'docker', 'install', 'update']
-  - title: '✨ Features'
+  - title: '✨ Features & Enhancements'
     exclusive: true
     when:
       conventional:
@@ -98,4 +98,4 @@ change-title-escapes: '\<*_&'
 template: |
   $CHANGES
 
-  **Full Changelog**: $PREVIOUS_TAG...$RESOLVED_TAG
+  [Full Changelog](https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_TAG)

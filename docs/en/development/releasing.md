@@ -27,7 +27,7 @@ Automation and maintainers share the work:
     * *Security*: `fix(security)`,
     * *Deployment & Operations*: `feat` or `fix` with the scope `byroctl`,
       `deploy`, `docker`, `install` or `update`,
-    * *Features*: `feat`,
+    * *Features & Enhancements*: `feat`,
     * *Bug Fixes*: `fix`,
     * *Documentation*: `docs`,
     * *Dependencies*: the label `dependencies`, which Dependabot sets, or the

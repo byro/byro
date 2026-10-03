@@ -77,7 +77,7 @@ ci: update release workflow
 
 | Typ        | Verwende ihn für                                |
 | ---------- | ----------------------------------------------- |
-| `feat`     | eine neue Funktion                              |
+| `feat`     | eine neue Funktion oder Erweiterung             |
 | `fix`      | eine Fehlerbehebung                             |
 | `docs`     | reine Dokumentationsänderungen                  |
 | `perf`     | eine Performance-Verbesserung                   |
