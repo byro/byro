@@ -32,6 +32,10 @@
   description: Exclude this PR from release notes
 
 # Workflow-Labels
+- name: needs-triage
+  color: 'd876e3'
+  description: Needs maintainer triage
+
 - name: needs-review
   color: 'fbca04'
   description: Waiting for review
@@ -47,4 +51,17 @@
 - name: help wanted
   color: '008672'
   description: Extra attention is needed
+
+# Dependabot-Labels
+- name: github_actions
+  color: '000000'
+  description: Pull requests that update GitHub Actions code
+
+- name: python
+  color: '2b67c6'
+  description: Pull requests that update python code
+
+- name: docker
+  color: '21ceff'
+  description: Pull requests that update docker code
 
