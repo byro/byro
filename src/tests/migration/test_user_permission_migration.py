@@ -66,7 +66,8 @@ def test_migration_is_wired_up_and_reversible_as_noop():
     migration = loader.graph.nodes[MIGRATION]
     assert ("common", "0020_alter_configuration_language") in migration.dependencies
     assert any(app == "auth" for app, _name in migration.dependencies)
-    assert loader.graph.leaf_nodes("common") == [MIGRATION]
+    (leaf,) = loader.graph.leaf_nodes("common")
+    assert MIGRATION in loader.graph.forwards_plan(leaf)
 
     (operation,) = migration.operations
     assert isinstance(operation, migrations.RunPython)
