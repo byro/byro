@@ -593,6 +593,7 @@ def default_csv_form_valid(view, form, dialect="excel"):
                             fields["_internal_last_transaction"].name,
                         ),
                     )
+                    transaction.set_rollback(True)
                     return redirect("office:members.list.import")
 
                 member.log(view, ".created")

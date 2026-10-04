@@ -9,9 +9,10 @@ from django.test import override_settings
 from django.urls import include, path, reverse
 from django.utils.timezone import now
 
+from byro.bookkeeping.models import Transaction
 from byro.common.models import LogEntry
 from byro.mails.models import MemberPGPKey, PGPKeySource, PGPKeyStatus
-from byro.members.models import Member
+from byro.members.models import Member, Membership
 from byro.office.views import members as members_views
 
 pytestmark = pytest.mark.usefixtures("configuration")
@@ -454,6 +455,65 @@ def test_member_import_balance_without_timestamp_redirects_to_import(
             balance, timestamp
         )
     ]
+    assert not Member.all_objects.exists()
+
+
+@pytest.mark.django_db
+def test_member_import_failure_rolls_back_previous_rows(member, logged_in_client):
+    fields = Member.get_fields()
+    previous_logs = set(LogEntry.objects.values_list("pk", flat=True))
+    previous_transactions = set(Transaction.objects.values_list("pk", flat=True))
+    previous_memberships = set(Membership.objects.values_list("pk", flat=True))
+    response = post_member_import(
+        logged_in_client,
+        "{},{},{},{},{},{}\r\n"
+        "Earlier member,10,2026-01-01,2026-01-01,20,12\r\n"
+        "Failing member,5,,,,\r\n".format(
+            fields["member__name"].name,
+            fields["_internal_balance"].name,
+            fields["_internal_last_transaction"].name,
+            fields["membership__start"].name,
+            fields["membership__amount"].name,
+            fields["membership__interval"].name,
+        ),
+    )
+
+    assert response.status_code == 302
+    assert response["Location"] == reverse("office:members.list.import")
+    member.refresh_from_db()
+    assert member.name == "Jona Than"
+    assert list(Member.all_objects.values_list("pk", flat=True)) == [member.pk]
+    assert set(Membership.objects.values_list("pk", flat=True)) == previous_memberships
+    assert (
+        set(Transaction.objects.values_list("pk", flat=True)) == previous_transactions
+    )
+    assert (
+        set(
+            LogEntry.objects.exclude(action_type="byro.members.import").values_list(
+                "pk", flat=True
+            )
+        )
+        == previous_logs
+    )
+
+
+@pytest.mark.django_db
+def test_member_import_with_balance_and_timestamp_commits(logged_in_client):
+    fields = Member.get_fields()
+    response = post_member_import(
+        logged_in_client,
+        "{},{},{}\r\nJane Doe,10,2026-01-01\r\n".format(
+            fields["member__name"].name,
+            fields["_internal_balance"].name,
+            fields["_internal_last_transaction"].name,
+        ),
+    )
+
+    assert response.status_code == 302
+    assert response["Location"] == reverse("office:members.list")
+    imported = Member.all_objects.get(name="Jane Doe")
+    assert imported.balance == 10
+    assert imported.log_entries().filter(action_type="byro.members.created").exists()
 
 
 @pytest.mark.django_db

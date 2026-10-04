@@ -145,6 +145,9 @@ import aborts with an error before anything is written.
   **new** members (both columns must be present together).
 * New members with no membership columns are created without a membership.
 
+If the import fails, all changes to members, memberships and bookings from
+that file are rolled back. Correct the file and import it again.
+
 ## Bulk actions
 
 * **Generate balances** (`Members → List → Balances`): creates a balance

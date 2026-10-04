@@ -154,6 +154,10 @@ wird.
 * Neue Mitglieder ohne Mitgliedschaftsspalten werden ohne Mitgliedschaft
   angelegt.
 
+Bricht der Import mit einem Fehler ab, werden alle Änderungen an Mitgliedern,
+Mitgliedschaften und Buchungen aus dieser Datei zurückgenommen. Korrigiere die
+Datei und importiere sie erneut.
+
 ## Massenaktionen
 
 * **Salden generieren** (`Mitglieder → Liste → Salden`): erzeugt für alle
