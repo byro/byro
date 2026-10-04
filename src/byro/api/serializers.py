@@ -1,4 +1,3 @@
-from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
@@ -158,13 +157,16 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 class DocumentUploadSerializer(serializers.ModelSerializer):
     document = DocumentFileField()
-    # The model default is a datetime, which a DateField cannot represent
-    date = serializers.DateField(required=False, default=timezone.localdate)
 
     class Meta:
         model = Document
         fields = ["document", "title", "date", "category", "direction"]
-        extra_kwargs = {"title": {"required": True, "allow_null": False}}
+        # The model allows documents without a title or a date, an upload
+        # does not. A missing date gets the default of the model.
+        extra_kwargs = {
+            "title": {"required": True, "allow_null": False},
+            "date": {"allow_null": False},
+        }
 
     def get_fields(self):
         fields = super().get_fields()
