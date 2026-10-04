@@ -14,6 +14,9 @@ Dokumente sind hochgeladene Dateien mit Titel, Datum, Kategorie und Richtung
   verbinden.
 * **Allgemein, ohne Bezug** (`Dokumente → Hinzufügen`): für Dokumente, die zu
   keinem Mitglied und keiner Transaktion gehören.
+* **Über die REST-API**: an einem Mitglied, zum Beispiel beim Import der
+  Dateien aus einem anderen System (siehe
+  [Dokumente eines Mitglieds](../development/api.md#dokumente-eines-mitglieds)).
 
 ## Kategorien
 
