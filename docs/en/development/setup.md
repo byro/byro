@@ -168,6 +168,22 @@ parallelized with automatic reruns for flaky tests:
     run `python -m pytest -n auto tests` (`pytest-xdist` is already part of
     the development dependencies).
 
+The test suite ignores byro plugins that are installed in your environment.
+`setup.cfg` selects `byro.common.settings.core_test_settings`, which drops the
+discovered `byro.plugin` entry points before Django loads the apps; the
+bundled plugins `byro.plugins.profile` and `byro.plugins.sepa` stay installed.
+To run the tests with the installed plugins, select the test settings that
+load them:
+
+```console
+(env)$ python -m pytest --ds=byro.common.settings.test_settings tests
+```
+
+Setting the environment variable
+`DJANGO_SETTINGS_MODULE=byro.common.settings.test_settings` has the same
+effect. Core tests may fail in that mode, because a plugin can register
+signal receivers that the tests do not expect.
+
 It's a good idea to put the style checks into your git hook
 `.git/hooks/pre-commit`, for example:
 

@@ -9,6 +9,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import textwrap
 
 import pytest
 from django.db import connection, migrations
@@ -30,8 +31,11 @@ def migrate(database, *target):
     env = {
         key: value for key, value in os.environ.items() if not key.startswith("BYRO_")
     }
+    # the core test settings take the database from the config file as well,
+    # but leave out the plugins installed in the environment
     env.update(
-        BYRO_CONFIG_FILE=str(config_file), DJANGO_SETTINGS_MODULE="byro.settings"
+        BYRO_CONFIG_FILE=str(config_file),
+        DJANGO_SETTINGS_MODULE="byro.common.settings.core_test_settings",
     )
     subprocess.run(
         [sys.executable, "manage.py", "migrate", *target, "--verbosity", "0"],
@@ -95,6 +99,69 @@ def test_existing_configuration_keeps_its_currency(database, currency):
     # ... and neither does any later migration up to the current state
     migrate(database)
     assert query(database, "SELECT currency FROM common_configuration") == [(currency,)]
+
+
+@pytest.fixture
+def broken_external_plugin(tmp_path, monkeypatch):
+    """A plugin that every child interpreter finds installed: a package and
+    its ``byro.plugin`` entry point on ``PYTHONPATH``. Importing the package
+    leaves a marker file, loading its app fails."""
+    site = tmp_path / "site"
+    package = site / "byro_broken_plugin"
+    package.mkdir(parents=True)
+    (package / "__init__.py").write_text(
+        "from pathlib import Path\n\nPath(__file__).with_name('imported').touch()\n"
+    )
+    (package / "apps.py").write_text(textwrap.dedent("""
+            from django.apps import AppConfig
+
+
+            class BrokenPluginApp(AppConfig):
+                name = "byro_broken_plugin"
+
+                class ByroPluginMeta:
+                    name = "Broken plugin"
+                    version = "1.0"
+
+                def ready(self):
+                    raise RuntimeError("external plugin was loaded")
+            """))
+    dist_info = site / "byro_broken_plugin-1.0.dist-info"
+    dist_info.mkdir()
+    (dist_info / "METADATA").write_text(
+        "Metadata-Version: 2.1\nName: byro-broken-plugin\nVersion: 1.0\n"
+    )
+    (dist_info / "entry_points.txt").write_text(
+        "[byro.plugin]\nbyro_broken_plugin = byro_broken_plugin:ByroPluginMeta\n"
+    )
+    monkeypatch.setenv(
+        "PYTHONPATH",
+        os.pathsep.join(filter(None, [str(site), os.environ.get("PYTHONPATH")])),
+    )
+    return package
+
+
+def test_migrate_does_not_load_external_plugins(database, broken_external_plugin):
+    # child interpreters do discover the entry point ...
+    discovered = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "from importlib.metadata import entry_points;"
+            "print(*(ep.value for ep in entry_points(group='byro.plugin')))",
+        ],
+        cwd=SRC_DIR,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    assert "byro_broken_plugin:ByroPluginMeta" in discovered.split()
+
+    # ... but the migration runs without the plugin (issue #567)
+    migrate(database)
+
+    assert query(database, "SELECT currency FROM common_configuration") == [("EUR",)]
+    assert not (broken_external_plugin / "imported").exists()
 
 
 @pytest.mark.django_db
