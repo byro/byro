@@ -154,7 +154,10 @@ def get_file_icon(document):
 
 
 def get_document_timeline(member):
-    for document in member.documents.order_by("-date", "-id").all():
+    # A document without a date has no place in the chronology, just like an
+    # email that was not sent. It stays visible in the documents of the member.
+    documents = member.documents.filter(date__isnull=False)
+    for document in documents.order_by("-date", "-id"):
         base_data = {
             "type": "document",
             "icon": get_file_icon(document),
@@ -169,6 +172,8 @@ def get_document_timeline(member):
 
 def add_dummy_entries(entries):
     entries = peekable(entries)
+    if not entries:
+        return
     prev_entry = next(entries)
     yield prev_entry
     output_month, output_year = prev_entry["date"].month, prev_entry["date"].year

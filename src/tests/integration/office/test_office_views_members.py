@@ -10,8 +10,10 @@ from django.urls import include, path, reverse
 from django.utils.timezone import now
 
 from byro.common.models import LogEntry
+from byro.documents.models import Document
 from byro.mails.models import MemberPGPKey, PGPKeySource, PGPKeyStatus
-from byro.members.models import Member
+from byro.members.models import FeeIntervals, Member
+from byro.members.timeline import get_document_timeline
 from byro.office.views import members as members_views
 
 pytestmark = pytest.mark.usefixtures("configuration")
@@ -488,3 +490,86 @@ def test_members_typeahead_returns_name_unchanged_as_json(
         "count": 1,
         "results": [{"id": member.pk, "nick": None, "name": name}],
     }
+
+
+def create_document(member, title, date):
+    return Document.objects.create(
+        document=SimpleUploadedFile("document.txt", b"a document"),
+        title=title,
+        date=date,
+        member=member,
+    )
+
+
+@pytest.mark.parametrize(
+    "other_entries",
+    (
+        pytest.param("membership", id="with-entries-of-another-kind"),
+        pytest.param("document", id="with-a-dated-document"),
+        pytest.param("both", id="with-both"),
+        pytest.param(None, id="alone"),
+    ),
+)
+@pytest.mark.django_db
+def test_member_timeline_with_document_without_date(
+    member, logged_in_client, other_entries
+):
+    """A document without a date has no place in a chronology and is left out,
+    like an email that was never sent. It must not break the timeline."""
+    create_document(member, "Undated letter", None)
+    if other_entries in ("membership", "both"):
+        member.memberships.create(
+            start=now().date(), amount=20, interval=FeeIntervals.MONTHLY
+        )
+    if other_entries in ("document", "both"):
+        create_document(member, "Dated letter", now().date())
+
+    response = logged_in_client.get(
+        reverse("office:members.timeline", kwargs={"pk": member.pk})
+    )
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "Undated letter" not in content
+    assert ("Dated letter" in content) is (other_entries in ("document", "both"))
+    assert ("tl-entry-ops-membership-begin" in content) is (
+        other_entries in ("membership", "both")
+    )
+
+
+@pytest.mark.django_db
+def test_member_timeline_without_entries(member, logged_in_client):
+    response = logged_in_client.get(
+        reverse("office:members.timeline", kwargs={"pk": member.pk})
+    )
+
+    assert response.status_code == 200
+    assert "tl-entry" not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_member_timeline_lists_only_dated_documents(member):
+    create_document(member, "Undated letter", None)
+    older = create_document(
+        member, "Older letter", now().date() - relativedelta(days=40)
+    )
+    newer = create_document(member, "Newer letter", now().date())
+
+    entries = list(get_document_timeline(member))
+
+    assert [entry["instance"] for entry in entries] == [newer, older]
+    assert [entry["date"] for entry in entries] == [newer.date, older.date]
+
+
+@pytest.mark.django_db
+def test_member_timeline_keeps_documents_without_date_in_the_documents_tab(
+    member, logged_in_client
+):
+    create_document(member, "Undated letter", None)
+
+    response = logged_in_client.get(
+        reverse("office:members.documents", kwargs={"pk": member.pk})
+    )
+
+    assert response.status_code == 200
+    assert "Undated letter" in response.content.decode()
