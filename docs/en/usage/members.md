@@ -117,6 +117,11 @@ direction incoming/outgoing/other) and lists the existing ones. More on the
 general document system (sending as a mail attachment, categories in detail)
 on the Documents page once it exists.
 
+A document without a date (possible for documents created by a plugin, for
+example) stays in this list. It gets no document entry of its own in the
+timeline, because there is no date to place it by. If the upload was logged,
+that log entry still appears in the timeline at the time of the upload.
+
 ### Data disclosure
 
 "Disclosure" generates a single disclosure mail for this member (content: all

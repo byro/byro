@@ -11,6 +11,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
@@ -177,6 +178,20 @@ def test_upload_empty_date_uses_default(api_client, member, payload):
 
     assert response.status_code == 201
     assert Document.objects.get().date == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_upload_default_date_is_the_local_date(api_client, member, payload, settings):
+    settings.TIME_ZONE = "Europe/Berlin"
+    # half past midnight in Berlin, still the day before in UTC
+    with freeze_time("2023-12-31 23:30:00"):
+        response = api_client.post(
+            list_url(member.pk), payload(date=None), format="multipart"
+        )
+
+    assert response.status_code == 201
+    assert response.json()["date"] == "2024-01-01"
+    assert Document.objects.get().date == datetime.date(2024, 1, 1)
 
 
 @pytest.mark.django_db
@@ -437,6 +452,7 @@ def test_unknown_document(api_client, member, create_document):
         pytest.param({"title": ""}, "title", id="blank-title"),
         pytest.param({"title": "x" * 301}, "title", id="title-too-long"),
         pytest.param({"date": "15.04.2022"}, "date", id="invalid-date"),
+        pytest.param({"date": "null"}, "date", id="null-as-date"),
         pytest.param({"category": "byro.unknown"}, "category", id="unknown-category"),
         pytest.param({"direction": "sideways"}, "direction", id="invalid-direction"),
     ),

@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
-from django.utils.timezone import now
+from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
 from byro.common.models import LogTargetMixin
@@ -28,7 +28,7 @@ class Document(models.Model, LogTargetMixin):
         ordering = ("-date", "title", "-id")
 
     document = models.FileField(upload_to="documents/%Y/%m/", max_length=1000)
-    date = models.DateField(null=True, default=now)
+    date = models.DateField(null=True, default=localdate)
     title = models.CharField(max_length=300, null=True)
     category = models.CharField(max_length=300, null=True)
     direction = models.CharField(
