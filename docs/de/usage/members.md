@@ -123,6 +123,12 @@ und Plugins –, Richtung eingehend/ausgehend/sonstig) und listet die bereits
 vorhandenen. Mehr zum allgemeinen Dokumentensystem (Versand als Mailanhang,
 Kategorien im Detail) auf der Dokumente-Seite, sobald sie entsteht.
 
+Ein Dokument ohne Datum (möglich zum Beispiel bei Dokumenten, die ein Plugin
+angelegt hat) bleibt in dieser Liste. In der Zeitleiste erhält es keinen
+eigenen Dokumenteintrag, weil ein Datum für die zeitliche Einordnung fehlt.
+Wurde der Upload protokolliert, erscheint dieser Log-Eintrag weiterhin mit
+dem Zeitpunkt des Uploads in der Zeitleiste.
+
 ### Datenoffenlegung
 
 „Offenlegung“ erzeugt eine einzelne Auskunftsmail für dieses Mitglied (Inhalt:

@@ -44,3 +44,43 @@ def test_document_upload_redirects_to_named_route_from_other_path(logged_in_clie
     assert response["Location"] == reverse("office:documents.add")
     assert response["Location"] == "/documents/add"
     assert Document.objects.get().title == "Minutes"
+
+
+@pytest.fixture
+def undated_document(member):
+    """The model allows documents without a date, for example from a plugin."""
+    return Document.objects.create(
+        document=SimpleUploadedFile("undated.txt", b"an undated document"),
+        title="Undated letter",
+        date=None,
+        member=member,
+    )
+
+
+@pytest.mark.django_db
+def test_document_detail_without_date(logged_in_client, undated_document):
+    response = logged_in_client.get(
+        reverse("office:documents.detail", kwargs={"pk": undated_document.pk})
+    )
+
+    assert response.status_code == 200
+    assert "Undated letter" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_member_documents_list_without_date(logged_in_client, member, undated_document):
+    dated = Document.objects.create(
+        document=SimpleUploadedFile("dated.txt", b"a dated document"),
+        title="Dated letter",
+        date=now().date(),
+        member=member,
+    )
+
+    response = logged_in_client.get(
+        reverse("office:members.documents", kwargs={"pk": member.pk})
+    )
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "Undated letter" in content
+    assert dated.title in content
