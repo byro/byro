@@ -127,38 +127,40 @@ urlpatterns = [
         ),
     ),
     re_path(
-        r"^transactions/(?P<pk>\d+)/",
+        r"^transactions/(?P<pk>\d+)/$",
         transactions.TransactionDetailView.as_view(),
         name="finance.transactions.detail",
     ),
     re_path(
-        "^upload/list", upload.UploadListView.as_view(), name="finance.uploads.list"
+        "^upload/list$", upload.UploadListView.as_view(), name="finance.uploads.list"
     ),
     re_path(
-        r"^upload/process/(?P<pk>\d+)",
+        r"^upload/process/(?P<pk>\d+)$",
         upload.UploadProcessView.as_view(),
         name="finance.uploads.process",
     ),
     re_path(
-        r"^upload/match/(?P<pk>\d+)",
+        r"^upload/match/(?P<pk>\d+)$",
         upload.UploadMatchView.as_view(),
         name="finance.uploads.match",
     ),
     re_path(
-        "^upload/add",
+        "^upload/add$",
         upload.BankTransactionImportView.as_view(),
         name="finance.uploads.add",
     ),
     re_path(
-        "^documents/add", documents.DocumentUploadView.as_view(), name="documents.add"
+        "^documents/add$",
+        documents.DocumentUploadView.as_view(),
+        name="documents.add",
     ),
     re_path(
-        r"^documents/(?P<pk>\d+)/(?P<filename>[^/]+)",
+        r"^documents/(?P<pk>\d+)/(?P<filename>[^/]+)$",
         documents.DocumentDownloadView.as_view(),
         name="documents.download",
     ),
     re_path(
-        r"^documents/(?P<pk>\d+)",
+        r"^documents/(?P<pk>\d+)$",
         documents.DocumentDetailView.as_view(),
         name="documents.detail",
     ),
