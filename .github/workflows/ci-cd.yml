@@ -187,6 +187,41 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
         if: matrix.database == 'postgres' && matrix.python-version == '3.12'
 
+  static-assets:
+    name: "[Build] Production static assets"
+    runs-on: ubuntu-22.04
+    env:
+      BYRO_CONFIG_FILE: tests/byro.sqlite.cfg
+      BYRO_DEBUG: 'false'
+      BYRO_DATA_DIR: ${{ runner.temp }}/byro-assets/data
+      BYRO_FILESYSTEM_LOGS: ${{ runner.temp }}/byro-assets/logs
+      BYRO_FILESYSTEM_MEDIA: ${{ runner.temp }}/byro-assets/media
+      BYRO_FILESYSTEM_STATIC: ${{ runner.temp }}/byro-assets/static
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('src/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagic1
+      - name: Install Python dependencies
+        run: python -m pip install -Ue src
+      - name: Collect and post-process static files
+        working-directory: ./src
+        run: python manage.py collectstatic --noinput
+      - name: Compile SCSS and compress offline
+        working-directory: ./src
+        run: python manage.py compress --force
+
   build-python-package:
     name: 🔨 Build python package
     needs:
@@ -196,6 +231,7 @@ jobs:
       - style-djhtml
       - testing
       - deploy-scripts
+      - static-assets
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
