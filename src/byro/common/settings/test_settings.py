@@ -44,5 +44,6 @@ DEBUG = True
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
 with suppress(ValueError):
-    INSTALLED_APPS.remove("debug_toolbar.apps.DebugToolbarConfig")  # noqa
+    INSTALLED_APPS.remove("debug_toolbar")  # noqa
+with suppress(ValueError):
     MIDDLEWARE.remove("debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa
