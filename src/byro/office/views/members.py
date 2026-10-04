@@ -15,6 +15,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import Count, Q
 from django.dispatch import receiver
@@ -63,6 +64,29 @@ from byro.office.signals import (
 from byro.public.models import model_field_for
 
 from .documents import DocumentUploadForm
+
+
+def send_member_welcome_email(member, config=None):
+    config = config or Configuration.get_solo()
+    if not config.welcome_member_template or not member.email:
+        return False
+
+    context = {
+        "name": config.name,
+        "contact": config.mail_from,
+        "number": member.number,
+        "member_name": member.name,
+    }
+    responses = [
+        response
+        for _receiver, response in new_member_mail_information.send_robust(
+            sender=member
+        )
+        if response
+    ]
+    context["additional_information"] = "\n".join(responses).strip()
+    config.welcome_member_template.to_mail(email=member.email, context=context)
+    return True
 
 
 class MemberView(DetailView):
@@ -667,22 +691,7 @@ class MemberCreateView(FormView):
                 )
         config = Configuration.get_solo()
 
-        if config.welcome_member_template and form.instance.email:
-            context = {
-                "name": config.name,
-                "contact": config.mail_from,
-                "number": form.instance.number,
-                "member_name": form.instance.name,
-            }
-            responses = [
-                r[1]
-                for r in new_member_mail_information.send_robust(sender=form.instance)
-                if r
-            ]
-            context["additional_information"] = "\n".join(responses).strip()
-            config.welcome_member_template.to_mail(
-                email=form.instance.email, context=context
-            )
+        send_member_welcome_email(form.instance, config)
         if config.welcome_office_template:
             context = {"member_name": form.instance.name}
             responses = [
@@ -1229,7 +1238,38 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
             )
         )
 
+        retval.append(
+            (
+                "member_welcome_email",
+                _("Send welcome email"),
+                forms.Form,
+                {"send": _("Send welcome email")},
+                self.send_welcome_email,
+            )
+        )
+
         return retval
+
+    def send_welcome_email(self, form, active_buttons):
+        member = self.get_object()
+        if not member.email:
+            messages.error(
+                self.request, _("This member does not have an email address.")
+            )
+            return
+        try:
+            validate_email(member.email)
+        except ValidationError:
+            messages.error(
+                self.request, _("This member does not have a valid email address.")
+            )
+            return
+
+        if not send_member_welcome_email(member):
+            messages.error(self.request, _("No welcome email template is configured."))
+            return
+
+        messages.success(self.request, _("Welcome email added to the outbox."))
 
     def get_redirect_url(self):
         return reverse("office:members.operations", kwargs={"pk": self.get_object().pk})

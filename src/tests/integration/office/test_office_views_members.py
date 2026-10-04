@@ -9,8 +9,14 @@ from django.test import override_settings
 from django.urls import include, path, reverse
 from django.utils.timezone import now
 
-from byro.common.models import LogEntry
-from byro.mails.models import MemberPGPKey, PGPKeySource, PGPKeyStatus
+from byro.common.models import Configuration, LogEntry
+from byro.mails.models import (
+    EMail,
+    MailTemplate,
+    MemberPGPKey,
+    PGPKeySource,
+    PGPKeyStatus,
+)
 from byro.members.models import Member
 from byro.office.views import members as members_views
 
@@ -358,6 +364,49 @@ def test_members_end_membership(member, membership, logged_in_client):
     )
     member.refresh_from_db()
     assert not member.is_active
+
+
+@pytest.mark.django_db
+def test_members_can_resend_welcome_email(member, logged_in_client):
+    config = Configuration.get_solo()
+    config.welcome_member_template = MailTemplate.objects.create(
+        subject="Welcome {name}", text="Hello {member_name}, member {number}"
+    )
+    config.save()
+
+    response = logged_in_client.post(
+        reverse("office:members.operations", kwargs={"pk": member.pk}),
+        {"submit_member_welcome_email_send": "send"},
+    )
+
+    assert response.status_code == 302
+    email = EMail.objects.get(to=member.email)
+    assert email.subject == "Welcome Association Name"
+    assert "Hello Jona Than, member 1" in email.text
+
+
+@pytest.mark.django_db
+def test_members_cannot_resend_welcome_email_to_invalid_address(
+    member, logged_in_client
+):
+    member.email = "not-an-email"
+    member.save(update_fields=["email"])
+    config = Configuration.get_solo()
+    config.welcome_member_template = MailTemplate.objects.create(
+        subject="Welcome {name}", text="Hello {member_name}"
+    )
+    config.save()
+
+    response = logged_in_client.post(
+        reverse("office:members.operations", kwargs={"pk": member.pk}),
+        {"submit_member_welcome_email_send": "send"},
+    )
+
+    assert response.status_code == 302
+    assert not EMail.objects.filter(to="not-an-email").exists()
+    assert "valid email address" in " ".join(
+        str(message) for message in get_messages(response.wsgi_request)
+    )
 
 
 @pytest.mark.django_db
