@@ -109,6 +109,11 @@ Damit erkennt byro das Plugin automatisch, sobald du es installiert hast, z. B.
 per `pip`. Während der Entwicklung installiere dein Plugin im Editable-Modus
 mit `pip install -e .` im Quellverzeichnis des Plugins, damit es gefunden wird.
 
+Verwende für die Tests deines Plugins `byro.common.settings.test_settings` als
+Django-Settings-Modul. Es lädt alle installierten Plugins.
+`byro.common.settings.core_test_settings` ist für byros eigene Testsuite
+gedacht und lässt installierte Plugins weg.
+
 ## In den Plugin-Katalog aufgenommen werden
 
 Administratoren installieren Plugins mit `byroctl plugin add <kurzname>` aus

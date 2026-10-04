@@ -109,6 +109,11 @@ installed it, e.g. through `pip`. During development, install your plugin in
 editable mode with `pip install -e .` inside your plugin source directory to
 make it discoverable.
 
+For the tests of your plugin, use `byro.common.settings.test_settings` as the
+Django settings module. It loads every installed plugin.
+`byro.common.settings.core_test_settings` is meant for byro's own test suite
+and leaves installed plugins out.
+
 ## Getting listed in the plugin catalog
 
 Administrators install plugins with `byroctl plugin add <shortname>` from a

@@ -167,6 +167,22 @@ parallelisiert und mit automatischen Wiederholungen bei geflakten Tests:
     verwende `python -m pytest -n auto tests` (`pytest-xdist` ist bereits Teil
     der Entwicklungsabhängigkeiten).
 
+Die Testsuite ignoriert byro-Plugins, die in deiner Umgebung installiert sind.
+`setup.cfg` wählt `byro.common.settings.core_test_settings`; dieses Modul
+entfernt die gefundenen `byro.plugin`-Entry-Points, bevor Django die Apps
+lädt. Die mitgelieferten Plugins `byro.plugins.profile` und
+`byro.plugins.sepa` bleiben installiert. Um die Tests mit den installierten
+Plugins auszuführen, wähle die Test-Settings, die sie laden:
+
+```console
+(env)$ python -m pytest --ds=byro.common.settings.test_settings tests
+```
+
+Die Umgebungsvariable
+`DJANGO_SETTINGS_MODULE=byro.common.settings.test_settings` bewirkt dasselbe.
+In diesem Modus können Core-Tests fehlschlagen, weil ein Plugin
+Signal-Receiver registrieren kann, die die Tests nicht erwarten.
+
 Es empfiehlt sich, die Stilprüfungen in den git-Hook `.git/hooks/pre-commit`
 zu legen, zum Beispiel:
 
