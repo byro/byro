@@ -59,6 +59,14 @@ endest du eine Mitgliedschaft stattdessen, siehe
 [Ein-/Austritt](../usage/members.md#ein-austritt)); ein Löschen über die API
 entfernt den Datensatz vollständig, ohne die Historie eines Austritts.
 
+Beide Mitgliedschafts-Endpunkte brauchen das Mitglied aus der URL. Eine ID,
+die zu keinem Mitglied gehört, wird mit `404` beantwortet, und zwar für jede
+Methode: ein Mitglied ohne Mitgliedschaften wird mit `200` und einer leeren
+Liste beantwortet, und eine Mitgliedschaft, die zu einem anderen Mitglied
+gehört, ist über die URL eines Mitglieds nicht erreichbar. Das Mitglied wird
+nach den Authentifizierungs- und Berechtigungsprüfungen nachgeschlagen, damit
+`401` und `403` nicht verraten, ob ein Mitglied existiert.
+
 ## Filtern und Suchen
 
 `/api/v1/members/` unterstützt Query-Parameter: `email` (exakt, ohne
