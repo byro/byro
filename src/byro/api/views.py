@@ -1,16 +1,25 @@
 from decimal import Decimal
 
 import django_filters
+from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from drf_spectacular.utils import extend_schema
+from rest_framework import mixins, status
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from byro.bookkeeping.special_accounts import SpecialAccounts
+from byro.documents.models import Document
 from byro.members.models import Member, Membership
 
-from .serializers import MemberSerializer, MembershipSerializer
+from .serializers import (
+    DocumentSerializer,
+    DocumentUploadSerializer,
+    MemberSerializer,
+    MembershipSerializer,
+)
 
 
 class MemberFilter(django_filters.FilterSet):
@@ -168,3 +177,44 @@ class MembershipViewSet(ModelViewSet):
         member.log(request, ".membership.deleted", membership_id=instance.pk)
         instance.delete()
         member.update_liabilites()
+
+
+class MemberDocumentViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet
+):
+    serializer_class = DocumentSerializer
+    parser_classes = [MultiPartParser]
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        # The member comes from the URL only, and is looked up after the
+        # authentication and permission checks
+        self.member = get_object_or_404(Member.all_objects, pk=self.kwargs["member_pk"])
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Document.objects.none()
+        return Document.objects.filter(member=self.member)
+
+    @extend_schema(
+        request=DocumentUploadSerializer, responses={201: DocumentSerializer}
+    )
+    def create(self, request, *args, **kwargs):
+        serializer = DocumentUploadSerializer(
+            data=request.data, context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        # Document.save() stores the file, calculates the content hash and
+        # logs ".stored". The document and both log entries are created
+        # together or not at all, as in the member view of the office.
+        with transaction.atomic():
+            document = serializer.save(member=self.member)
+            self.member.log(
+                request,
+                ".document.created",
+                document=document,
+                content_hash=document.content_hash,
+            )
+        return Response(
+            self.get_serializer(document).data, status=status.HTTP_201_CREATED
+        )

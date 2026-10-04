@@ -1,6 +1,7 @@
 # REST API
 
-byro has a REST API for members and memberships, built with
+byro has a REST API for members, memberships and member documents, built
+with
 [Django REST Framework](https://www.django-rest-framework.org/) and
 [drf-spectacular](https://drf-spectacular.readthedocs.io/).
 
@@ -44,6 +45,8 @@ endpoints for the superuser-only functions (settings, user management, log).
 | `/api/v1/members/<id>/adjust-balance/` | POST | adjust the balance (payment, initial balance or waiver, see below) |
 | `/api/v1/members/<id>/memberships/` | GET, POST | list a member's memberships, create a new one |
 | `/api/v1/members/<id>/memberships/<id>/` | GET, PUT, PATCH, DELETE | read, change, delete one membership |
+| `/api/v1/members/<id>/documents/` | GET, POST | list a member's documents, upload a new one (see below) |
+| `/api/v1/members/<id>/documents/<id>/` | GET | read the metadata of one document |
 
 **There is no delete method for members themselves** (`DELETE
 /api/v1/members/<id>/` is not allowed) - matching the Office, where a member
@@ -73,9 +76,73 @@ optionally `memo`, `type` (`payment`, `initial` or `waiver`) and optionally
 `value_datetime`. Details on the three types and their account effects are
 on the same Office reference page; the API maps exactly the same logic.
 
+## Member documents
+
+`/api/v1/members/<id>/documents/` lists the documents of a member and uploads
+new ones, `/api/v1/members/<id>/documents/<id>/` reads a single one. These
+are the documents of the "Documents" tab in the member view (see
+[Documents](../usage/documents.md)).
+
+An upload is a `POST` with `multipart/form-data`. Other content types such
+as JSON are answered with `415`.
+
+| Field | Required | Value |
+|---|---|---|
+| `document` | yes | the file, must not be empty |
+| `title` | yes | up to 300 characters |
+| `date` | no | `YYYY-MM-DD`, defaults to today |
+| `category` | no | one of the installed categories (see [Categories](../usage/documents.md#categories)), defaults to `byro.documents.misc` |
+| `direction` | no | `incoming`, `outgoing` or `other`, defaults to `outgoing` |
+
+```console
+$ curl -H "Authorization: Token <your-token>" \
+    -F document=@application.pdf \
+    -F title="Membership application" \
+    -F date=2022-04-15 \
+    -F category=byro.documents.registration_form \
+    -F direction=incoming \
+    https://byro.example.org/api/v1/members/42/documents/
+```
+
+The member comes from the URL only, and byro calculates the content hash
+itself. A request that contains `member` or `content_hash` is rejected with
+`400`.
+
+The response, the list and the detail endpoint return `id`, `title`, `date`,
+`category`, `direction`, `content_hash` (`sha512:` followed by the hex
+digest) and `filename`. `filename` is the name byro stored the file under. It
+can differ from the uploaded name, for example when a file with that name
+already exists. The file itself and its storage path are not part of the
+response.
+
+Documents that were not uploaded through the API can have `null` as `title`,
+`date` or `category`, and a category of a plugin that is no longer installed.
+The list and the detail endpoint return them as stored. An upload accepts
+neither.
+
+An upload writes the same log entries as an upload in the Office, with the
+account of the token as the user. The document and its log entries are
+created together or not at all. As with an upload in the Office, a file
+without a document can remain in the storage when creating the document fails
+after the file was written.
+
+What the API does not do:
+
+* **No duplicate detection.** Uploading the same file twice creates two
+  documents, as in the Office. An import that may run more than once can
+  compare the `content_hash` values of the list first.
+* **No download.** The file content can only be fetched in the Office (see
+  [Downloading](../usage/documents.md#downloading)).
+* **No changing or deleting.** `PUT`, `PATCH` and `DELETE` answer `405`.
+
+An unknown member answers `404`, and so does a document that belongs to
+another member. byro itself does not limit the size of an upload. A reverse
+proxy in front of it may: nginx rejects request bodies above 1 MB unless
+`client_max_body_size` says otherwise.
+
 ## Architecture
 
-Member and membership serialization are
+Member, membership and document serialization are
 `rest_framework.serializers.ModelSerializer` classes in
 `byro.api.serializers`; installed profile plugins (see
 [Members](../usage/members.md)) automatically show up as nested fields under

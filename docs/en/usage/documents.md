@@ -13,6 +13,9 @@ Documents are uploaded files with a title, date, category and direction
   link, this connects a receipt to the specific booking.
 * **General, unrelated** (`Documents → Add`): for documents that belong to
   no member and no transaction.
+* **Through the REST API**: for a member, for example when importing the
+  files of another system (see
+  [Member documents](../development/api.md#member-documents)).
 
 ## Categories
 
