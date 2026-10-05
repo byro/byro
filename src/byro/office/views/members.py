@@ -476,7 +476,10 @@ class MemberListImportView(FormView):
             },
         )
 
-        return importer["form_valid"](self, form)
+        try:
+            return importer["form_valid"](self, form)
+        except MemberImportError:
+            return redirect("office:members.list.import")
 
 
 def get_encoding(form):
@@ -498,6 +501,18 @@ def create_membership(membership_parms, member):
                     membership_parms[k], languages=[settings.LANGUAGE_CODE, "en"]
                 )
         Membership.objects.create(member=member, **membership_parms)
+
+
+class MemberImportError(Exception):
+    """Raised when an importer cannot process the uploaded file.
+
+    Importers signal failure by raising instead of returning a redirect: a
+    redirect is a normal return, so the enclosing ``transaction.atomic`` would
+    commit whatever the importer wrote before it noticed the problem. Raising
+    unwinds the atomic block and leaves the member data unchanged. The view
+    catches this and redirects to the import form, where the error message
+    added by the importer is shown.
+    """
 
 
 @transaction.atomic  # noqa
@@ -593,7 +608,7 @@ def default_csv_form_valid(view, form, dialect="excel"):
                             fields["_internal_last_transaction"].name,
                         ),
                     )
-                    return redirect("office:members.list.import")
+                    raise MemberImportError
 
                 member.log(view, ".created")
                 member.save()
