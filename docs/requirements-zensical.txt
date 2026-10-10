@@ -12,7 +12,7 @@
 click==8.5.0
 deepmerge==3.0.1
 ghp-import==2.1.0
-griffelib==2.3.0
+griffelib==2.3.2
 jinja2==3.1.6
 markdown==3.11
 markupsafe==3.0.3
