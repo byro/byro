@@ -15,7 +15,7 @@
                         {{ mail.subject }}
                     </a>
                 </td>
-                <td>{% if mail.to == "special:all" %}{% trans "All members" %}{% else %}{{ mail.to }}{% endif %}</td>
+                <td>{{ mail.recipient_display }}</td>
                 <td>
                     {{ mail.sent|date:"Y-m-d H:i" }}
                 </td>

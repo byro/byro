@@ -119,10 +119,19 @@ Schlüssel werden nur akzeptiert, wenn das Schlüsselmaterial zum eingegebenen
 Fingerabdruck passt; sonst lehnt byro den Upload mit einem Formularfehler ab.
 
 Ist die PGP-Verschlüsselung aktiv, stellt byro getrennte Nachrichten an die
-Empfänger in `To`, `Cc` und `Bcc` zu. Jeder Mitgliedsempfänger wird daher mit
-seinem eigenen Schlüssel verschlüsselt und gegen die konfigurierte
-Schlüsselrichtlinie geprüft. Die sichtbaren Header `To` und `Cc` bleiben
-erhalten, `Bcc`-Empfänger bleiben verborgen.
+Empfänger in `To`, `Cc` und `Bcc` zu. Die sichtbaren Header `To` und `Cc`
+bleiben erhalten, `Bcc`-Empfänger bleiben verborgen.
+
+Verschlüsselt werden nur Mails, die an ein Mitglied adressiert sind: Die
+Nachricht für dieses Mitglied wird mit dessen eigenem Schlüssel verschlüsselt
+und gegen die konfigurierte Schlüsselrichtlinie geprüft. byro sucht nie anhand
+einer E-Mail-Adresse nach einem Mitglied. Mails an eine bestimmte Adresse und
+die Kopien für `Cc`- und `Bcc`-Adressen werden deshalb unverschlüsselt
+versendet und unterliegen nicht der Schlüsselrichtlinie, auch wenn die Adresse
+zusätzlich bei einem Mitglied hinterlegt ist. Mitglieder, die sich eine
+Adresse teilen, erhalten ihre Mail jeweils mit dem eigenen Schlüssel
+verschlüsselt (siehe
+[Mitglieder und Adressen](../usage/mails.md#mitglieder-und-adressen)).
 
 ## Fingerabdrücke aus Mitgliedsanträgen
 

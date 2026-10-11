@@ -102,14 +102,20 @@ Thank you,
         from byro.mails.models import EMail
 
         us = Configuration.get_solo().name
-        mail = EMail.objects.create(
-            to=email or self.member.email,
-            text=text
+        fields = {
+            "text": text
             or self.template.format(
                 name=self.member.name if self.member else email, association=us
             ),
-            subject=_("[{association}] Your document").format(association=us),
-        )
+            "subject": _("[{association}] Your document").format(association=us),
+        }
+        # An explicit address is a plain address. Without one, the document
+        # goes to its member, who stays the recipient of the mail.
+        if email:
+            mail = EMail(to=email, **fields)
+        else:
+            mail = EMail.for_member(self.member, **fields)
+        mail.save()
         mail.attachments.add(self)
         mail.save()
         if immediately:

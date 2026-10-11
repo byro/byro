@@ -464,7 +464,7 @@ class Member(Auditable, models.Model, LogTargetMixin):
             "number": self.number,
             "balance": format_with_currency(self.balance, long_form=True),
         }
-        return template.to_mail(self.email, context=context, save=False)
+        return template.to_mail(member=self, context=context, save=False)
 
     @transaction.atomic
     def update_liabilites(self):

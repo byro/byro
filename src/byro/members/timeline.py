@@ -39,7 +39,11 @@ def sorted_merge(*args):
 
 
 def get_mail_timeline(member):
-    for instance in member.emails.filter(sent__isnull=False).order_by("-sent").all():
+    for instance in (
+        member.emails.with_member_recipients()
+        .filter(sent__isnull=False)
+        .order_by("-sent")
+    ):
         yield {
             "type": "mail",
             "subtype": "mail-out",
