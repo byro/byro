@@ -1,5 +1,6 @@
 import pytest
 from django.http.request import QueryDict
+from django.template import Context, Template
 from django.utils import translation
 
 from byro.common.models.log import LogEntry
@@ -70,6 +71,39 @@ def test_log_entry_source_formatting(mail_template, user):
             )
         )
         == 'value (via <span class="fa fa-user"></span> regular_user)'
+    )
+
+
+@pytest.mark.django_db
+def test_log_entry_source_is_escaped(user):
+    def source(value, user=None):
+        return format_log_source(
+            LogEntry(user=user, data={"source": value}, action_type="action.type")
+        )
+
+    assert (
+        source("<b>x</b>", user=user)
+        == '&lt;b&gt;x&lt;/b&gt; (via <span class="fa fa-user"></span> regular_user)'
+    )
+    assert source("internal: <b>x</b>", user=user) == (
+        '<span class="fa fa-gears"></span> &lt;b&gt;x&lt;/b&gt;'
+        ' (via <span class="fa fa-user"></span> regular_user)'
+    )
+    assert (
+        source("internal: <b>x</b>")
+        == '<span class="fa fa-gears"></span> &lt;b&gt;x&lt;/b&gt;'
+    )
+    # without a user the source stays a plain string the template escapes
+    assert (
+        Template("{% load log_entry %}{{ entry|format_log_source }}").render(
+            Context({"entry": LogEntry(data={"source": "<b>x</b>"})})
+        )
+        == "&lt;b&gt;x&lt;/b&gt;"
+    )
+
+    user.username = "<b>x</b>"
+    assert source("<b>x</b>", user=user) == (
+        '<span class="fa fa-user"></span> &lt;b&gt;x&lt;/b&gt;'
     )
 
 
