@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import register
 from django.template.loader import TemplateDoesNotExist, get_template
 from django.urls import reverse
-from django.utils.html import escape
+from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 
 from byro.common.signals import log_formatters
@@ -59,17 +59,17 @@ def format_log_entry(entry):
 def format_log_source(entry):
     user = ""
     if entry.user:
-        user = mark_safe(f'<span class="fa fa-user"></span> {escape(entry.user)}')
+        user = format_html('<span class="fa fa-user"></span> {}', entry.user)
 
     source = entry.data.get("source", "")
     if source.startswith("internal: "):
-        source = mark_safe(f'<span class="fa fa-gears"></span> {escape(source[10:])}')
+        source = format_html('<span class="fa fa-gears"></span> {}', source[10:])
 
     if entry.user:
         if entry.data.get("source", None) == str(entry.user):
             return user
         else:
-            return mark_safe(f"{source} (via {user})")
+            return format_html("{} (via {})", source, user)
     else:
         return source
 
