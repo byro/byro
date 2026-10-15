@@ -306,6 +306,9 @@ def log_call(action, log_on="retval"):
             retval = f(*args, **kwargs)
 
             log_kwargs = {k: v for k, v in kwargs.items() if v}
+            if "source" in log_kwargs:
+                # data["source"] is reserved for the actor of the log entry
+                log_kwargs["_source"] = log_kwargs.pop("source")
             log_args = list(args)
             log_args = log_args[
                 1:

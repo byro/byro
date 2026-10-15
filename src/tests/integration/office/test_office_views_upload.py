@@ -14,6 +14,7 @@ from byro.bookkeeping.bank_import import (
 from byro.bookkeeping.models import Booking, RealTransactionSource
 from byro.bookkeeping.models.real_transaction import SourceState
 from byro.bookkeeping.signals import bank_transaction_importers, process_csv_upload
+from byro.common.models import LogEntry
 from byro.office.views.upload import LEGACY_IMPORTER_CHOICE, BankTransactionImportView
 
 pytestmark = pytest.mark.usefixtures("configuration")
@@ -136,6 +137,34 @@ def test_upload_with_importer_imports_and_reports_counts(
     assert "1 newly imported" in content
     assert "1 already known" in content
     assert Booking.objects.filter(source__isnull=False).count() == 3
+
+
+@pytest.mark.django_db
+def test_imported_bookings_are_logged_with_the_uploading_user(
+    superuser_client, superuser, line_importer
+):
+    upload(superuser_client, "test.lines", b"25.00;Fee Max;REF-1\n")
+
+    booking = Booking.objects.get()
+    entry = LogEntry.objects.get(
+        action_type="byro.bookkeeping.transaction.debit.created"
+    )
+    assert entry.data["source"] == str(superuser)
+    assert entry.data["_source"]["ref"] == [
+        "bookkeeping",
+        "realtransactionsource",
+        booking.source.pk,
+    ]
+
+    for url in (
+        reverse(
+            "office:finance.transactions.detail",
+            kwargs={"pk": booking.transaction.pk},
+        ),
+        reverse("office:settings.log"),
+    ):
+        response = superuser_client.get(url)
+        assert response.status_code == 200, url
 
 
 @pytest.mark.django_db

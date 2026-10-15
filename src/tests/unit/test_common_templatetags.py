@@ -108,6 +108,33 @@ def test_log_entry_source_is_escaped(user):
 
 
 @pytest.mark.django_db
+def test_log_entry_with_object_as_source_is_rendered(user):
+    # stored by bank imports before log_call moved the booking's source
+    # kwarg to "_source"; the entries cannot be changed afterwards
+    stored = {
+        "object": "real transaction source",
+        "ref": ["bookkeeping", "realtransactionsource", 0],
+        "value": "<b>x.csv</b>",
+    }
+
+    def source(user=None):
+        return format_log_source(
+            LogEntry(user=user, data={"source": stored}, action_type="action.type")
+        )
+
+    assert source(user=user) == '<span class="fa fa-user"></span> regular_user'
+    assert source() == (
+        "<i>real transaction source object</i>: '&lt;b&gt;x.csv&lt;/b&gt;'"
+    )
+    assert (
+        Template("{% load log_entry %}{{ entry|format_log_source }}").render(
+            Context({"entry": LogEntry(data={"source": ["<b>x</b>"]})})
+        )
+        == "[&#x27;&lt;b&gt;x&lt;/b&gt;&#x27;]"
+    )
+
+
+@pytest.mark.django_db
 def test_rejected_login_is_rendered_readably(user):
     entry = LogEntry.objects.create(
         content_object=user, user=user, action_type="byro.common.login.no_access"
