@@ -37,6 +37,11 @@ die Datei erst nach eigener Zugriffsprüfung aus (siehe
 zur Begründung, warum `/media/` nie direkt über den Webserver ausgeliefert
 werden darf).
 
+PDF-Dateien und Bilder im Format PNG, JPEG, GIF oder WebP öffnen sich im
+Browser, und die Detailseite zeigt sie als Vorschau. Alle anderen Dateien
+werden nur zum Herunterladen angeboten. byro entscheidet das anhand des
+Inhalts der Datei, nicht anhand ihres Namens.
+
 ## Als Mailanhang versenden
 
 Ein Dokument lässt sich programmatisch als Anhang einer neuen Mail in den
