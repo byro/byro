@@ -33,6 +33,11 @@
                         <a href="{% url "office:mails.mail.delete" pk=form.instance.pk %}" class="btn btn-danger">
                             {% trans "Discard" %}
                         </a>
+                        {% if form.instance.has_deliveries %}
+                            <a href="{% url "office:mails.mail.copy" pk=form.instance.pk %}" class="btn btn-secondary">
+                                {% trans "Copy to new mail" %}
+                            </a>
+                        {% endif %}
                     {% else %}
                         <a href="{% url "office:mails.mail.copy" pk=form.instance.pk %}" class="btn btn-danger">
                             {% trans "Copy to new mail" %}

@@ -6,11 +6,11 @@
 
 {% block member_content %}
 
-    <a href="{% url "office:mails.compose" %}?to=special:member:{{ member.pk }}" class="btn btn-success">
+    <a href="{% url "office:mails.compose" %}?to_type=member&amp;to_member={{ member.pk }}" class="btn btn-success">
         <span class="fa fa-envelope"></span> {% trans "Compose new message …" %}
     </a>
 
-    {% include "office/mails/sent_mails_part.html" with mails=member.emails.all %}
+    {% include "office/mails/sent_mails_part.html" with mails=member.emails.with_member_recipients %}
     {% include "office/pagination.html" %}
 
 {% endblock %}

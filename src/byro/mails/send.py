@@ -130,6 +130,12 @@ def mail_send_task(
     bcc = _recipient_addresses(bcc)
     if not _recipient_addresses(to, cc, bcc):
         raise SendMailException("Cannot send an email without recipients.")
+    if member is not None and len(to) != 1:
+        # ``member`` is the one recipient in ``to``. With any other number of
+        # addresses it would be unclear whom the member context belongs to.
+        raise SendMailException(
+            "An email to a member must have exactly one address in 'to'."
+        )
 
     pgp_config = pgp_config or PGPConfiguration.get_solo()
     if pgp_config.encryption_enabled:
@@ -138,30 +144,39 @@ def mail_send_task(
             visible_headers["To"] = ", ".join(to)
         if cc:
             visible_headers["Cc"] = ", ".join(cc)
+        # ``member`` is the single recipient in ``to`` (checked above). The
+        # copies for ``cc`` and ``bcc`` go to plain addresses, which never
+        # identify a member.
         emails = [
-            _build_email(
-                subject,
-                body,
-                sender,
-                [recipient],
-                html=html,
-                headers=visible_headers,
-                attachments=attachments,
+            (
+                _build_email(
+                    subject,
+                    body,
+                    sender,
+                    [recipient],
+                    html=html,
+                    headers=visible_headers,
+                    attachments=attachments,
+                ),
+                member if index < len(to) else None,
             )
-            for recipient in _recipient_addresses(to, cc, bcc)
+            for index, recipient in enumerate(_recipient_addresses(to, cc, bcc))
         ]
     else:
         emails = [
-            _build_email(
-                subject,
-                body,
-                sender,
-                to,
-                html=html,
-                cc=cc,
-                bcc=bcc,
-                headers=headers,
-                attachments=attachments,
+            (
+                _build_email(
+                    subject,
+                    body,
+                    sender,
+                    to,
+                    html=html,
+                    cc=cc,
+                    bcc=bcc,
+                    headers=headers,
+                    attachments=attachments,
+                ),
+                member,
             )
         ]
 
@@ -169,14 +184,10 @@ def mail_send_task(
         prepare_email_message(
             email,
             recipient_address=email.to[0] if email.to else None,
-            member=(
-                member
-                if member and email.to and member.email.lower() == email.to[0].lower()
-                else None
-            ),
+            member=email_member,
             config=pgp_config,
         )
-        for email in emails
+        for email, email_member in emails
     ]
     backend = get_connection(fail_silently=False)
 

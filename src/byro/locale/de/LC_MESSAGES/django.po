@@ -905,6 +905,63 @@ msgstr ""
 "E-Mail an {recipient} kann nicht gesendet werden: kein nutzbarer PGP-"
 "Schlüssel."
 
+#: byro/mails/models.py
+msgid "Recipient type"
+msgstr "Empfängertyp"
+
+#: byro/mails/models.py
+msgid "Delivered to members"
+msgstr "Zugestellt an Mitglieder"
+
+#: byro/mails/models.py
+#, python-brace-format
+msgid "Cannot send this email: its recipient {to} was stored by an older version and has to be reviewed. Select the recipient again, or copy the mail to a new one if it has been delivered partly."
+msgstr "Diese E-Mail kann nicht gesendet werden: Ihr Empfänger {to} wurde von einer älteren Version gespeichert und muss geprüft werden. Wähle den Empfänger neu aus oder kopiere die Mail in eine neue, falls sie bereits teilweise zugestellt wurde."
+
+#: byro/mails/models.py
+#, python-brace-format
+msgid "Review required: {to}"
+msgstr "Prüfung erforderlich: {to}"
+
+#: byro/mails/models.py
+msgid "The recipients of this email were changed while it was sent. Send it again to reach the remaining recipients."
+msgstr "Die Empfänger dieser E-Mail wurden während des Versands geändert. Sende sie erneut, um die übrigen Empfänger zu erreichen."
+
+#: byro/office/templates/office/mails/special_to_part.html
+msgid "This mail was created by an older version and has been delivered partly. byro cannot tell which members have received it already, so it cannot be sent anymore. Copy it to a new mail or discard it."
+msgstr "Diese Mail wurde von einer älteren Version erstellt und bereits teilweise zugestellt. byro kann nicht feststellen, welche Mitglieder sie schon erhalten haben, deshalb kann sie nicht mehr gesendet werden. Kopiere sie in eine neue Mail oder verwirf sie."
+
+#: byro/office/templates/office/mails/special_to_part.html
+msgid "This mail has already been delivered to some of its recipients, so its recipients cannot be changed anymore. Sending it again only reaches the recipients that are still missing. To write to somebody else, copy it to a new mail."
+msgstr "Diese Mail wurde bereits einigen ihrer Empfänger zugestellt, deshalb können ihre Empfänger nicht mehr geändert werden. Ein erneuter Versand erreicht nur die noch fehlenden Empfänger. Um jemand anderem zu schreiben, kopiere sie in eine neue Mail."
+
+#: byro/office/templates/office/mails/special_to_part.html
+msgid "This mail was created by an older version and its recipient could not be converted. Please select the recipient again."
+msgstr "Diese Mail wurde von einer älteren Version erstellt, und ihr Empfänger konnte nicht übernommen werden. Bitte wähle den Empfänger neu aus."
+
+#: byro/office/templates/office/mails/special_to_part.html
+msgid "No valid member is selected as the recipient of this mail. Please select a member."
+msgstr "Für diese Mail ist kein gültiges Mitglied als Empfänger ausgewählt. Bitte wähle ein Mitglied aus."
+
+#: byro/mails/models.py
+#, python-brace-format
+msgid "Cannot send this email: unknown recipient type {to_type}."
+msgstr ""
+"Diese E-Mail kann nicht gesendet werden: unbekannter Empfängertyp {to_type}."
+
+#: byro/mails/models.py
+msgid "Cannot send this email: no member is set as its recipient."
+msgstr ""
+"Diese E-Mail kann nicht gesendet werden: Es ist kein Mitglied als Empfänger "
+"festgelegt."
+
+#: byro/mails/models.py
+#, python-brace-format
+msgid "Cannot send email to {member}: no email address."
+msgstr ""
+"E-Mail an {member} kann nicht gesendet werden: keine E-Mail-Adresse "
+"hinterlegt."
+
 #: byro/mails/pgp.py:180
 msgid "Imported key does not match the requested fingerprint."
 msgstr "Der importierte Schlüssel passt nicht zum angefragten Fingerprint."
@@ -2334,6 +2391,18 @@ msgstr "Angebene Adresse"
 #: byro/office/views/mails.py:83
 msgid "Field cannot be empty"
 msgstr "Feld kann nicht leer sein"
+
+#: byro/office/views/mails.py
+msgid "Please enter an email address."
+msgstr "Bitte gib eine E-Mail-Adresse ein."
+
+#: byro/office/views/mails.py
+msgid "Please select a member."
+msgstr "Bitte wähle ein Mitglied aus."
+
+#: byro/office/views/mails.py
+msgid "This mail has been delivered to some of its recipients in the meantime. Its recipients cannot be changed anymore."
+msgstr "Diese Mail wurde inzwischen einigen ihrer Empfänger zugestellt. Ihre Empfänger können nicht mehr geändert werden."
 
 #: byro/office/views/mails.py:96
 msgid ""

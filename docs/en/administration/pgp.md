@@ -113,10 +113,17 @@ uploaded key material matches the entered fingerprint; otherwise byro rejects
 the upload with a form error.
 
 When PGP encryption is enabled, byro delivers separate messages to recipients
-in the `To`, `Cc`, and `Bcc` fields. Each member recipient is therefore
-encrypted using their own key and evaluated against the configured key policy.
-The visible `To` and `Cc` headers are retained, while `Bcc` recipients remain
-hidden.
+in the `To`, `Cc`, and `Bcc` fields. The visible `To` and `Cc` headers are
+retained, while `Bcc` recipients remain hidden.
+
+Only mail that is addressed to a member is encrypted: the message for this
+member is encrypted using the member's own key and evaluated against the
+configured key policy. byro never searches for a member by an email address.
+Mail to a specific address, and the copies for `Cc` and `Bcc` addresses, are
+therefore sent unencrypted and are not subject to the key policy, even if the
+address is also stored for a member. Members who share an address each
+receive their mail encrypted with their own key (see
+[Members and addresses](../usage/mails.md#members-and-addresses)).
 
 ## Member application fingerprints
 

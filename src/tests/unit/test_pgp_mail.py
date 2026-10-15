@@ -25,6 +25,7 @@ from byro.mails.models import (
     PGPKeySource,
     PGPKeyStatus,
     PGPPolicy,
+    RecipientType,
 )
 from byro.mails.pgp import (
     PGPBackendError,
@@ -43,6 +44,14 @@ from byro.members.models import FeeIntervals, Member
 VALID_FINGERPRINT = "0123456789ABCDEF0123456789ABCDEF01234567"
 FAKE_BACKEND_PATH = f"{__name__}.FakePGPBackend"
 FAILING_BACKEND_PATH = f"{__name__}.FailingPGPBackend"
+
+
+def member_mail(*members):
+    mail = EMail.objects.create(
+        to_type=RecipientType.MEMBER, subject="Test", text="Text"
+    )
+    mail.members.add(*members)
+    return mail
 
 
 class FakePGPBackend:
@@ -823,9 +832,7 @@ def test_missing_member_key_can_block_mail(member):
     config.missing_key_policy = PGPPolicy.BLOCK
     config.save()
 
-    from byro.mails.models import EMail
-
-    mail = EMail.objects.create(to=member.email, subject="Test", text="Text")
+    mail = member_mail(member)
 
     with pytest.raises(SendMailException):
         mail.send()
@@ -854,9 +861,7 @@ def test_pgp_block_keeps_successful_recipients_for_retry(member, mailoutbox):
         fingerprint="1111111111111111111111111111111111111111",
         status=PGPKeyStatus.INVALID,
     )
-    mail = EMail.objects.create(
-        to=f"{member.email},{blocked_member.email}", subject="Test", text="Text"
-    )
+    mail = member_mail(member, blocked_member)
 
     with pytest.raises(SendMailException, match="blocked@example.org"):
         mail.send()
@@ -864,7 +869,8 @@ def test_pgp_block_keeps_successful_recipients_for_retry(member, mailoutbox):
     mail.refresh_from_db()
     assert mail.sent is None
     assert mail.delivered_to == [member.email]
-    assert list(mail.members.all()) == [member]
+    assert mail.delivered_to_members == {str(member.pk): member.email}
+    assert set(mail.members.all()) == {member, blocked_member}
     assert len(mailoutbox) == 1
 
     blocked_key.status = PGPKeyStatus.VALID
@@ -875,6 +881,10 @@ def test_pgp_block_keeps_successful_recipients_for_retry(member, mailoutbox):
     mail.refresh_from_db()
     assert mail.sent is not None
     assert set(mail.delivered_to) == {member.email, blocked_member.email}
+    assert mail.delivered_to_members == {
+        str(member.pk): member.email,
+        str(blocked_member.pk): blocked_member.email,
+    }
     assert set(mail.members.all()) == {member, blocked_member}
     assert len(mailoutbox) == 2
     assert [message.to for message in mailoutbox] == [
@@ -896,9 +906,7 @@ def test_missing_member_key_can_fall_back_to_plain_mail(member, mailoutbox):
     config.missing_key_policy = PGPPolicy.SEND_PLAIN
     config.save()
 
-    from byro.mails.models import EMail
-
-    mail = EMail.objects.create(to=member.email, subject="Test", text="Text")
+    mail = member_mail(member)
     mail.send()
 
     mail.refresh_from_db()
@@ -938,9 +946,7 @@ def test_valid_member_key_is_signed_before_encrypted(member, mailoutbox):
         status=PGPKeyStatus.VALID,
     )
 
-    from byro.mails.models import EMail
-
-    mail = EMail.objects.create(to=member.email, subject="Test", text="Text")
+    mail = member_mail(member)
     mail.send()
 
     assert FakePGPBackend.calls == [
@@ -977,22 +983,147 @@ def test_pgp_delivery_treats_to_cc_and_bcc_as_individual_recipients(member, mail
         subject="Test",
         body="Text",
         sender="sender@example.org",
+        member=member,
     )
 
-    assert {message.to[0] for message in mailoutbox} == {
+    assert [message.to[0] for message in mailoutbox] == [
         member.email,
         cc_member.email,
         bcc_member.email,
-    }
-    assert all(message.subject == "encrypted:Test" for message in mailoutbox)
+    ]
     assert all(message.message()["To"] == member.email for message in mailoutbox)
     assert all(message.message()["Cc"] == cc_member.email for message in mailoutbox)
     assert all(message.message()["Bcc"] is None for message in mailoutbox)
-    assert {call[1] for call in FakePGPBackend.calls if call[0] == "encrypt"} == {
-        f"public key for {member.email}",
-        f"public key for {cc_member.email}",
-        f"public key for {bcc_member.email}",
-    }
+    # Only the member the mail is addressed to is known. The copies go to
+    # plain addresses, which are not matched against the members' addresses.
+    assert [message.subject for message in mailoutbox] == [
+        "encrypted:Test",
+        "Test",
+        "Test",
+    ]
+    assert [call[1] for call in FakePGPBackend.calls if call[0] == "encrypt"] == [
+        f"public key for {member.email}"
+    ]
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_mail_send_task_does_not_find_a_member_key_by_address(member, mailoutbox):
+    config = PGPConfiguration.get_solo()
+    config.encryption_enabled = True
+    config.missing_key_policy = PGPPolicy.BLOCK
+    config.save()
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        public_key="public key",
+        status=PGPKeyStatus.VALID,
+    )
+
+    mail_send_task(
+        to=[member.email], subject="Test", body="Text", sender="sender@example.org"
+    )
+
+    assert [message.subject for message in mailoutbox] == ["Test"]
+    assert FakePGPBackend.calls == []
+
+
+@pytest.fixture
+def family_with_keys():
+    """Two members sharing one address, each with an own PGP key."""
+    members = (
+        Member.objects.create(email="family@example.org", number="10", name="A"),
+        Member.objects.create(email="family@example.org", number="11", name="B"),
+    )
+    for family_member in members:
+        MemberPGPKey.objects.create(
+            member=family_member,
+            fingerprint=f"{int(family_member.number):040d}",
+            public_key=f"public key of member {family_member.name}",
+            status=PGPKeyStatus.VALID,
+        )
+    config = PGPConfiguration.get_solo()
+    config.encryption_enabled = True
+    config.save()
+    return members
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+@pytest.mark.parametrize("addressed", (0, 1))
+def test_shared_address_uses_the_key_of_the_addressed_member(
+    family_with_keys, configuration, mailoutbox, addressed
+):
+    recipient = family_with_keys[addressed]
+
+    member_mail(recipient).send()
+
+    assert [message.to for message in mailoutbox] == [["family@example.org"]]
+    assert FakePGPBackend.calls == [
+        ("encrypt", f"public key of member {recipient.name}", "Test")
+    ]
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_shared_address_uses_the_key_policy_of_the_addressed_member(
+    family_with_keys, configuration, mailoutbox
+):
+    member_a, member_b = family_with_keys
+    member_b.pgp_keys.update(status=PGPKeyStatus.INVALID)
+
+    member_mail(member_a).send()
+    assert [message.subject for message in mailoutbox] == ["encrypted:Test"]
+
+    blocked_mail = member_mail(member_b)
+    with pytest.raises(SendMailException):
+        blocked_mail.send()
+    assert len(mailoutbox) == 1
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_mail_to_all_members_uses_the_key_of_each_member_of_a_shared_address(
+    family_with_keys, configuration, mailoutbox
+):
+    for family_member in family_with_keys:
+        family_member.memberships.create(
+            start=timezone.now().date() - timedelta(days=30),
+            amount=20,
+            interval=FeeIntervals.MONTHLY,
+        )
+    mail = EMail.objects.create(
+        to_type=RecipientType.ALL_MEMBERS, subject="Test", text="Text"
+    )
+
+    mail.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is not None
+    assert len(mailoutbox) == 2
+    assert sorted(call[1] for call in FakePGPBackend.calls) == [
+        "public key of member A",
+        "public key of member B",
+    ]
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_specific_address_does_not_get_a_member_key(
+    family_with_keys, configuration, mailoutbox
+):
+    config = PGPConfiguration.get_solo()
+    config.missing_key_policy = PGPPolicy.BLOCK
+    config.save()
+    mail = EMail.objects.create(to="family@example.org", subject="Test", text="Text")
+
+    mail.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is not None
+    assert [message.subject for message in mailoutbox] == ["Test"]
+    assert FakePGPBackend.calls == []
+    assert not mail.members.exists()
 
 
 @pytest.mark.django_db
@@ -1024,16 +1155,14 @@ def test_bulk_mail_uses_preloaded_member_and_active_key(
     with django_assert_num_queries(0):
         assert get_active_key(preloaded_member) == key
 
-    mail = EMail.objects.create(to="special:all", subject="Test", text="Text")
+    mail = EMail.objects.create(
+        to_type=RecipientType.ALL_MEMBERS, subject="Test", text="Text"
+    )
     with patch(
         "byro.mails.pgp.get_active_key", wraps=get_active_key
     ) as get_active_key_mock:
-        with patch(
-            "byro.mails.pgp.get_member_for_recipient"
-        ) as get_member_for_recipient:
-            mail.send()
+        mail.send()
 
-    get_member_for_recipient.assert_not_called()
     assert hasattr(get_active_key_mock.call_args.args[0], "active_pgp_keys")
     assert len(mailoutbox) == 1
     assert mailoutbox[0].subject == "encrypted:Test"
@@ -1155,7 +1284,213 @@ def test_pgp_expiry_reminder_is_created_as_outbox_draft(member):
 
     send_pgp_expiry_reminders(sender="test")
 
-    reminder = EMail.objects.get(to=member.email)
+    reminder = member.emails.get()
     assert reminder.sent is None
+    assert reminder.to_type == RecipientType.MEMBER
+    assert reminder.to == ""
+    assert reminder.get_member_recipients() == [member]
     key.refresh_from_db()
     assert key.last_reminder_at is not None
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_mail_send_task_with_a_member_refuses_several_addresses(member, mailoutbox):
+    config = PGPConfiguration.get_solo()
+    config.encryption_enabled = True
+    config.save()
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        public_key="public key",
+        status=PGPKeyStatus.VALID,
+    )
+
+    with pytest.raises(SendMailException, match="exactly one address"):
+        mail_send_task(
+            to=[member.email, "outside@example.org"],
+            subject="Test",
+            body="Text",
+            sender="sender@example.org",
+            member=member,
+        )
+
+    # nothing was sent, and the key of the member was used for nobody
+    assert len(mailoutbox) == 0
+    assert FakePGPBackend.calls == []
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_mail_send_task_without_a_member_sends_several_addresses_unencrypted(
+    member, mailoutbox
+):
+    config = PGPConfiguration.get_solo()
+    config.encryption_enabled = True
+    config.missing_key_policy = PGPPolicy.BLOCK
+    config.save()
+    MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=VALID_FINGERPRINT,
+        public_key="public key",
+        status=PGPKeyStatus.VALID,
+    )
+
+    mail_send_task(
+        to=[member.email, "outside@example.org"],
+        cc=["cc@example.org"],
+        subject="Test",
+        body="Text",
+        sender="sender@example.org",
+    )
+
+    assert [message.to for message in mailoutbox] == [
+        [member.email],
+        ["outside@example.org"],
+        ["cc@example.org"],
+    ]
+    assert all(message.subject == "Test" for message in mailoutbox)
+    assert FakePGPBackend.calls == []
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+@pytest.mark.parametrize(
+    "status,policy_field",
+    (
+        (PGPKeyStatus.EXPIRED, "expired_key_policy"),
+        (PGPKeyStatus.UNVERIFIED, "unverified_key_policy"),
+        (PGPKeyStatus.INVALID, "invalid_key_policy"),
+    ),
+)
+@pytest.mark.parametrize("policy", (PGPPolicy.BLOCK, PGPPolicy.SEND_PLAIN))
+def test_key_policies_apply_to_the_addressed_member_only(
+    family_with_keys, configuration, mailoutbox, status, policy_field, policy
+):
+    member_a, member_b = family_with_keys
+    # only the key of member B is not usable
+    member_b.pgp_keys.update(status=status)
+    config = PGPConfiguration.get_solo()
+    setattr(config, policy_field, policy)
+    config.save()
+
+    # member A shares the address, but is not affected by the key of member B
+    member_mail(member_a).send()
+    assert [message.subject for message in mailoutbox] == ["encrypted:Test"]
+    assert FakePGPBackend.calls == [("encrypt", "public key of member A", "Test")]
+
+    mail = member_mail(member_b)
+    if policy == PGPPolicy.BLOCK:
+        with pytest.raises(SendMailException, match="no usable PGP key"):
+            mail.send()
+        mail.refresh_from_db()
+        assert mail.sent is None
+        assert mail.delivered_to_members == {}
+        assert len(mailoutbox) == 1
+    else:
+        mail.send()
+        mail.refresh_from_db()
+        assert mail.sent is not None
+        # sent in plain, and never with the key of member A
+        assert [message.subject for message in mailoutbox] == [
+            "encrypted:Test",
+            "Test",
+        ]
+    assert len(FakePGPBackend.calls) == 1
+
+    # a plain address is not subject to the policy of either member
+    EMail.objects.create(to="family@example.org", subject="Test", text="Text").send()
+    assert mailoutbox[-1].subject == "Test"
+    assert len(FakePGPBackend.calls) == 1
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_pgp_backend_error_keeps_the_members_that_were_reached(
+    family_with_keys, configuration, mailoutbox
+):
+    member_a, member_b = family_with_keys
+    mail = member_mail(member_a, member_b)
+
+    def encrypt(backend, email_message, public_key):
+        if public_key == "public key of member B":
+            raise PGPBackendError("The key of member B cannot be used.")
+        email_message.subject = "encrypted:" + email_message.subject
+        return email_message
+
+    with patch.object(FakePGPBackend, "encrypt_message", encrypt):
+        with pytest.raises(SendMailException, match="member B"):
+            mail.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is None
+    assert mail.delivered_to_members == {str(member_a.pk): "family@example.org"}
+    assert [message.subject for message in mailoutbox] == ["encrypted:Test"]
+
+    mail.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is not None
+    assert len(mailoutbox) == 2
+    assert FakePGPBackend.calls == [("encrypt", "public key of member B", "Test")]
+    assert mail.delivered_to_members == {
+        str(member_a.pk): "family@example.org",
+        str(member_b.pk): "family@example.org",
+    }
+
+
+@pytest.mark.django_db
+@override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+def test_stale_address_object_uses_the_key_of_the_stored_member(
+    family_with_keys, configuration, mailoutbox
+):
+    """A draft to the shared address is changed to the members A and B. A is
+    reached, B is not. An object from before that change sends the mail again:
+    B has to get it, encrypted with the key of B."""
+    member_a, member_b = family_with_keys
+    mail = EMail.objects.create(to="family@example.org", subject="Test", text="Text")
+    stale = EMail.objects.get(pk=mail.pk)
+    mail.to_type = RecipientType.MEMBER
+    mail.to = ""
+    mail.save()
+    mail.set_member_recipients([member_a, member_b])
+
+    def encrypt(backend, email_message, public_key):
+        FakePGPBackend.calls.append(("encrypt", public_key, email_message.subject))
+        if public_key == "public key of member B":
+            raise PGPBackendError("The key of member B cannot be used.")
+        email_message.subject = "encrypted:" + email_message.subject
+        return email_message
+
+    with patch.object(FakePGPBackend, "encrypt_message", encrypt):
+        with pytest.raises(SendMailException, match="member B"):
+            mail.send()
+        # the stale object must not take the delivered address for "all done"
+        with pytest.raises(SendMailException, match="member B"):
+            stale.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is None
+    assert mail.delivered_to_members == {str(member_a.pk): "family@example.org"}
+    assert len(mailoutbox) == 1
+    FakePGPBackend.calls = []
+    stale = EMail.objects.get(pk=mail.pk)
+    stale.to_type = RecipientType.ADDRESS
+    stale.to = "family@example.org"
+
+    stale.send()
+
+    mail.refresh_from_db()
+    assert mail.sent is not None
+    # only B was sent to, with the key and the member page of B
+    assert FakePGPBackend.calls == [("encrypt", "public key of member B", "Test")]
+    assert [message.subject for message in mailoutbox] == [
+        "encrypted:Test",
+        "encrypted:Test",
+    ]
+    assert member_b.profile_memberpage.get_url() in mailoutbox[1].body
+    assert member_a.profile_memberpage.get_url() not in mailoutbox[1].body
+    assert mail.delivered_to_members == {
+        str(member_a.pk): "family@example.org",
+        str(member_b.pk): "family@example.org",
+    }

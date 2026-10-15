@@ -99,9 +99,8 @@
                                         <table>
                                             <tr>
                                                 <th>{% trans "To" context "mail header" %}:</th>
-                                                <td>{{ entry.instance.to }}</td>
+                                                <td>{{ entry.instance.recipient_display }}</td>
                                             </tr>
-                                        {# FIXME Format special names #}
                                             <tr>
                                                 <th>{% trans "Subject" context "mail header" %}:</th>
                                                 <td class="tl-entry-value">{{ entry.instance.subject }}</td>

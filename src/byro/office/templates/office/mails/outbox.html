@@ -35,7 +35,7 @@
                             {{ mail.subject }}
                         </a>
                     </td>
-                    <td>{{ mail.to }}</td>
+                    <td>{{ mail.recipient_display }}</td>
                     <td>
                         <a href="{% url "office:mails.mail.send" pk=mail.pk %}" class="btn btn-sm btn-success">
                             {% trans "Send" %}

@@ -263,15 +263,14 @@ class MemberBalanceView(MemberListMixin, FormView):
             except Exception:
                 errors += 1
             if balance and (not balance_cutoff or balance.amount < -balance_cutoff):
-                mail = EMail.objects.create(
-                    to=member.email,
+                EMail.for_member(
+                    member,
                     balance=balance,
                     text=text.format(
                         name=member.name, start=start, end=end, amount=balance.amount
                     ),
                     subject=subject,
-                )
-                mail.members.add(member)
+                ).save()
                 mails += 1
         message = str(
             _(
@@ -681,7 +680,7 @@ class MemberCreateView(FormView):
             ]
             context["additional_information"] = "\n".join(responses).strip()
             config.welcome_member_template.to_mail(
-                email=form.instance.email, context=context
+                member=form.instance, context=context
             )
         if config.welcome_office_template:
             context = {"member_name": form.instance.name}
@@ -1345,7 +1344,7 @@ class MemberOperationsView(MultipleFormsMixin, MemberView):
                 ]
                 context["additional_information"] = "\n".join(responses).strip()
                 config.leave_member_template.to_mail(
-                    email=form.instance.member.email, context=context
+                    member=form.instance.member, context=context
                 )
             if config.leave_office_template:
                 context = {
