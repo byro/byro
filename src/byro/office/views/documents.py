@@ -1,14 +1,13 @@
-import os
-
 from django import forms
 from django.contrib import messages
 from django.db import transaction
-from django.http import FileResponse
+from django.http import FileResponse, Http404
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, FormView
+from django.views.generic import DetailView, FormView, View
 
-from byro.documents.models import Document, get_document_category_names
+from byro.documents.models import Document, get_document_category_names, guess_mime_type
 
 
 class DocumentUploadForm(forms.ModelForm):
@@ -43,7 +42,7 @@ class DocumentUploadView(FormView):
         form.instance.log(
             self,
             ".saved",
-            file_name=form.instance.document.name,
+            file_name=form.instance.filename,
             content_size=form.instance.document.size,
             content_hash=form.instance.content_hash,
         )
@@ -74,26 +73,35 @@ class DocumentDownloadView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        # Only the types in INLINE_MIME_TYPES are shown in the browser,
-        # anything else is downloaded as opaque data.
+        try:
+            # FileResponse closes the handle when it is done
+            response_file = self.object.open_file()
+        except FileNotFoundError:
+            raise Http404
+        # Detect the type from the handle that is sent, so that the file is
+        # opened only once. Only the types in INLINE_MIME_TYPES are shown in
+        # the browser, anything else is downloaded as opaque data.
+        self.object.mime_type_guessed = guess_mime_type(
+            next(response_file.chunks(), b"")
+        )
+        response_file.seek(0)
         inline_mime_type = self.object.inline_mime_type
-        # Detecting the type read the file, start again at the beginning
-        self.object.document.open(mode="rb")
-        # HACK HACK
-        # FileResponse can work with a file stream, and do optimized sending with some WSGI servers
-        # but the FieldFile in a FileField will be closed upon return from this function, while
-        # the wsgi.file_wrapper will operate after returning from Django.
-        # dup() the open file, then return an fdopen()
-        # FIXME: Fallback to another mechanism for non-local media storage
-        response_file = os.fdopen(os.dup(self.object.document.fileno()), mode="rb")
         response = FileResponse(
             response_file,
             content_type=inline_mime_type or "application/octet-stream",
             as_attachment=inline_mime_type is None,
-            filename=self.object.basename,
+            filename=self.object.download_filename,
         )
         if inline_mime_type:
             # The detail page shows the document in a frame. Everything else
             # keeps the DENY of XFrameOptionsMiddleware.
             response["X-Frame-Options"] = "SAMEORIGIN"
         return response
+
+
+class DocumentLegacyDownloadView(View):
+    """The download URL used to end with the file name, which identified
+    nothing. Old links lead to the current URL."""
+
+    def get(self, request, pk, filename):
+        return redirect("office:documents.download", pk=pk)

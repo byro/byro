@@ -1,12 +1,15 @@
 import base64
 import io
+import re
 import zipfile
 
 import pytest
+from django.core.files.storage import InMemoryStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import include, path, reverse
 from django.utils.timezone import now
 
+from byro.common.models import LogEntry
 from byro.documents.models import Document
 from byro.office.views.documents import DocumentUploadView
 
@@ -38,6 +41,35 @@ def test_document_upload_redirects_to_upload_page(logged_in_client):
     assert response.status_code == 302
     assert response["Location"] == reverse("office:documents.add")
     assert Document.objects.get().title == "Minutes"
+
+
+KEY = re.compile(r"^documents/[0-9a-f]{2}/[0-9a-f]{32}$")
+
+
+@pytest.mark.parametrize("upload_to", ("documents", "member"))
+@pytest.mark.django_db
+def test_document_upload_keeps_the_file_name_apart_from_the_key(
+    logged_in_client, member, upload_to
+):
+    url = {
+        "documents": reverse("office:documents.add"),
+        "member": reverse("office:members.documents", kwargs={"pk": member.pk}),
+    }[upload_to]
+
+    response = logged_in_client.post(url, document_upload_data())
+
+    assert response.status_code == 302
+    document = Document.objects.get()
+    assert document.filename == "minutes.txt"
+    assert KEY.match(document.document.name)
+
+
+@pytest.mark.django_db
+def test_document_upload_logs_the_file_name(logged_in_client):
+    logged_in_client.post(reverse("office:documents.add"), document_upload_data())
+
+    entry = LogEntry.objects.get(action_type="byro.documents.document.saved")
+    assert entry.data["file_name"] == "minutes.txt"
 
 
 @pytest.mark.django_db
@@ -114,13 +146,12 @@ def create_document(name, content):
     )
 
 
+def download_url(document):
+    return reverse("office:documents.download", kwargs={"pk": document.pk})
+
+
 def download(client, document):
-    return client.get(
-        reverse(
-            "office:documents.download",
-            kwargs={"pk": document.pk, "filename": document.basename},
-        )
-    )
+    return client.get(download_url(document))
 
 
 @pytest.mark.parametrize(
@@ -145,7 +176,10 @@ def test_document_download_shows_pdf_files_and_images(
 
     assert response.status_code == 200
     assert response["Content-Type"] == content_type
-    assert response["Content-Disposition"] == f'inline; filename="{document.basename}"'
+    assert (
+        response["Content-Disposition"]
+        == f'inline; filename="{document.download_filename}"'
+    )
     assert response["X-Content-Type-Options"] == "nosniff"
     # the preview on the detail page is a frame of byro itself
     assert response["X-Frame-Options"] == "SAMEORIGIN"
@@ -176,7 +210,8 @@ def test_document_download_offers_other_files_as_download(
     assert response.status_code == 200
     assert response["Content-Type"] == "application/octet-stream"
     assert (
-        response["Content-Disposition"] == f'attachment; filename="{document.basename}"'
+        response["Content-Disposition"]
+        == f'attachment; filename="{document.download_filename}"'
     )
     assert response["X-Content-Type-Options"] == "nosniff"
     assert response["X-Frame-Options"] == "DENY"
@@ -205,12 +240,9 @@ def test_document_detail_previews_only_what_the_browser_may_show(
 
     assert response.status_code == 200
     content = response.content.decode()
-    url = reverse(
-        "office:documents.download",
-        kwargs={"pk": document.pk, "filename": document.basename},
-    )
-    assert url in content
+    assert download_url(document) in content
     assert ("<iframe" in content) is preview
+    assert document.document.name not in content
 
 
 @pytest.mark.django_db
@@ -221,3 +253,77 @@ def test_document_download_requires_login(client):
 
     assert response.status_code == 302
     assert response["Location"].startswith(reverse("common:login"))
+
+
+@pytest.mark.django_db
+def test_document_download_is_named_after_the_title(logged_in_client):
+    document = Document.objects.create(
+        document=SimpleUploadedFile("scan0042.pdf", PDF),
+        title="Aufnahmeantrag Max Müller",
+    )
+
+    response = download(logged_in_client, document)
+
+    assert response["Content-Disposition"] == (
+        "inline; filename*=utf-8''Aufnahmeantrag%20Max%20M%C3%BCller.pdf"
+    )
+    assert document.document.name not in response["Content-Disposition"]
+
+
+@pytest.mark.parametrize("filename", ("scan0042.pdf", "anything", "download.pdf"))
+@pytest.mark.django_db
+def test_old_document_download_url_leads_to_the_current_one(logged_in_client, filename):
+    document = create_document("scan0042.pdf", PDF)
+
+    response = logged_in_client.get(f"/documents/{document.pk}/{filename}")
+
+    assert response.status_code == 302
+    assert response["Location"] == download_url(document)
+
+
+@pytest.mark.django_db
+def test_document_download_without_a_stored_file(logged_in_client):
+    document = create_document("letter.pdf", PDF)
+    document.document.storage.delete(document.document.name)
+    without_file = Document.objects.create(title="No file yet")
+
+    assert download(logged_in_client, document).status_code == 404
+    assert download(logged_in_client, without_file).status_code == 404
+
+
+@pytest.mark.parametrize("storage", ("memory", "non-reopenable"))
+@pytest.mark.django_db
+def test_document_views_work_without_a_local_file_system(
+    logged_in_client, use_document_storage, request, storage
+):
+    if storage == "memory":
+        use_document_storage(InMemoryStorage())
+    else:
+        request.getfixturevalue("non_reopenable_storage")
+    document = create_document("letter.pdf", PDF)
+    document = Document.objects.get(pk=document.pk)
+
+    response = download(logged_in_client, document)
+    assert response.status_code == 200
+    assert response["Content-Type"] == "application/pdf"
+    # reading the content to the end closes the response
+    assert b"".join(response.streaming_content) == PDF
+
+    response = logged_in_client.get(
+        reverse("office:documents.detail", kwargs={"pk": document.pk})
+    )
+    assert response.status_code == 200
+    assert download_url(document) in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_document_detail_shows_the_file_name(logged_in_client):
+    document = create_document("minutes.html", HTML)
+
+    response = logged_in_client.get(
+        reverse("office:documents.detail", kwargs={"pk": document.pk})
+    )
+
+    content = response.content.decode()
+    assert f">{document.filename}</a>" in content
+    assert document.document.name not in content

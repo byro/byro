@@ -1,6 +1,8 @@
 import datetime
 
 import pytest
+from django.core import mail
+from django.core.files.storage import InMemoryStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from freezegun import freeze_time
 
@@ -79,3 +81,53 @@ def test_document_without_date_can_be_stored_and_loaded():
     assert Document.objects.get(pk=document.pk).date is None
     # the model orders by date
     assert list(Document.objects.all()) == [document]
+
+
+PDF = b"%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF\n"
+
+
+@pytest.mark.parametrize("storage", (None, InMemoryStorage))
+@pytest.mark.parametrize(
+    "name,title,content,expected_name,expected_type",
+    (
+        pytest.param(
+            "scan0042.pdf",
+            "Aufnahmeantrag Max Müller",
+            PDF,
+            "Aufnahmeantrag Max Müller.pdf",
+            "application/pdf",
+            id="type-from-the-extension",
+        ),
+        pytest.param(
+            "scan0042", "Letter", PDF, "Letter", "application/pdf", id="type-detected"
+        ),
+        pytest.param(
+            "notes.txt", "Notes", b"some notes", "Notes.txt", "text/plain", id="text"
+        ),
+    ),
+)
+@pytest.mark.django_db
+def test_document_attachment_is_named_like_a_download(
+    configuration,
+    member,
+    use_document_storage,
+    storage,
+    name,
+    title,
+    content,
+    expected_name,
+    expected_type,
+):
+    if storage:
+        use_document_storage(storage())
+    document = Document.objects.create(
+        document=SimpleUploadedFile(name, content), title=title, member=member
+    )
+
+    document.send(immediately=True)
+
+    (filename, body, mimetype), *_ = mail.outbox[-1].attachments
+    assert filename == expected_name
+    assert mimetype == expected_type
+    assert (body.encode() if isinstance(body, str) else body) == content
+    assert document.document.name.rsplit("/", 1)[-1] not in filename

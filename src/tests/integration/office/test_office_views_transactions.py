@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.shortcuts import reverse
@@ -174,6 +176,28 @@ def test_transaction_post_with_invalid_in_account(
     assert response.status_code == 404
     assert "Location" not in response
     assert transaction.bookings.count() == 1
+
+
+@pytest.mark.django_db
+def test_transaction_upload_keeps_the_file_name_apart_from_the_key(
+    logged_in_client, configuration
+):
+    transaction = bank_booking(None)
+    response = logged_in_client.post(
+        transaction_detail_url(transaction),
+        {
+            "upload_form-document": SimpleUploadedFile("receipt.txt", b"a receipt"),
+            "upload_form-title": "Receipt",
+            "upload_form-date": str(now().date()),
+            "upload_form-category": "byro.bookkeeping.receipt",
+            "upload_form-direction": "incoming",
+        },
+    )
+
+    assert response.status_code == 302
+    document = DocumentTransactionLink.objects.get(transaction=transaction).document
+    assert document.filename == "receipt.txt"
+    assert re.match(r"^documents/[0-9a-f]{2}/[0-9a-f]{32}$", document.document.name)
 
 
 @pytest.mark.django_db

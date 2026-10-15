@@ -37,9 +37,9 @@
         <div class="card-body">
             {% if document.inline_mime_type %}
             {# We should sandbox the iframe, but Chrome doesn't allow PDF rendiering then #}
-                <iframe src="{% url "office:documents.download" pk=document.pk filename=document.basename %}" width="100%" style="height: 100vh"></iframe>
+                <iframe src="{% url "office:documents.download" pk=document.pk %}" width="100%" style="height: 100vh"></iframe>
             {% else %}
-                Link: <a href="{% url "office:documents.download" pk=document.pk filename=document.basename %}">{{document.document}}</a>
+                Link: <a href="{% url "office:documents.download" pk=document.pk %}">{{ document.filename|default:document.download_filename }}</a>
             {% endif %}
 
         </div>

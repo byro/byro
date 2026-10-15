@@ -9,16 +9,18 @@ CANONICAL_ROUTES = (
     ("/upload/match/1", "office:finance.uploads.match", {"pk": 1}),
     ("/upload/add", "office:finance.uploads.add", {}),
     ("/documents/add", "office:documents.add", {}),
+    # "download" would also be a valid file name in an old download URL
+    ("/documents/1/download", "office:documents.download", {"pk": 1}),
     (
         "/documents/1/minutes.pdf",
-        "office:documents.download",
+        "office:documents.download.legacy",
         {"pk": 1, "filename": "minutes.pdf"},
     ),
     ("/documents/1", "office:documents.detail", {"pk": 1}),
 )
 
-# "/documents/1/extra" is missing on purpose: it is a download URL with the
-# filename "extra".
+# "/documents/1/extra" is missing on purpose: it is an old download URL with
+# the filename "extra".
 EXTRA_SEGMENT_URLS = (
     "/transactions/1/extra",
     "/upload/list/extra",
@@ -27,6 +29,7 @@ EXTRA_SEGMENT_URLS = (
     "/upload/add/extra",
     "/documents/add/extra",
     "/documents/1/minutes.pdf/extra",
+    "/documents/1/download/extra",
 )
 
 PREFIX_MATCH_URLS = (
@@ -46,6 +49,7 @@ TRAILING_SLASH_URLS = (
     "/upload/add/",
     "/documents/add/",
     "/documents/1/minutes.pdf/",
+    "/documents/1/download/",
     "/documents/1/",
 )
 
@@ -83,9 +87,9 @@ def test_non_canonical_trailing_slash_is_rejected(url):
 @pytest.mark.parametrize(
     "filename", ("minutes.pdf", "Protokoll 2024 (1).pdf", "Satzung-ä.pdf", "extra")
 )
-def test_document_download_accepts_filename_as_single_segment(filename):
+def test_old_document_download_accepts_filename_as_single_segment(filename):
     match = resolve(f"/documents/1/{filename}")
-    assert match.view_name == "office:documents.download"
+    assert match.view_name == "office:documents.download.legacy"
     assert match.kwargs["filename"] == filename
 
 
@@ -100,7 +104,7 @@ def test_transaction_detail_requires_trailing_slash():
         ("/transactions/001/", "office:finance.transactions.detail"),
         ("/upload/process/001", "office:finance.uploads.process"),
         ("/upload/match/001", "office:finance.uploads.match"),
-        ("/documents/001/minutes.pdf", "office:documents.download"),
+        ("/documents/001/minutes.pdf", "office:documents.download.legacy"),
         ("/documents/001", "office:documents.detail"),
     ),
 )

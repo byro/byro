@@ -39,6 +39,16 @@ PDF files and images in PNG, JPEG, GIF or WebP format open in the browser, and
 the detail page shows them as a preview. All other files are only offered as a
 download. byro decides this by the content of the file, not by its name.
 
+A downloaded file is named after the title of the document, with the
+extension of the uploaded file: `scan0042.pdf` with the title "Membership
+application Jona Than" becomes `Membership application Jona Than.pdf`.
+Without a title, byro uses the name of the category, and without either, the
+name of the uploaded file. Mail attachments get the same name.
+
+byro stores every file under a key of its own, independent of its name, so
+uploading a file with the same name never replaces another document's file.
+The name of the uploaded file is kept with the document.
+
 ## Sending as a mail attachment
 
 A document can be attached programmatically to a new mail placed in the

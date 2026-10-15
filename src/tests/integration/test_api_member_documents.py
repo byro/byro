@@ -1,12 +1,10 @@
 import datetime
 import json
 import os
-from glob import glob
 from hashlib import sha512
 from uuid import uuid4
 
 import pytest
-from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
@@ -16,6 +14,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from byro.common.models import LogEntry
+from byro.documents.fields import DOCUMENT_STORAGE_PREFIX
+from byro.documents.management.commands.list_orphaned_documents import walk
 from byro.documents.models import Document
 from byro.members.models import Member
 
@@ -41,10 +41,32 @@ def detail_url(member_pk, pk):
     )
 
 
-def stored_files(stem):
-    """The files in the document storage that an upload named ``stem`` left."""
-    pattern = os.path.join(settings.MEDIA_ROOT, "documents", "**", f"{stem}*")
-    return glob(pattern, recursive=True)
+def document_files(storage=None):
+    """The keys of all files in the document storage."""
+    storage = storage or Document._meta.get_field("document").storage
+    try:
+        return set(walk(storage, DOCUMENT_STORAGE_PREFIX))
+    except FileNotFoundError:
+        return set()
+
+
+class NewFiles:
+    """The keys of the files stored since the test started, or since
+    ``mark()`` was called after preparing documents."""
+
+    def __init__(self):
+        self.mark()
+
+    def mark(self):
+        self.before = document_files()
+
+    def __call__(self):
+        return document_files() - self.before
+
+
+@pytest.fixture
+def new_files():
+    return NewFiles()
 
 
 def api_client_for(user):
@@ -73,7 +95,7 @@ def other_member():
 
 @pytest.fixture
 def stem():
-    """A file name that only this test uploads, to find its file again."""
+    """A file name that only this test uploads."""
     return f"upload-{uuid4().hex}"
 
 
@@ -105,7 +127,9 @@ def create_document():
 
 
 @pytest.mark.django_db
-def test_upload_creates_document_for_member(api_client, member, payload, stem):
+def test_upload_creates_document_for_member(
+    new_files, api_client, member, payload, stem
+):
     response = api_client.post(list_url(member.pk), payload(), format="multipart")
 
     assert response.status_code == 201
@@ -122,7 +146,9 @@ def test_upload_creates_document_for_member(api_client, member, payload, stem):
         "content_hash": document.content_hash,
         "filename": f"{stem}.pdf",
     }
-    assert stored_files(stem) == [document.document.path]
+    assert new_files() == {document.document.name}
+    # the file name is no part of the storage key
+    assert stem not in document.document.name
     with open(document.document.path, "rb") as stored:
         assert stored.read() == CONTENT
 
@@ -223,11 +249,12 @@ def test_upload_assigns_member_from_url(api_client, member, other_member, payloa
         pytest.param("member", "", id="empty-member"),
         pytest.param("content_hash", "sha512:" + "0" * 128, id="content-hash"),
         pytest.param("content_hash", "", id="empty-content-hash"),
+        pytest.param("filename", "other.pdf", id="filename"),
     ),
 )
 @pytest.mark.django_db
 def test_upload_rejects_server_managed_fields(
-    api_client, member, other_member, payload, stem, field, value
+    new_files, api_client, member, other_member, payload, field, value
 ):
     value = {"other": other_member.pk, "same": member.pk}.get(value, value)
     log_entries = LogEntry.objects.count()
@@ -239,7 +266,7 @@ def test_upload_rejects_server_managed_fields(
     assert response.status_code == 400
     assert list(response.json()) == [field]
     assert not Document.objects.exists()
-    assert stored_files(stem) == []
+    assert new_files() == set()
     assert LogEntry.objects.count() == log_entries
 
     # the same request without the field is a valid upload
@@ -248,7 +275,7 @@ def test_upload_rejects_server_managed_fields(
     document = Document.objects.get()
     assert document.member == member
     assert document.content_hash == f"sha512:{sha512(CONTENT).hexdigest()}"
-    assert stored_files(stem) == [document.document.path]
+    assert new_files() == {document.document.name}
 
 
 @pytest.mark.django_db
@@ -325,7 +352,7 @@ def test_detail_returns_document(api_client, member, create_document):
         "category": "byro.documents.misc",
         "direction": "incoming",
         "content_hash": document.content_hash,
-        "filename": document.basename,
+        "filename": document.filename,
     }
 
 
@@ -356,8 +383,9 @@ def test_detail_does_not_return_document_without_member(
 
 
 @pytest.mark.django_db
-def test_requires_a_token(member, create_document, payload, stem):
+def test_requires_a_token(new_files, member, create_document, payload):
     document = create_document(member)
+    new_files.mark()
     client = APIClient()
 
     assert client.get(list_url(member.pk)).status_code == 401
@@ -365,7 +393,7 @@ def test_requires_a_token(member, create_document, payload, stem):
     response = client.post(list_url(member.pk), payload(), format="multipart")
     assert response.status_code == 401
     assert Document.objects.count() == 1
-    assert stored_files(stem) == []
+    assert new_files() == set()
 
 
 @pytest.mark.django_db
@@ -388,9 +416,17 @@ def test_requires_a_token_before_looking_up_the_member(payload):
 )
 @pytest.mark.django_db
 def test_requires_backend_access(
-    create_user, member, create_document, payload, stem, is_staff, is_superuser, allowed
+    new_files,
+    create_user,
+    member,
+    create_document,
+    payload,
+    is_staff,
+    is_superuser,
+    allowed,
 ):
     document = create_document(member)
+    new_files.mark()
     user = create_user("some_user", is_staff=is_staff, is_superuser=is_superuser)
     client = api_client_for(user)
 
@@ -401,23 +437,24 @@ def test_requires_backend_access(
     response = client.post(list_url(member.pk), payload(), format="multipart")
     assert response.status_code == (201 if allowed else 403)
     assert Document.objects.count() == (2 if allowed else 1)
-    assert len(stored_files(stem)) == (1 if allowed else 0)
+    assert len(new_files()) == (1 if allowed else 0)
 
 
 @pytest.mark.django_db
 def test_ignores_browser_session(
-    superuser_client, configuration, member, payload, stem
+    new_files, superuser_client, configuration, member, payload
 ):
     assert superuser_client.get(list_url(member.pk)).status_code == 401
     response = superuser_client.post(list_url(member.pk), payload())
     assert response.status_code == 401
     assert not Document.objects.exists()
-    assert stored_files(stem) == []
+    assert new_files() == set()
 
 
 @pytest.mark.django_db
-def test_unknown_member(api_client, member, create_document, payload, stem):
+def test_unknown_member(new_files, api_client, member, create_document, payload):
     document = create_document(member)
+    new_files.mark()
     unknown = member.pk + 1000
     log_entries = LogEntry.objects.count()
 
@@ -426,7 +463,7 @@ def test_unknown_member(api_client, member, create_document, payload, stem):
     response = api_client.post(list_url(unknown), payload(), format="multipart")
     assert response.status_code == 404
     assert Document.objects.count() == 1
-    assert stored_files(stem) == []
+    assert new_files() == set()
     assert LogEntry.objects.count() == log_entries
 
     # the same upload works for the existing member
@@ -458,7 +495,7 @@ def test_unknown_document(api_client, member, create_document):
     ),
 )
 @pytest.mark.django_db
-def test_upload_validation(api_client, member, payload, stem, overrides, field):
+def test_upload_validation(new_files, api_client, member, payload, overrides, field):
     log_entries = LogEntry.objects.count()
 
     response = api_client.post(
@@ -468,12 +505,12 @@ def test_upload_validation(api_client, member, payload, stem, overrides, field):
     assert response.status_code == 400
     assert list(response.json()) == [field]
     assert not Document.objects.exists()
-    assert stored_files(stem) == []
+    assert new_files() == set()
     assert LogEntry.objects.count() == log_entries
 
 
 @pytest.mark.django_db
-def test_upload_rejects_empty_file(api_client, member, payload, stem):
+def test_upload_rejects_empty_file(new_files, api_client, member, payload, stem):
     response = api_client.post(
         list_url(member.pk),
         payload(document=SimpleUploadedFile(f"{stem}.pdf", b"")),
@@ -483,7 +520,7 @@ def test_upload_rejects_empty_file(api_client, member, payload, stem):
     assert response.status_code == 400
     assert list(response.json()) == ["document"]
     assert not Document.objects.exists()
-    assert stored_files(stem) == []
+    assert new_files() == set()
 
 
 @pytest.mark.django_db
@@ -568,14 +605,6 @@ def test_failed_upload_rolls_back_document_and_log_entries(
     assert LogEntry.objects.count() == log_entries + 2
 
 
-def files_in(storage, directory=""):
-    directories, files = storage.listdir(directory)
-    found = {os.path.join(directory, name) for name in files}
-    for name in directories:
-        found |= files_in(storage, os.path.join(directory, name))
-    return found
-
-
 @pytest.mark.parametrize(
     "allow_overwrite",
     (
@@ -585,24 +614,27 @@ def files_in(storage, directory=""):
 )
 @pytest.mark.django_db
 def test_failed_upload_deletes_nothing_from_storage(
-    api_user, member, payload, stem, monkeypatch, tmp_path, allow_overwrite
+    api_user,
+    member,
+    payload,
+    stem,
+    monkeypatch,
+    use_document_storage,
+    tmp_path,
+    allow_overwrite,
 ):
-    """The API has no code path that deletes from the storage.
-
-    That is all this test covers, also with the overwriting storage: a failed
-    upload must not remove the file of an existing document. An overwriting
-    storage still lets an upload replace the content of an existing file with
-    the same name, in the API as in the office. This is NOT fixed here, it
-    belongs to the follow-up issue on the document storage.
-    """
-    storage = FileSystemStorage(location=tmp_path, allow_overwrite=allow_overwrite)
-    monkeypatch.setattr(Document._meta.get_field("document"), "storage", storage)
+    """A failed upload removes nothing from the storage and changes no
+    existing file, also not one with the same file name on a storage that
+    overwrites existing names."""
+    storage = use_document_storage(
+        FileSystemStorage(location=tmp_path, allow_overwrite=allow_overwrite)
+    )
     existing = Document.objects.create(
         document=SimpleUploadedFile(f"{stem}.pdf", b"existing content"),
         title="Existing",
         member=member,
     )
-    before = files_in(storage)
+    before = document_files(storage)
     assert before == {existing.document.name}
 
     with monkeypatch.context() as patch:
@@ -613,18 +645,15 @@ def test_failed_upload_deletes_nothing_from_storage(
                 list_url(member.pk), payload(), format="multipart"
             )
 
-    assert before <= files_in(storage)
-    assert storage.exists(existing.document.name)
+    assert before <= document_files(storage)
     assert Document.objects.get() == existing
-    if not allow_overwrite:
-        # Django gave the upload another name
-        with storage.open(existing.document.name) as stored:
-            assert stored.read() == b"existing content"
-        assert Document.objects.get().content_hash_ok
+    with storage.open(existing.document.name) as stored:
+        assert stored.read() == b"existing content"
+    assert Document.objects.get().content_hash_ok
 
 
 @pytest.mark.django_db
-def test_same_file_can_be_uploaded_twice(api_client, member, payload, stem):
+def test_same_file_can_be_uploaded_twice(new_files, api_client, member, payload, stem):
     first = api_client.post(list_url(member.pk), payload(), format="multipart")
     second = api_client.post(list_url(member.pk), payload(), format="multipart")
 
@@ -632,9 +661,10 @@ def test_same_file_can_be_uploaded_twice(api_client, member, payload, stem):
     first, second = first.json(), second.json()
     assert first["id"] != second["id"]
     assert first["content_hash"] == second["content_hash"]
-    assert first["filename"] != second["filename"]
+    # both keep the name they were uploaded with, in files of their own
+    assert first["filename"] == second["filename"] == f"{stem}.pdf"
     assert Document.objects.filter(member=member).count() == 2
-    assert len(stored_files(stem)) == 2
+    assert len(new_files()) == 2
 
 
 @pytest.mark.django_db
@@ -676,7 +706,7 @@ def test_legacy_document_is_returned_as_stored(api_client, member, legacy_docume
         "category": "retired.plugin.category",
         "direction": "outgoing",
         "content_hash": legacy_document.content_hash,
-        "filename": legacy_document.basename,
+        "filename": legacy_document.filename,
     }
 
     response = api_client.get(list_url(member.pk))
