@@ -35,6 +35,10 @@ file after its own access check (see
 [Security baseline](../administration/security-baseline.md#tls-and-reverse-proxy)
 for why `/media/` must never be served directly by the web server).
 
+PDF files and images in PNG, JPEG, GIF or WebP format open in the browser, and
+the detail page shows them as a preview. All other files are only offered as a
+download. byro decides this by the content of the file, not by its name.
+
 ## Sending as a mail attachment
 
 A document can be attached programmatically to a new mail placed in the

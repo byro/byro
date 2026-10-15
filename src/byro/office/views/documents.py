@@ -74,6 +74,11 @@ class DocumentDownloadView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+        # Only the types in INLINE_MIME_TYPES are shown in the browser,
+        # anything else is downloaded as opaque data.
+        inline_mime_type = self.object.inline_mime_type
+        # Detecting the type read the file, start again at the beginning
+        self.object.document.open(mode="rb")
         # HACK HACK
         # FileResponse can work with a file stream, and do optimized sending with some WSGI servers
         # but the FieldFile in a FileField will be closed upon return from this function, while
@@ -83,10 +88,12 @@ class DocumentDownloadView(DetailView):
         response_file = os.fdopen(os.dup(self.object.document.fileno()), mode="rb")
         response = FileResponse(
             response_file,
-            # content_type=self.object.mime_type_guessed, # FIXME: Bug with content-length after upgrading to Django 4.2
+            content_type=inline_mime_type or "application/octet-stream",
+            as_attachment=inline_mime_type is None,
             filename=self.object.basename,
         )
-
-        # The actions above may have seeked the fd
-        response_file.seek(0)
+        if inline_mime_type:
+            # The detail page shows the document in a frame. Everything else
+            # keeps the DENY of XFrameOptionsMiddleware.
+            response["X-Frame-Options"] = "SAMEORIGIN"
         return response

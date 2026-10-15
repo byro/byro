@@ -14,6 +14,12 @@ from django.utils.translation import gettext_lazy as _
 from byro.common.models import LogTargetMixin
 from byro.common.models.choices import Choices
 
+# Types the Office shows in the browser, detected from the content of the
+# file. Everything else is only offered as a download.
+INLINE_MIME_TYPES = frozenset(
+    {"application/pdf", "image/gif", "image/jpeg", "image/png", "image/webp"}
+)
+
 
 class DocumentDirection(Choices):
     INCOMING = "incoming"
@@ -74,6 +80,12 @@ Thank you,
         with self.document.open(mode="rb") as f:
             chunk = next(f.chunks())
             return magic.from_buffer(chunk, mime=True)
+
+    @property
+    def inline_mime_type(self):
+        """The detected type if the browser may display the document, else None."""
+        mime_type = self.mime_type_guessed
+        return mime_type if mime_type in INLINE_MIME_TYPES else None
 
     @transaction.atomic
     def save(self, *args, **kwargs):
