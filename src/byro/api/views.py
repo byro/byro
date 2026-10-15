@@ -150,19 +150,22 @@ class MemberViewSet(ModelViewSet):
 class MembershipViewSet(ModelViewSet):
     serializer_class = MembershipSerializer
 
-    def get_queryset(self):
-        member_pk = self.kwargs.get("member_pk")
-        return Membership.objects.filter(member_id=member_pk)
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        # The member comes from the URL only, and is looked up after the
+        # authentication and permission checks
+        self.member = get_object_or_404(Member.all_objects, pk=self.kwargs["member_pk"])
 
-    def get_member(self):
-        return get_object_or_404(Member.all_objects, pk=self.kwargs["member_pk"])
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Membership.objects.none()
+        return Membership.objects.filter(member=self.member)
 
     def perform_create(self, serializer):
-        member = self.get_member()
-        instance = serializer.save(member=member)
+        instance = serializer.save(member=self.member)
         request = self.request
-        member.log(request, ".membership.created", membership_id=instance.pk)
-        member.update_liabilites()
+        self.member.log(request, ".membership.created", membership_id=instance.pk)
+        self.member.update_liabilites()
 
     def perform_update(self, serializer):
         instance = serializer.save()

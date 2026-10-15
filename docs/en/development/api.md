@@ -57,6 +57,13 @@ no dedicated function for that (there you end a membership instead, see
 through the API removes the record completely, without the history of a
 leave.
 
+Both membership endpoints need the member from the URL. An id that belongs to
+no member is answered with `404`, for every method: a member without
+memberships answers `200` with an empty list, and a membership that belongs to
+another member is not reachable through a member's URL. The member is looked
+up after the authentication and permission checks, so `401` and `403` do not
+reveal whether a member exists.
+
 ## Filtering and search
 
 `/api/v1/members/` supports query parameters: `email` (exact, case
