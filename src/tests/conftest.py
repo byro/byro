@@ -1,8 +1,11 @@
+import io
 import os.path
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
+from django.core.files import File
+from django.core.files.storage import InMemoryStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.shortcuts import reverse
@@ -18,6 +21,7 @@ from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common import oidc
 from byro.common import views as common_views
 from byro.common.models.configuration import Configuration
+from byro.documents.models import Document
 from byro.mails.models import EMail, MailTemplate
 from byro.members.models import FeeIntervals, Member, Membership
 from byro.plugins.sepa.models import MemberSepa
@@ -264,3 +268,27 @@ fee_account = account_helper("fee_account", "member_fees")
 income_account = account_helper("income_account", AccountCategory.INCOME)
 receivable_account = account_helper("receivable_account", AccountCategory.ASSET)
 bank_account = account_helper("asset_account", AccountCategory.ASSET)
+
+
+class NonReopenableStorage(InMemoryStorage):
+    """Hands out handles that cannot be opened again, like many remote
+    storages do."""
+
+    def _open(self, name, mode="rb"):
+        return File(io.BytesIO(super()._open(name, mode).read()), name=name)
+
+
+@pytest.fixture
+def use_document_storage(monkeypatch):
+    """Store the document files of the test in the given storage."""
+
+    def use(storage):
+        monkeypatch.setattr(Document._meta.get_field("document"), "storage", storage)
+        return storage
+
+    return use
+
+
+@pytest.fixture
+def non_reopenable_storage(use_document_storage):
+    return use_document_storage(NonReopenableStorage())

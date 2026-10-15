@@ -30,6 +30,14 @@ The examples below show the byroctl form; substitute as needed.
   start (`python -m byro check`) and in CI.
 * `make_testdata` - fills an empty installation with test data. For trying
   byro out and development only, not for an installation with real data.
+* `list_orphaned_documents` - lists the files in the document storage that no
+  document refers to, with size and modification time, and a summary at the
+  end. Such a file can remain when saving a document fails after its file was
+  written, or when a document gets a new file. The command only reads: it
+  changes and deletes nothing. Files younger than `--min-age-hours` (default
+  24) are left out, so that uploads still in progress do not show up. If the
+  storage cannot list its files or report their age, the command stops with
+  an error and exit code 1.
 
 ## Account management
 

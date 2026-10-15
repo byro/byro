@@ -29,6 +29,15 @@ Die folgenden Beispiele zeigen die byroctl-Form; ersetze sie nach Bedarf.
   Container-Start (`python -m byro check`) und in CI.
 * `make_testdata` – füllt eine leere Installation mit Testdaten. Nur für
   Ausprobieren und Entwicklung, nicht für eine Installation mit echten Daten.
+* `list_orphaned_documents` – listet die Dateien im Dokumentspeicher auf, auf
+  die kein Dokument verweist, mit Größe und Änderungszeit und am Ende einer
+  Zusammenfassung. So eine Datei kann zurückbleiben, wenn das Speichern eines
+  Dokuments scheitert, nachdem seine Datei geschrieben wurde, oder wenn ein
+  Dokument eine neue Datei bekommt. Das Kommando liest nur: Es ändert und
+  löscht nichts. Dateien, die jünger als `--min-age-hours` sind (Standard 24),
+  lässt es aus, damit laufende Uploads nicht erscheinen. Kann der Speicher
+  seine Dateien nicht auflisten oder ihr Alter nicht angeben, bricht das
+  Kommando mit einem Fehler und Exit-Code 1 ab.
 
 ## Kontoverwaltung
 

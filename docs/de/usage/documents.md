@@ -42,6 +42,17 @@ Browser, und die Detailseite zeigt sie als Vorschau. Alle anderen Dateien
 werden nur zum Herunterladen angeboten. byro entscheidet das anhand des
 Inhalts der Datei, nicht anhand ihres Namens.
 
+Eine heruntergeladene Datei heißt wie der Titel des Dokuments, mit der Endung
+der hochgeladenen Datei: Aus `scan0042.pdf` mit dem Titel „Mitgliedsantrag
+Jona Than“ wird `Mitgliedsantrag Jona Than.pdf`. Ohne Titel nimmt byro den
+Namen der Kategorie, ohne beides den Namen der hochgeladenen Datei.
+Mailanhänge bekommen denselben Namen.
+
+byro speichert jede Datei unter einem eigenen Schlüssel, unabhängig von ihrem
+Namen. Eine hochgeladene Datei mit gleichem Namen ersetzt daher nie die
+Datei eines anderen Dokuments. Der Name der hochgeladenen Datei bleibt beim
+Dokument erhalten.
+
 ## Als Mailanhang versenden
 
 Ein Dokument lässt sich programmatisch als Anhang einer neuen Mail in den

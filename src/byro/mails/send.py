@@ -1,7 +1,9 @@
 import logging
+import mimetypes
 from smtplib import SMTPRecipientsRefused, SMTPSenderRefused
 from typing import Any, Dict, Union
 
+from django.core.files import File
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import override
@@ -76,12 +78,27 @@ def _build_email(
     )
     if html is not None:
         email.attach_alternative(inline_css(html), "text/html")
-    if attachments:
-        from byro.documents.models import Document
-
-        for attachment in attachments:
-            email.attach_file(Document.objects.get(pk=attachment).document.path)
+    for filename, content, mimetype in attachments or ():
+        email.attach(filename, content, mimetype)
     return email
+
+
+def _load_attachments(document_ids):
+    """Read the attached documents once, for every copy of the mail."""
+    from byro.documents.models import Document, guess_mime_type
+
+    attachments = []
+    for pk in document_ids or ():
+        document = Document.objects.get(pk=pk)
+        with document.open_file() as handle:
+            content = handle.read()
+        # The name the recipient sees, never the storage key
+        filename = document.download_filename
+        mimetype = mimetypes.guess_type(filename)[0] or guess_mime_type(
+            content[: File.DEFAULT_CHUNK_SIZE]
+        )
+        attachments.append((filename, content, mimetype))
+    return attachments
 
 
 def mail(
@@ -137,6 +154,7 @@ def mail_send_task(
             "An email to a member must have exactly one address in 'to'."
         )
 
+    attachments = _load_attachments(attachments)
     pgp_config = pgp_config or PGPConfiguration.get_solo()
     if pgp_config.encryption_enabled:
         visible_headers = dict(headers or {})

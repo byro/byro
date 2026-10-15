@@ -116,15 +116,15 @@ $ curl -H "Authorization: Token <dein-token>" \
 ```
 
 Das Mitglied ergibt sich ausschließlich aus der URL, und den Content-Hash
-berechnet byro selbst. Ein Request, der `member` oder `content_hash` enthält,
-wird mit `400` abgewiesen.
+berechnet byro selbst. Ein Request, der `member`, `content_hash` oder
+`filename` enthält, wird mit `400` abgewiesen.
 
 Die Antwort, die Liste und der Einzelabruf liefern `id`, `title`, `date`,
 `category`, `direction`, `content_hash` (`sha512:` gefolgt vom Hex-Digest)
-und `filename`. `filename` ist der Name, unter dem byro die Datei gespeichert
-hat. Er kann vom hochgeladenen Namen abweichen, zum Beispiel wenn es schon
-eine Datei mit diesem Namen gibt. Die Datei selbst und ihr Speicherpfad sind
-nicht Teil der Antwort.
+und `filename`. `filename` ist der Name der hochgeladenen Datei. Bei
+Dokumenten aus der Zeit, bevor byro diesen Namen aufbewahrt hat, ist es der
+letzte Teil des alten Speicherpfads, der vom hochgeladenen Namen abweichen
+kann. Die Datei selbst und ihr Speicherpfad sind nicht Teil der Antwort.
 
 Dokumente, die nicht über die API hochgeladen wurden, können bei `title`,
 `date` oder `category` den Wert `null` haben oder eine Kategorie eines

@@ -7,7 +7,7 @@ from byro.members.models import Member, Membership
 
 AUDIT_FIELDS = {"id", "member", "created", "modified", "created_by", "modified_by"}
 # Set by byro when a document is created, never by the client
-DOCUMENT_SERVER_FIELDS = ("member", "content_hash")
+DOCUMENT_SERVER_FIELDS = ("member", "content_hash", "filename")
 
 
 @extend_schema_field({"type": "string", "format": "decimal", "example": "0.00"})
@@ -138,8 +138,6 @@ class DocumentSerializer(serializers.ModelSerializer):
     """A stored document. Documents that were not uploaded through the API can
     lack a title or a date, and their category can come from a plugin that is
     no longer installed."""
-
-    filename = serializers.CharField(source="basename", read_only=True)
 
     class Meta:
         model = Document
