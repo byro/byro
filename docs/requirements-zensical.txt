@@ -31,6 +31,6 @@ python-dateutil==2.9.0.post0
 pyyaml==6.0.3
 pyyaml-env-tag==1.1
 six==1.17.0
-tomli==2.4.1
+tomli==2.5.0
 watchdog==6.0.0
 zensical==0.0.68
