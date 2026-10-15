@@ -43,6 +43,8 @@ GET_SOLO_TEMPLATE_TAG_NAME = "get_solo"
 DEBUG = True
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
+for toolbar_app in ("debug_toolbar", "debug_toolbar.apps.DebugToolbarConfig"):
+    with suppress(ValueError):
+        INSTALLED_APPS.remove(toolbar_app)  # noqa
 with suppress(ValueError):
-    INSTALLED_APPS.remove("debug_toolbar.apps.DebugToolbarConfig")  # noqa
     MIDDLEWARE.remove("debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa

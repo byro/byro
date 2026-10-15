@@ -12,6 +12,30 @@ from byro.common.settings.utils import resolve_oidc_staff_group
 SRC_DIR = os.path.join(os.path.dirname(__file__), "..", "..")
 
 
+@pytest.mark.parametrize("toolbar", [False, True])
+def test_test_settings_disable_optional_debug_toolbar(toolbar):
+    code = (
+        "import sys; from types import ModuleType;"
+        + (
+            "sys.modules['debug_toolbar'] = ModuleType('debug_toolbar');"
+            if toolbar
+            else "sys.modules['debug_toolbar'] = None;"
+        )
+        + "from byro.common.settings import test_settings as s;"
+        "assert 'debug_toolbar' not in s.INSTALLED_APPS;"
+        "assert 'debug_toolbar.apps.DebugToolbarConfig' not in s.INSTALLED_APPS;"
+        "assert 'debug_toolbar.middleware.DebugToolbarMiddleware' not in s.MIDDLEWARE;"
+        "assert 'django.contrib.auth' in s.INSTALLED_APPS;"
+        "assert 'django.middleware.security.SecurityMiddleware' in s.MIDDLEWARE"
+    )
+    subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=SRC_DIR,
+        env={**os.environ, "BYRO_DB_ENGINE": "sqlite3"},
+        check=True,
+    )
+
+
 @pytest.fixture
 def reload_config(monkeypatch):
     """Reload the config module so that ``CONFIG`` picks up the patched
