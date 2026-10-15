@@ -62,6 +62,13 @@ def format_log_source(entry):
         user = format_html('<span class="fa fa-user"></span> {}', entry.user)
 
     source = entry.data.get("source", "")
+    if not isinstance(source, str):
+        # Bookings logged before log_call moved their source kwarg to
+        # "_source" stored the import source here and lost the actor.
+        if entry.user:
+            return user
+        return str(format_log_object(source))
+
     if source.startswith("internal: "):
         source = format_html('<span class="fa fa-gears"></span> {}', source[10:])
 

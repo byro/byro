@@ -1,6 +1,9 @@
 import pytest
 from django.db import transaction
+from django.utils.timezone import now
 
+from byro.bookkeeping.models import Transaction
+from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import LogEntry
 
 
@@ -93,3 +96,27 @@ def test_log_user(user, member):
         LogEntry.objects.create(content_object=member, action_type="test.test_log_user")
 
     assert LogEntry.objects.filter(user=user).first().data["source"] == str(user)
+
+
+@pytest.mark.django_db
+def test_log_call_keeps_source_kwarg_apart_from_actor(real_transaction_source):
+    t = Transaction.objects.create(
+        value_datetime=now(), user_or_context="internal: test"
+    )
+    t.debit(
+        account=SpecialAccounts.bank,
+        amount=1,
+        source=real_transaction_source,
+        user_or_context="internal: test",
+    )
+
+    entry = LogEntry.objects.get(
+        action_type="byro.bookkeeping.transaction.debit.created"
+    )
+    assert entry.data["source"] == "internal: test"
+    assert entry.data["_source"]["ref"] == [
+        "bookkeeping",
+        "realtransactionsource",
+        real_transaction_source.pk,
+    ]
+    assert entry.verify()
