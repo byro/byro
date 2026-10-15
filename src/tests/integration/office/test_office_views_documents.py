@@ -306,8 +306,8 @@ def test_document_views_work_without_a_local_file_system(
     response = download(logged_in_client, document)
     assert response.status_code == 200
     assert response["Content-Type"] == "application/pdf"
+    # reading the content to the end closes the response
     assert b"".join(response.streaming_content) == PDF
-    response.close()
 
     response = logged_in_client.get(
         reverse("office:documents.detail", kwargs={"pk": document.pk})
