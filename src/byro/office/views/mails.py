@@ -8,7 +8,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, UpdateView, View
 
 from byro.common.forms.i18n import RestrictedLanguagesI18nModelForm
+from byro.common.models import Configuration
 from byro.mails.models import EMail, MailTemplate, RecipientsLockedError, RecipientType
+from byro.mails.placeholders import check_template_text, template_contexts
 from byro.mails.send import SendMailException
 from byro.members.models import Member
 
@@ -252,9 +254,36 @@ class TemplateList(ListView):
     context_object_name = "templates"
 
 
+class MailTemplateForm(RestrictedLanguagesI18nModelForm):
+    """Refuses placeholders the template cannot be rendered with, instead of
+    failing later when byro sends a mail from it."""
+
+    def _check_placeholders(self, field):
+        value = self.cleaned_data.get(field)
+        if not value:
+            return value
+        data = value.data
+        texts = data.values() if isinstance(data, dict) else [data]
+        contexts = template_contexts(self.instance, Configuration.get_solo(), field)
+        if contexts is None:
+            contexts = [None]
+        for text in texts:
+            if not text:
+                continue
+            for context in contexts:
+                check_template_text(text, context)
+        return value
+
+    def clean_subject(self):
+        return self._check_placeholders("subject")
+
+    def clean_text(self):
+        return self._check_placeholders("text")
+
+
 MAIL_TEMPLATE_FORM_CLASS = forms.modelform_factory(
     MailTemplate,
-    form=RestrictedLanguagesI18nModelForm,
+    form=MailTemplateForm,
     fields=["subject", "text", "reply_to", "bcc"],
 )
 

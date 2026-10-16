@@ -47,7 +47,10 @@ Text and subject can contain variables in curly braces:
 | Document delivery | `{name}` (the member, for a document without member the address), `{association}` |
 | PGP key expiry reminder | `{name}`, `{date}` (expiry date) |
 
-A literal curly brace is written as `{{` or `}}`.
+A literal curly brace is written as `{{` or `}}`. When a template is saved,
+byro checks its placeholders for every mail the template is used for and shows
+an error for an unknown placeholder or an invalid curly brace. A template that
+byro does not use itself is only checked for invalid curly braces.
 
 In the balance reminder `{start}` and `{end}` are dates such as
 2026-08-01. A different format can be given after a colon, for example
