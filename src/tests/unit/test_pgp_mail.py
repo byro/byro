@@ -1315,8 +1315,8 @@ def test_pgp_expiry_reminder_uses_the_default_template(configuration, member):
     assert reminder.subject == "Your PGP key expires soon"
     assert reminder.text == (
         f"Hello {member.name},\n\n"
-        f"the PGP key stored for your membership expires on {key.expires_at.date()}. "
-        "Please send us an updated public key before it expires.\n"
+        f"The PGP key stored for your membership expires on {key.expires_at.date()}. "
+        "Please send us an updated public key before it expires."
     )
 
 

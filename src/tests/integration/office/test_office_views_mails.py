@@ -763,7 +763,7 @@ def test_balance_reminder_shows_the_outstanding_amount_in_the_configured_currenc
     reminder = EMail.objects.get(balance__isnull=False)
     outstanding = -reminder.balance.amount
     assert outstanding > 0
-    assert f"\n   {expected.format(amount=f'{outstanding:.2f}')}\n" in reminder.text
+    assert f"\n    {expected.format(amount=f'{outstanding:.2f}')}\n" in reminder.text
     assert "EUR" not in reminder.text
     # balances protect their member, which the member fixture deletes
     MemberBalance.objects.all().delete()
@@ -782,7 +782,7 @@ def test_balance_reminder_shows_the_dates_without_a_time(
     logged_in_client.post(reverse("office:members.balance"), data)
 
     reminder = EMail.objects.get(balance__isnull=False)
-    assert f" {data['start']}\n" in reminder.text
+    assert f" {data['start']} " in reminder.text
     assert f" {data['end']} " in reminder.text
     assert "00:00" not in reminder.text and "23:59" not in reminder.text
     # balances protect their member, which the member fixture deletes

@@ -85,46 +85,138 @@ def test_unsaved_template_creates_a_mail_without_template(configuration):
     assert mail.text == "Text for Jona"
 
 
-# Behaviour preservation: the runtime defaults keep the texts these mails had
-# before they became templates. Only the balance reminder no longer names a
-# currency, the amount brings the configured one.
-@pytest.mark.parametrize(
-    "value,expected",
+DEFAULT_TEXTS = (
     (
-        (default.BALANCE_REMINDER_SUBJECT, "Outstanding membership fees"),
-        (
-            default.BALANCE_REMINDER_TEXT,
-            """Hello {name},
-
-we wanted to let you know that within the time from {start}
-to {end} you incurred unpaid liabilities in the amount of
-
-   {amount}
-
-Please settle this amount as soon as possible, or let us
-know if you think this email is incorrect.""",
-        ),
-        (default.DOCUMENT_DELIVERY_SUBJECT, "[{association}] Your document"),
-        (
-            default.DOCUMENT_DELIVERY_TEXT,
-            """Hi, {name},
-
-Please find attached a document we wanted to send you/that you requested.
-
-Thank you,
-{association}""",
-        ),
-        (default.PGP_EXPIRY_REMINDER_SUBJECT, "Your PGP key expires soon"),
-        (
-            default.PGP_EXPIRY_REMINDER_TEXT,
-            "Hello {name},\n\n"
-            "the PGP key stored for your membership expires on {date}. "
-            "Please send us an updated public key before it expires.\n",
-        ),
+        "WELCOME_MEMBER_SUBJECT",
+        "Welcome to {name}",
+        "Willkommen bei {name}",
+    ),
+    (
+        "WELCOME_MEMBER_TEXT",
+        "Hello {member_name},\n\n"
+        "Welcome to {name}! Your member number is {number}.\n\n"
+        "If you have questions about your membership fees or want to update your "
+        "details, please contact us at {contact}.\n\n"
+        "{additional_information}",
+        "Hallo {member_name},\n\n"
+        "willkommen bei {name}! Deine Mitgliedsnummer ist {number}.\n\n"
+        "Wenn du Fragen zu deinen Mitgliedsbeiträgen hast oder sich deine Daten "
+        "ändern, schreib uns bitte an {contact}.\n\n"
+        "{additional_information}",
+    ),
+    (
+        "WELCOME_OFFICE_SUBJECT",
+        "[byro] New member: {member_name}",
+        "[byro] Neues Mitglied: {member_name}",
+    ),
+    (
+        "WELCOME_OFFICE_TEXT",
+        "A new member has been added: {member_name}\n\n{additional_information}",
+        "Ein neues Mitglied wurde angelegt: {member_name}\n\n{additional_information}",
+    ),
+    (
+        "LEAVE_MEMBER_SUBJECT",
+        "End of your membership",
+        "Ende deiner Mitgliedschaft",
+    ),
+    (
+        "LEAVE_MEMBER_TEXT",
+        "Hello {member_name},\n\n"
+        "Your membership in {name} ends on {end}.\n\n"
+        "{additional_information}",
+        "Hallo {member_name},\n\n"
+        "deine Mitgliedschaft bei {name} endet am {end}.\n\n"
+        "{additional_information}",
+    ),
+    (
+        "LEAVE_MEMBER_OFFICE_SUBJECT",
+        "[byro] End of membership: {member_name}",
+        "[byro] Ende der Mitgliedschaft: {member_name}",
+    ),
+    (
+        "LEAVE_MEMBER_OFFICE_TEXT",
+        "The membership of {member_name} ends on {end}.\n\n{additional_information}",
+        "Die Mitgliedschaft von {member_name} endet am {end}.\n\n"
+        "{additional_information}",
+    ),
+    (
+        "RECORD_DISCLOSURE_SUBJECT",
+        "Your data at {association_name} (member number {number})",
+        "Deine Daten bei {association_name} (Mitgliedsnummer {number})",
+    ),
+    (
+        "RECORD_DISCLOSURE_TEXT",
+        "Hello,\n\n"
+        "This is an overview of the data {association_name} currently stores about "
+        "you and your membership.\n\n"
+        "Your current balance is {balance}. A negative balance means that fees are "
+        "outstanding.\n\n"
+        "{data}\n\n"
+        "If anything is outdated or incorrect, please reply to this email and let us "
+        "know.",
+        "Hallo,\n\n"
+        "hier ist eine Übersicht der Daten, die {association_name} aktuell über dich "
+        "und deine Mitgliedschaft gespeichert hat.\n\n"
+        "Dein aktueller Kontostand beträgt {balance}. Ein negativer Betrag bedeutet, "
+        "dass Beiträge offen sind.\n\n"
+        "{data}\n\n"
+        "Wenn etwas veraltet oder falsch ist, antworte bitte einfach auf diese E-Mail.",
+    ),
+    (
+        "BALANCE_REMINDER_SUBJECT",
+        "Outstanding membership fees",
+        "Offene Mitgliedsbeiträge",
+    ),
+    (
+        "BALANCE_REMINDER_TEXT",
+        "Hello {name},\n\n"
+        "According to our records, membership fees for the period from {start} to "
+        "{end} are still outstanding:\n\n"
+        "    {amount}\n\n"
+        "Please pay this amount as soon as possible. If you think this is a mistake, "
+        "please reply to this email.",
+        "Hallo {name},\n\n"
+        "laut unseren Unterlagen sind für den Zeitraum vom {start} bis {end} noch "
+        "Mitgliedsbeiträge offen:\n\n"
+        "    {amount}\n\n"
+        "Bitte zahle den Betrag so bald wie möglich. Falls du denkst, dass hier ein "
+        "Fehler vorliegt, antworte bitte auf diese E-Mail.",
+    ),
+    (
+        "DOCUMENT_DELIVERY_SUBJECT",
+        "Your document from {association}",
+        "Dein Dokument von {association}",
+    ),
+    (
+        "DOCUMENT_DELIVERY_TEXT",
+        "Hello,\n\nA document from {association} is attached to this email.",
+        "Hallo,\n\nim Anhang dieser E-Mail findest du ein Dokument von {association}.",
+    ),
+    (
+        "PGP_EXPIRY_REMINDER_SUBJECT",
+        "Your PGP key expires soon",
+        "Dein PGP-Schlüssel läuft bald ab",
+    ),
+    (
+        "PGP_EXPIRY_REMINDER_TEXT",
+        "Hello {name},\n\n"
+        "The PGP key stored for your membership expires on {date}. "
+        "Please send us an updated public key before it expires.",
+        "Hallo {name},\n\n"
+        "der für deine Mitgliedschaft gespeicherte PGP-Schlüssel läuft am {date} ab. "
+        "Bitte sende uns vor Ablauf einen aktualisierten öffentlichen Schlüssel.",
     ),
 )
-def test_default_mail_texts_keep_their_english_wording(value, expected):
-    assert value.localize("en") == expected
+
+
+# The member mails end without a greeting, the footer adds it. Portuguese has
+# no translation of these texts yet and uses the English ones.
+@pytest.mark.parametrize("name,en,de", DEFAULT_TEXTS, ids=[t[0] for t in DEFAULT_TEXTS])
+def test_default_mail_texts(name, en, de):
+    value = getattr(default, name)
+    assert value.localize("en") == en
+    assert value.localize("de") == de
+    assert value.localize("pt-br") == en
 
 
 @pytest.mark.django_db

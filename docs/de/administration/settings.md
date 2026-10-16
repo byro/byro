@@ -66,7 +66,9 @@ nicht aus; byro ordnet sie selbst zu (siehe
 ### Fußzeile für Mails an Mitglieder
 
 byro setzt diesen Text unter jede Mail an ein Mitglied oder an alle
-Mitglieder, getrennt durch eine Leerzeile. Mails an eine Adresse erhalten ihn
+Mitglieder, getrennt durch eine Leerzeile. Zeilenumbrüche am Ende des
+Mailtexts entfernt byro vorher, zwischen Text und Fußzeile steht also genau
+eine Leerzeile. Mails an eine Adresse erhalten ihn
 nicht (siehe
 [Mitglieder und Adressen](../usage/mails.md#mitglieder-und-adressen)). Die
 Fußzeile ist der vollständige Abschlussblock: Wer den Signaturtrenner (zwei

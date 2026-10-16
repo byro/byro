@@ -1,93 +1,77 @@
 from django.utils.translation import gettext_lazy as _
 from i18nfield.strings import LazyI18nString
 
-WELCOME_MEMBER_SUBJECT = LazyI18nString.from_gettext(_("Welcome, latest member!"))
-WELCOME_MEMBER_TEXT = LazyI18nString.from_gettext(_("""Hi,
+WELCOME_MEMBER_SUBJECT = LazyI18nString.from_gettext(_("Welcome to {name}"))
+WELCOME_MEMBER_TEXT = LazyI18nString.from_gettext(_("""Hello {member_name},
 
-welcome to {name}! You're now officially our latest member. Your member ID
-is {number}. If you have any questions relating to your member fees or
-you want to update your member data, please contact us at {contact}.
+Welcome to {name}! Your member number is {number}.
 
-{additional_information}
+If you have questions about your membership fees or want to update your details, please contact us at {contact}.
 
-Thanks,
-the robo clerk"""))
+{additional_information}"""))
 
-WELCOME_OFFICE_SUBJECT = LazyI18nString.from_gettext(_("[byro] New member"))
-WELCOME_OFFICE_TEXT = LazyI18nString.from_gettext(_("""Hi,
+WELCOME_OFFICE_SUBJECT = LazyI18nString.from_gettext(
+    _("[byro] New member: {member_name}")
+)
+WELCOME_OFFICE_TEXT = LazyI18nString.from_gettext(
+    _("""A new member has been added: {member_name}
 
-we have a new member: {member_name}
+{additional_information}""")
+)
 
-{additional_information}
+LEAVE_MEMBER_SUBJECT = LazyI18nString.from_gettext(_("End of your membership"))
+LEAVE_MEMBER_TEXT = LazyI18nString.from_gettext(_("""Hello {member_name},
 
-Thanks,
-the robo clerk"""))
+Your membership in {name} ends on {end}.
 
-LEAVE_MEMBER_SUBJECT = LazyI18nString.from_gettext(_("Goodbye!"))
-LEAVE_MEMBER_TEXT = LazyI18nString.from_gettext(_("""Hi,
-
-we are sorry that you will leave us at {end}.
-
-{additional_information}
-
-Thanks,
-the robo clerk"""))
+{additional_information}"""))
 
 LEAVE_MEMBER_OFFICE_SUBJECT = LazyI18nString.from_gettext(
-    _("[byro] Membership termination")
+    _("[byro] End of membership: {member_name}")
 )
-LEAVE_MEMBER_OFFICE_TEXT = LazyI18nString.from_gettext(_("""Hi,
+LEAVE_MEMBER_OFFICE_TEXT = LazyI18nString.from_gettext(
+    _("""The membership of {member_name} ends on {end}.
 
-{member_name} will leave us at {end}.
-
-{additional_information}
-
-Thanks,
-the robo clerk"""))
+{additional_information}""")
+)
 RECORD_DISCLOSURE_SUBJECT = LazyI18nString.from_gettext(
-    _("Your {association_name} data record (#{number})")
+    _("Your data at {association_name} (member number {number})")
 )
-RECORD_DISCLOSURE_TEXT = LazyI18nString.from_gettext(_("""Hi,
+RECORD_DISCLOSURE_TEXT = LazyI18nString.from_gettext(_("""Hello,
 
-We're writing you to let you know about the data we have currently stored about
-yourself and your membership.
+This is an overview of the data {association_name} currently stores about you and your membership.
 
-Your current balance is {balance}.
+Your current balance is {balance}. A negative balance means that fees are outstanding.
 
 {data}
 
-If these records are outdated or incorrect, please let us know as a response to
-this email.
-
-Thanks,
-the robo clerk"""))
+If anything is outdated or incorrect, please reply to this email and let us know."""))
 BALANCE_REMINDER_SUBJECT = LazyI18nString.from_gettext(_("Outstanding membership fees"))
-BALANCE_REMINDER_TEXT = LazyI18nString.from_gettext(_("""Hello {name},
+BALANCE_REMINDER_TEXT = LazyI18nString.from_gettext(
+    _(
+        """Hello {name},
 
-we wanted to let you know that within the time from {start}
-to {end} you incurred unpaid liabilities in the amount of
+According to our records, membership fees for the period from {start} to {end} are still outstanding:
 
-   {amount}
+    {amount}
 
-Please settle this amount as soon as possible, or let us
-know if you think this email is incorrect."""))
-DOCUMENT_DELIVERY_SUBJECT = LazyI18nString.from_gettext(
-    _("[{association}] Your document")
+Please pay this amount as soon as possible. If you think this is a mistake, please reply to this email."""
+    )
 )
-DOCUMENT_DELIVERY_TEXT = LazyI18nString.from_gettext(_("""Hi, {name},
+DOCUMENT_DELIVERY_SUBJECT = LazyI18nString.from_gettext(
+    _("Your document from {association}")
+)
+DOCUMENT_DELIVERY_TEXT = LazyI18nString.from_gettext(_("""Hello,
 
-Please find attached a document we wanted to send you/that you requested.
-
-Thank you,
-{association}"""))
+A document from {association} is attached to this email."""))
 PGP_EXPIRY_REMINDER_SUBJECT = LazyI18nString.from_gettext(
     _("Your PGP key expires soon")
 )
 PGP_EXPIRY_REMINDER_TEXT = LazyI18nString.from_gettext(
     _(
         "Hello {name},\n\n"
-        "the PGP key stored for your membership expires on {date}. "
-        "Please send us an updated public key before it expires.\n"
+        "The PGP key stored for your membership expires on {date}. "
+        "Please send us an updated public key before it expires."
     )
 )
 # The closing block of every mail to a member, see byro.mails.footer. The
