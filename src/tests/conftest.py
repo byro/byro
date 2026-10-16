@@ -38,6 +38,15 @@ def configuration():
 
 
 @pytest.fixture
+def member_page_url_footer(configuration):
+    """A footer with the member page link, for tests of which member gets
+    which link. The default footer has no link."""
+    configuration.member_mail_footer = {"en": "Member page: {member_page_url}"}
+    configuration.save()
+    return configuration
+
+
+@pytest.fixture
 def full_testdata(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         call_command("loaddata", "tests/fixtures/test_full_testdata.json")

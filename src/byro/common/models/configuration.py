@@ -2,6 +2,7 @@ from django.conf.global_settings import LANGUAGES
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from i18nfield.fields import I18nTextField
 from solo.models import SingletonModel
 
 from byro.common.models.choices import Choices
@@ -192,6 +193,18 @@ class Configuration(ByroConfiguration):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
+    )
+    # NULL is the built-in default, see byro.mails.footer
+    member_mail_footer = I18nTextField(
+        null=True,
+        blank=True,
+        verbose_name=_("Footer of mails to members"),
+        help_text=_(
+            "Added below the text of every mail to a member, not to mails to "
+            "an address. Leave it empty for no footer. Placeholders: "
+            "{association_name}, {association_address}, {association_url}, "
+            "{member_page_url}"
+        ),
     )
 
     form_title = _("General settings")

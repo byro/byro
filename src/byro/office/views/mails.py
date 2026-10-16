@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
@@ -7,21 +6,11 @@ from django.db.models import Q
 from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, UpdateView, View
-from i18nfield.forms import I18nModelForm
 
+from byro.common.forms.i18n import RestrictedLanguagesI18nModelForm
 from byro.mails.models import EMail, MailTemplate, RecipientsLockedError, RecipientType
 from byro.mails.send import SendMailException
 from byro.members.models import Member
-
-
-class RestrictedLanguagesI18nModelForm(I18nModelForm):
-    def __init__(self, *args, **kwargs):
-        if "locales" not in kwargs:
-            from byro.common.models import Configuration
-
-            config = Configuration.get_solo()
-            kwargs["locales"] = [config.language or settings.LANGUAGE_CODE]
-        return super().__init__(*args, **kwargs)
 
 
 class MailSpecialToFormClass(forms.ModelForm):

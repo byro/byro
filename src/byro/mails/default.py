@@ -90,3 +90,16 @@ PGP_EXPIRY_REMINDER_TEXT = LazyI18nString.from_gettext(
         "Please send us an updated public key before it expires.\n"
     )
 )
+# The closing block of every mail to a member, see byro.mails.footer. The
+# signature separator is "-- " with a trailing space.
+MEMBER_MAIL_FOOTER = LazyI18nString.from_gettext(
+    _(
+        "Best regards\n"
+        "Your membership team\n"
+        "\n"
+        "-- \n"
+        "{association_name}\n"
+        "{association_address}\n"
+        "{association_url}"
+    )
+)

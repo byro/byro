@@ -17,6 +17,12 @@ from byro.common.models import LogTargetMixin
 from byro.common.models.auditable import Auditable
 from byro.common.models.choices import Choices
 from byro.common.models.configuration import ByroConfiguration
+from byro.mails.footer import (
+    check_member_mail_footer,
+    get_member_mail_footer_text,
+    member_mail_footer_context,
+    render_member_mail_footer,
+)
 from byro.mails.send import SendMailException
 from byro.members.models import Member
 
@@ -732,6 +738,7 @@ class EMail(Auditable, models.Model):
         # What is sent to whom is decided by the stored mail: this object
         # takes over its recipients and deliveries first.
         recipients = self._load_stored_recipients(pgp_config)
+        footer = self._get_member_footer(config, recipients)
 
         headers = {}
         if self.reply_to:
@@ -756,14 +763,15 @@ class EMail(Auditable, models.Model):
                         )
                     )
                     continue
-                signature = _(
-                    "You are receiving this email due to your membership in {name}."
-                ).format(name=config.name)
-                signature += "\n"
-                signature += _(
-                    "You can see your member page at this URL: {url}"
-                ).format(url=member.profile_memberpage.get_url())
-                body += "\n\n-- \n" + signature
+                if footer:
+                    rendered_footer = render_member_mail_footer(
+                        footer,
+                        member_mail_footer_context(
+                            config, member.profile_memberpage.get_url()
+                        ),
+                    )
+                    if rendered_footer.strip():
+                        body += "\n\n" + rendered_footer
             elif addr.lower() in delivered_addresses:
                 continue
             try:
@@ -789,6 +797,31 @@ class EMail(Auditable, models.Model):
             raise SendMailException("\n".join(errors))
 
         self._mark_sent()
+
+    @staticmethod
+    def _get_member_footer(config, recipients):
+        """Return the footer text for the member recipients, empty if there
+        is none or no recipient is a member.
+
+        A footer that cannot be filled in stops the mail before anything is
+        delivered: it would fail for every member in the same way.
+        """
+        if not any(member for _address, member in recipients):
+            return ""
+        footer = get_member_mail_footer_text(config)
+        if not footer.strip():
+            return ""
+        try:
+            check_member_mail_footer(footer, config)
+        except ValidationError as e:
+            raise SendMailException(
+                _(
+                    "Cannot send this email: the footer of mails to members "
+                    "cannot be filled in. {error} Correct it in the general "
+                    "settings."
+                ).format(error=" ".join(e.messages))
+            )
+        return footer
 
     def copy_to_draft(self):
         new_mail = deepcopy(self)
