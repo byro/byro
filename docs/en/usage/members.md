@@ -158,7 +158,12 @@ import aborts with an error before anything is written.
   configurable balance threshold. Subject and text of the reminder are
   filled in from the balance reminder template and can be changed for each
   run (see [Templates](mails.md#templates)). Runs synchronously when the
-  form is submitted.
+  form is submitted. If no balance can be created for a single member,
+  for example because it would overlap an existing balance, the member is
+  counted and skipped and the run continues with the other members. If
+  an uncaught error aborts the run, the balances and reminder mails it
+  has already created are rolled back, so no partially processed run is
+  left behind.
 * **Disclosure for all** (`Members → List → Disclosure`): generates a
   disclosure mail in the outbox for **every currently filtered** member -
   check the active filter first.

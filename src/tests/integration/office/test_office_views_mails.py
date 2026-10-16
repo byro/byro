@@ -720,6 +720,197 @@ def test_balance_reminders_use_the_text_of_the_run_and_the_template_settings(
     MemberBalance.objects.all().delete()
 
 
+def balance_run_data(text):
+    return {
+        "start": str((now() - relativedelta(months=2)).date()),
+        "end": str((now() - relativedelta(days=1)).date()),
+        "create_if_zero": "on",
+        "subject": "Your balance",
+        "text": text,
+    }
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "text", ["Hello {nmae}", "Hello {", "Hello }", "Hello {}", "You owe {amount:d}"]
+)
+def test_balance_run_with_an_invalid_reminder_text_creates_nothing(
+    member, membership, logged_in_client, configuration, text
+):
+    response = logged_in_client.post(
+        reverse("office:members.balance"), balance_run_data(text)
+    )
+
+    assert response.status_code == 200
+    assert response.context["form"].errors["text"]
+    assert not MemberBalance.objects.exists()
+    assert not EMail.objects.filter(balance__isnull=False).exists()
+
+
+@pytest.mark.django_db
+def test_balance_run_names_an_unknown_placeholder(
+    member, membership, logged_in_client, configuration
+):
+    response = logged_in_client.post(
+        reverse("office:members.balance"), balance_run_data("Hello {nmae}")
+    )
+
+    assert response.context["form"].errors["text"] == [
+        "Unknown placeholder: {nmae}. Available placeholders: "
+        "{name}, {start}, {end}, {amount}"
+    ]
+
+
+@pytest.mark.django_db
+def test_balance_run_explains_invalid_placeholders_in_the_office_language(
+    member, membership, logged_in_client, configuration, settings
+):
+    settings.DEFAULT_LANGUAGE = "de"
+
+    response = logged_in_client.post(
+        reverse("office:members.balance"), balance_run_data("Hello {")
+    )
+
+    assert response.context["form"].errors["text"] == [
+        "Der Text enthält einen ungültigen Platzhalter. Verfügbare Platzhalter: "
+        "{name}, {start}, {end}, {amount}. Für geschweifte Klammern im Text "
+        "schreibe {{ und }}."
+    ]
+
+
+@pytest.mark.django_db
+def test_balance_reminder_text_accepts_format_specs(
+    member, membership, logged_in_client, configuration
+):
+    data = balance_run_data("{start:%d.%m.%Y} to {end:%d.%m.%Y}: {amount:.2f}")
+
+    response = logged_in_client.post(reverse("office:members.balance"), data)
+
+    assert response.status_code == 302, response.content.decode()
+    reminder = EMail.objects.get(balance__isnull=False)
+    balance = reminder.balance
+    assert reminder.text == (
+        f"{balance.start:%d.%m.%Y} to {balance.end:%d.%m.%Y}: {balance.amount:.2f}"
+    )
+    # balances protect their member, which the member fixture deletes
+    MemberBalance.objects.all().delete()
+
+
+@pytest.mark.django_db
+def test_balance_run_rolls_back_when_a_reminder_text_fails_for_a_member(
+    member, membership, logged_in_client, configuration
+):
+    # Passes the check with a sample name, fails for a member without a name.
+    member.name = ""
+    member.save()
+
+    response = logged_in_client.post(
+        reverse("office:members.balance"), balance_run_data("Dear {name[0]}")
+    )
+
+    assert response.status_code == 200
+    assert response.context["form"].errors["text"]
+    assert not MemberBalance.objects.exists()
+    assert not EMail.objects.filter(balance__isnull=False).exists()
+
+
+@pytest.mark.django_db
+def test_balance_run_rolls_back_when_it_is_aborted(
+    member, membership, logged_in_client, configuration, monkeypatch
+):
+    second = Member.objects.create(email="second@example.org", number="2")
+    Membership.objects.create(
+        member=second,
+        start=membership.start,
+        amount=20,
+        interval=FeeIntervals.MONTHLY,
+    )
+    save = EMail.save
+    calls = []
+
+    def save_once(self, *args, **kwargs):
+        calls.append(self)
+        if len(calls) > 1:
+            raise RuntimeError("mail could not be saved")
+        return save(self, *args, **kwargs)
+
+    monkeypatch.setattr(EMail, "save", save_once)
+
+    with pytest.raises(RuntimeError):
+        logged_in_client.post(
+            reverse("office:members.balance"), balance_run_data("Hello {name}")
+        )
+
+    assert len(calls) == 2
+    assert not MemberBalance.objects.exists()
+    assert not EMail.objects.filter(balance__isnull=False).exists()
+
+
+@pytest.mark.django_db
+def test_balance_run_continues_after_a_database_error_for_one_member(
+    member, membership, logged_in_client, configuration, monkeypatch
+):
+    second = Member.objects.create(email="second@example.org", number="2")
+    Membership.objects.create(
+        member=second,
+        start=membership.start,
+        amount=20,
+        interval=FeeIntervals.MONTHLY,
+    )
+    create_balance = Member.create_balance
+
+    def failing_for_second(self, *args, **kwargs):
+        if self.pk == second.pk:
+            # a failing query, as a database error during the creation would be
+            for _ in range(2):
+                MemberBalance.objects.create(
+                    member=self,
+                    reference="duplicate",
+                    start=now() - relativedelta(years=2),
+                    end=now() - relativedelta(years=2),
+                    amount=0,
+                )
+        return create_balance(self, *args, **kwargs)
+
+    monkeypatch.setattr(Member, "create_balance", failing_for_second)
+
+    response = logged_in_client.post(
+        reverse("office:members.balance"), balance_run_data("Hello {name}")
+    )
+
+    assert response.status_code == 302, response.content.decode()
+    assert list(MemberBalance.objects.values_list("member", flat=True)) == [member.pk]
+    assert EMail.objects.filter(balance__isnull=False).count() == 1
+    # balances protect their member, which the member fixture deletes
+    MemberBalance.objects.all().delete()
+
+
+@pytest.mark.django_db
+def test_balance_run_reports_skipped_members_in_the_office_language(
+    member, membership, logged_in_client, configuration, settings
+):
+    settings.DEFAULT_LANGUAGE = "de"
+    MemberBalance.objects.create(
+        member=member,
+        start=now() - relativedelta(months=3),
+        end=now() - relativedelta(months=1),
+        amount=0,
+    )
+
+    response = logged_in_client.post(
+        reverse("office:members.balance"),
+        balance_run_data("Hello {name}"),
+        follow=True,
+    )
+
+    assert (
+        "1 Abschlüsse konnten wegen Fehlern nicht erstellt werden"
+        in response.content.decode()
+    )
+    # balances protect their member, which the member fixture deletes
+    MemberBalance.objects.all().delete()
+
+
 @pytest.mark.django_db
 def test_data_disclosure_mails_are_addressed_to_their_members(
     member, membership, logged_in_client, configuration

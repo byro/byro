@@ -2491,6 +2491,16 @@ msgstr ""
 "zu zahlen. Bitte hole dies so bald wie möglich nach, oder lass\n"
 "uns wissen, wenn diese Erinnerung irrtümlich versandt wurde."
 
+#: byro/office/views/members.py:222
+#, python-format
+msgid ""
+"The text contains an invalid placeholder. Available placeholders: "
+"%(available)s. Write %(open)s and %(close)s for literal curly braces."
+msgstr ""
+"Der Text enthält einen ungültigen Platzhalter. Verfügbare Platzhalter: "
+"%(available)s. Für geschweifte Klammern im Text schreibe %(open)s und "
+"%(close)s."
+
 #: byro/office/views/members.py:199
 msgid "End must be in the past!"
 msgstr "Das Ende muss in der Vergangenheit liegen!"
@@ -3632,7 +3642,7 @@ msgstr ""
 msgid "Account name in authenticator apps"
 msgstr "Kontobezeichnung in Authenticator-Apps"
 
-#: byro/mfa/models.py:38
+#: byro/mfa/models.py:38 byro/office/views/members.py:214
 #, python-format
 msgid ""
 "Unknown placeholder: %(placeholder)s. Available placeholders: %(available)s"

@@ -198,6 +198,35 @@ def get_balance_reminder_template(config):
     )
 
 
+BALANCE_REMINDER_PLACEHOLDERS = ("name", "start", "end", "amount")
+
+
+def render_balance_reminder_text(text, *, name, start, end, amount):
+    """Fill in the placeholders of a balance reminder text.
+
+    Raises a ValidationError if the text cannot be rendered with these values.
+    """
+    available = ", ".join("{%s}" % name for name in BALANCE_REMINDER_PLACEHOLDERS)
+    try:
+        return text.format(name=name, start=start, end=end, amount=amount)
+    except KeyError as e:
+        raise ValidationError(
+            _(
+                "Unknown placeholder: %(placeholder)s. Available placeholders: %(available)s"
+            ),
+            code="unknown_placeholder",
+            params={"placeholder": "{%s}" % e.args[0], "available": available},
+        )
+    except (IndexError, AttributeError, ValueError, TypeError):
+        raise ValidationError(
+            _(
+                "The text contains an invalid placeholder. Available placeholders: %(available)s. Write %(open)s and %(close)s for literal curly braces."
+            ),
+            code="invalid_placeholder",
+            params={"available": available, "open": "{{", "close": "}}"},
+        )
+
+
 class MemberBalanceForm(forms.Form):
     start = forms.DateField(label=_("Start of balance timeframe"))
     end = forms.DateField(label=_("End of balance timeframe"))
@@ -231,6 +260,20 @@ class MemberBalanceForm(forms.Form):
             self.fields["subject"].initial = str(template.subject)
             self.fields["text"].initial = str(template.text)
 
+    def clean_text(self):
+        text = self.cleaned_data["text"]
+        # Sample values of the same types as in a run, so that format specs
+        # such as {start:%d.%m.%Y} are checked as well.
+        sample_date = datetime.combine(now().date(), time(0, 0))
+        render_balance_reminder_text(
+            text,
+            name="Name",
+            start=sample_date,
+            end=sample_date,
+            amount=Decimal("0.00"),
+        )
+        return text
+
     def clean(self):
         cleaned_data = super().clean()
         end = cleaned_data.get("end")
@@ -258,28 +301,43 @@ class MemberBalanceView(MemberListMixin, FormView):
         text = form.cleaned_data.get("text")
         subject = form.cleaned_data.get("subject")
         template = get_balance_reminder_template(Configuration.get_solo())
-        for member in members:
-            balance = None
-            try:
-                balance = member.create_balance(
-                    start=start, end=end, create_if_zero=create_if_zero
-                )
-                balance_count += 1 if balance else 0
-            except Exception:
-                errors += 1
-            if balance and (not balance_cutoff or balance.amount < -balance_cutoff):
-                EMail.for_member(
-                    member,
-                    balance=balance,
-                    text=text.format(
-                        name=member.name, start=start, end=end, amount=balance.amount
-                    ),
-                    subject=subject,
-                    reply_to=template.reply_to,
-                    bcc=template.bcc,
-                    template=template if template.pk else None,
-                ).save()
-                mails += 1
+        # A run that is aborted by an error leaves no balances or mails behind.
+        # Balances that cannot be created for single members are counted and
+        # skipped, as before.
+        try:
+            with transaction.atomic():
+                for member in members:
+                    balance = None
+                    try:
+                        with transaction.atomic():
+                            balance = member.create_balance(
+                                start=start, end=end, create_if_zero=create_if_zero
+                            )
+                        balance_count += 1 if balance else 0
+                    except Exception:
+                        errors += 1
+                    if balance and (
+                        not balance_cutoff or balance.amount < -balance_cutoff
+                    ):
+                        EMail.for_member(
+                            member,
+                            balance=balance,
+                            text=render_balance_reminder_text(
+                                text,
+                                name=member.name,
+                                start=start,
+                                end=end,
+                                amount=balance.amount,
+                            ),
+                            subject=subject,
+                            reply_to=template.reply_to,
+                            bcc=template.bcc,
+                            template=template if template.pk else None,
+                        ).save()
+                        mails += 1
+        except ValidationError as e:
+            form.add_error("text", e)
+            return self.form_invalid(form)
         message = str(
             _(
                 "{balance_count} balances were created and {mail_count} reminder emails were placed in the outbox."
@@ -288,10 +346,8 @@ class MemberBalanceView(MemberListMixin, FormView):
         if errors:
             message += " " + str(
                 _(
-                    "{errors} balances could not be created due to errors. Presumably, these members already have balances overlapping this timeframe.".format(
-                        errors=errors
-                    )
-                )
+                    "{errors} balances could not be created due to errors. Presumably, these members already have balances overlapping this timeframe."
+                ).format(errors=errors)
             )
         messages.success(self.request, message)
         return redirect("/members/list")
