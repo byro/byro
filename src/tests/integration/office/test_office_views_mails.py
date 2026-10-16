@@ -1032,6 +1032,28 @@ def test_data_disclosure_mails_are_addressed_to_their_members(
         assert mail.get_member_recipients() == [member]
 
 
+@pytest.mark.django_db
+def test_data_disclosure_without_template_uses_the_default(
+    member, membership, logged_in_client, configuration
+):
+    configuration.record_disclosure_template = None
+    configuration.save()
+
+    response = logged_in_client.get(
+        reverse("office:members.record-disclosure", kwargs={"pk": member.pk})
+    )
+
+    assert response.status_code == 200
+    assert "Your data at Association Name" in response.content.decode()
+
+    response = logged_in_client.post(reverse("office:members.disclosure"))
+
+    assert response.status_code == 302, response.content.decode()
+    mail = EMail.objects.get()
+    assert mail.template is None
+    assert mail.subject == "Your data at Association Name (member number 1)"
+
+
 # -- the member selection never falls back to another member -----------------
 
 
