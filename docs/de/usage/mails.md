@@ -42,9 +42,15 @@ Text und Betreff können Variablen in geschweiften Klammern enthalten:
 | Dokumentversand | `{name}` (das Mitglied, bei einem Dokument ohne Mitglied die Adresse), `{association}` |
 | Ablauf des PGP-Schlüssels | `{name}`, `{date}` (Ablaufdatum) |
 
+Eine geschweifte Klammer im Text schreibst du als `{{` oder `}}`.
+
 Die Vorlage der Saldo-Erinnerung füllt nur Betreff und Text des Formulars
 unter „Mitglieder → Liste → Salden" vor; beides lässt sich dort für jeden
-Lauf ändern. Verschickt ein Plugin ein Dokument mit eigenem Betreff oder
+Lauf ändern. Das Formular prüft den Text vor dem Lauf und zeigt bei einer
+unbekannten Variable oder einer ungültigen geschweiften Klammer einen
+Fehler an. Lässt sich der Text trotzdem für ein einzelnes Mitglied nicht
+füllen, wird der Lauf zurückgerollt und das Formular zeigt denselben
+Fehler. Verschickt ein Plugin ein Dokument mit eigenem Betreff oder
 Text, ersetzt es damit Betreff oder Text der Vorlage. Verwendet die Vorlage
 der Ablauferinnerung eine unbekannte Variable, legt byro für die
 betroffenen Schlüssel keine Erinnerung an und versucht es beim nächsten

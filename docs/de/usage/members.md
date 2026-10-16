@@ -168,7 +168,13 @@ wird.
   unter einem einstellbaren Schwellwert in den Postausgang. Betreff und
   Text der Erinnerung kommen aus der Vorlage der Saldo-Erinnerung und
   lassen sich für jeden Lauf ändern (siehe [Vorlagen](mails.md#vorlagen)).
-  Läuft synchron beim Absenden des Formulars.
+  Läuft synchron beim Absenden des Formulars. Kann für ein einzelnes
+  Mitglied kein Saldo erzeugt werden, etwa weil er einen bestehenden Saldo
+  überlappen würde, wird das Mitglied gezählt und übersprungen, und der
+  Lauf geht mit den übrigen Mitgliedern weiter. Bricht ein nicht
+  abgefangener Fehler den Lauf ab, werden die bis dahin erzeugten Salden
+  und Erinnerungsmails zurückgerollt; es bleibt kein teilweise
+  verarbeiteter Lauf zurück.
 * **Datenoffenlegung für alle** (`Mitglieder → Liste → Offenlegung`): erzeugt
   für **alle aktuell gefilterten** Mitglieder eine Auskunftsmail im
   Postausgang – prüfe vorher den gesetzten Filter.

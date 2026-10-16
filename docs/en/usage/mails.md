@@ -40,8 +40,14 @@ Text and subject can contain variables in curly braces:
 | Document delivery | `{name}` (the member, for a document without member the address), `{association}` |
 | PGP key expiry reminder | `{name}`, `{date}` (expiry date) |
 
+A literal curly brace is written as `{{` or `}}`.
+
 The balance reminder template only fills in subject and text of the form
 under "Members → List → Balances"; both can be changed there for each run.
+The form checks the text before the run and shows an error for an
+unknown variable or an invalid curly brace. If the text still cannot be
+filled in for a single member, the run is rolled back and the form shows
+the same error.
 A plugin that sends a document with its own subject or text replaces the
 template's subject or text with it. If the expiry reminder template uses an
 unknown variable, byro creates no reminder for the affected keys and tries
