@@ -161,7 +161,9 @@ periodic task. The refresh interval and keyserver timeout are configured in the
 PGP office settings. Make sure the periodic task is run regularly in your
 deployment. Expired keys can trigger reminder emails to members before the
 expiry date. These reminders are created as drafts in the byro outbox so office
-users can review and send them through the normal mail workflow.
+users can review and send them through the normal mail workflow. Their subject
+and text come from the PGP key expiry reminder template (see
+[Templates](../usage/mails.md#templates)).
 
 ## Dashboard warnings
 

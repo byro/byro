@@ -237,6 +237,8 @@ class MailTemplate(Auditable, models.Model):
         attachments=None,
         save=True,
         member=None,
+        subject=None,
+        text=None,
     ):
         """Create a mail from this template.
 
@@ -244,6 +246,11 @@ class MailTemplate(Auditable, models.Model):
         as its recipient and uses the member's address when it is sent. Pass
         ``email`` for any other address, such as the backoffice address. An
         address is never used to find a member.
+
+        An explicit ``subject`` or ``text`` is used as given instead of the
+        template's field, which is then not rendered at all. A template that
+        is not stored, such as a built-in default, is not recorded as the
+        template of the mail.
         """
         from byro.common.models import Configuration
 
@@ -255,13 +262,16 @@ class MailTemplate(Auditable, models.Model):
         with override(locale):
             context = context or dict()
             try:
-                subject = str(self.subject).format(**context)
-                text = str(self.text).format(**context)
-            except KeyError as e:
+                if subject is None:
+                    subject = str(self.subject).format(**context)
+                if text is None:
+                    text = str(self.text).format(**context)
+            except (KeyError, IndexError, AttributeError, ValueError) as e:
                 raise SendMailException(
-                    f"Experienced KeyError when rendering Text: {e}"
+                    f"Experienced {type(e).__name__} when rendering Text: {e}"
                 )
 
+            template = self if self.pk else None
             if member is not None:
                 mail = EMail.for_member(
                     member,
@@ -269,7 +279,7 @@ class MailTemplate(Auditable, models.Model):
                     bcc=self.bcc,
                     subject=subject,
                     text=text,
-                    template=self,
+                    template=template,
                 )
             else:
                 mail = EMail(
@@ -278,7 +288,7 @@ class MailTemplate(Auditable, models.Model):
                     bcc=self.bcc,
                     subject=subject,
                     text=text,
-                    template=self,
+                    template=template,
                 )
             if save:
                 mail.save()

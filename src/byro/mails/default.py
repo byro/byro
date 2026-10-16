@@ -61,3 +61,32 @@ this email.
 
 Thanks,
 the robo clerk"""))
+BALANCE_REMINDER_SUBJECT = LazyI18nString.from_gettext(_("Outstanding membership fees"))
+BALANCE_REMINDER_TEXT = LazyI18nString.from_gettext(_("""Hello {name},
+
+we wanted to let you know that within the time from {start}
+to {end} you incurred unpaid liabilities in the amount of
+
+   EUR {amount}
+
+Please settle this amount as soon as possible, or let us
+know if you think this email is incorrect."""))
+DOCUMENT_DELIVERY_SUBJECT = LazyI18nString.from_gettext(
+    _("[{association}] Your document")
+)
+DOCUMENT_DELIVERY_TEXT = LazyI18nString.from_gettext(_("""Hi, {name},
+
+Please find attached a document we wanted to send you/that you requested.
+
+Thank you,
+{association}"""))
+PGP_EXPIRY_REMINDER_SUBJECT = LazyI18nString.from_gettext(
+    _("Your PGP key expires soon")
+)
+PGP_EXPIRY_REMINDER_TEXT = LazyI18nString.from_gettext(
+    _(
+        "Hello {name},\n\n"
+        "the PGP key stored for your membership expires on {date}. "
+        "Please send us an updated public key before it expires.\n"
+    )
+)

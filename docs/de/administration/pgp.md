@@ -172,7 +172,8 @@ periodische Aufgabe in deiner Installation regelmäßig läuft. Ablaufende
 Schlüssel können vor dem Ablaufdatum Erinnerungsmails an Mitglieder auslösen.
 Diese Erinnerungen werden als Entwürfe im byro-Postausgang angelegt, damit
 Office-Benutzer sie prüfen und über den normalen Mail-Workflow versenden
-können.
+können. Betreff und Text kommen aus der Vorlage für die Erinnerung vor Ablauf
+des PGP-Schlüssels (siehe [Vorlagen](../usage/mails.md#vorlagen)).
 
 ## Dashboard-Warnungen
 

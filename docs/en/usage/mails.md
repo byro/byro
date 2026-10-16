@@ -11,7 +11,10 @@ action.
   [Joining and leaving](members.md#joining-and-leaving)), data disclosures
   (single or as a bulk action, see
   [Members](members.md#data-disclosure)), reminder mail from the fee
-  reconciliation (see [Bulk actions](members.md#bulk-actions)).
+  reconciliation (see [Bulk actions](members.md#bulk-actions)), reminders
+  before a member's PGP key expires (see
+  [PGP](../administration/pgp.md#automatic-refresh)) and documents a plugin
+  sends (see [Documents](documents.md#sending-as-a-mail-attachment)).
 * **Written by hand**: "Mails → Compose" (see below).
 
 ## Templates
@@ -20,9 +23,29 @@ action.
 reply-to address, BCC addresses). Text and subject are only maintained in
 the organization's configured language (see
 [Settings](../administration/settings.md#general)), not per recipient in
-multiple languages. Which templates are used automatically where (welcome,
-leave, disclosure) is set under
-[Settings → General](../administration/settings.md#general).
+multiple languages.
+
+byro creates one template for each mail it generates itself: welcome mail
+to the member and to the office, leave mail to the member and to the office,
+record disclosure, balance reminder, document delivery and PGP key expiry
+reminder. Which template is used for which mail is fixed and cannot be
+chosen in the interface. To change the wording of such a mail, edit its
+template; the list shows the templates by their subject.
+
+Text and subject can contain variables in curly braces:
+
+| Template | Variables |
+| --- | --- |
+| Balance reminder | `{name}`, `{start}`, `{end}`, `{amount}`, only in the text |
+| Document delivery | `{name}` (the member, for a document without member the address), `{association}` |
+| PGP key expiry reminder | `{name}`, `{date}` (expiry date) |
+
+The balance reminder template only fills in subject and text of the form
+under "Members → List → Balances"; both can be changed there for each run.
+A plugin that sends a document with its own subject or text replaces the
+template's subject or text with it. If the expiry reminder template uses an
+unknown variable, byro creates no reminder for the affected keys and tries
+again on the next periodic run.
 
 !!! note
     There is no function to delete a template; no such link exists in the

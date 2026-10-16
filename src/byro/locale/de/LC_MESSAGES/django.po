@@ -420,26 +420,24 @@ msgstr "Sonstiges Dokument"
 msgid "Registration form"
 msgstr "Beitrittsformular"
 
-#: byro/documents/models.py:48
+#: byro/documents/models.py:85 byro/mails/default.py:77
 #, python-brace-format
 msgid ""
-"\n"
 "Hi, {name},\n"
 "\n"
 "Please find attached a document we wanted to send you/that you requested.\n"
 "\n"
 "Thank you,\n"
-"{association}\n"
+"{association}"
 msgstr ""
-"\n"
 "Hi, {name},\n"
 "\n"
 "Im Anhang befindet sich ein Dokument für dich.\n"
 "\n"
 "Danke\n"
-"{association}\n"
+"{association}"
 
-#: byro/documents/models.py:111
+#: byro/mails/default.py:75
 #, python-brace-format
 msgid "[{association}] Your document"
 msgstr "[{association}] Dein Dokument"
@@ -1019,11 +1017,11 @@ msgstr ""
 "Vollständiger OpenPGP-Fingerprint zum Import des öffentlichen "
 "Mitgliederschlüssels."
 
-#: byro/mails/signals.py:51
+#: byro/mails/default.py:84
 msgid "Your PGP key expires soon"
 msgstr "Dein PGP-Schlüssel läuft bald ab"
 
-#: byro/mails/signals.py:53
+#: byro/mails/default.py:87
 #, python-brace-format
 msgid ""
 "Hello {name},\n"
@@ -2466,7 +2464,11 @@ msgstr ""
 "Nur Mitglieder mit einem ausstehenden Beitrag oberhalb dieser Grenze werden "
 "eine Mail erhalten."
 
-#: byro/office/views/members.py:176
+#: byro/mails/default.py:64
+msgid "Outstanding membership fees"
+msgstr "Offene Mitgliedsbeiträge"
+
+#: byro/mails/default.py:65
 #, python-brace-format
 msgid ""
 "Hello {name},\n"

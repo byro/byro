@@ -61,4 +61,6 @@ Dokument automatisch zustellen. **Im Office selbst gibt es dafür keine
 eigene Schaltfläche** – weder das Kompose-Formular noch die
 Mitgliedsansicht bieten „dieses Dokument per Mail versenden" an. Ein
 Dokument landet nur dann als Anhang in einer Mail, wenn eine automatisierte
-Funktion (zum Beispiel ein Plugin) es dort hinzufügt.
+Funktion (zum Beispiel ein Plugin) es dort hinzufügt. Betreff und Text einer
+solchen Mail kommen aus der Vorlage für den Dokumentversand, sofern die
+Funktion keine eigenen übergibt (siehe [Vorlagen](mails.md#vorlagen)).

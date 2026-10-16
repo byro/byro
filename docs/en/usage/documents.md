@@ -56,4 +56,6 @@ outbox; plugins that automatically deliver a requested document use this, for
 example. **The Office itself has no button for this** - neither the compose
 form nor the member view offer "send this document by mail". A document only
 ends up as a mail attachment when an automated function (for example a
-plugin) adds it there.
+plugin) adds it there. Subject and text of such a mail come from the document
+delivery template, unless the function passes its own (see
+[Templates](mails.md#templates)).
