@@ -1563,6 +1563,7 @@ def test_pgp_backend_error_keeps_the_members_that_were_reached(
 
 @pytest.mark.django_db
 @override_settings(BYRO_PGP_BACKEND=FAKE_BACKEND_PATH)
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_stale_address_object_uses_the_key_of_the_stored_member(
     family_with_keys, configuration, mailoutbox
 ):

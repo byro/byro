@@ -54,6 +54,7 @@ Die Vereinskonfiguration selbst umfasst:
   der Rest von byro; sonst leer lassen.
 - **Absender- und Benachrichtigungsadresse** (dieselben Felder wie in der
   Ersteinrichtung, hier änderbar),
+- **Fußzeile für Mails an Mitglieder** (siehe unten),
 - **Standard-Sortierreihenfolge** und **Standard-Anredeform** für Mitglieder
   (Vor- oder Nachname zuerst), mit einer Aktion, um sie nachträglich auf alle
   bestehenden Mitglieder anzuwenden.
@@ -61,6 +62,51 @@ Die Vereinskonfiguration selbst umfasst:
 Die Mailvorlagen für die Mails, die byro selbst erzeugt, wählst du hier
 nicht aus; byro ordnet sie selbst zu (siehe
 [Vorlagen](../usage/mails.md#vorlagen)).
+
+### Fußzeile für Mails an Mitglieder
+
+byro setzt diesen Text unter jede Mail an ein Mitglied oder an alle
+Mitglieder, getrennt durch eine Leerzeile. Mails an eine Adresse erhalten ihn
+nicht (siehe
+[Mitglieder und Adressen](../usage/mails.md#mitglieder-und-adressen)). Die
+Fußzeile ist der vollständige Abschlussblock: Wer den Signaturtrenner (zwei
+Bindestriche und ein Leerzeichen) möchte, schreibt ihn in den Text. Eine neue
+Installation beginnt mit einem Gruß und den Vereinsdaten:
+
+```text
+Viele Grüße
+Deine Mitgliedsverwaltung
+
+-- 
+{association_name}
+{association_address}
+{association_url}
+```
+
+| Platzhalter | Wert |
+| --- | --- |
+| `{association_name}` | Vereinsname |
+| `{association_address}` | Vereinsadresse |
+| `{association_url}` | Vereins-URL |
+| `{member_page_url}` | Link zur Mitgliederseite des Mitglieds, das die Mail erhält |
+
+Eine nicht ausgefüllte Einstellung bleibt leer, Leerzeilen am Ende der
+Fußzeile werden entfernt. Eine geschweifte Klammer im Text schreibst du als
+`{{` oder `}}`. Beim Speichern prüft byro die Platzhalter und zeigt bei einem
+unbekannten Platzhalter oder einer ungültigen geschweiften Klammer einen
+Fehler.
+
+Die Fußzeile wird wie die Mailvorlagen in der Sprache des Vereins bearbeitet
+und versendet. Eine Änderung behält die Texte der anderen Sprachen. Eine
+leere Fußzeile ist in allen Sprachen abgeschaltet; byro setzt dann nichts
+unter den Mailtext.
+
+Die Standard-Fußzeile enthält keinen Link zur Mitgliederseite. Soll der Link
+mit jeder Mail an ein Mitglied verschickt werden, ergänze
+`{member_page_url}`. Bis zu dieser Version hat byro stattdessen einen festen
+Hinweis mit diesem Link angehängt; nach dem Update hat jede Installation die
+oben gezeigte Standard-Fußzeile. Lässt sich die Fußzeile beim Versand nicht
+ausfüllen, verschickt byro die Mail an niemanden und zeigt einen Fehler.
 
 Jede gespeicherte Änderung wird mit den geänderten Feldern (vorher/nachher)
 im Audit-Log festgehalten (siehe unten); Formulare können einzelne Felder

@@ -88,6 +88,7 @@ def test_member_mail_follows_a_changed_address(member, configuration, mailoutbox
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("addressed", (0, 1))
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_shared_address_keeps_the_addressed_member(
     family, addressed, send_task, mailoutbox
 ):
@@ -108,6 +109,7 @@ def test_shared_address_keeps_the_addressed_member(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_mail_to_all_members_reaches_every_member_of_a_shared_address(
     family, send_task, mailoutbox
 ):
@@ -567,6 +569,7 @@ def test_failed_first_save_does_not_lose_the_member(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_member_mail_changed_to_an_address_before_saving_drops_the_member(
     mail_template, member, configuration, send_task, mailoutbox
 ):
@@ -929,6 +932,7 @@ def test_recipients_of_a_delivered_mail_cannot_be_saved(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_stale_save_does_not_reset_the_deliveries(partly_delivered, mailoutbox):
     stale, member_a, member_b = partly_delivered
     stale.subject = "Changed"
@@ -968,6 +972,7 @@ def test_stale_save_cannot_wipe_deliveries_it_set_itself(partly_delivered):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_stale_object_does_not_send_to_a_delivered_member_again(
     partly_delivered, mailoutbox
 ):
@@ -1282,6 +1287,7 @@ def fail_for(failing_member):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_stale_address_object_sends_to_the_stored_member_recipients(family, mailoutbox):
     member_a, member_b = family
     mail = EMail.objects.create(to=SHARED_ADDRESS, subject="Test", text="Text")
@@ -1357,6 +1363,7 @@ def test_stale_member_object_sends_to_the_stored_address(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_stale_member_object_sends_to_the_stored_member(family, send_task, mailoutbox):
     member_a, member_b = family
     mail = member_mail(member_a)
@@ -1440,6 +1447,7 @@ def test_mail_is_not_sent_while_a_stored_recipient_is_open(family, mailoutbox):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_mail_to_all_members_is_not_sent_while_an_active_member_is_open(
     family, mailoutbox
 ):
@@ -1596,6 +1604,7 @@ def test_rebuilt_member_mail_cannot_add_a_member_to_a_delivered_mail(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_rebuilt_object_with_the_same_recipients_keeps_the_deliveries(
     partly_delivered, mailoutbox
 ):

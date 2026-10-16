@@ -178,6 +178,7 @@ def test_compose_to_a_member_keeps_the_selected_member(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("addressed", (0, 1))
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_compose_and_send_to_a_member_of_a_shared_address(
     family, addressed, logged_in_client, mailoutbox
 ):
@@ -1263,6 +1264,7 @@ def activate(member):
         {"to_type": "addr", "to": "other@example.org"},
     ),
 )
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_partly_delivered_mail_keeps_its_recipients_and_history(
     family, logged_in_client, mailoutbox, data
 ):
@@ -1447,6 +1449,7 @@ def assert_not_in_history(client, member, subject="Legacy mail"):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_review_to_all_members_drops_stale_members(
     family, logged_in_client, mailoutbox
 ):
@@ -1500,6 +1503,7 @@ def test_review_to_all_members_drops_stale_members_before_sending(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("to", ("special:all", "special:member:999999"))
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_review_to_a_member_keeps_only_the_selected_member(
     family, logged_in_client, mailoutbox, to
 ):

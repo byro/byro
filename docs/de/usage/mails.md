@@ -88,22 +88,23 @@ Adresse**:
 
 * Eine Mail an ein Mitglied oder an alle Mitglieder weiß, für welches
   Mitglied sie bestimmt ist. Die Adresse wird erst beim Versand aus dem
-  Mitglied ermittelt. Eine solche Mail erhält die Signatur mit dem Link zur
-  Mitgliederseite genau dieses Mitglieds, wird bei aktiver
-  PGP-Verschlüsselung mit dem Schlüssel dieses Mitglieds verschlüsselt und
+  Mitglied ermittelt. Eine solche Mail erhält die Fußzeile aus den
+  allgemeinen Einstellungen, ausgefüllt für genau dieses Mitglied (siehe
+  [Fußzeile für Mails an Mitglieder](../administration/settings.md#fuzeile-fur-mails-an-mitglieder)),
+  wird bei aktiver PGP-Verschlüsselung mit dem Schlüssel dieses Mitglieds verschlüsselt und
   erscheint in dessen Mailverlauf. Die Mails, die
   byro für ein Mitglied erzeugt (Willkommen, Austritt, Datenauskunft,
   Erinnerung, Ablauf des PGP-Schlüssels, Dokumente), sind von dieser Art.
 * Eine Mail an eine bestimmte Adresse ist genau das. byro sucht nie nach
   einem Mitglied hinter einer Adresse, auch wenn die Adresse bei einem
-  Mitglied hinterlegt ist: Eine solche Mail hat keine Mitgliedssignatur, wird
+  Mitglied hinterlegt ist: Eine solche Mail hat keine Fußzeile, wird
   nicht verschlüsselt und erscheint in keinem Mailverlauf eines Mitglieds.
   Wer einem Mitglied schreiben will, wählt „Mitglied".
 
 Mehrere Mitglieder dürfen dieselbe Adresse verwenden, zum Beispiel eine
-Familie. Jedes von ihnen erhält trotzdem seine eigene Mail mit dem Link zur
-eigenen Mitgliederseite, und eine Mail an alle Mitglieder wird einmal je
-Mitglied zugestellt, nicht einmal je Adresse.
+Familie. Jedes von ihnen erhält trotzdem seine eigene Mail, mit dem Link zur
+eigenen Mitgliederseite, wenn die Fußzeile ihn enthält, und eine Mail an alle
+Mitglieder wird einmal je Mitglied zugestellt, nicht einmal je Adresse.
 
 „Speichern" legt die Mail als Entwurf ab, „Speichern und senden" verschickt
 sie sofort. Eine bereits versendete Mail lässt sich nicht mehr bearbeiten;
@@ -136,7 +137,7 @@ für die gesamte Liste stehen **Senden** und **Löschen** zur Verfügung.
     Ältere byro-Versionen haben in den Mails, die sie für ein Mitglied
     erzeugt haben, nur die Adresse gespeichert. Liegen solche Entwürfe nach
     einem Update noch im Postausgang, sind sie Mails an eine Adresse: Sie
-    werden ohne Mitgliedssignatur und **ohne PGP-Verschlüsselung** versendet.
+    werden ohne Fußzeile und **ohne PGP-Verschlüsselung** versendet.
     Versende den Postausgang vor dem Update oder öffne den Entwurf danach und
     wähle das Mitglied als Empfänger. Erinnerungsmails aus dem
     Beitragsabgleich und über „Verfassen" an ein Mitglied oder an alle

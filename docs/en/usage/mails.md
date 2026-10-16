@@ -83,18 +83,20 @@ byro tells a mail **to a member** from a mail **to an address**:
 
 * A mail to a member, or to every member, knows which member it is for. The
   address is only looked up from the member at the moment of sending. Such a
-  mail gets the signature with the link to the member page of exactly this
-  member, is encrypted with this member's PGP key if PGP encryption is
-  enabled, and shows up in this member's mail history. The mail byro generates for a member (welcome,
+  mail gets the footer from the general settings, filled in for exactly this
+  member (see
+  [Footer of mails to members](../administration/settings.md#footer-of-mails-to-members)),
+  is encrypted with this member's PGP key if PGP encryption is enabled, and shows up in this member's mail history. The mail byro generates for a member (welcome,
   leave, disclosure, reminder, PGP key expiry, documents) is of this kind.
 * A mail to a specific address is just that. byro never looks for a member
   behind an address, even if the address is stored for a member: such a mail
-  has no member signature, is not encrypted and does not appear in any
+  has no footer, is not encrypted and does not appear in any
   member's mail history. To write to a member, pick "Member".
 
 Several members may share one address, for example a family. Each of them
-still receives their own mail with their own member page link, and a mail to
-every member is delivered once per member, not once per address.
+still receives their own mail, with their own member page link if the footer
+contains it, and a mail to every member is delivered once per member, not
+once per address.
 
 "Save" stores the mail as a draft, "Save and send" sends it immediately. A
 mail that has already been sent can no longer be edited; "Copy" creates a
@@ -124,7 +126,7 @@ available individually or for the whole list.
 !!! warning "Drafts created by older versions"
     Older byro versions stored only the address in the mail they generated
     for a member. Such drafts that are still in the outbox after an update
-    are mails to an address: they are sent without the member signature and
+    are mails to an address: they are sent without the footer and
     **without PGP encryption**. Send the outbox before updating, or open the
     draft afterwards and select the member as recipient. Reminder mail from
     the fee reconciliation and drafts written to a member or to every member

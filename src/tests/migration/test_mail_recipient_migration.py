@@ -727,6 +727,7 @@ def test_real_migration_backward_and_forward(migrate_schema, configuration, mail
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.parametrize("shared_address", (True, False))
+@pytest.mark.usefixtures("member_page_url_footer")
 def test_real_migration_backward_refuses_a_partly_delivered_member_mail(
     migrate_schema, configuration, mailoutbox, shared_address
 ):

@@ -628,15 +628,24 @@ msgstr "CC"
 msgid "Sent at"
 msgstr "Enviado em"
 
-#: byro/mails/models.py:195
+#: byro/mails/default.py
 #, python-brace-format
-msgid "You are receiving this email due to your membership in {name}."
-msgstr "Você está recebendo este e-mail devido à sua associação em {name}."
-
-#: byro/mails/models.py:199
-#, python-brace-format
-msgid "You can see your member page at this URL: {url}"
-msgstr "Você pode ver sua página de associada nesta URL: {url}"
+msgid ""
+"Best regards\n"
+"Your membership team\n"
+"\n"
+"-- \n"
+"{association_name}\n"
+"{association_address}\n"
+"{association_url}"
+msgstr ""
+"Atenciosamente\n"
+"Equipe de gestão de associados\n"
+"\n"
+"-- \n"
+"{association_name}\n"
+"{association_address}\n"
+"{association_url}"
 
 #: byro/members/models.py:153
 msgid "Membership number/ID"

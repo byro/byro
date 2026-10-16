@@ -50,12 +50,56 @@ The association configuration itself covers:
   byro; otherwise leave it empty.
 - **Sender and notification address** (the same fields as in the initial
   setup, changeable here),
+- **Footer of mails to members** (see below),
 - **Default sort order** and **default form of address** for members (first
   or last name part first), with an action to apply them retroactively to
   every existing member.
 
 The mail templates byro uses for the mails it generates are not chosen here;
 byro assigns them itself (see [Templates](../usage/mails.md#templates)).
+
+### Footer of mails to members
+
+byro adds this text below every mail to a member or to every member,
+separated by an empty line. Mails to an address do not get it (see
+[Members and addresses](../usage/mails.md#members-and-addresses)). The
+footer is the complete closing block: if you want the signature separator
+(two dashes and a space), it is part of the text. A new installation starts
+with a greeting and the association data:
+
+```text
+Best regards
+Your membership team
+
+-- 
+{association_name}
+{association_address}
+{association_url}
+```
+
+| Placeholder | Value |
+| --- | --- |
+| `{association_name}` | association name |
+| `{association_address}` | association address |
+| `{association_url}` | association URL |
+| `{member_page_url}` | link to the member page of the member who receives the mail |
+
+A setting that is not filled in stays empty, and empty lines at the end of
+the footer are removed. A literal curly brace is written as `{{` or `}}`.
+Saving checks the placeholders and shows an error for an unknown placeholder
+or an invalid curly brace.
+
+The footer is edited and sent in the organization's language, like the mail
+templates. Changing it keeps the texts of the other languages. An empty
+footer is turned off in every language; byro then adds nothing below the
+mail text.
+
+The default footer has no link to the member page. To send the link with
+every mail to a member, add `{member_page_url}`. Up to this version byro
+added a fixed notice with this link instead; after the update every
+installation has the default footer shown above. If the footer cannot be
+filled in when a mail is sent, byro sends the mail to nobody and shows an
+error.
 
 Every saved change is recorded in the audit log with the changed fields
 (before/after) (see below); forms can exclude individual fields (for example

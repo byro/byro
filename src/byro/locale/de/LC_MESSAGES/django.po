@@ -870,16 +870,50 @@ msgstr "CC"
 msgid "Sent at"
 msgstr "Verschickt"
 
-#: byro/mails/models.py:354
+#: byro/mails/default.py
 #, python-brace-format
-msgid "You are receiving this email due to your membership in {name}."
+msgid ""
+"Best regards\n"
+"Your membership team\n"
+"\n"
+"-- \n"
+"{association_name}\n"
+"{association_address}\n"
+"{association_url}"
 msgstr ""
-"Du erhältst diese E-Mail aufgrund Deiner Mitgliedschaft im Verein {name}."
+"Viele Grüße\n"
+"Deine Mitgliedsverwaltung\n"
+"\n"
+"-- \n"
+"{association_name}\n"
+"{association_address}\n"
+"{association_url}"
 
-#: byro/mails/models.py:358
+#: byro/mails/models.py
 #, python-brace-format
-msgid "You can see your member page at this URL: {url}"
-msgstr "Deine persönliche Mitgliedsseite ist hier: {url}"
+msgid ""
+"Cannot send this email: the footer of mails to members cannot be filled in. "
+"{error} Correct it in the general settings."
+msgstr ""
+"Diese E-Mail kann nicht gesendet werden: Die Fußzeile für Mails an "
+"Mitglieder kann nicht ausgefüllt werden. {error} Korrigiere sie in den "
+"allgemeinen Einstellungen."
+
+#: byro/common/models/configuration.py
+msgid "Footer of mails to members"
+msgstr "Fußzeile für Mails an Mitglieder"
+
+#: byro/common/models/configuration.py
+#, python-brace-format
+msgid ""
+"Added below the text of every mail to a member, not to mails to an address. "
+"Leave it empty for no footer. Placeholders: {association_name}, "
+"{association_address}, {association_url}, {member_page_url}"
+msgstr ""
+"Wird unter den Text jeder Mail an ein Mitglied gesetzt, nicht unter Mails an "
+"eine Adresse. Leer lassen für keine Fußzeile. Platzhalter: "
+"{association_name}, {association_address}, {association_url}, "
+"{member_page_url}"
 
 #: byro/mails/pgp.py:33 byro/mails/pgp.py:36 byro/mails/pgp.py:39
 #: byro/mails/pgp.py:42
