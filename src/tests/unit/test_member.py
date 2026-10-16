@@ -39,3 +39,21 @@ def test_member_record_disclosure_email(member_with_sepa_profile):
     assert member.number in email.subject
     assert member.profile_sepa.iban in email.text
     assert member.name in email.text
+
+
+@pytest.mark.django_db
+def test_member_record_disclosure_email_without_template_uses_the_default(
+    configuration, member_with_sepa_profile
+):
+    configuration.record_disclosure_template = None
+    configuration.save()
+
+    email = member_with_sepa_profile.record_disclosure_email
+
+    assert email.template is None
+    assert email.subject == "Your data at Association Name (member number 1)"
+    assert email.text.startswith(
+        "Hello,\n\nThis is an overview of the data Association Name currently "
+        "stores about you and your membership."
+    )
+    assert member_with_sepa_profile.profile_sepa.iban in email.text

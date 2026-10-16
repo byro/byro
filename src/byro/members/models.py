@@ -436,8 +436,14 @@ class Member(Auditable, models.Model, LogTargetMixin):
 
     @property
     def record_disclosure_email(self):
+        from byro.mails import default
+        from byro.mails.models import MailTemplate
+
         config = Configuration.get_solo()
-        template = config.record_disclosure_template
+        template = config.record_disclosure_template or MailTemplate(
+            subject=default.RECORD_DISCLOSURE_SUBJECT,
+            text=default.RECORD_DISCLOSURE_TEXT,
+        )
         data = get_member_data(self)
         for profile in self.profiles:
             data += get_member_data(profile)
