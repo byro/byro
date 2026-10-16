@@ -1,5 +1,6 @@
 """The footer below every mail to a member, ``Configuration.member_mail_footer``."""
 
+from datetime import date
 from unittest.mock import patch
 
 import pytest
@@ -8,7 +9,8 @@ from django.utils.timezone import now
 from django.utils.translation import override
 
 from byro.common.models.configuration import Configuration
-from byro.mails.models import EMail, RecipientType
+from byro.mails import default
+from byro.mails.models import EMail, MailTemplate, RecipientType
 from byro.mails.send import SendMailException, mail_send_task
 from byro.members.models import FeeIntervals, Member, Membership
 
@@ -138,6 +140,63 @@ def test_literal_braces_in_the_footer(association, member, mailoutbox):
     member_mail(member).send()
 
     assert mailoutbox[0].body == "Text\n\n{literal} Association Name"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "text", ("Text\n", "Text\n\n", "Text\n\n\n", "Text\r\n\r\n"), ids=repr
+)
+def test_line_breaks_at_the_end_of_the_text_leave_one_empty_line(
+    association, member, mailoutbox, text
+):
+    member_mail(member, text=text).send()
+
+    assert mailoutbox[0].body == "Text\n\n" + FOOTER_EN
+
+
+@pytest.mark.django_db
+def test_only_line_breaks_are_removed_before_the_footer(
+    association, member, mailoutbox
+):
+    member_mail(member, text="Text  \n\n").send()
+
+    assert mailoutbox[0].body == "Text  \n\n" + FOOTER_EN
+
+
+@pytest.mark.django_db
+def test_default_template_with_empty_additional_information(
+    association, member, mailoutbox
+):
+    template = MailTemplate(
+        subject=default.LEAVE_MEMBER_SUBJECT, text=default.LEAVE_MEMBER_TEXT
+    )
+    mail = template.to_mail(
+        member=member,
+        context={
+            "name": "Association Name",
+            "contact": "office@example.org",
+            "number": member.number,
+            "member_name": member.name,
+            "end": date(2026, 12, 31),
+            "additional_information": "",
+        },
+    )
+
+    mail.send()
+
+    assert mailoutbox[0].body == (
+        f"Hello {member.name},\n\n"
+        "Your membership in Association Name ends on 2026-12-31.\n\n" + FOOTER_EN
+    )
+
+
+@pytest.mark.django_db
+def test_text_without_footer_keeps_its_line_breaks(configuration, member, mailoutbox):
+    set_footer({})
+    member_mail(member, text="Text\n\n").send()
+    EMail.objects.create(to=member.email, subject="Test", text="Text\n\n").send()
+
+    assert [mail.body for mail in mailoutbox] == ["Text\n\n", "Text\n\n"]
 
 
 @pytest.mark.django_db

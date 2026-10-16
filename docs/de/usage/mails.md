@@ -34,6 +34,14 @@ verwendet wird, ist fest vorgegeben und lässt sich in der Oberfläche nicht
 auswählen. Um den Wortlaut einer solchen Mail zu ändern, bearbeitest du ihre
 Vorlage; die Liste zeigt die Vorlagen mit ihrem Betreff.
 
+Die Standardtexte der Mails an Mitglieder enden ohne Gruß; den setzt die
+[Fußzeile](../administration/settings.md#fuzeile-fur-mails-an-mitglieder).
+Beim Update erhalten Vorlagen, die noch die bisherigen Standardtexte haben,
+die neuen. byro vergleicht Betreff und Text je Sprache: Eine Sprache, in der
+eins von beiden geändert wurde, behält ihre Texte. Brasilianisches
+Portugiesisch verwendet den englischen Standardtext, weil es für die neuen
+Texte noch keine Übersetzung gibt.
+
 Text und Betreff können Variablen in geschweiften Klammern enthalten:
 
 | Vorlage | Variablen |

@@ -771,7 +771,9 @@ class EMail(Auditable, models.Model):
                         ),
                     )
                     if rendered_footer.strip():
-                        body += "\n\n" + rendered_footer
+                        # exactly one empty line, also after a text that
+                        # ends with line breaks (an empty last placeholder)
+                        body = body.rstrip("\r\n") + "\n\n" + rendered_footer
             elif addr.lower() in delivered_addresses:
                 continue
             try:

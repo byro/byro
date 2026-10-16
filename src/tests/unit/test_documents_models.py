@@ -160,11 +160,9 @@ def test_document_send_uses_the_default_delivery_template(
     mail = member_document.send()
 
     assert mail.template == delivery_template
-    assert mail.subject == "[Association Name] Your document"
+    assert mail.subject == "Your document from Association Name"
     assert mail.text == (
-        f"Hi, {member.name},\n\n"
-        "Please find attached a document we wanted to send you/that you requested."
-        "\n\nThank you,\nAssociation Name"
+        "Hello,\n\nA document from Association Name is attached to this email."
     )
     assert mail.to_type == RecipientType.MEMBER
     assert mail.get_member_recipients() == [member]
@@ -180,8 +178,11 @@ def test_document_send_renders_the_default_template_in_the_configured_language(
 
     mail = member_document.send()
 
-    assert mail.subject == "[Association Name] Dein Dokument"
-    assert "Im Anhang befindet sich ein Dokument für dich." in mail.text
+    assert mail.subject == "Dein Dokument von Association Name"
+    assert mail.text == (
+        "Hallo,\n\nim Anhang dieser E-Mail findest du ein Dokument von "
+        "Association Name."
+    )
 
 
 @pytest.mark.django_db
@@ -237,7 +238,7 @@ def test_document_send_uses_an_explicit_text(member_document):
 
     mail.refresh_from_db()
     assert mail.text == "Here it is: {not a variable}"
-    assert mail.subject == "[Association Name] Your document"
+    assert mail.subject == "Your document from Association Name"
 
 
 @pytest.mark.django_db
@@ -290,8 +291,10 @@ def test_document_send_without_delivery_template_uses_the_default(
     mail = member_document.send()
 
     assert mail.template is None
-    assert mail.subject == "[Association Name] Your document"
-    assert mail.text.startswith(f"Hi, {member.name},\n\n")
+    assert mail.subject == "Your document from Association Name"
+    assert mail.text == (
+        "Hello,\n\nA document from Association Name is attached to this email."
+    )
 
 
 # Behaviour preservation: plugins may still read the old attribute.

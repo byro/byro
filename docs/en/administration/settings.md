@@ -61,7 +61,9 @@ byro assigns them itself (see [Templates](../usage/mails.md#templates)).
 ### Footer of mails to members
 
 byro adds this text below every mail to a member or to every member,
-separated by an empty line. Mails to an address do not get it (see
+separated by an empty line. Line breaks at the end of the mail text are
+removed first, so there is exactly one empty line between text and footer.
+Mails to an address do not get it (see
 [Members and addresses](../usage/mails.md#members-and-addresses)). The
 footer is the complete closing block: if you want the signature separator
 (two dashes and a space), it is part of the text. A new installation starts

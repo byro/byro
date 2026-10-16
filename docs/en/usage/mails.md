@@ -32,6 +32,13 @@ reminder. Which template is used for which mail is fixed and cannot be
 chosen in the interface. To change the wording of such a mail, edit its
 template; the list shows the templates by their subject.
 
+The default texts of mails to members end without a greeting; it comes from
+the [footer](../administration/settings.md#footer-of-mails-to-members). On
+update, templates that still have the previous default texts get the new
+ones. byro compares subject and text per language: a language in which
+either was changed keeps its texts. Brazilian Portuguese uses the English
+default, as there is no translation of the new texts yet.
+
 Text and subject can contain variables in curly braces:
 
 | Template | Variables |
