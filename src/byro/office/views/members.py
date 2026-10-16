@@ -33,6 +33,7 @@ from django.views.generic.list import (
 from byro.bookkeeping.models import Booking
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry
+from byro.common.templatetags.format_with_currency import format_with_currency
 from byro.mails import default
 from byro.mails.forms import MemberPGPFingerprintForm, MemberPGPKeyUploadForm
 from byro.mails.models import EMail, MailTemplate, MemberPGPKey, PGPKeySource
@@ -201,6 +202,11 @@ def get_balance_reminder_template(config):
 BALANCE_REMINDER_PLACEHOLDERS = ("name", "start", "end", "amount")
 
 
+def balance_reminder_amount(balance_amount):
+    """The outstanding amount of a balance as shown to the member."""
+    return format_with_currency(-balance_amount, long_form=True)
+
+
 def render_balance_reminder_text(text, *, name, start, end, amount):
     """Fill in the placeholders of a balance reminder text.
 
@@ -264,13 +270,12 @@ class MemberBalanceForm(forms.Form):
         text = self.cleaned_data["text"]
         # Sample values of the same types as in a run, so that format specs
         # such as {start:%d.%m.%Y} are checked as well.
-        sample_date = datetime.combine(now().date(), time(0, 0))
         render_balance_reminder_text(
             text,
             name="Name",
-            start=sample_date,
-            end=sample_date,
-            amount=Decimal("0.00"),
+            start=now().date(),
+            end=now().date(),
+            amount=balance_reminder_amount(Decimal("-1.00")),
         )
         return text
 
@@ -316,18 +321,17 @@ class MemberBalanceView(MemberListMixin, FormView):
                         balance_count += 1 if balance else 0
                     except Exception:
                         errors += 1
-                    if balance and (
-                        not balance_cutoff or balance.amount < -balance_cutoff
-                    ):
+                    # Only a deficit greater than the cutoff is reminded of.
+                    if balance and balance.amount < -(balance_cutoff or 0):
                         EMail.for_member(
                             member,
                             balance=balance,
                             text=render_balance_reminder_text(
                                 text,
                                 name=member.name,
-                                start=start,
-                                end=end,
-                                amount=balance.amount,
+                                start=form.cleaned_data["start"],
+                                end=form.cleaned_data["end"],
+                                amount=balance_reminder_amount(balance.amount),
                             ),
                             subject=subject,
                             reply_to=template.reply_to,

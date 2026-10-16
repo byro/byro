@@ -67,7 +67,7 @@ BALANCE_REMINDER_TEXT = LazyI18nString.from_gettext(_("""Hello {name},
 we wanted to let you know that within the time from {start}
 to {end} you incurred unpaid liabilities in the amount of
 
-   EUR {amount}
+   {amount}
 
 Please settle this amount as soon as possible, or let us
 know if you think this email is incorrect."""))

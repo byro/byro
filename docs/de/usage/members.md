@@ -164,8 +164,10 @@ wird.
 
 * **Salden generieren** (`Mitglieder → Liste → Salden`): erzeugt für alle
   Mitglieder mit aktiver Mitgliedschaft einen Saldo über einen gewählten
-  Zeitraum und legt optional Erinnerungsmails für Mitglieder mit einem Saldo
-  unter einem einstellbaren Schwellwert in den Postausgang. Betreff und
+  Zeitraum und legt optional Erinnerungsmails für Mitglieder, deren
+  Fehlbetrag größer als ein einstellbarer Schwellwert ist, in den
+  Postausgang. Ein leerer Schwellwert zählt als 0, Mitglieder mit Saldo 0
+  oder Guthaben bekommen also keine Erinnerung. Betreff und
   Text der Erinnerung kommen aus der Vorlage der Saldo-Erinnerung und
   lassen sich für jeden Lauf ändern (siehe [Vorlagen](mails.md#vorlagen)).
   Läuft synchron beim Absenden des Formulars. Kann für ein einzelnes

@@ -131,7 +131,16 @@ def test_fresh_installation_has_every_core_mail_template(tmp_path):
     with sqlite3.connect(database) as db:
         (assigned,) = db.execute(f"SELECT {columns} FROM common_configuration")
         templates = dict(db.execute("SELECT id, subject FROM mails_mailtemplate"))
+        (balance_text,) = db.execute(
+            "SELECT text FROM mails_mailtemplate WHERE id = ?",
+            (assigned[len(EXISTING_FIELDS)],),
+        ).fetchone()
 
+    # the currency is part of the amount, the text does not name one
+    assert all(
+        "{amount}" in text and "EUR" not in text
+        for text in json.loads(balance_text).values()
+    )
     assert None not in assigned
     assert sorted(assigned) == sorted(templates)
     pgp_subject = json.loads(templates[assigned[-1]])

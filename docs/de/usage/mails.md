@@ -38,11 +38,18 @@ Text und Betreff können Variablen in geschweiften Klammern enthalten:
 
 | Vorlage | Variablen |
 | --- | --- |
-| Saldo-Erinnerung | `{name}`, `{start}`, `{end}`, `{amount}`, nur im Text |
+| Saldo-Erinnerung | `{name}`, `{start}` und `{end}` (erster und letzter Tag des Zeitraums), `{amount}` (offener Betrag), nur im Text |
 | Dokumentversand | `{name}` (das Mitglied, bei einem Dokument ohne Mitglied die Adresse), `{association}` |
 | Ablauf des PGP-Schlüssels | `{name}`, `{date}` (Ablaufdatum) |
 
 Eine geschweifte Klammer im Text schreibst du als `{{` oder `}}`.
+
+In der Saldo-Erinnerung sind `{start}` und `{end}` Datumsangaben wie
+2026-08-01. Ein anderes Format lässt sich nach einem Doppelpunkt angeben,
+zum Beispiel `{start:%d.%m.%Y}` für 01.08.2026. `{amount}` ist der Betrag,
+den das Mitglied für den Zeitraum schuldet, mit der Währung aus den
+allgemeinen Einstellungen, zum Beispiel 20.00 EUR. Er ist Text, deshalb
+werden Zahlenformate wie `{amount:.2f}` abgelehnt.
 
 Die Vorlage der Saldo-Erinnerung füllt nur Betreff und Text des Formulars
 unter „Mitglieder → Liste → Salden" vor; beides lässt sich dort für jeden

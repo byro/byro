@@ -154,8 +154,10 @@ import aborts with an error before anything is written.
 
 * **Generate balances** (`Members → List → Balances`): creates a balance
   over a chosen time range for every member with an active membership, and
-  optionally places reminder mails in the outbox for members below a
-  configurable balance threshold. Subject and text of the reminder are
+  optionally places reminder mails in the outbox for members whose deficit
+  is greater than a configurable threshold. An empty threshold counts as
+  0, so members with a zero balance or a credit get no reminder. Subject
+  and text of the reminder are
   filled in from the balance reminder template and can be changed for each
   run (see [Templates](mails.md#templates)). Runs synchronously when the
   form is submitted. If no balance can be created for a single member,

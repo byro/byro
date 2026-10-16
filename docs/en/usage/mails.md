@@ -36,11 +36,18 @@ Text and subject can contain variables in curly braces:
 
 | Template | Variables |
 | --- | --- |
-| Balance reminder | `{name}`, `{start}`, `{end}`, `{amount}`, only in the text |
+| Balance reminder | `{name}`, `{start}` and `{end}` (first and last day of the period), `{amount}` (outstanding amount), only in the text |
 | Document delivery | `{name}` (the member, for a document without member the address), `{association}` |
 | PGP key expiry reminder | `{name}`, `{date}` (expiry date) |
 
 A literal curly brace is written as `{{` or `}}`.
+
+In the balance reminder `{start}` and `{end}` are dates such as
+2026-08-01. A different format can be given after a colon, for example
+`{start:%d.%m.%Y}` for 01.08.2026. `{amount}` is the amount the member owes
+for the period, with the currency from the general settings, for example
+20.00 EUR. It is text, so number formats such as `{amount:.2f}` are
+rejected.
 
 The balance reminder template only fills in subject and text of the form
 under "Members → List → Balances"; both can be changed there for each run.
