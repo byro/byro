@@ -605,6 +605,12 @@ def test_leave_mail_is_addressed_to_the_leaving_member(
     assert not office.members.exists()
 
 
+def book_fees(*members):
+    """Book the membership fees due so far, so that the members owe money."""
+    for member in members:
+        member.update_liabilites()
+
+
 @pytest.mark.django_db
 def test_balance_reminders_are_addressed_to_their_members(
     member, membership, logged_in_client, configuration
@@ -618,6 +624,7 @@ def test_balance_reminders_are_addressed_to_their_members(
         amount=20,
         interval=FeeIntervals.MONTHLY,
     )
+    book_fees(member, same_address)
 
     response = logged_in_client.post(
         reverse("office:members.balance"),
@@ -658,7 +665,8 @@ def test_balance_form_suggests_the_reminder_template_in_the_configured_language(
 
     assert subject == "Offene Mitgliedsbeiträge"
     assert text.startswith("Hallo {name},")
-    assert "{start}" in text and "{end}" in text and "{amount}" in text
+    assert "{start}" in text and "{end}" in text
+    assert "    {amount}\n" in text and "EUR" not in text
 
 
 @pytest.mark.django_db
@@ -697,6 +705,7 @@ def test_balance_reminders_use_the_text_of_the_run_and_the_template_settings(
     template.reply_to = "treasurer@example.org"
     template.bcc = "archive@example.org"
     template.save()
+    book_fees(member)
 
     response = logged_in_client.post(
         reverse("office:members.balance"),
@@ -712,7 +721,9 @@ def test_balance_reminders_use_the_text_of_the_run_and_the_template_settings(
     assert response.status_code == 302, response.content.decode()
     reminder = EMail.objects.get(balance__isnull=False)
     assert reminder.subject == "Changed for this run"
-    assert reminder.text == (f"Hello {member.name}, you owe {reminder.balance.amount}")
+    assert reminder.text == (
+        f"Hello {member.name}, you owe {-reminder.balance.amount:.2f} EUR"
+    )
     assert reminder.template == template
     assert reminder.reply_to == "treasurer@example.org"
     assert reminder.bcc == "archive@example.org"
@@ -732,7 +743,91 @@ def balance_run_data(text):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "text", ["Hello {nmae}", "Hello {", "Hello }", "Hello {}", "You owe {amount:d}"]
+    "postfix,expected", [(True, "{amount} CHF"), (False, "CHF {amount}")]
+)
+def test_balance_reminder_shows_the_outstanding_amount_in_the_configured_currency(
+    member, membership, logged_in_client, configuration, postfix, expected
+):
+    configuration.currency = "CHF"
+    configuration.currency_postfix = postfix
+    configuration.save()
+    book_fees(member)
+    text = balance_form_initial(logged_in_client)[1]
+
+    response = logged_in_client.post(
+        reverse("office:members.balance"), balance_run_data(text)
+    )
+
+    assert response.status_code == 302, response.content.decode()
+    reminder = EMail.objects.get(balance__isnull=False)
+    outstanding = -reminder.balance.amount
+    assert outstanding > 0
+    assert f"\n   {expected.format(amount=f'{outstanding:.2f}')}\n" in reminder.text
+    assert "EUR" not in reminder.text
+    # balances protect their member, which the member fixture deletes
+    MemberBalance.objects.all().delete()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_balance_reminder_shows_the_dates_without_a_time(
+    member, membership, logged_in_client, configuration, language
+):
+    configuration.language = language
+    configuration.save()
+    book_fees(member)
+    data = balance_run_data(balance_form_initial(logged_in_client)[1])
+
+    logged_in_client.post(reverse("office:members.balance"), data)
+
+    reminder = EMail.objects.get(balance__isnull=False)
+    assert f" {data['start']}\n" in reminder.text
+    assert f" {data['end']} " in reminder.text
+    assert "00:00" not in reminder.text and "23:59" not in reminder.text
+    # balances protect their member, which the member fixture deletes
+    MemberBalance.objects.all().delete()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("cutoff", ["", "0"])
+def test_balance_run_reminds_only_members_with_a_deficit(
+    member, membership, logged_in_client, configuration, cutoff
+):
+    without_fees = Member.objects.create(email="free@example.org", number="2")
+    Membership.objects.create(
+        member=without_fees,
+        start=membership.start,
+        amount=0,
+        interval=FeeIntervals.MONTHLY,
+    )
+    book_fees(member, without_fees)
+    data = {**balance_run_data("Hello {name}"), "balance_cutoff": cutoff}
+
+    response = logged_in_client.post(reverse("office:members.balance"), data)
+
+    assert response.status_code == 302, response.content.decode()
+    assert MemberBalance.objects.filter(member=without_fees, amount=0).exists()
+    assert list(
+        EMail.objects.filter(balance__isnull=False).values_list(
+            "balance__member", flat=True
+        )
+    ) == [member.pk]
+    # balances protect their member, which the member fixture deletes
+    MemberBalance.objects.all().delete()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Hello {nmae}",
+        "Hello {",
+        "Hello }",
+        "Hello {}",
+        "You owe {amount:d}",
+        # the amount is a text with the currency, not a number
+        "You owe {amount:.2f}",
+    ],
 )
 def test_balance_run_with_an_invalid_reminder_text_creates_nothing(
     member, membership, logged_in_client, configuration, text
@@ -782,16 +877,16 @@ def test_balance_run_explains_invalid_placeholders_in_the_office_language(
 def test_balance_reminder_text_accepts_format_specs(
     member, membership, logged_in_client, configuration
 ):
-    data = balance_run_data("{start:%d.%m.%Y} to {end:%d.%m.%Y}: {amount:.2f}")
+    book_fees(member)
+    data = balance_run_data("{start:%d.%m.%Y} to {end:%d.%m.%Y}: {amount:>12}")
 
     response = logged_in_client.post(reverse("office:members.balance"), data)
 
     assert response.status_code == 302, response.content.decode()
     reminder = EMail.objects.get(balance__isnull=False)
-    balance = reminder.balance
-    assert reminder.text == (
-        f"{balance.start:%d.%m.%Y} to {balance.end:%d.%m.%Y}: {balance.amount:.2f}"
-    )
+    start, end = (now() - relativedelta(months=2)), (now() - relativedelta(days=1))
+    amount = f"{-reminder.balance.amount:.2f} EUR"
+    assert reminder.text == f"{start:%d.%m.%Y} to {end:%d.%m.%Y}: {amount:>12}"
     # balances protect their member, which the member fixture deletes
     MemberBalance.objects.all().delete()
 
@@ -803,6 +898,7 @@ def test_balance_run_rolls_back_when_a_reminder_text_fails_for_a_member(
     # Passes the check with a sample name, fails for a member without a name.
     member.name = ""
     member.save()
+    book_fees(member)
 
     response = logged_in_client.post(
         reverse("office:members.balance"), balance_run_data("Dear {name[0]}")
@@ -825,6 +921,7 @@ def test_balance_run_rolls_back_when_it_is_aborted(
         amount=20,
         interval=FeeIntervals.MONTHLY,
     )
+    book_fees(member, second)
     save = EMail.save
     calls = []
 
@@ -857,6 +954,7 @@ def test_balance_run_continues_after_a_database_error_for_one_member(
         amount=20,
         interval=FeeIntervals.MONTHLY,
     )
+    book_fees(member, second)
     create_balance = Member.create_balance
 
     def failing_for_second(self, *args, **kwargs):

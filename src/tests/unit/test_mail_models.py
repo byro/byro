@@ -86,7 +86,8 @@ def test_unsaved_template_creates_a_mail_without_template(configuration):
 
 
 # Behaviour preservation: the runtime defaults keep the texts these mails had
-# before they became templates.
+# before they became templates. Only the balance reminder no longer names a
+# currency, the amount brings the configured one.
 @pytest.mark.parametrize(
     "value,expected",
     (
@@ -98,7 +99,7 @@ def test_unsaved_template_creates_a_mail_without_template(configuration):
 we wanted to let you know that within the time from {start}
 to {end} you incurred unpaid liabilities in the amount of
 
-   EUR {amount}
+   {amount}
 
 Please settle this amount as soon as possible, or let us
 know if you think this email is incorrect.""",

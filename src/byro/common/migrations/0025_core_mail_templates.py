@@ -12,8 +12,8 @@ TEMPLATES = {
             "pt-br": "Outstanding membership fees",
         },
         "text": {
-            "en": "Hello {name},\n\nwe wanted to let you know that within the time from {start}\nto {end} you incurred unpaid liabilities in the amount of\n\n   EUR {amount}\n\nPlease settle this amount as soon as possible, or let us\nknow if you think this email is incorrect.",
-            "de": "Hallo {name},\n\nwir wollten Dich wissen lassen, dass Du in der Zeit von {start}\nbis {end} versäumt hast, Mitgliedsbeiträge in Höhe von\n\n    EUR {amount}\n\nzu zahlen. Bitte hole dies so bald wie möglich nach, oder lass\nuns wissen, wenn diese Erinnerung irrtümlich versandt wurde.",
+            "en": "Hello {name},\n\nwe wanted to let you know that within the time from {start}\nto {end} you incurred unpaid liabilities in the amount of\n\n   {amount}\n\nPlease settle this amount as soon as possible, or let us\nknow if you think this email is incorrect.",
+            "de": "Hallo {name},\n\nwir wollten Dich wissen lassen, dass Du in der Zeit von {start}\nbis {end} versäumt hast, Mitgliedsbeiträge in Höhe von\n\n    {amount}\n\nzu zahlen. Bitte hole dies so bald wie möglich nach, oder lass\nuns wissen, wenn diese Erinnerung irrtümlich versandt wurde.",
             "pt-br": "Olá {name},\n\ngostaríamos de informar que dentro de {start}\npara {end} você incorreu em responsabilidades não pagas no valor de\n\n   {amount}\n\nPor favor, liquide este valor o mais rápido possível, ou deixe-nos\nsaber se você acha que este e-mail está incorreto.",
         },
     },
