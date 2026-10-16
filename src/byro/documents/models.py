@@ -80,14 +80,14 @@ class Document(models.Model, LogTargetMixin):
     )
     content_hash = models.CharField(max_length=300, null=True)
 
-    template = _("""
-Hi, {name},
+    # Legacy compatibility attribute, kept for plugins that read it. send()
+    # uses the configured document delivery mail template instead.
+    template = _("""Hi, {name},
 
 Please find attached a document we wanted to send you/that you requested.
 
 Thank you,
-{association}
-""").strip()
+{association}""").strip()
 
     def _get_log_properties(self):
         return {
@@ -176,23 +176,39 @@ Thank you,
         return retval
 
     def send(self, immediately=False, text=None, subject=None, email=None):
-        from byro.common.models import Configuration
-        from byro.mails.models import EMail
+        """Place a mail with this document attached in the outbox.
 
-        us = Configuration.get_solo().name
-        fields = {
-            "text": text
-            or self.template.format(
-                name=self.member.name if self.member else email, association=us
-            ),
-            "subject": _("[{association}] Your document").format(association=us),
+        Subject and text come from the document delivery mail template. An
+        explicit ``text`` or ``subject`` is used as given instead. A document
+        without a member needs an explicit ``email``.
+        """
+        from byro.common.models import Configuration
+        from byro.mails import default
+        from byro.mails.models import MailTemplate
+
+        if not email and self.member is None:
+            raise ValueError(
+                "A document without a member can only be sent to an explicit address."
+            )
+        config = Configuration.get_solo()
+        template = config.document_delivery_template or MailTemplate(
+            subject=default.DOCUMENT_DELIVERY_SUBJECT,
+            text=default.DOCUMENT_DELIVERY_TEXT,
+        )
+        context = {
+            "name": self.member.name if self.member else email,
+            "association": config.name,
         }
         # An explicit address is a plain address. Without one, the document
         # goes to its member, who stays the recipient of the mail.
-        if email:
-            mail = EMail(to=email, **fields)
-        else:
-            mail = EMail.for_member(self.member, **fields)
+        recipient = {"email": email} if email else {"member": self.member}
+        mail = template.to_mail(
+            context=context,
+            save=False,
+            subject=subject or None,
+            text=text or None,
+            **recipient,
+        )
         mail.save()
         mail.attachments.add(self)
         mail.save()

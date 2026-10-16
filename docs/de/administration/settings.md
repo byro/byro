@@ -56,9 +56,11 @@ Die Vereinskonfiguration selbst umfasst:
   Ersteinrichtung, hier änderbar),
 - **Standard-Sortierreihenfolge** und **Standard-Anredeform** für Mitglieder
   (Vor- oder Nachname zuerst), mit einer Aktion, um sie nachträglich auf alle
-  bestehenden Mitglieder anzuwenden,
-- **Standard-Mailvorlagen** für Willkommens- und Austrittsmails (an Mitglied
-  und Office) sowie für die Offenlegung von Datensätzen.
+  bestehenden Mitglieder anzuwenden.
+
+Die Mailvorlagen für die Mails, die byro selbst erzeugt, wählst du hier
+nicht aus; byro ordnet sie selbst zu (siehe
+[Vorlagen](../usage/mails.md#vorlagen)).
 
 Jede gespeicherte Änderung wird mit den geänderten Feldern (vorher/nachher)
 im Audit-Log festgehalten (siehe unten); Formulare können einzelne Felder

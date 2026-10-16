@@ -400,27 +400,25 @@ msgstr "Documento diverso"
 msgid "Registration form"
 msgstr "Formulário de registro"
 
-#: byro/documents/models.py:49
+#: byro/documents/models.py:85 byro/mails/default.py:77
 #, python-brace-format
 msgid ""
-"\n"
 "Hi, {name},\n"
 "\n"
 "Please find attached a document we wanted to send you/that you requested.\n"
 "\n"
 "Thank you,\n"
-"{association}\n"
+"{association}"
 msgstr ""
-"\n"
 "Olá, {name},\n"
 "\n"
 "Em anexo encontra-se um documento que queríamos lhe enviar/que você "
 "solicitou.\n"
 "\n"
 "Obrigado,\n"
-"{association}\n"
+"{association}"
 
-#: byro/documents/models.py:113
+#: byro/mails/default.py:75
 #, python-brace-format
 msgid "[{association}] Your document"
 msgstr "[{association}] Seu documento"
@@ -1893,7 +1891,7 @@ msgstr "corte de saldo"
 msgid "Only members with a deficit greater than this will receive an email."
 msgstr "Apenas os membros com um défice superior a este receberão um e-mail."
 
-#: byro/office/views/members.py:167
+#: byro/mails/default.py:65
 #, python-brace-format
 msgid ""
 "Hello {name},\n"

@@ -52,9 +52,10 @@ The association configuration itself covers:
   setup, changeable here),
 - **Default sort order** and **default form of address** for members (first
   or last name part first), with an action to apply them retroactively to
-  every existing member,
-- **Default mail templates** for welcome and leave mail (to the member and
-  to the office) and for record disclosure.
+  every existing member.
+
+The mail templates byro uses for the mails it generates are not chosen here;
+byro assigns them itself (see [Templates](../usage/mails.md#templates)).
 
 Every saved change is recorded in the audit log with the changed fields
 (before/after) (see below); forms can exclude individual fields (for example

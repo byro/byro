@@ -11,7 +11,11 @@ Zutun verschickt.
   [Ein-/Austritt](members.md#ein-austritt)), Datenoffenlegungen (einzeln oder
   als Massenaktion, siehe [Mitglieder](members.md#datenoffenlegung)),
   Erinnerungsmails beim Beitragsabgleich (siehe
-  [Massenaktionen](members.md#massenaktionen)).
+  [Massenaktionen](members.md#massenaktionen)), Erinnerungen vor dem Ablauf
+  des PGP-Schlüssels eines Mitglieds (siehe
+  [PGP](../administration/pgp.md#automatisches-auffrischen)) und Dokumente,
+  die ein Plugin verschickt (siehe
+  [Dokumente](documents.md#als-mailanhang-versenden)).
 * **Von Hand verfasst**: „Mails → Verfassen" (siehe unten).
 
 ## Vorlagen
@@ -20,9 +24,31 @@ Zutun verschickt.
 abweichende Reply-To-Adresse, BCC-Adressen). Text und Betreff werden nur in
 der konfigurierten Sprache der Organisation gepflegt (siehe
 [Einstellungen](../administration/settings.md#allgemein)), nicht mehrsprachig
-je Empfänger. Welche Vorlagen an welcher Stelle automatisch verwendet werden
-(Willkommen, Austritt, Offenlegung), legst du unter
-[Einstellungen → Allgemein](../administration/settings.md#allgemein) fest.
+je Empfänger.
+
+byro legt für jede Mail, die es selbst erzeugt, eine Vorlage an:
+Willkommensmail an Mitglied und Office, Austrittsmail an Mitglied und
+Office, Offenlegung von Datensätzen, Saldo-Erinnerung, Dokumentversand und
+Erinnerung vor Ablauf des PGP-Schlüssels. Welche Vorlage für welche Mail
+verwendet wird, ist fest vorgegeben und lässt sich in der Oberfläche nicht
+auswählen. Um den Wortlaut einer solchen Mail zu ändern, bearbeitest du ihre
+Vorlage; die Liste zeigt die Vorlagen mit ihrem Betreff.
+
+Text und Betreff können Variablen in geschweiften Klammern enthalten:
+
+| Vorlage | Variablen |
+| --- | --- |
+| Saldo-Erinnerung | `{name}`, `{start}`, `{end}`, `{amount}`, nur im Text |
+| Dokumentversand | `{name}` (das Mitglied, bei einem Dokument ohne Mitglied die Adresse), `{association}` |
+| Ablauf des PGP-Schlüssels | `{name}`, `{date}` (Ablaufdatum) |
+
+Die Vorlage der Saldo-Erinnerung füllt nur Betreff und Text des Formulars
+unter „Mitglieder → Liste → Salden" vor; beides lässt sich dort für jeden
+Lauf ändern. Verschickt ein Plugin ein Dokument mit eigenem Betreff oder
+Text, ersetzt es damit Betreff oder Text der Vorlage. Verwendet die Vorlage
+der Ablauferinnerung eine unbekannte Variable, legt byro für die
+betroffenen Schlüssel keine Erinnerung an und versucht es beim nächsten
+periodischen Lauf erneut.
 
 !!! note
     Es gibt keine Funktion, eine Vorlage zu löschen; ein entsprechender Link

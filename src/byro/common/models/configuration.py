@@ -172,6 +172,27 @@ class Configuration(ByroConfiguration):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    balance_reminder_template = models.ForeignKey(
+        to="mails.MailTemplate",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    document_delivery_template = models.ForeignKey(
+        to="mails.MailTemplate",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    pgp_expiry_reminder_template = models.ForeignKey(
+        to="mails.MailTemplate",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
 
     form_title = _("General settings")
 

@@ -23,6 +23,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import override
 from django.views.generic import DetailView, FormView, ListView, TemplateView, View
 from django.views.generic.list import (
     MultipleObjectMixin,
@@ -32,8 +33,9 @@ from django.views.generic.list import (
 from byro.bookkeeping.models import Booking
 from byro.bookkeeping.special_accounts import SpecialAccounts
 from byro.common.models import Configuration, LogEntry
+from byro.mails import default
 from byro.mails.forms import MemberPGPFingerprintForm, MemberPGPKeyUploadForm
-from byro.mails.models import EMail, MemberPGPKey, PGPKeySource
+from byro.mails.models import EMail, MailTemplate, MemberPGPKey, PGPKeySource
 from byro.mails.pgp import import_member_key, normalize_fingerprint
 from byro.mails.registration import PGP_REGISTRATION_FIELD
 from byro.members.forms import CreateMemberForm
@@ -190,6 +192,12 @@ class MemberDisclosureView(MemberListMixin, TemplateView):
         return redirect("/members/list")
 
 
+def get_balance_reminder_template(config):
+    return config.balance_reminder_template or MailTemplate(
+        subject=default.BALANCE_REMINDER_SUBJECT, text=default.BALANCE_REMINDER_TEXT
+    )
+
+
 class MemberBalanceForm(forms.Form):
     start = forms.DateField(label=_("Start of balance timeframe"))
     end = forms.DateField(label=_("End of balance timeframe"))
@@ -207,25 +215,21 @@ class MemberBalanceForm(forms.Form):
         min_value=0,
     )
     subject = forms.CharField(label=_("Subject"))
-    text = forms.CharField(
-        label=_("Text"),
-        initial=_("""Hello {name},
-
-we wanted to let you know that within the time from {start}
-to {end} you incurred unpaid liabilities in the amount of
-
-   EUR {amount}
-
-Please settle this amount as soon as possible, or let us
-know if you think this email is incorrect."""),
-        widget=forms.Textarea,
-    )
+    text = forms.CharField(label=_("Text"), widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["start"].widget.attrs["class"] = " datepicker"
         self.fields["end"].widget.attrs["class"] = " datepicker"
         # TODO: set start/end
+        # The reminder template only suggests subject and text, both can be
+        # changed for every run. They are shown in the language the template
+        # is edited and rendered in.
+        config = Configuration.get_solo()
+        template = get_balance_reminder_template(config)
+        with override(config.language):
+            self.fields["subject"].initial = str(template.subject)
+            self.fields["text"].initial = str(template.text)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -253,6 +257,7 @@ class MemberBalanceView(MemberListMixin, FormView):
         balance_cutoff = form.cleaned_data.get("balance_cutoff")
         text = form.cleaned_data.get("text")
         subject = form.cleaned_data.get("subject")
+        template = get_balance_reminder_template(Configuration.get_solo())
         for member in members:
             balance = None
             try:
@@ -270,6 +275,9 @@ class MemberBalanceView(MemberListMixin, FormView):
                         name=member.name, start=start, end=end, amount=balance.amount
                     ),
                     subject=subject,
+                    reply_to=template.reply_to,
+                    bcc=template.bcc,
+                    template=template if template.pk else None,
                 ).save()
                 mails += 1
         message = str(

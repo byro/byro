@@ -20,6 +20,7 @@ from byro.common.models import LogEntry
 from byro.mails.gnupg_backend import GnuPGBackend, PreparedPGPEmail
 from byro.mails.models import (
     EMail,
+    MailTemplate,
     MemberPGPKey,
     PGPConfiguration,
     PGPKeySource,
@@ -1291,6 +1292,127 @@ def test_pgp_expiry_reminder_is_created_as_outbox_draft(member):
     assert reminder.get_member_recipients() == [member]
     key.refresh_from_db()
     assert key.last_reminder_at is not None
+
+
+def expiring_key(member, fingerprint=VALID_FINGERPRINT, days=10):
+    return MemberPGPKey.objects.create(
+        member=member,
+        fingerprint=fingerprint,
+        public_key="public key",
+        status=PGPKeyStatus.VALID,
+        expires_at=timezone.now() + timedelta(days=days),
+    )
+
+
+@pytest.mark.django_db
+def test_pgp_expiry_reminder_uses_the_default_template(configuration, member):
+    key = expiring_key(member)
+
+    send_pgp_expiry_reminders(sender="test")
+
+    reminder = member.emails.get()
+    assert reminder.template == configuration.pgp_expiry_reminder_template
+    assert reminder.subject == "Your PGP key expires soon"
+    assert reminder.text == (
+        f"Hello {member.name},\n\n"
+        f"the PGP key stored for your membership expires on {key.expires_at.date()}. "
+        "Please send us an updated public key before it expires.\n"
+    )
+
+
+@pytest.mark.django_db
+def test_pgp_expiry_reminder_uses_an_edited_template(configuration, member):
+    key = expiring_key(member)
+    template = configuration.pgp_expiry_reminder_template
+    template.subject = "Key of {name}"
+    template.text = "Valid until {date}"
+    template.save()
+
+    send_pgp_expiry_reminders(sender="test")
+
+    reminder = member.emails.get()
+    assert reminder.subject == f"Key of {member.name}"
+    assert reminder.text == f"Valid until {key.expires_at.date()}"
+
+
+@pytest.mark.django_db
+def test_pgp_expiry_reminder_skips_members_without_address(configuration):
+    member = Member.objects.create(email="", number="3", name="No Address")
+    key = expiring_key(member)
+
+    send_pgp_expiry_reminders(sender="test")
+
+    assert not member.emails.exists()
+    key.refresh_from_db()
+    assert key.last_reminder_at is None
+    member.delete()
+
+
+@pytest.mark.django_db
+def test_pgp_expiry_reminder_with_a_broken_template_reminds_nobody_and_goes_on(
+    configuration, member
+):
+    other = Member.objects.create(email="other@example.org", number="2", name="Other")
+    broken_key = expiring_key(member)
+    other_key = expiring_key(other, fingerprint="1" * 40)
+    template = configuration.pgp_expiry_reminder_template
+    template.text = "Hello {nmae}"
+    template.save()
+
+    send_pgp_expiry_reminders(sender="test")
+
+    assert not EMail.objects.exists()
+    broken_key.refresh_from_db()
+    other_key.refresh_from_db()
+    assert broken_key.last_reminder_at is None
+    assert other_key.last_reminder_at is None
+
+    # once the template is fixed, both keys are reminded on the next run
+    template.text = "Hello {name}"
+    template.save()
+    send_pgp_expiry_reminders(sender="test")
+
+    assert member.emails.get().text == f"Hello {member.name}"
+    assert other.emails.get().text == "Hello Other"
+    other.delete()
+
+
+@pytest.mark.django_db
+def test_pgp_expiry_reminder_goes_on_after_a_key_that_failed(configuration, member):
+    other = Member.objects.create(email="other@example.org", number="2", name="Other")
+    keys = [expiring_key(member), expiring_key(other, fingerprint="1" * 40)]
+    to_mail = MailTemplate.to_mail
+    calls = []
+
+    def fail_once(self, *args, **kwargs):
+        calls.append(kwargs["member"])
+        if len(calls) == 1:
+            raise SendMailException("broken")
+        return to_mail(self, *args, **kwargs)
+
+    with patch.object(MailTemplate, "to_mail", fail_once):
+        send_pgp_expiry_reminders(sender="test")
+
+    failed, reminded = calls
+    assert list(EMail.objects.all()) == list(reminded.emails.all())
+    assert reminded.emails.count() == 1
+    for key in keys:
+        key.refresh_from_db()
+        assert (key.last_reminder_at is not None) is (key.member == reminded)
+    other.delete()
+
+
+@pytest.mark.django_db
+def test_pgp_expiry_reminder_without_template_uses_the_default(configuration, member):
+    configuration.pgp_expiry_reminder_template = None
+    configuration.save()
+    expiring_key(member)
+
+    send_pgp_expiry_reminders(sender="test")
+
+    reminder = member.emails.get()
+    assert reminder.template is None
+    assert reminder.subject == "Your PGP key expires soon"
 
 
 @pytest.mark.django_db

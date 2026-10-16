@@ -165,8 +165,10 @@ wird.
 * **Salden generieren** (`Mitglieder → Liste → Salden`): erzeugt für alle
   Mitglieder mit aktiver Mitgliedschaft einen Saldo über einen gewählten
   Zeitraum und legt optional Erinnerungsmails für Mitglieder mit einem Saldo
-  unter einem einstellbaren Schwellwert in den Postausgang. Läuft
-  synchron beim Absenden des Formulars.
+  unter einem einstellbaren Schwellwert in den Postausgang. Betreff und
+  Text der Erinnerung kommen aus der Vorlage der Saldo-Erinnerung und
+  lassen sich für jeden Lauf ändern (siehe [Vorlagen](mails.md#vorlagen)).
+  Läuft synchron beim Absenden des Formulars.
 * **Datenoffenlegung für alle** (`Mitglieder → Liste → Offenlegung`): erzeugt
   für **alle aktuell gefilterten** Mitglieder eine Auskunftsmail im
   Postausgang – prüfe vorher den gesetzten Filter.

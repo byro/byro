@@ -155,8 +155,10 @@ import aborts with an error before anything is written.
 * **Generate balances** (`Members → List → Balances`): creates a balance
   over a chosen time range for every member with an active membership, and
   optionally places reminder mails in the outbox for members below a
-  configurable balance threshold. Runs synchronously when the form is
-  submitted.
+  configurable balance threshold. Subject and text of the reminder are
+  filled in from the balance reminder template and can be changed for each
+  run (see [Templates](mails.md#templates)). Runs synchronously when the
+  form is submitted.
 * **Disclosure for all** (`Members → List → Disclosure`): generates a
   disclosure mail in the outbox for **every currently filtered** member -
   check the active filter first.

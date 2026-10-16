@@ -642,6 +642,84 @@ def test_balance_reminders_are_addressed_to_their_members(
     MemberBalance.objects.all().delete()
 
 
+def balance_form_initial(client):
+    form = client.get(reverse("office:members.balance")).context["form"]
+    return form["subject"].initial, form["text"].initial
+
+
+@pytest.mark.django_db
+def test_balance_form_suggests_the_reminder_template_in_the_configured_language(
+    logged_in_client, configuration
+):
+    configuration.language = "de"
+    configuration.save()
+
+    subject, text = balance_form_initial(logged_in_client)
+
+    assert subject == "Offene Mitgliedsbeiträge"
+    assert text.startswith("Hallo {name},")
+    assert "{start}" in text and "{end}" in text and "{amount}" in text
+
+
+@pytest.mark.django_db
+def test_balance_form_suggests_an_edited_reminder_template(
+    logged_in_client, configuration
+):
+    template = configuration.balance_reminder_template
+    template.subject = "Please pay"
+    template.text = "Dear {name}, please pay {amount}."
+    template.save()
+
+    assert balance_form_initial(logged_in_client) == (
+        "Please pay",
+        "Dear {name}, please pay {amount}.",
+    )
+
+
+@pytest.mark.django_db
+def test_balance_form_without_reminder_template_suggests_the_default(
+    logged_in_client, configuration
+):
+    configuration.balance_reminder_template = None
+    configuration.save()
+
+    subject, text = balance_form_initial(logged_in_client)
+
+    assert subject == "Outstanding membership fees"
+    assert text.startswith("Hello {name},")
+
+
+@pytest.mark.django_db
+def test_balance_reminders_use_the_text_of_the_run_and_the_template_settings(
+    member, membership, logged_in_client, configuration
+):
+    template = configuration.balance_reminder_template
+    template.reply_to = "treasurer@example.org"
+    template.bcc = "archive@example.org"
+    template.save()
+
+    response = logged_in_client.post(
+        reverse("office:members.balance"),
+        {
+            "start": str((now() - relativedelta(months=2)).date()),
+            "end": str((now() - relativedelta(days=1)).date()),
+            "create_if_zero": "on",
+            "subject": "Changed for this run",
+            "text": "Hello {name}, you owe {amount}",
+        },
+    )
+
+    assert response.status_code == 302, response.content.decode()
+    reminder = EMail.objects.get(balance__isnull=False)
+    assert reminder.subject == "Changed for this run"
+    assert reminder.text == (f"Hello {member.name}, you owe {reminder.balance.amount}")
+    assert reminder.template == template
+    assert reminder.reply_to == "treasurer@example.org"
+    assert reminder.bcc == "archive@example.org"
+    # balances protect their member, which the member fixture deletes
+    MemberBalance.objects.all().delete()
+
+
 @pytest.mark.django_db
 def test_data_disclosure_mails_are_addressed_to_their_members(
     member, membership, logged_in_client, configuration

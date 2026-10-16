@@ -1,6 +1,7 @@
 import pytest
 
-from byro.mails.models import EMail
+from byro.mails import default
+from byro.mails.models import EMail, MailTemplate
 from byro.mails.send import SendMailException
 
 
@@ -25,6 +26,104 @@ def test_template_to_mail_fail(mail_template):
     with pytest.raises(SendMailException):
         mail_template.to_mail("test@localhost")
     assert EMail.objects.count() == count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("text", ("{", "{0}", "{name.missing}", "{name:%Y}"))
+def test_template_to_mail_fails_for_every_formatting_error(mail_template, text):
+    mail_template.text = text
+    count = EMail.objects.count()
+    with pytest.raises(SendMailException):
+        mail_template.to_mail("test@localhost", context={"name": "Jona"})
+    assert EMail.objects.count() == count
+
+
+@pytest.mark.django_db
+def test_template_to_mail_uses_an_explicit_subject_without_rendering_the_template(
+    mail_template,
+):
+    mail_template.subject = "{incorrect_key}"
+    mail_template.text = "Hello {name}"
+    mail_template.save()
+
+    mail = mail_template.to_mail(
+        "test@localhost", context={"name": "Jona"}, subject="Explicit {subject}"
+    )
+
+    mail.refresh_from_db()
+    assert mail.subject == "Explicit {subject}"
+    assert mail.text == "Hello Jona"
+    assert mail.template == mail_template
+
+
+@pytest.mark.django_db
+def test_template_to_mail_uses_an_explicit_text_without_rendering_the_template(
+    mail_template,
+):
+    mail_template.subject = "Hello {name}"
+    mail_template.text = "{incorrect_key}"
+    mail_template.save()
+
+    mail = mail_template.to_mail(
+        "test@localhost", context={"name": "Jona"}, text="Explicit {text}"
+    )
+
+    mail.refresh_from_db()
+    assert mail.subject == "Hello Jona"
+    assert mail.text == "Explicit {text}"
+
+
+@pytest.mark.django_db
+def test_unsaved_template_creates_a_mail_without_template(configuration):
+    template = MailTemplate(subject="Hello {name}", text="Text for {name}")
+
+    mail = template.to_mail("test@localhost", context={"name": "Jona"})
+
+    mail.refresh_from_db()
+    assert mail.template is None
+    assert mail.subject == "Hello Jona"
+    assert mail.text == "Text for Jona"
+
+
+# Behaviour preservation: the runtime defaults keep the texts these mails had
+# before they became templates.
+@pytest.mark.parametrize(
+    "value,expected",
+    (
+        (default.BALANCE_REMINDER_SUBJECT, "Outstanding membership fees"),
+        (
+            default.BALANCE_REMINDER_TEXT,
+            """Hello {name},
+
+we wanted to let you know that within the time from {start}
+to {end} you incurred unpaid liabilities in the amount of
+
+   EUR {amount}
+
+Please settle this amount as soon as possible, or let us
+know if you think this email is incorrect.""",
+        ),
+        (default.DOCUMENT_DELIVERY_SUBJECT, "[{association}] Your document"),
+        (
+            default.DOCUMENT_DELIVERY_TEXT,
+            """Hi, {name},
+
+Please find attached a document we wanted to send you/that you requested.
+
+Thank you,
+{association}""",
+        ),
+        (default.PGP_EXPIRY_REMINDER_SUBJECT, "Your PGP key expires soon"),
+        (
+            default.PGP_EXPIRY_REMINDER_TEXT,
+            "Hello {name},\n\n"
+            "the PGP key stored for your membership expires on {date}. "
+            "Please send us an updated public key before it expires.\n",
+        ),
+    ),
+)
+def test_default_mail_texts_keep_their_english_wording(value, expected):
+    assert value.localize("en") == expected
 
 
 @pytest.mark.django_db
