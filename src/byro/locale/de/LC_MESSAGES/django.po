@@ -2511,6 +2511,15 @@ msgstr ""
 "%(available)s. Für geschweifte Klammern im Text schreibe %(open)s und "
 "%(close)s."
 
+#: byro/mails/placeholders.py
+#, python-format
+msgid ""
+"The text contains an invalid placeholder. Write %(open)s and %(close)s for "
+"literal curly braces."
+msgstr ""
+"Der Text enthält einen ungültigen Platzhalter. Für geschweifte Klammern im "
+"Text schreibe %(open)s und %(close)s."
+
 #: byro/office/views/members.py:199
 msgid "End must be in the past!"
 msgstr "Das Ende muss in der Vergangenheit liegen!"

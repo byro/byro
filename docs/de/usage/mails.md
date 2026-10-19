@@ -50,7 +50,11 @@ Text und Betreff können Variablen in geschweiften Klammern enthalten:
 | Dokumentversand | `{name}` (das Mitglied, bei einem Dokument ohne Mitglied die Adresse), `{association}` |
 | Ablauf des PGP-Schlüssels | `{name}`, `{date}` (Ablaufdatum) |
 
-Eine geschweifte Klammer im Text schreibst du als `{{` oder `}}`.
+Eine geschweifte Klammer im Text schreibst du als `{{` oder `}}`. Beim
+Speichern einer Vorlage prüft byro die Platzhalter für jede Mail, für die die
+Vorlage verwendet wird, und zeigt bei einem unbekannten Platzhalter oder einer
+ungültigen geschweiften Klammer einen Fehler. Eine Vorlage, die byro nicht
+selbst verwendet, wird nur auf ungültige geschweifte Klammern geprüft.
 
 In der Saldo-Erinnerung sind `{start}` und `{end}` Datumsangaben wie
 2026-08-01. Ein anderes Format lässt sich nach einem Doppelpunkt angeben,
