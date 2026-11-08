@@ -272,7 +272,7 @@ jobs:
       - name: 🔎 plugin catalog is well-formed
         run: .github/scripts/check-plugin-catalog.sh
       - name: 🏗 Install bats
-        uses: bats-core/bats-action@4.0.0
+        uses: bats-core/bats-action@4.1.0
         with:
           support-install: false
           assert-install: false
