@@ -18,7 +18,7 @@ markdown==3.11.1
 markupsafe==3.0.4
 mergedeep==1.3.4
 mkdocs==1.6.1
-mkdocs-autorefs==1.4.4
+mkdocs-autorefs==1.4.5
 mkdocs-get-deps==0.2.2
 mkdocstrings==1.0.8
 mkdocstrings-python==2.0.9
