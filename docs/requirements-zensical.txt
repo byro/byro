@@ -21,7 +21,7 @@ mkdocs==1.6.1
 mkdocs-autorefs==1.4.4
 mkdocs-get-deps==0.2.2
 mkdocstrings==1.0.8
-mkdocstrings-python==2.0.9
+mkdocstrings-python==2.0.10
 packaging==26.3
 pathspec==1.1.1
 platformdirs==4.13.5
